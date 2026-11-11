@@ -147,6 +147,10 @@ def cpu_convention() -> dict:
     if values["mode"] == "timing":
         # T-P6-01: in a timing window cargo runs with -j 2 at BelowNormal, nothing more.
         jobs, priority = min(jobs, 2), "BelowNormal"
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        # The release runner has 4 vCPUs: leave one and keep the runner agent ahead of
+        # rustc, so its heartbeat to GitHub is never starved by the build.
+        jobs, priority = max(1, min(jobs, (os.cpu_count() or 2) - 1)), "BelowNormal"
     gate(priority in ("Normal", "BelowNormal"), f"unknown cargo_priority {priority!r} in {values['file']}")
     return {"mode": values["mode"], "jobs": jobs, "priority": priority, "file": values["file"]}
 
@@ -776,6 +780,31 @@ def print_scope(exe: Path, env: dict, args: tuple[str, ...] = ()) -> tuple[int, 
         raise GateError(f"--print-scope printed no JSON: {lines[0]!r}") from error
 
 
+def token_elevated() -> bool:
+    """The same test as shell/app/src/single_instance.rs elevated(): TokenElevation (class 20)
+    of this process. Children inherit the token, so this is what the shell under test sees."""
+    if os.name != "nt":
+        return False
+    advapi32 = ctypes.WinDLL("advapi32", use_last_error=True)
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+    kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+    advapi32.OpenProcessToken.argtypes = [wintypes.HANDLE, wintypes.DWORD, ctypes.POINTER(wintypes.HANDLE)]
+    advapi32.GetTokenInformation.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p,
+                                             wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
+    token = wintypes.HANDLE()
+    gate(bool(advapi32.OpenProcessToken(kernel32.GetCurrentProcess(), 0x0008, ctypes.byref(token))),
+         f"OpenProcessToken failed ({ctypes.get_last_error()})")
+    try:
+        elevation, returned = wintypes.DWORD(), wintypes.DWORD()
+        gate(bool(advapi32.GetTokenInformation(token, 20, ctypes.byref(elevation), ctypes.sizeof(elevation),
+                                                ctypes.byref(returned))),
+             f"GetTokenInformation(TokenElevation) failed ({ctypes.get_last_error()})")
+        return elevation.value != 0
+    finally:
+        kernel32.CloseHandle(token)
+
+
 def gate_print_scope(app: Path, contract: dict) -> dict:
     """T-P6-06 gate: the assembled Tesseract.exe decides the default scope correctly. Only
     `--print-scope` and `--version` run (no lock, no directory, no log, no process), and only under
@@ -801,8 +830,12 @@ def gate_print_scope(app: Path, contract: dict) -> dict:
         gate(default["names"] == asdict(names_for_scope("default", "default")), f"default names {default['names']} are not the legacy names")
         gate(default["sidecar"]["mode"] == "frozen" and same_path(default["sidecar"]["path"], sidecar)
              and default["sidecar"]["exists"] is True, f"default sidecar {default['sidecar']} is not {sidecar}")
-        gate(Path(default["webview2"]).resolve().is_relative_to((local / "Tesseract" / "WebView2").resolve()),
-             f"WebView2 folder {default['webview2']} is not under <data>\\WebView2 (plan §9.8)")
+        # An elevated shell keeps its own WebView2 profile (single_instance.rs profile()); the
+        # release runner builds elevated, so the expected folder follows this process's token.
+        profile = "WebView2-admin" if token_elevated() else "WebView2"
+        result["webview2_profile"] = profile
+        gate(Path(default["webview2"]).resolve().is_relative_to((local / "Tesseract" / profile).resolve()),
+             f"WebView2 folder {default['webview2']} is not under <data>\\{profile} (plan §9.8)")
         gate(not roaming.exists() and not local.exists(), "--print-scope created a directory")
         code, refused = print_scope(exe, env, ("--sidecar", str(sidecar)))
         result["default_with_sidecar"] = refused
@@ -1175,7 +1208,9 @@ def smoke(args) -> int:
     for name in ("Tesseract.exe", "tesseract-runtime.exe"):
         gate((app / name).is_file(), f"build first: missing {app / name}")
     runtime, shell = app / "tesseract-runtime.exe", app / "Tesseract.exe"
-    temp_root = Path(tempfile.mkdtemp(prefix="tesseract-p6-preview-"))
+    # resolve(): on the release runner TEMP is an 8.3 short path (RUNNER~1), which process_watch
+    # would compare unexpanded and so shorten WebView2's exit allowance.
+    temp_root = Path(tempfile.mkdtemp(prefix="tesseract-p6-preview-")).resolve()
     result: dict = {"label": args.label, "started_utc": utc(), "sandbox_root": str(temp_root), "runs": [],
                     "app": str(app),
                     "dist": json.loads((app.parent / "preview-build.json").read_text(encoding="utf-8"))

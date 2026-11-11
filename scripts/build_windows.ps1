@@ -1372,7 +1372,10 @@ if (-not $SkipInstaller) {
     # published binary (the crates registry, the repository, then anything else under the
     # profile; rustc applies the last matching remap). Separated by 0x1F, so spaces are safe.
     $SetupCargoHome = if ($env:CARGO_HOME) { $env:CARGO_HOME } else { Join-Path $env:USERPROFILE ".cargo" }
+    # CARGO_ENCODED_RUSTFLAGS replaces every config rustflags, so the static CRT is set
+    # here too: the setup window must start on a PC without the VC++ redistributable.
     $env:CARGO_ENCODED_RUSTFLAGS = @(
+        "-C", "target-feature=+crt-static",
         "--remap-path-prefix=$($env:USERPROFILE)=/home",
         "--remap-path-prefix=$((Resolve-RepoPath '.').TrimEnd('\'))=/src",
         "--remap-path-prefix=$SetupCargoHome=/cargo"
@@ -1386,6 +1389,15 @@ if (-not $SkipInstaller) {
         throw "The setup window still carries the build machine's profile path."
     }
     $SetupWindowExe = Resolve-RepoPath "shell\setup\target\release\tesseract-setup.exe"
+    # The published installer is this program: it must not need the VC++ runtime DLLs.
+    Invoke-Native "setup window static runtime check" $ReleasePython @(
+        "-B", "-c",
+        ("import sys; sys.path.insert(0, 'scripts'); import build_shell_preview as b; from pathlib import Path; " +
+         "f = b.pe_facts(Path(sys.argv[1])); " +
+         "bad = [d for d in f['imports'] + f['delay_imports'] if d.lower().startswith(('vcruntime', 'msvcp', 'concrt', 'api-ms-win-crt-'))]; " +
+         "sys.exit('setup window links the VC++ runtime dynamically: ' + ', '.join(bad)) if bad else print('setup window imports: ' + ', '.join(sorted(set(f['imports']))))"),
+        $SetupWindowExe
+    )
     if (-not (Test-Path -LiteralPath $SetupWindowExe -PathType Leaf) -or
         (Get-Item -LiteralPath $SetupWindowExe).Length -le (Get-Item -LiteralPath $SetupInnerPath).Length) {
         throw "The setup window was not built around the installer: $SetupWindowExe"

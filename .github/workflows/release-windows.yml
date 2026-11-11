@@ -498,7 +498,8 @@ jobs:
           $manifest = Get-Item -LiteralPath (Join-Path $releaseRoot "SHA256SUMS.txt")
           $payload = @($installer, $portable, $sbom, $metadataFile, $sources)
 
-          $packagedExe = Get-Item -LiteralPath "dist/Tesseract/Tesseract.exe"
+          # build_windows.ps1 assembles the release candidate in dist-release (never dist).
+          $packagedExe = Get-Item -LiteralPath "dist-release/Tesseract/Tesseract.exe"
           foreach ($unsignedArtifact in @($packagedExe, $installer)) {
             $authenticode = Get-AuthenticodeSignature -LiteralPath $unsignedArtifact.FullName
             if ($authenticode.Status -ne [System.Management.Automation.SignatureStatus]::NotSigned) {

@@ -1,5 +1,5 @@
 {
-  "description": "Microsoft Edge WebView2 Runtime Evergreen Bootstrapper. Embedded in the Shell-flavor installer with dontcopy, extracted to {tmp} and run only when WebView2 is missing; never installed into {app}. Not committed: fetch_webview2_bootstrapper.ps1 downloads it into cache/ and verifies sha256 and the Authenticode signer.",
+  "description": "Microsoft Edge WebView2 Runtime Evergreen Bootstrapper. Embedded in the Shell-flavor installer with dontcopy, extracted to {tmp} and run only when WebView2 is missing; never installed into {app}. The pinned copy is committed in cache/ (redistributable; Microsoft republishes the file behind the fwlink every few weeks, so a tagged build must not depend on the download); fetch_webview2_bootstrapper.ps1 verifies its sha256 and Authenticode signer and only downloads when cache/ has no copy.",
   "file_name": "MicrosoftEdgeWebview2Setup.exe",
   "source_url": "https://go.microsoft.com/fwlink/p/?LinkId=2124703",
   "sha256": "ca4c9016c70e2184c5e231662e0e98abf4826647180ef3faab32fcb1ca2ec15e",
