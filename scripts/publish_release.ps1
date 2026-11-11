@@ -118,6 +118,18 @@ function Invoke-Tool([string] $Exe, [string[]] $Arguments, [object] $InputText =
     }
 }
 
+# The publish job requires the new release to come out immutable (its files and
+# tag locked once published); that is a repository setting.
+function Enable-ImmutableReleases {
+    Write-Step "Immutable releases"
+    $put = Invoke-Tool "gh" @("api", "-X", "PUT", "repos/$Repository/immutable-releases")
+    $check = Invoke-Tool "gh" @("api", "repos/$Repository/immutable-releases", "--jq", ".enabled|tostring")
+    if ($check.Code -ne 0 -or $check.Out -ne "true") {
+        Stop-Publish "Turning on immutable releases for $Repository failed: $($put.Err) $($check.Err)"
+    }
+    Write-Ok "immutable releases are on for $Repository"
+}
+
 function Confirm-Yes([string] $Question) {
     $answer = Read-Host "$Question [y/N]"
     return ($answer -match '^(y|yes)$')
@@ -332,6 +344,19 @@ elseif (Test-Path -LiteralPath (Join-Path $PublicDir ".git")) {
 }
 else { Write-Ok "tag $tag is unused" }
 
+$enableImmutable = $false
+if ($resumeMode -ne "verify") {
+    $immutable = if ($createRepo) { $null } else { Invoke-Tool "gh" @("api", "repos/$Repository/immutable-releases", "--jq", ".enabled|tostring") }
+    if ($null -ne $immutable -and $immutable.Code -eq 0 -and $immutable.Out -eq "true") { Write-Ok "immutable releases are on" }
+    elseif ($null -ne $immutable -and $immutable.Code -ne 0 -and $immutable.Err -notmatch "404|Not Found") {
+        Stop-Publish "Cannot read the immutable-releases setting of $Repository`: $($immutable.Err)"
+    }
+    else {
+        $enableImmutable = $true
+        Write-Todo "immutable releases are off; the release workflow requires them"
+    }
+}
+
 if ($resumeMode) {
     # Nothing is set up or pushed again; the update-signing key is not needed.
     $actions.Clear()
@@ -368,6 +393,9 @@ if ($moveTag) { $actions.Add("Delete the unreleased tag $tag on GitHub and in $P
 $actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and its 3 secrets")
 $actions.Add("Audit, commit and sign the public tree in $PublicDir, tag $tag, push main and $tag")
 }
+if ($enableImmutable) {
+    $actions.Insert(0, "Turn on immutable releases for $Repository (once published, a release's files and tag can never be changed or deleted)")
+}
 
 # ---------------------------------------------------------------- 2. confirm
 Write-Step "Plan"
@@ -390,6 +418,12 @@ if ($DryRun) {
 if (-not $resumeMode) {
     Write-Host ""
     if (-not (Confirm-Yes "Publish Tesseract $version publicly at https://github.com/$Repository ?")) { Stop-Publish "Cancelled; nothing was changed." }
+}
+elseif ($enableImmutable) {
+    Write-Host ""
+    if (-not (Confirm-Yes "Turn on immutable releases for $Repository now (releases published while it is on stay locked)?")) {
+        Stop-Publish "Cancelled; the release workflow cannot finish without immutable releases."
+    }
 }
 
 # ---------------------------------------------------------------- 3. set up and push
@@ -458,6 +492,7 @@ if ($makePublic) {
     if ($edited.Code -ne 0) { Stop-Publish "gh repo edit --visibility public failed: $($edited.Err)" }
     Write-Ok "$Repository is public"
 }
+if ($enableImmutable) { Enable-ImmutableReleases }
 
 Write-Step "Release environment and secrets"
 $environment = @{
@@ -516,6 +551,9 @@ Write-Step "Publish source and tag"
 & (Join-Path $PSScriptRoot "push_to_github.ps1") -Release -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `
     -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir
 }
+
+# A resumed run still needs the setting before its publish job starts.
+if ($resumeMode -and $enableImmutable) { Enable-ImmutableReleases }
 
 # ---------------------------------------------------------------- 4. watch and verify
 [Environment]::SetEnvironmentVariable($PasswordEnv, $null, "Process")
@@ -591,8 +629,13 @@ if ($resumeMode -ne "verify") {
 }
 
 Write-Step "In-app update check against the live release"
-$verified = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "verify-live")
-$verified.Out -split "\r?\n" | Where-Object { $_ } | ForEach-Object { Write-Host "   $_" }
+# Read-only, so a cut-off download (it shows up as a checksum mismatch) is retried.
+for ($check = 1; $check -le 3; $check++) {
+    $verified = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "verify-live")
+    $verified.Out -split "\r?\n" | Where-Object { $_ } | ForEach-Object { Write-Host "   $_" }
+    if ($verified.Code -eq 0) { break }
+    if ($check -lt 3) { Write-Todo "the live check did not pass (attempt $check of 3); trying again"; Start-Sleep -Seconds 15 }
+}
 if ($verified.Code -ne 0) { Stop-Publish "The release exists but the app could not verify it: $($verified.Out) $($verified.Err)" }
 Write-Host ""
 Write-Host "Published: https://github.com/$Repository/releases/tag/$tag" -ForegroundColor Green

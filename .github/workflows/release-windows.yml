@@ -1057,9 +1057,10 @@ jobs:
           $bundlePath = Join-Path "release" $bundleName
           foreach ($name in @($expectedNames | Where-Object { $_ -ne $bundleName })) {
             $path = Join-Path "release" $name
+            # --signer-workflow pins both the repository and the workflow file;
+            # gh refuses it together with --signer-repo (mutually exclusive flags).
             & gh attestation verify $path `
               --repo $env:EXPECTED_REPOSITORY `
-              --signer-repo $env:EXPECTED_REPOSITORY `
               --signer-workflow "$env:EXPECTED_REPOSITORY/.github/workflows/release-windows.yml" `
               --source-ref "refs/tags/$env:RELEASE_TAG" `
               --bundle $bundlePath
