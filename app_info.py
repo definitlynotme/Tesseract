@@ -82,7 +82,7 @@ APP_UPDATE_API_URL = "https://api.github.com/repos/definitlynotme/Tessract/relea
 # Base64 of the project's raw 32-byte Ed25519 public key. The encrypted PKCS#8
 # private key is kept outside the repository and is used only by the protected
 # release-signing environment.
-APP_UPDATE_SIGNING_PUBLIC_KEY = "chAnBBHuyGqekaLIwc95IANmn6zdPy3kujrdY4zFtT0="
+APP_UPDATE_SIGNING_PUBLIC_KEY = "N48QsjFONGrdJVOFUaiakM+XufZbIRgM1UL40gn+rbo="
 # Runtime verification accepts this key ring so a transition release can
 # contain both the old and new public keys.  APP_UPDATE_SIGNING_PUBLIC_KEY is
 # the key used by the release workflow for the current tag; keep it first.

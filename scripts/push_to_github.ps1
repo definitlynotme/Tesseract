@@ -40,6 +40,27 @@ function Invoke-Git([string] $Directory, [string[]] $Arguments) {
     return $output
 }
 
+# Connections to GitHub from this machine drop now and then. Network git calls
+# (ls-remote, push) are repeated when the failure looks like the network;
+# pushing the same commits again is harmless.
+$TransientNetworkPattern = '(?i)\bEOF\b|connection (was )?reset|forcibly closed|wsarecv|i/o timeout|timed out|' +
+    'HTTP 50[234]|returned error: 50[234]|could not resolve host|recv failure|ssl_error_syscall|schannel|' +
+    'failed to connect|early eof|rpc failed|remote end hung up|temporarily unavailable'
+function Invoke-GitNetwork([string] $Directory, [string[]] $Arguments) {
+    $ErrorActionPreference = "Continue"   # git reports progress on stderr
+    for ($attempt = 1; ; $attempt++) {
+        $output = & git -C $Directory @Arguments 2>&1
+        $code = $LASTEXITCODE
+        $text = (@($output) | ForEach-Object { "$_" }) -join "`n"
+        if ($code -eq 0) { return $text }
+        if ($attempt -ge 6 -or $text -notmatch $TransientNetworkPattern) {
+            throw "git $($Arguments -join ' ') failed (exit $code):`n$text"
+        }
+        Write-Host "   ..  the connection to GitHub dropped; retrying ($attempt of 5)" -ForegroundColor DarkGray
+        Start-Sleep -Seconds ([int][Math]::Min(30, [Math]::Pow(2, $attempt)))
+    }
+}
+
 if (-not $PublicDir) { $PublicDir = Join-Path (Split-Path -Parent $RepoRoot) "Tessract-public" }
 if (-not $SshSigningKey) { $SshSigningKey = Join-Path $env:USERPROFILE ".ssh\id_ed25519" }
 if (-not $DenyFile) { $DenyFile = Join-Path $env:USERPROFILE ".tesseract-release\public-denylist.txt" }
@@ -169,10 +190,19 @@ if ($Release) {
     $tag = "v$version"
     & git -C $PublicDir rev-parse -q --verify "refs/tags/$tag" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-        throw "Tag $tag already exists; bump APP_RELEASE_BASE_VERSION in app_info.py for a new release."
+        # An earlier run signed the tag but did not get to push it: reuse it
+        # only while it still names the current public commit.
+        $tagCommit = ((Invoke-Git $PublicDir @("rev-parse", "refs/tags/$tag^{commit}")) | Out-String).Trim()
+        $headCommit = ((Invoke-Git $PublicDir @("rev-parse", "HEAD")) | Out-String).Trim()
+        if ($tagCommit -ne $headCommit) {
+            throw "Tag $tag already exists on an older public commit; bump APP_RELEASE_BASE_VERSION in app_info.py for a new release."
+        }
+        Write-Host "Reusing signed tag $tag (it names the current public commit)."
     }
-    Invoke-Git $PublicDir @("tag", "-s", $tag, "-m", "Tesseract $version") | Out-Null
-    Write-Host "Created signed tag $tag."
+    else {
+        Invoke-Git $PublicDir @("tag", "-s", $tag, "-m", "Tesseract $version") | Out-Null
+        Write-Host "Created signed tag $tag."
+    }
 }
 
 if ($NoPush) {
@@ -183,14 +213,14 @@ if ($NoPush) {
 # Fails early (and without prompting) when GitHub credentials are missing or
 # expired: run `gh auth login` and `gh auth setup-git`, then retry.
 $env:GIT_TERMINAL_PROMPT = "0"
-& git -C $PublicDir ls-remote --heads $RemoteUrl | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    throw "Cannot reach $RemoteUrl with the stored credentials. Run 'gh auth login' and 'gh auth setup-git', then retry."
+try { Invoke-GitNetwork $PublicDir @("ls-remote", "--heads", $RemoteUrl) | Out-Null }
+catch {
+    throw "Cannot reach $RemoteUrl with the stored credentials. Run 'gh auth login' and 'gh auth setup-git', then retry.`n$_"
 }
-Invoke-Git $PublicDir @("push", $RemoteUrl, "main:main") | Out-Null
+Invoke-GitNetwork $PublicDir @("push", $RemoteUrl, "main:main") | Out-Null
 Write-Host "Pushed main to $RemoteUrl."
 if ($Release) {
-    Invoke-Git $PublicDir @("push", $RemoteUrl, "refs/tags/v${version}:refs/tags/v${version}") | Out-Null
+    Invoke-GitNetwork $PublicDir @("push", $RemoteUrl, "refs/tags/v${version}:refs/tags/v${version}") | Out-Null
     Write-Host "Pushed v$version; the Release Windows workflow builds and publishes it."
 }
 }
