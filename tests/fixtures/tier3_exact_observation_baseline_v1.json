@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "description": "Sanitized frozen Tier3 exact-observation characterization; no URI, credential, host, path, or reversible identity is retained.",
+  "stable_observation_count": 244,
+  "source_observation_count": 20505,
+  "tcp_responsive_count": 106,
+  "validation_attempt_count": 79,
+  "validation_pass_count": 26,
+  "pool_commit_count": 26,
+  "all_committed_nodes_exactly_observed_positive": true
+}

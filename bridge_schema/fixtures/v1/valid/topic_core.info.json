@@ -1,0 +1,16 @@
+{
+  "data": {
+    "cleanup_pending": false,
+    "generation": 0,
+    "pid": null,
+    "running": false,
+    "version": null
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "core.info"
+}

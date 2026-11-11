@@ -1,0 +1,140 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "res",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "id": 1,
+    "req_id": "request-1",
+    "owner": "window-1",
+    "cmd": "config.snapshot",
+    "ok": true,
+    "data": {
+      "rev": 3,
+      "values": {
+        "network": {
+          "allow_lan": false,
+          "mode": "system",
+          "egress_recovery": {
+            "enabled": true,
+            "retry_source_refresh": true
+          }
+        },
+        "dns": {
+          "mode": "custom",
+          "nameserver": [
+            "https://doh.example.invalid/dns-query?token=abcdef"
+          ],
+          "default_nameserver": [
+            "system"
+          ],
+          "proxy_server_nameserver": [
+            "quic://dns.adguard-dns.com"
+          ],
+          "direct_nameserver": [
+            "223.5.5.5"
+          ]
+        },
+        "sources": [
+          {
+            "id": "src-github",
+            "kind": "github_repos",
+            "display": "github_repos",
+            "enabled": true,
+            "hint": "a•••/r•••"
+          },
+          {
+            "id": "src-telegram",
+            "kind": "telegram_channels",
+            "display": "telegram_channels",
+            "enabled": true,
+            "hint": "@c•••"
+          },
+          {
+            "id": "src-sub",
+            "kind": "subscription_urls",
+            "display": "subscription_urls",
+            "enabled": false,
+            "hint": "h•••"
+          },
+          {
+            "id": "src-file",
+            "kind": "local_files",
+            "display": "local_files",
+            "enabled": true,
+            "hint": "••••"
+          },
+          {
+            "id": "src-legacy",
+            "kind": "local_files",
+            "display": "local_files",
+            "enabled": true
+          }
+        ],
+        "alerts": {
+          "channels": [
+            {
+              "id": "ops",
+              "type": "telegram",
+              "label": "Ops",
+              "enabled": true,
+              "alert_types": [],
+              "config": {
+                "enabled": true,
+                "chat_id": "-1001234567890",
+                "parse_mode": "HTML"
+              }
+            },
+            {
+              "id": "mail",
+              "type": "email_smtp",
+              "label": "Mail",
+              "enabled": false,
+              "alert_types": [],
+              "config": {
+                "host": "smtp.example.invalid",
+                "port": 465,
+                "ssl": true,
+                "from_addr": "alerts@example.invalid",
+                "to_addrs": [
+                  "ops@example.invalid"
+                ]
+              }
+            }
+          ]
+        },
+        "ui": {
+          "language": "en_US",
+          "start_in_tray_on_autostart": true
+        },
+        "killswitch": {
+          "enabled": true,
+          "allow_lan": true,
+          "allow_dns": true,
+          "dns_whitelist": [
+            "192.0.2.53"
+          ],
+          "additional_whitelist": [
+            "198.51.100.0/24"
+          ]
+        },
+        "bastion": {
+          "enabled": true,
+          "min_alive_nodes": 8
+        }
+      },
+      "secret_fields_set": [
+        "alerts.ops.bot_token",
+        "alerts.mail.password",
+        "sources.src-github.value",
+        "sources.src-telegram.value",
+        "sources.src-sub.value",
+        "sources.src-file.value"
+      ],
+      "read_errors": [],
+      "pending": null
+    }
+  },
+  "expected": "sensitive:data.values.dns.nameserver[0]"
+}

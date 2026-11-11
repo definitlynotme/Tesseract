@@ -1,0 +1,19 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "bastion.sources",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "items": [
+      {
+        "id": "example",
+        "kind": "example",
+        "display": "example",
+        "enabled": true
+      }
+    ]
+  }
+}

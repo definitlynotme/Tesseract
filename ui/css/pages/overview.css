@@ -1,0 +1,523 @@
+/* ==========================================================================
+   pages/overview.css — 总览
+   One grid, one column line. The left column tells the story (which tier →
+   where traffic exits → how much flows); the right column is the control
+   column (run control → fallback deck → mode / protection / pool → protocols).
+     "hero  ctl"      the tier name · the run control (its segment spans the column)
+     "exit  deck"     frameless 当前出口 · the tier deck (the one stacked object)
+     "traf  side"     frameless 流量 (the chart takes the leftover height) · status strip + 协议分布
+   Only the deck stack, the status strip and the run pill are framed; content
+   sections are frameless and sit on section heads that share one 32 px band.
+   Fits 1280×800 and 1060×700 exactly; the mode confirmation makes the protocol
+   legend yield first, and the chart never drops below its floor (banners float
+   above the page since F-05 and take no room).
+   ========================================================================== */
+.page-overview {
+  --ov-col: 32px; --ov-row: 24px; --ov-head: 32px;
+  --dk-h: 92px; --dk-b: 30px; --dk-g: 38px;
+}
+@media (max-width: 1180px) { .page-overview { --ov-col: 28px; } }
+@media (max-height: 760px) { .page-overview { --ov-row: 16px; --ov-head: 30px; --dk-h: 84px; --dk-b: 26px; --dk-g: 34px; } }
+
+.ov {
+  flex: 1 1 auto; display: grid; min-width: 0;
+  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas: "hero ctl" "exit deck" "traf side";
+  column-gap: var(--ov-col); row-gap: var(--ov-row);
+}
+@media (max-width: 1180px) { .ov { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+
+/* section heads: one band height for every section, so titles on a row share a baseline */
+.ov-head { display: flex; align-items: center; gap: 10px; height: var(--ov-head); margin-bottom: 6px; min-width: 0; flex: none; }
+.ov-title { font-size: var(--fs-14); line-height: 20px; font-weight: var(--fw-semi); letter-spacing: -.005em; white-space: nowrap; }
+.ov-meta { font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ov-act { margin-left: auto; display: flex; align-items: center; gap: 6px; flex: none; }
+.ov-meta > .sw { overflow: hidden; text-overflow: ellipsis; }
+.ov-meta.warn { color: var(--c-warn); }
+/* T-P5-13 (决定_P5裁定 P5-e #5: interface words are read whole, an ellipsis is for data): a head's note
+   (the traffic scope, the protocol count, the deck's note) wraps beside the title, two lines in the
+   head's band; the band grows only for a third */
+.ov-head { height: auto; min-height: var(--ov-head); }
+.ov-meta, .ov-meta > .sw { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.ov-meta.swap { grid-template-columns: minmax(0, 1fr); }
+
+/* ---- hero -------------------------------------------------------------------- */
+.ov-hero { grid-area: hero; display: flex; align-items: flex-end; min-width: 0; }
+.ov-id { min-width: 0; }
+.ov-tier { display: flex; align-items: center; gap: 10px; height: 44px; margin-top: 2px; min-width: 0; }
+.ov-tier-name { font-size: var(--fs-34); line-height: 44px; font-weight: var(--fw-semi); letter-spacing: -.03em; white-space: nowrap; transition: color .3s var(--ease-out); }
+.ov-tier-name.is-idle { color: var(--c-ink-3); font-weight: var(--fw-regular); letter-spacing: -.02em; }
+/* 启动失败 / 出站已阻断 (T-P4-05a, G05 / G06): the state word in the name's place, in clay (F-02) */
+.ov-tier-name.is-err { color: var(--c-fail); letter-spacing: -.02em; }
+/* F-06: the name changes character by character (overview.js charRoll). The faces share one cell and
+   each carries its own look, so a leaving word keeps it while the heading's class has moved on; the
+   slot (.cr-v, only while it rolls) clips at the line's top and foot, so the old characters leave
+   through its top (never over the eyebrow) and the new ones rise out of the line */
+.cr { display: inline-grid; vertical-align: top; }
+.cr > .cr-f { grid-area: 1 / 1; min-width: 0; }
+.cr-v { display: inline-block; clip-path: inset(0 -0.3em 0 -0.3em); }
+.cr-w { display: inline-block; white-space: nowrap; }
+.cr-c { display: inline-block; white-space: pre; }
+.ov-tier-name .cr-f { color: var(--c-ink); font-weight: var(--fw-semi); letter-spacing: -.03em; }
+.ov-tier-name .cr-f.is-idle { color: var(--c-ink-3); font-weight: var(--fw-regular); letter-spacing: -.02em; }
+.ov-tier-name .cr-f.is-err { color: var(--c-fail); letter-spacing: -.02em; }
+/* T-P5-06: the name never runs past the hero column: a state word in the name slot (启动失败,
+   出站已阻断 …) wraps within itself. (F-03: the role word beside the name is gone.) */
+.ov-tier { height: auto; min-height: 44px; flex-wrap: wrap; row-gap: 0; }
+.ov-tier-name, #ov-name > .sw { white-space: normal; }
+.ov-hint { display: flex; align-items: center; gap: 8px; margin-top: 4px; min-height: 20px; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); white-space: nowrap; min-width: 0; }
+.ov-hint b { font-weight: var(--fw-semi); color: var(--c-ink); }
+.ov-hint .warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.ov-hint .err { color: var(--c-fail); font-weight: var(--fw-semi); }
+/* a long hint (a startup failure's message) ellipsizes; its data-tip carries the whole sentence */
+.ov-hint > .swap { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* one-line rolls that ellipsize (T-P4-05a): a long sentence (a start failure, an exit reason's
+   full text, a long language) never widens its roll's track past the box; the face ellipsizes
+   and the tip carries it whole */
+#ov-hint, .idle-s, .cell-hint > .swap, .prov > .swap-box, #ov-gate-stat, #ov-route { grid-template-columns: minmax(0, 1fr); }
+#ov-hint > .sw, .idle-s > .sw, .cell-hint > .swap > .sw, .prov > .swap-box > .sw, #ov-gate-stat > .sw, #ov-route > .sw { overflow: hidden; text-overflow: ellipsis; }
+/* the route line (a flex child of .exit-route) may shrink: a stale suffix or a long node name ellipsizes, the tip says it whole */
+#ov-route { min-width: 0; }
+/* T-P5-13 (决定_P5裁定 P5-e #5: an ellipsis is for data): the Gateway line's state and the route line
+   are rows of their runs, so a long node name (data, .dt / .hop) is what gives way and ends in its
+   own ellipsis, never the words after it (· 2/2, 数据未更新). white-space: pre keeps the spaces of the
+   runs (the faces are one line, without line breaks) */
+#ov-gate-stat > .sw, #ov-route > .sw { display: flex; align-items: baseline; white-space: pre; min-width: 0; }
+#ov-gate-stat > .sw > .dt, #ov-route > .sw > .hop { flex: 0 1 auto; min-width: 2em; overflow: hidden; text-overflow: ellipsis; }
+/* the route line's words that still do not fit (fr … · Données non actualisées) go on to a second
+   line of the band (two lines fit its 38 px); the band grows past that */
+.exit-route { height: auto; min-height: var(--dk-g); }
+#ov-route > .sw { flex-wrap: wrap; }
+/* the Gateway line likewise (11-04: pseudo / longer languages at 1060 cut 当前出口缺失 · …): its words
+   wrap to a second line, right-aligned under the first, and the row grows; only the node name
+   (data, .dt) still ellipsizes */
+.dgate { height: auto; min-height: var(--dk-g); }
+#ov-gate-stat { min-width: 0; text-align: right; }
+#ov-gate-stat > .sw { flex-wrap: wrap; justify-content: flex-end; }
+.ov-hint .spin { width: 11px; height: 11px; border-width: 1.5px; margin: 0 5px 0 1px; vertical-align: -1px; color: var(--c-ink-3); }
+/* F-01: a state the name and the pill already say leaves the line empty: it keeps its height
+   (nothing below moves between states) and drops its dot */
+.ov-hint.is-empty > .sdot { display: none; }
+/* T-P5-11 (ruling 2): the hint is a status line: it wraps to a second line instead of cutting a
+   tier tag (de selbst gehostet) or a word; only a sentence longer than two lines (a long startup
+   failure) still ends in an ellipsis, its tip says it whole */
+.ov-hint { white-space: normal; }
+#ov-hint > .sw { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+/* T-P5-13: no clamp either: a startup failure is read whole (it wraps to as many lines as it needs) */
+#ov-hint > .sw { display: block; -webkit-line-clamp: none; overflow: visible; overflow-wrap: break-word; }
+
+/* the control row spans the right column exactly: 重启服务 on the column line, the pill to the edge */
+.ov-ctl { grid-area: ctl; align-self: end; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.ov-restart { flex: none; transition-property: background-color, box-shadow, color, opacity, scale, translate, visibility; }
+.ov-restart .bi { display: grid; }
+/* a long language: the button yields before the pill (its label ellipsizes; the tip says the rest) */
+.ov-restart { min-width: 0; flex: 0 1 auto; }
+.ov-restart .lab { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ov-restart.is-away { opacity: 0; translate: 10px 0; visibility: hidden; pointer-events: none;
+  transition: opacity .2s var(--ease-out), translate .3s var(--ease-out), visibility 0s linear .3s; }
+/* T-P5-11: the away button's room goes to the pill when the pill's words need it (overview.js
+   fitRun); otherwise the pill keeps the column's fixed width */
+.ov-ctl.is-roomy > .ov-restart.is-away { display: none; }
+/* T-P5-13 (决定_P5裁定 P5-e #5, form b): 重启服务 gives way as an icon button (overview.js fitRun:
+   when its label or the pill's words would be cut); the label is its accessible name and leads its
+   tip. A busy / done / fail face shows its words again (T.ui.busy sizes them) */
+.ov-restart.is-icon:not(.is-busy):not(.is-done):not(.is-fail) { padding-left: 0; padding-right: 0; width: 34px; justify-content: center; }
+.ov-restart.is-icon:not(.is-busy):not(.is-done):not(.is-fail) .lab { display: none; }
+
+/* ---- run control: fixed width (the column's), the button becomes the progress ------ */
+.run { position: relative; flex: 1 1 auto; min-width: 236px; height: 40px; border-radius: var(--r-pill); isolation: isolate; transition: scale var(--spring-dur) var(--spring); }
+.run:has(button:active:not(:disabled)) { scale: .965; transition-duration: var(--dur-press); }
+.run-layer { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.run-base { z-index: 0; background: var(--c-surface); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line-2);
+  transition: background-color .3s var(--ease-out), box-shadow .25s var(--ease-out), color .3s var(--ease-out); }
+.run[data-state="starting"] .run-base { background: var(--c-accent-tint); color: var(--c-accent-ink); box-shadow: inset 0 0 0 1px var(--c-accent-tint-2); }
+.run[data-state="stopping"] .run-base { background: var(--c-well); color: var(--c-ink-2); box-shadow: inset 0 0 0 1px var(--c-line); }
+.run:has(.run-act:hover) .run-base { box-shadow: inset 0 0 0 1px var(--c-line-3); }
+.run[data-state="starting"]:has(.run-act:hover) .run-base { box-shadow: inset 0 0 0 1px var(--c-accent-line); }
+.run-over { z-index: 1; background: var(--c-accent); color: var(--c-on-accent); clip-path: inset(0 100% 0 0 round 999px); }
+/* F-06: after ✓ 已就绪 the white running pill opens out of the centre over the accent (overview.js openPill) */
+.run-base.is-bloom { z-index: 2; }
+/* the solid start pill: gone in the same frame the track appears (never drained or faded to lavender) */
+.run-solid { z-index: 2; background: var(--c-accent); color: var(--c-on-accent); opacity: 0; transition: opacity .15s var(--ease-out), background-color .15s var(--ease-out); }
+.run[data-state="stopped"] .run-solid { opacity: 1; transition-duration: .24s, .15s; }
+.run.is-snap .run-solid { transition: none; }
+.run:has(.run-main:hover) .run-solid { background: var(--c-accent-hover); }
+.run:has(.run-main:active) .run-solid { background: var(--c-accent-press); }
+
+.run-row { position: absolute; inset: 0; display: flex; align-items: center; white-space: nowrap; font-size: var(--fs-14); font-weight: var(--fw-medium); }
+.run-row.center { justify-content: center; gap: 8px; }
+.run-row .ic { width: 17px; height: 17px; }
+.run-read { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding-left: 17px; }
+.run-read .sdot { width: 8px; height: 8px; transition: background-color .3s var(--ease-out); }
+/* secondary figures use a solid tone per layer (never opacity: the tint side must keep 4.5:1) */
+.run-up { font-size: var(--fs-13); font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
+.run-step { font-size: var(--fs-12); font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
+.run-base .run-up { color: var(--c-ink-3); }
+.run-base .run-step { color: var(--c-accent-ink); }
+.run-over .run-up, .run-over .run-step { color: var(--c-on-accent-2); }
+.run-div { width: 1px; height: 16px; background: currentColor; opacity: .2; flex: none; }
+.run-seg { width: 78px; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; }
+/* T-P5-11: wider when its words need it (overview.js fitRun sets --seg-w; de Wiederholen) */
+.run-seg { width: var(--seg-w, 78px); }
+.run-seg .ic { width: 14px; height: 14px; }
+.run-row .spin { width: 14px; height: 14px; }
+/* the failure faces (T-P4-05a, G05): 启动失败 / 停止失败 in bold clay (F-02); 重试 inside the read
+   area (the Core still runs: the area is run-main, 停止 stays on the segment) */
+.run-base .run-err { color: var(--c-fail); font-weight: var(--fw-semi); }
+.run-read > span:not(.sdot):not(.spin) { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* T-P5-13 (form b): the run word steps out of a pill too narrow for it (overview.js fitRun): the
+   state dot and the uptime stay, the word stays for a screen reader and is the pill's tip */
+.run.is-word-out .run-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.run-link { color: var(--c-accent-ink); text-decoration: underline; text-underline-offset: 3px; font-weight: var(--fw-regular); }
+
+.run-main, .run-act { position: absolute; z-index: 3; border-radius: var(--r-pill); }
+.run-main { inset: 0; }
+.run-act { top: 0; right: 0; bottom: 0; width: 78px; }
+.run-act { width: var(--seg-w, 78px); }
+.run-act::before { content: ""; position: absolute; inset: 4px 4px 4px 3px; border-radius: var(--r-pill); background: var(--c-wash); opacity: 0; transition: opacity .15s var(--ease-out); }
+.run[data-state="starting"] .run-act::before { background: var(--c-accent-wash); }
+.run-act:hover::before { opacity: 1; }
+.run-act:active::before { opacity: 1; background: var(--c-wash-2); }
+.run-act:focus-visible { outline-offset: -3px; }
+.run-main:disabled, .run-act:disabled { pointer-events: none; visibility: hidden; }
+.run[data-state="stopping"] { cursor: default; }
+
+/* ---- 当前出口 (frameless) ---------------------------------------------------------- */
+.ov-exit { grid-area: exit; display: flex; flex-direction: column; min-width: 0; }
+.prov { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0; border-radius: var(--r-ctl); font-size: var(--fs-12); font-weight: var(--fw-medium); white-space: nowrap; background: none; color: var(--c-ink-2); overflow: hidden; }
+.prov .ic { width: 13px; height: 13px; }
+.prov .spin { width: 11px; height: 11px; border-width: 1.5px; }
+/* F-02: the exit's provenance is a mark beside the head, not a chip: its icon and its word,
+   bold in its muted hue when it is a warning or a failure */
+.prov.ok { color: var(--c-ok); }
+/* a warning or an expired result keeps the address (S-E9, S-E11); a failure says its reason (S-E14) */
+.prov.warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.prov.err { color: var(--c-fail); font-weight: var(--fw-semi); }
+.ov-head .prov { min-width: 0; flex: 0 1 auto; text-overflow: ellipsis; }
+.exit-refresh { transition-property: background-color, box-shadow, color, opacity, scale, translate, visibility; }
+.exit-refresh .bi { display: grid; }
+.exit-refresh.is-away { opacity: 0; translate: 8px 0; visibility: hidden; pointer-events: none; transition: opacity .2s, translate .3s var(--ease-out), visibility 0s linear .3s; }
+/* T-P5-13 (决定_P5裁定 P5-e #5): the check chip is read whole. 刷新 gives way first as an icon button
+   (form b, overview.js fitExit); a chip still too long wraps (form a); .is-one is the one-line
+   measurement */
+.exit-refresh.is-icon:not(.is-busy):not(.is-done):not(.is-fail) { padding-left: 0; padding-right: 0; width: 30px; justify-content: center; }
+.exit-refresh.is-icon:not(.is-busy):not(.is-done):not(.is-fail) .lab { display: none; }
+.ov-head .prov { height: auto; min-height: 22px; padding-top: 2px; padding-bottom: 2px; line-height: 18px; white-space: normal; }
+.ov-head .prov > .swap-box > .sw { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.ov-head .prov.is-one, .ov-head .prov.is-one > .swap-box > .sw { white-space: nowrap; }
+
+.exit-stage { position: relative; flex: 1 1 auto; min-height: 0; display: grid; }
+.exit-full, .exit-idle { grid-area: 1 / 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 2px 0 14px; transition: opacity .25s var(--ease-out); }
+.exit-idle { opacity: 0; pointer-events: none; gap: 14px; }
+.ov-exit[data-state="none"] .exit-full { opacity: 0; pointer-events: none; }
+.ov-exit[data-state="none"] .exit-idle { opacity: 1; pointer-events: auto; transition-delay: .08s; }
+/* no address: both family rows (equal ghost dashes); a reason (the check failed, the exit is in
+   doubt) adds its message block under both (F-01: no other state has words here) */
+.idle-rows { display: flex; flex-direction: column; gap: 6px; }
+.ip-ghost { font-family: var(--font-mono); font-weight: var(--fw-medium); color: var(--c-ink-4); font-size: 15px; line-height: 24px; }
+.idle-msg { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.idle-t { display: flex; align-items: center; gap: 7px; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink); font-weight: var(--fw-medium); }
+.idle-s { font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13: why there is no address (the service is stopped, the check failed …) is read whole */
+.idle-s, #ov-idle-s > .sw { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.ip-block { min-width: 0; }
+.ip-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fam { display: inline-grid; place-items: center; flex: none; min-width: 38px; height: 20px; padding: 0 6px; border-radius: var(--r-xs); background: var(--c-well); color: var(--c-ink-2); font-size: var(--fs-12); font-weight: var(--fw-medium); }
+.ip { position: relative; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); white-space: nowrap; user-select: all; cursor: text; border-radius: var(--r-xs); padding: 0 4px; margin: 0 -4px; transition: opacity .25s var(--ease-out); }
+.ip::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--c-accent-tint-2); opacity: 0; pointer-events: none; mix-blend-mode: multiply; }
+.ip4 { font-size: var(--fs-24); line-height: 32px; letter-spacing: -.035em; }
+.ip6 { font-size: 15px; line-height: 24px; letter-spacing: -.02em; color: var(--c-ink); overflow: hidden; text-overflow: ellipsis; }
+.last-tag { display: none; flex: none; margin-left: auto; height: 20px; padding: 0 6px; border-radius: var(--r-xs); align-items: center; background: var(--c-well); color: var(--c-ink-2); font-size: var(--fs-12); }
+.ov-exit.is-pending .last-tag, .ov-exit.is-last .last-tag { display: inline-flex; }
+.ov-exit.is-pending .ip { opacity: .42; }
+.ip-meta { margin: 2px 0 0 46px; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ip-loc { font-size: var(--fs-13); line-height: 20px; color: var(--c-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ip-net { display: flex; align-items: center; gap: 8px; font-size: var(--fs-13); line-height: 22px; color: var(--c-ink-2); white-space: nowrap; min-width: 0; }
+.ip-net > span:first-child { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ip-same { font-size: var(--fs-12); color: var(--c-ink-3); white-space: nowrap; }
+/* a family without an address: its reason in place of the address, never a fake one (D15) */
+.ip.is-why { font-family: inherit; font-size: var(--fs-13); line-height: 24px; letter-spacing: 0; font-weight: var(--fw-regular); color: var(--c-ink-3); user-select: auto; cursor: default; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ip-row .ip { min-width: 0; }
+/* 单一来源 (C2 item 1): only one source confirmed this address */
+.ip-src { flex: none; }
+/* the reason the card has no address (conflict / rotating / failed): the title in the warning ink */
+.ov-exit.is-why .idle-t { color: var(--c-warn); }
+/* the route line sits on the same line as the Gateway row across the column line */
+.exit-route { display: flex; align-items: center; gap: 7px; height: var(--dk-g); box-shadow: inset 0 1px 0 var(--c-line); font-size: var(--fs-12); color: var(--c-ink-3); white-space: nowrap; overflow: hidden; flex: none; }
+/* F-01 round 1: no route (not running): the band and its hairline go, and the family rows sit
+   right under the head instead of in the middle of the column (no hole above IPv4) */
+.ov-exit.is-noroute .exit-route { display: none; }
+.ov-exit.is-noroute .exit-full, .ov-exit.is-noroute .exit-idle { justify-content: flex-start; }
+/* a hop (icon + node name) is inline text, not an inline-flex box: a long node name then ends in
+   the route line's own ellipsis (#ov-route > .sw) like the rest of the sentence instead of running
+   past it (P5 #29, T-P4-H4) */
+.exit-route .hop { display: inline; color: var(--c-ink-2); font-weight: var(--fw-medium); }
+.exit-route .hop .ic { display: inline-block; width: 14px; height: 14px; margin-right: 5px; vertical-align: middle; color: var(--c-ink-3); }
+.exit-route .arr { width: 13px; height: 13px; color: var(--c-ink-4); }
+.ov-exit.is-off .exit-route .hop { color: var(--c-ink-3); font-weight: var(--fw-regular); }
+
+/* ---- the tier deck (signature) ------------------------------------------------------ */
+.ov-deckcol { grid-area: deck; display: flex; flex-direction: column; min-width: 0; }
+
+.deck { position: relative; height: calc(var(--dk-h) + 2 * var(--dk-b)); flex: none; }
+.dcard {
+  position: absolute; left: 0; right: 0; top: 0; height: var(--dk-h); display: block; text-align: left; border-radius: var(--r-panel);
+  background: var(--c-surface); box-shadow: var(--sh-card); color: var(--c-ink); transform-origin: 50% 100%;
+  transition: translate .22s var(--ease-out), background-color .3s var(--ease-out), box-shadow .25s var(--ease-out), scale var(--spring-dur) var(--spring);
+  will-change: transform;   /* the cards keep their own layer: a press or a pass never waits for a raster */
+  --press: .985;
+}
+.dcard:active { scale: var(--press); transition-duration: .22s, .3s, .25s, var(--dur-press); }
+.dcard[data-r="1"] { background: var(--c-tint-1); box-shadow: var(--sh-card-back); }
+.dcard[data-r="2"] { background: var(--c-tint-2); box-shadow: var(--sh-card-back); }
+.dcard.is-front:hover { translate: 0 -2px; box-shadow: var(--sh-card-lift); }
+.dcard:not(.is-front):hover { translate: 0 3px; background: var(--c-surface); }
+.dcard:focus-visible { outline-offset: 2px; }
+.dcard-top { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--dk-h) - var(--dk-b)); padding: 11px 14px 8px; display: flex; flex-direction: column; justify-content: space-between; opacity: 0; transition: opacity .16s var(--ease-out); }
+.dcard.is-front .dcard-top { opacity: 1; transition: opacity .24s var(--ease-out) .14s; }
+.dc-row1 { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dc-more { margin-left: auto; display: inline-flex; align-items: center; gap: 1px; font-size: var(--fs-12); color: var(--c-ink-3); opacity: 0; translate: -4px 0; transition: opacity .15s var(--ease-out), translate .2s var(--ease-out); white-space: nowrap; }
+.dc-more .ic { width: 13px; height: 13px; }
+.dcard.is-front:hover .dc-more, .dcard.is-front:focus-visible .dc-more { opacity: 1; translate: 0 0; }
+.dc-node { display: flex; align-items: baseline; gap: 6px; font-size: var(--fs-13); line-height: 18px; color: var(--c-ink-2); white-space: nowrap; min-width: 0; overflow: hidden; }
+.dc-node b { font-weight: var(--fw-semi); color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.dc-node .warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+/* one line: a sentence longer than the card (a down reason) ellipsizes (T-P4-05a) */
+.dc-node > .swap, .dc-node > .swap-box { min-width: 0; overflow: hidden; }
+.dc-node .sw { overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13 (form a): the front card's node line wraps; the deck grows by its extra lines (overview.js
+   fitNode sets --dk-h on the deck) */
+.dc-node, .dc-node .sw { white-space: normal; overflow-wrap: break-word; }
+.dc-node .sw { overflow: visible; }
+.dc-node > .swap, .dc-node > .swap-box { grid-template-columns: minmax(0, 1fr); }
+.dcard-id { position: absolute; left: 0; right: 0; bottom: 0; height: var(--dk-b); display: flex; align-items: center; gap: 7px; padding: 0 14px; font-size: var(--fs-13); line-height: 18px; white-space: nowrap; min-width: 0; }
+.dcard.is-front .dcard-id { box-shadow: inset 0 1px 0 var(--c-line); }
+/* F-06: a live card's band is its lower edge: it carries the card's ground, so when the card unrolls
+   (overview.js glidePlay) the band slides down covering what it uncovers, never over another line.
+   (A ghost band keeps no ground: it would hide the ghost card's inset hairline.) */
+.deck:not(.is-ghost) .dcard-id { background: inherit; border-radius: 0 0 var(--r-panel) var(--r-panel); }
+.dcard-id > .ic { width: 16px; height: 16px; color: var(--c-ink-2); }
+.dc-name { font-weight: var(--fw-semi); }
+.dc-stat { margin-left: auto; color: var(--c-ink-2); overflow: hidden; text-overflow: ellipsis; min-width: 0; font-variant-numeric: tabular-nums; }
+.dc-stat.warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.dc-stat.err { color: var(--c-fail); font-weight: var(--fw-semi); }
+.dc-stat.mute { color: var(--c-ink-3); }
+/* T-P5-11: a band that cannot hold its state words lets its dots or pool meter step out
+   (overview.js fitBands): the state words are interface text and show whole, never cut */
+.dcard-id.is-tight > .dots, .dgate.is-tight > .dots { display: none; }
+/* 数据未更新 after a value kept from the last frame (requirement 3: stale regions) */
+.ov-stale { color: var(--c-ink-3); font-weight: var(--fw-regular); }
+.dcard-id .dots { margin-left: 2px; }
+
+/* stopped: the deck shows ghost bands in fallback order */
+.deck.is-ghost .dcard { background: var(--c-ghost-1); box-shadow: inset 0 0 0 1px var(--c-line-2); }
+.deck.is-ghost .dcard[data-r="1"] { background: var(--c-ghost-2); }
+.deck.is-ghost .dcard[data-r="2"] { background: var(--c-ghost-3); }
+/* F-01 round 1: not running, the deck is its tier bands only: the front card's top band (a state
+   pill over an empty line) folds away and every card is one band; running, it comes back */
+.deck.is-ghost { --dk-h: var(--dk-b); }
+.deck.is-ghost .dcard-top { display: none; }
+.deck.is-ghost .dcard.is-front .dcard-id { box-shadow: none; }
+/* F-01 round 2: a front card whose second line is empty keeps its state pill and drops the line
+   (overview.js fitNode sets --dk-h to the pill row: the deck is shorter while it lasts) */
+.deck.is-bare .dcard.is-front .dc-node { display: none; }
+.deck.is-ghost .dc-name { color: var(--c-ink-2); }
+.deck.is-ghost .dcard-id > .ic { color: var(--c-ink-3); }
+
+/* Gateway: detached from the fallback deck (a hairline, not a card), outside the order */
+.dgate {
+  display: flex; align-items: center; gap: 7px; height: var(--dk-g); margin-top: 12px; padding: 0 14px; border-radius: 0;
+  background: transparent; box-shadow: inset 0 1px 0 var(--c-line); font-size: var(--fs-13); white-space: nowrap; text-align: left; min-width: 0; flex: none;
+  transition: background-color .15s var(--ease-out), border-radius .15s, scale var(--spring-dur) var(--spring);
+  --press: .985;
+}
+.dgate:hover { background: var(--c-surface-hover); border-radius: var(--r-ctl); }
+.dgate:active { scale: var(--press); background: var(--c-surface-press); transition-duration: .15s, .15s, var(--dur-press); }
+.dgate > .ic { width: 16px; height: 16px; color: var(--c-ink-2); }
+.dgate .dc-stat { margin-left: auto; }
+@media (max-height: 760px) { .dgate { margin-top: 10px; } }
+
+/* ---- 流量 (frameless; the chart takes the leftover height) -------------------------- */
+.ov-traffic { grid-area: traf; display: flex; flex-direction: column; min-width: 0; }
+.tot { display: flex; gap: 40px; flex: none; min-width: 0; }
+.tot-lab { display: flex; align-items: center; gap: 6px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-2); }
+.tot-lab .ic { width: 14px; height: 14px; }
+.tot-lab .down { color: var(--c-accent); }
+.tot-lab .up { color: var(--c-series-up); }
+.tot-val { display: flex; align-items: baseline; gap: 5px; margin-top: 2px; white-space: nowrap; }
+.tot-num { font-size: var(--fs-26); line-height: 32px; font-weight: var(--fw-semi); letter-spacing: -.02em; }
+.tot-unit { font-size: var(--fs-14); font-weight: var(--fw-medium); color: var(--c-ink-2); }
+.tot-rate { margin-left: 6px; font-size: var(--fs-12); color: var(--c-ink-3); display: inline-flex; gap: 4px; align-items: baseline; white-space: nowrap; }
+.tot-rate > span { color: var(--c-ink-2); font-weight: var(--fw-medium); font-variant-numeric: tabular-nums; }
+/* T-P5-11: a long label and its live rate (fr Envoi · En direct 2,00 Ko/s, es Subida …) never run
+   past the traffic column: the two totals may narrow, and the rate moves under its label */
+.tot > div { min-width: 0; }
+.tot-lab { flex-wrap: wrap; row-gap: 0; }
+@media (max-height: 760px) { .tot-num { font-size: var(--fs-24); line-height: 30px; } }
+
+/* the chart's floor: a ~110 px plot even with the mode confirmation open (the protocol
+   legend yields first) */
+.chart { position: relative; flex: 1 1 0; min-height: 140px; margin: 8px 0 0 -4px; }
+.chart > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ch-grid line { stroke: var(--c-grid); stroke-width: 1; shape-rendering: crispEdges; }
+.ch-grid line.base { stroke: var(--c-grid-base); }
+.ch-plot { transition: opacity .35s var(--ease-out); }
+.ch-cr { transform-box: fill-box; transform-origin: 0 0; }
+.ch-ld { fill: none; stroke: var(--c-series-down); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.ch-lu { fill: none; stroke: var(--c-series-up); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+.ch-ad { fill: url(#ch-gd); }
+.ch-au { fill: var(--c-series-up-area); }
+.ch-ed { fill: var(--c-series-down); stroke: var(--c-surface); stroke-width: 2; }
+.ch-eu { fill: var(--c-series-up); stroke: var(--c-surface); stroke-width: 2; }
+.ch-end { transition: opacity .25s; }
+/* paused, the grey history is its own copy under the plot (.ch-ghost, a <use> of the series); going
+   live (F-06) the plot's colour runs over it from the left (.is-sweep) and the copy fades after */
+.chart.is-paused .ch-plot { opacity: 0; }
+.ch-ghost { opacity: 0; filter: grayscale(1); transition: opacity .35s var(--ease-out); pointer-events: none; }
+.chart.is-paused .ch-ghost, .chart.is-sweep .ch-ghost { opacity: .5; }
+.chart.is-sweep .ch-ghost, .chart.is-sweep .ch-plot { transition: none; }
+.chart.is-paused .ch-end, .chart.is-sweep .ch-end { opacity: 0; }
+.ch-y { position: absolute; left: 0; top: 0; bottom: 0; width: 50px; pointer-events: none; }
+/* T-P5-11: the y labels (128 KB/s: 51 px in most languages) get the gutter up to 2 px before the
+   plot (overview.js pad.l = 54), instead of standing a pixel out of their 50 px track */
+.ch-y { width: 52px; }
+.ch-y .swap { position: absolute; right: 0; transform: translateY(-50%); font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+.ch-x { position: absolute; left: 0; right: 0; bottom: 0; height: 16px; pointer-events: none; }
+.ch-x span { position: absolute; top: 0; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ch-hov { opacity: 0; transition: opacity .12s; pointer-events: none; }
+.chart.is-hover .ch-hov { opacity: 1; }
+.ch-hov line { stroke: var(--c-line-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.ch-hov .d { fill: var(--c-series-down); stroke: var(--c-surface); stroke-width: 2; }
+.ch-hov .u { fill: var(--c-series-up); stroke: var(--c-surface); stroke-width: 2; }
+.ch-tip { position: absolute; left: 0; top: 0; min-width: 150px; padding: 7px 10px 8px; border-radius: var(--r-md); background: var(--c-surface); box-shadow: var(--sh-pop); font-size: var(--fs-12); line-height: 20px; color: var(--c-ink-2); pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 2; white-space: nowrap; }
+.chart.is-hover .ch-tip { opacity: 1; }
+.ch-tip .tt { color: var(--c-ink-3); font-variant-numeric: tabular-nums; }
+.ch-tip .tr { display: flex; align-items: center; gap: 7px; }
+.ch-tip .tr b { margin-left: auto; padding-left: 14px; font-weight: var(--fw-medium); color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.ch-tip .sw { width: 10px; height: 2px; border-radius: 2px; }
+/* no history yet, or one point (ruling 5th wave 10-5): nothing drawn. F-01: neither the paused nor
+   the empty chart lays a note over the grid; the chart stays quiet */
+.chart.is-empty .ch-end, .chart.is-empty .ch-hov { opacity: 0; }
+
+/* ---- side: the status strip (one hairline strip, three cells) + 协议分布 ------------ */
+.ov-side { grid-area: side; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ov-strip { display: flex; flex-direction: column; min-width: 0; flex: none; }
+/* the hairline frame is drawn by the cells themselves (each owns its sides and bottom), so when
+   the mode confirmation pushes or releases the cells below, the frame travels with them */
+.cell { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; padding: 9px 15px 10px; text-align: left;
+  background: var(--c-surface); border: 1px solid var(--c-line); border-top-width: 0; border-radius: 0; }
+.cell:first-child { border-top-width: 1px; border-radius: var(--r-panel) var(--r-panel) 0 0; }
+.cell:last-child { border-radius: 0 0 var(--r-panel) var(--r-panel); }
+.cell-in { display: flex; flex-direction: column; gap: 4px; min-width: 0; transition: scale var(--spring-dur) var(--spring); }
+button.cell { padding-right: 29px; transition: background-color .15s var(--ease-out); }
+button.cell:hover { background: var(--c-surface-hover); }
+/* press: the cell's content answers (a scaled full-width cell would pull away from the frame) */
+button.cell:active { background: var(--c-surface-press); }
+button.cell:active .cell-in { scale: .975; transition-duration: var(--dur-press); }
+button.cell:focus-visible { outline-offset: -2px; }
+.cell-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; min-width: 0; }
+.cell-lab { display: flex; align-items: center; gap: 8px; font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--c-ink-2); white-space: nowrap; }
+.cell-lab .ic { width: 16px; height: 16px; color: var(--c-ink-3); }
+.cell-val { display: flex; align-items: center; gap: 7px; font-size: var(--fs-14); font-weight: var(--fw-semi); white-space: nowrap; }
+.cell-val.is-idle { color: var(--c-ink-3); font-weight: var(--fw-medium); }
+.cell-val.is-err { color: var(--c-fail); }
+.cell-val.is-warn { color: var(--c-warn); }
+.cell-hint .gate-ic { width: 13px; height: 13px; vertical-align: -2px; margin-right: 4px; color: var(--c-warn); }
+/* 全局 / 混合 without administrator rights: shown, locked (a press explains in the hint line) */
+.seg-btn.is-gated { color: var(--c-ink-3); }
+.seg-btn.is-gated .gate-l { display: inline-block; width: 12px; height: 12px; margin: 0 3px 0 -1px; vertical-align: -1.5px; color: var(--c-ink-3); }
+.seg-btn.is-gated:hover { color: var(--c-ink-2); }
+/* Bastion's automatic pool: 60 places read as a compact meter (deck band + 节点池 row), not dots */
+.dcard-id .dc-meter { width: 44px; min-width: 0; height: 5px; margin-left: 2px; flex: none; }
+.dcard-id .dc-meter.is-off .meter-fill { background: var(--c-dot-off); }
+.deck.is-ghost .dcard-id .dc-meter .meter-track { background: var(--c-well); }
+.ov-bmeter { width: 26px; min-width: 0; height: 5px; flex: none; }
+.cell-unit { font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--c-ink-2); }
+.cell-hint { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 18px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); white-space: nowrap; min-width: 0; }
+.cell-hint > .swap { overflow: hidden; min-width: 0; }
+.cell-hint .mono { font-size: var(--fs-12); color: var(--c-ink-2); }
+.cell-hint .warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.cell-hint .spin { width: 11px; height: 11px; border-width: 1.5px; vertical-align: -1px; margin-right: 5px; }
+/* a long language: the 接管方式 toggles take what the label leaves and ellipsize; the row never
+   pushes the page sideways (T-P4-05a) */
+.ov-strip .cell-row > .seg { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+.ov-strip .cell-row > .seg > .seg-btn { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ov-strip .cell-lab { display: block; min-width: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.ov-strip .cell-lab .ic { display: inline-block; vertical-align: -3px; margin-right: 8px; }
+/* G08's remedy inside the hint: 重启服务 as a link */
+.cell-hint .ov-relink { font-size: var(--fs-12); line-height: 18px; height: auto; padding: 0; }
+/* G08: the drift sentence yields (ellipsis), 重启服务 after it stays whole (T-P4-05a) */
+#ov-mode-hint > .sw:has(> .ov-drift-t) { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.ov-drift-t { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#ov-mode-hint .ov-relink { flex: none; margin: 0; }
+/* T-P5-13 (决定_P5裁定 P5-e #5): a cell's hint (the kill switch's rule, the mode's state, the pool's
+   rate, the drift sentence) is read whole: it wraps under the cell's row. The label and its control
+   share the row while they fit; the toggles move under the label when they do not, and never
+   shrink below their words */
+.cell-hint { white-space: normal; align-items: flex-start; }
+.cell-hint > .swap { grid-template-columns: minmax(0, 1fr); }
+.cell-hint > .swap > .sw, .ov-drift-t { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+#ov-mode-hint > .sw:has(> .ov-drift-t) { display: block; }
+#ov-mode-hint .ov-relink { vertical-align: top; margin-left: 4px; }
+.cell-hint > .dots-group { margin-top: 5px; }
+.ov-strip .cell-row { flex-wrap: wrap; row-gap: 6px; }
+.ov-strip .cell-lab { overflow: visible; white-space: normal; overflow-wrap: break-word; }
+.ov-strip .cell-row > .seg { flex: none; }
+.ov-strip .cell-row > .seg > .seg-btn { flex: 1 0 auto; overflow: visible; }
+/* no network.mode yet: the control is shown, nothing is on or locked (paintToggles) */
+.cell .go { position: absolute; right: 10px; top: 50%; margin-top: -7px; width: 14px; height: 14px; color: var(--c-ink-3); opacity: 0; translate: -4px 0; transition: opacity .15s var(--ease-out), translate .2s var(--ease-out); }
+.cell:hover .go, .cell:focus-visible .go { opacity: 1; translate: 0 0; }
+@media (max-height: 760px) { .ov-side { gap: 12px; } .cell { padding-top: 7px; padding-bottom: 8px; } .cell-row { min-height: 26px; } }
+
+/* mode switching: the thumb stays on the asked mode and breathes until the switch is done */
+.seg[aria-busy="true"] .seg-thumb { animation: ovSegBusy .8s ease-in-out infinite alternate; }
+@keyframes ovSegBusy { to { opacity: .45; } }
+
+/* inline confirmation: opens inside the 网络模式 cell and pushes the cells below (never covers) */
+.ov-confirm { position: relative; z-index: 2; display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px 10px; margin: 8px -15px -10px; padding: 12px 15px 12px;
+  background: var(--c-surface-hover); box-shadow: inset 0 1px 0 var(--c-line); }
+/* closing: out of flow while it rolls up, carrying its own side lines over the cell below */
+.ov-confirm.is-closing { left: -1px !important; right: -1px !important; box-shadow: inset 1px 0 0 var(--c-line), inset -1px 0 0 var(--c-line); }
+.ov-confirm > .ic { width: 18px; height: 18px; color: var(--c-ink-2); margin-top: 1px; }
+.ov-confirm .txt { min-width: 0; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); white-space: normal; }
+.ov-confirm .txt b { display: block; font-weight: var(--fw-semi); color: var(--c-ink); }
+.ov-confirm .txt .warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.ov-confirm .acts { grid-column: 2; display: flex; gap: 6px; }
+@media (max-height: 760px) { .ov-confirm { margin-bottom: -8px; padding-top: 10px; padding-bottom: 10px; } }
+
+/* F-01 round 1: 协议分布 follows the status strip (no longer pinned to the column's foot: a short
+   strip left a 100 px gap above it) */
+.ov-proto { display: flex; flex-direction: column; min-width: 0; flex: none; }
+.ov-proto .ov-head { height: 20px; margin-bottom: 8px; }
+/* T-P5-13: its note wraps under a long count (es 7 entradas de protocolo · Cargado en Mihomo): the
+   head grows instead of the note running over the bar */
+.ov-proto .ov-head { height: auto; min-height: 20px; }
+.ov-proto .ov-title { font-size: var(--fs-13); }
+.proto { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pbar { display: flex; gap: 2px; height: 8px; border-radius: var(--r-xs); overflow: hidden; background: var(--c-well); flex: none; }
+.pbar i { display: block; height: 100%; transform-origin: 0 50%; transition: opacity .2s var(--ease-out); }
+.pbar.hl i:not(.on) { opacity: .28; }
+.proto.is-idle .pbar i { opacity: .25; }
+.pleg { display: flex; flex-wrap: wrap; gap: 2px 14px; min-width: 0; }
+.prow { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 6px; margin: 0 -6px; border-radius: var(--r-ctl); font-size: var(--fs-12); color: var(--c-ink-2); white-space: nowrap; transition: background-color .15s; }
+.prow.on { background: var(--c-wash); }
+.prow .sw { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.prow .pc { font-weight: var(--fw-semi); color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.prow.is-empty { padding: 0; margin: 0; }
+/* T-P5-06: the empty legend's way to 层级 is a sentence: it wraps in the column, never runs past it */
+.prow.is-empty { height: auto; min-height: 22px; max-width: 100%; white-space: normal; }
+.prow.is-empty > .link-btn { height: auto; min-height: 26px; margin-top: -2px; margin-bottom: -2px; white-space: normal; text-align: left; }
+.proto.is-idle .prow .pc { color: var(--c-ink-3); font-weight: var(--fw-regular); }
+/* the mode confirmation takes room: the least-needed content (the protocol mix, static
+   configuration) yields first, so the chart keeps its height */
+.page-overview .ov-side:has(.ov-confirm) .ov-proto { display: none; }
+
+/* ---- narrow fallback (< 1060 px wide, web builds only): one column, nothing clever ---- */
+@media (max-width: 1059px) {
+  .ov { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "hero" "ctl" "exit" "deck" "side" "traf"; row-gap: 20px; }
+  .ov-ctl { align-self: start; }
+  .run { flex: 0 0 236px; }
+  .ov-traffic { min-height: 300px; }
+  .tot { gap: 20px; flex-wrap: wrap; }
+}

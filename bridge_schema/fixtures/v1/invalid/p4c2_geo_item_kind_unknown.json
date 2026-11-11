@@ -1,0 +1,38 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "geo.status",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "running": false,
+      "updated_at_ms": 1790726400000,
+      "errors": [
+        {
+          "code": "io",
+          "message_key": "errors.geo.update_failed",
+          "params": {}
+        }
+      ],
+      "items": [
+        {
+          "kind": "rules",
+          "updated_at_ms": 1790726400000
+        },
+        {
+          "kind": "geosite",
+          "updated_at_ms": 1790726400000
+        },
+        {
+          "kind": "mmdb",
+          "updated_at_ms": null
+        }
+      ]
+    }
+  },
+  "expected": "type:geo.status.items[0].kind"
+}

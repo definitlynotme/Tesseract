@@ -1,0 +1,16 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "tier.transition",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "from": "vanguard",
+    "to": "vanguard",
+    "observed_at_ms": 1,
+    "authority": "observed"
+  },
+  "seq": 1
+}

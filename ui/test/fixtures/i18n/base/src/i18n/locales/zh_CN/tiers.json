@@ -1,0 +1,6 @@
+{
+  "tiers.reason.timeout": {
+    "m": "检测超时",
+    "_desc": "节点检测原因"
+  }
+}

@@ -1,0 +1,218 @@
+{
+ "close_flag_off": {
+  "close_enabled": false
+ },
+ "empty": {
+  "admission": null,
+  "calls": {},
+  "close_enabled": true,
+  "closed": [],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:980b7b32a2e866170e20d9c8\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0 observer=ob-995a0825d12f2774 scope=sc-daa4ff34d403757a scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0 observer=ob-995a0825d12f2774 scope=sc-daa4ff34d403757a scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:980b7b32a2e866170e20d9c8 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a2c458fc00ade862 seq=<seq> loss_total=0)"
+   ]
+  }
+ },
+ "exact_ids": {
+  "admission": null,
+  "calls": {
+   "close": [
+    [
+     "c1"
+    ],
+    [
+     "c2"
+    ]
+   ],
+   "connections": [
+    []
+   ]
+  },
+  "close_enabled": true,
+  "closed": [
+   "c1",
+   "c2"
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:0b72b2e1e9750dcb32c312b2\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0 observer=ob-2b44cc05024e91b5 scope=sc-3713df882732563d scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0 observer=ob-2b44cc05024e91b5 scope=sc-3713df882732563d scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:0b72b2e1e9750dcb32c312b2 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-64b3b0a7c38e02c3 seq=<seq> loss_total=0)"
+   ]
+  }
+ },
+ "other_leaf": {
+  "admission": null,
+  "calls": {
+   "connections": [
+    []
+   ]
+  },
+  "close_enabled": true,
+  "closed": [],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:3186c32c82947e9563b03bc0\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0 observer=ob-e5c2809f3c79d36c scope=sc-fa2abd5afcbc4f3e scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0 observer=ob-e5c2809f3c79d36c scope=sc-fa2abd5afcbc4f3e scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:3186c32c82947e9563b03bc0 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6ee1280c2315dd32 seq=<seq> loss_total=0)"
+   ]
+  }
+ },
+ "shadow": {
+  "close_enabled": false
+ },
+ "unknown_id": {
+  "admission": null,
+  "calls": {
+   "close": [
+    [
+     "c1"
+    ]
+   ],
+   "connections": [
+    []
+   ]
+  },
+  "close_enabled": true,
+  "closed": [
+   "c1"
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:a75b1630b1a74fc5f2db5072\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0 observer=ob-167fccfd2419db41 scope=sc-32d4752412285764 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0 observer=ob-167fccfd2419db41 scope=sc-32d4752412285764 scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:a75b1630b1a74fc5f2db5072 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d9a03048b2f45f4e seq=<seq> loss_total=0)"
+   ]
+  }
+ },
+ "wrong_job_leaf": {
+  "admission": null,
+  "calls": {},
+  "close_enabled": true,
+  "closed": [],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:87f0d58779e977941de46217\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0 observer=ob-8044c4512d675684 scope=sc-1f8a0e303d978f9d scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0 observer=ob-8044c4512d675684 scope=sc-1f8a0e303d978f9d scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:87f0d58779e977941de46217 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9aff9d7ef6b22cba seq=<seq> loss_total=0)"
+   ]
+  }
+ }
+}

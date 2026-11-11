@@ -1,0 +1,19 @@
+{
+  "fmt.ago.days": "{n, plural, one {vor # Tag} other {vor # Tagen}}",
+  "fmt.ago.hours": "{n, plural, one {vor # Stunde} other {vor # Stunden}}",
+  "fmt.ago.minutes": "{n, plural, one {vor # Minute} other {vor # Minuten}}",
+  "fmt.ago.now": "gerade eben",
+  "fmt.lat.down": "Nicht verfügbar",
+  "fmt.lat.ok": "Normal",
+  "fmt.lat.slow": "Langsam",
+  "fmt.ms": "{n, number, integer} ms",
+  "fmt.qty": "{num} {unit}",
+  "fmt.unit.b": "B",
+  "fmt.unit.gb": "GB",
+  "fmt.unit.kb": "KB",
+  "fmt.unit.mb": "MB",
+  "fmt.unit.per_second": "{unit}/s",
+  "fmt.uptime.hours_minutes": "{h} Std. {m} Min.",
+  "fmt.uptime.minutes": "{m} Min.",
+  "fmt.uptime.under_minute": "unter 1 Min."
+}

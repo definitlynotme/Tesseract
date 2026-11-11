@@ -1,0 +1,67 @@
+{
+  "_doc": "Demo-only markers searched by scan.mjs --rule demo (P4 architecture §6; a hard gate since T-P4-07). Bundle part: the top-level *.js and *.css listed in ui/dist/app/build-manifest.json, or the in-memory bundle for build.mjs --check. Taken from the 'demo code to delete' tables of 映射_core §7, 映射_overview §5, 映射_tiers §13, 映射_logs §6, 映射_settings §6. text: literal substrings (JS); regex: JS patterns that survive minification (property names, string literals); css_classes: class/id tokens (ov-demo and logs-demo are element ids) searched as whole tokens in JS and, in CSS, as .name / #name selectors and [id=name] / [class~=name] attribute selectors — the CSS move into css/design.css is driven by this list; css_text: literal substrings searched in the CSS bundle; message_ids: prototype-explanation message ids, added by the 04 series once the strings are extracted. source: what is banned in the sources the app target is built from (T-P4-07 requirement 2): every *.js under ui/src and src/index.html (comments included) except src/design/ and src/i18n/locales/, and every *.css under ui/css except css/design.css (class tokens as selectors with comments skipped; text such as @i18n-pending anywhere). The app entry's import graph must not reach src/design/. JS (bundle and sources) is matched after decoding \\uXXXX / \\u{...} escapes, so a CJK marker or a message id inside a locale chunk (a catalog string inside a string) is seen (T-P4-07 fix round 1). message_ids are id prefixes: overview.demo. and shell.demo. were deleted from the catalog with the demo controls (design/demo.js uses design-time literals); they must not come back. source.design_only: hook files outside src/design/ that only the design entry imports (P4 architecture §1.1.1), exempt from the source markers by name with a reason; the gate fails if the app entry reaches one of them.",
+  "text": [
+    "T.sim",
+    "sim:",
+    "scenario(",
+    "setState(",
+    "fillTo",
+    "window.demo",
+    "sampleFor",
+    "seedHistory",
+    "C:\\\\Users\\\\user",
+    "demoFail",
+    "set-demo-",
+    "@i18n-pending",
+    "原型演示",
+    "原型只有简体中文界面"
+  ],
+  "regex": [
+    "[A-Za-z_$][\\w$]*\\.sim\\b"
+  ],
+  "css_classes": [
+    "demo-link",
+    "ov-demo",
+    "logs-demo",
+    "set-demo",
+    "set-notes-demo",
+    "set-demo-tag"
+  ],
+  "css_text": [
+    "@i18n-pending"
+  ],
+  "message_ids": [
+    "overview.demo.",
+    "shell.demo."
+  ],
+  "source": {
+    "text": [
+      "T.sim",
+      "sim:",
+      "window.demo",
+      "scenario(",
+      "@i18n-pending"
+    ],
+    "regex": [
+      "\\bT\\.D\\b"
+    ],
+    "design_only": [
+      {
+        "file": "src/boot/rt-design.js",
+        "reason": "The design target runtime hook (fixture mode / sim mode, P4 architecture §1.1.1): it starts the prototype simulator, so it names T.sim and sim: by design. Imported by src/entry/design.js only."
+      },
+      {
+        "file": "src/boot/data-design.js",
+        "reason": "The design target data hook: imports design/data.js and design/demo.js (the demo controls). Imported by src/entry/design.js only."
+      },
+      {
+        "file": "src/boot/design.js",
+        "reason": "Design-only odds and ends run last in the design entry (?lang handling, sim bookkeeping). Imported by src/entry/design.js only."
+      },
+      {
+        "file": "src/entry/design.js",
+        "reason": "The design target entry: imports the design hooks above. Never imported by the app entry."
+      }
+    ]
+  }
+}

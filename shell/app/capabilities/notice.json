@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "notice",
+  "description": "The notice card window (notice.html) only: no core, plugin, shell, filesystem or process API. Its commands are notice_ready, notice_rendered, notice_open, notice_dismiss and notice_resize; the app has no ACL manifest for its own commands, so main.rs checks the caller's window label in every command (the notice window can call only these five, the main window only its own).",
+  "windows": ["notice"],
+  "permissions": []
+}

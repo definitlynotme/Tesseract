@@ -1,0 +1,27 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "jobs",
+    "rev": 1,
+    "kind": "edge",
+    "seq": 1,
+    "data": {
+      "op": "op-1",
+      "req_id": "request-1",
+      "owner": "window-1",
+      "name": "app.update.install",
+      "state": "done",
+      "started_at_ms": 1790812800000,
+      "result": {
+        "verified": false,
+        "handoff_pending": true,
+        "receipt_ref": "example"
+      }
+    }
+  },
+  "expected": "invariant:jobs.result.handoff_pending"
+}

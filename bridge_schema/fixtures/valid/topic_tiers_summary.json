@@ -1,0 +1,47 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "tiers.summary",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "carrier": "vanguard",
+    "offline_reason": null,
+    "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+    ],
+    "degraded": false,
+    "fallback": false,
+    "tiers": {
+      "vanguard": {
+        "enabled": true,
+        "total": 3,
+        "usable": 2
+      },
+      "sentinel": {
+        "enabled": true,
+        "total": 2,
+        "usable": 1
+      },
+      "bastion": {
+        "enabled": true,
+        "total": 40,
+        "usable": 25
+      },
+      "gateway": {
+        "enabled": false,
+        "total": 0,
+        "usable": 0
+      }
+    },
+    "pool": {
+      "usable": 5,
+      "total": 7
+    }
+  }
+}

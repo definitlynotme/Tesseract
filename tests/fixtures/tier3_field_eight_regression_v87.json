@@ -1,0 +1,22 @@
+{
+  "evidence_kind": "observed_aggregate_only",
+  "executable_sha256": "3ca2524b3a1861efb5af32a1e3ca10e6967497118c7be837c2e98ca29dd98e0b",
+  "tcp_started": 550,
+  "tcp_responsive": 80,
+  "unique_candidates": 8001,
+  "individual_transport_trace": "unavailable",
+  "report": {
+    "running": false,
+    "source_stream_shutdown_confirmed": true,
+    "source_stream_time_to_pool_revision_3_ms": 3609,
+    "source_stream_time_to_pool_target_ms": null,
+    "source_stream_alive_at_20s": 8,
+    "source_stream_committed_alive_count": 8,
+    "source_stream_full_validation_passed_count": 8,
+    "source_stream_admission_commit_committed_count": 8,
+    "source_stream_admission_commit_skipped_count": 0,
+    "candidate_scheduler_active_ticket_count": 0,
+    "source_stream_admission_commit_pending_count": 0,
+    "source_stream_validation_submit_pending_count": 0
+  }
+}

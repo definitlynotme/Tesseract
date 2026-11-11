@@ -1,0 +1,8 @@
+{
+  "t": "hello_ack",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "proto": 1,
+  "accepted": true
+}

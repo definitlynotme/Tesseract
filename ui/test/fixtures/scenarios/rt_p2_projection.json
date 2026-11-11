@@ -1,0 +1,527 @@
+{
+ "name": "rt_p2_projection",
+ "desc": "A v1 hello and one frame of each P2 topic the projection maps, plus a two-page nodes.list snapshot. The kill switch frame is an armed one (enabled, admin, not active / triggered: active means rules in force, i.e. triggered, T-P4-C1; T-P4-12).",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "alerts.catalog",
+      "alerts.deliveries",
+      "alerts.onboarding.cancel",
+      "alerts.onboarding.complete",
+      "alerts.onboarding.poll",
+      "alerts.onboarding.start",
+      "alerts.test",
+      "app.info",
+      "app.update.check",
+      "app.update.install",
+      "autostart.state",
+      "config.snapshot",
+      "exit.verify",
+      "gateway.select",
+      "geo.status",
+      "geo.update",
+      "import.apply",
+      "import.preview",
+      "import.specs",
+      "logs.exportBundle",
+      "logs.exportFiltered",
+      "logs.query",
+      "logs.setMihomoLevel",
+      "logs.tail",
+      "mode.set",
+      "nodes.cancelDiagnose",
+      "nodes.delete",
+      "nodes.detail",
+      "nodes.diagnose",
+      "nodes.reveal",
+      "nodes.update",
+      "service.restart",
+      "service.start",
+      "service.stop",
+      "settings.apply",
+      "settings.validate",
+      "subscriptions.refresh"
+     ],
+     "topics": [
+      "alerts.delivery",
+      "alerts.history",
+      "alerts.onboarding",
+      "bastion.pool",
+      "bastion.sources",
+      "config.changed",
+      "config.items",
+      "core.info",
+      "exit.identity",
+      "gateway.current",
+      "geo.status",
+      "jobs",
+      "killswitch.state",
+      "logs.batch",
+      "logs.feed",
+      "network.mode",
+      "nodes.list",
+      "protocols.mix",
+      "route.published",
+      "service.collect",
+      "service.state",
+      "subscriptions.list",
+      "tier.transition",
+      "tiers.summary",
+      "traffic.history",
+      "traffic.tick",
+      "update.state"
+     ],
+     "features": []
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": true,
+      "startup_phase": "running",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": true,
+      "pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": 120
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "vanguard",
+     "offline_reason": null,
+     "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+     ],
+     "degraded": false,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 3,
+       "usable": 2
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 2,
+       "usable": 1
+      },
+      "bastion": {
+       "enabled": true,
+       "total": 40,
+       "usable": 25
+      },
+      "gateway": {
+       "enabled": false,
+       "total": 0,
+       "usable": 0
+      }
+     },
+     "pool": {
+      "usable": 5,
+      "total": 7
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "network.mode",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "mode": "system",
+     "admin": true,
+     "switching": false,
+     "proxy_state": "owned",
+     "drift": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "killswitch.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "enabled": true,
+     "active": false,
+     "triggered": false,
+     "admin": true,
+     "error": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "bastion.pool",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "runtime_alive": 1,
+     "user_alive": 1,
+     "capacity": 1,
+     "min_alive_nodes": 1,
+     "target_alive": 1,
+     "collecting": true,
+     "observed_at_ms": 1
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "exit.identity",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "current": {
+      "request_id": "example",
+      "generation": 1,
+      "binding_id": null,
+      "status": "idle",
+      "reason_code": null,
+      "v4": {
+       "status": "unknown",
+       "address": null,
+       "country": null,
+       "reason_code": null,
+       "observed_at_ms": null
+      },
+      "v6": {
+       "status": "unknown",
+       "address": null,
+       "country": null,
+       "reason_code": null,
+       "observed_at_ms": null
+      },
+      "fresh": false,
+      "observed_at_ms": null,
+      "native_fallback_verified": false,
+      "native_fallback_verified_commit_rejected": false,
+      "native_fallback_unverified_budget": false,
+      "manual_execution_binding_stale": false
+     },
+     "previous": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.collect",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "generation": 1,
+     "tiers": [
+      {
+       "tier": "bastion",
+       "generation": 1,
+       "first_check": "unknown",
+       "source_count": null,
+       "healthy": null,
+       "required": null,
+       "observed_at_ms": null
+      },
+      {
+       "tier": "gateway",
+       "generation": 1,
+       "first_check": "unknown",
+       "source_count": null,
+       "healthy": null,
+       "required": null,
+       "observed_at_ms": null
+      },
+      {
+       "tier": "sentinel",
+       "generation": 1,
+       "first_check": "unknown",
+       "source_count": null,
+       "healthy": null,
+       "required": null,
+       "observed_at_ms": null
+      },
+      {
+       "tier": "vanguard",
+       "generation": 1,
+       "first_check": "unknown",
+       "source_count": null,
+       "healthy": null,
+       "required": null,
+       "observed_at_ms": null
+      }
+     ],
+     "observed_at_ms": 1
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "update.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "state": "idle",
+     "version": null,
+     "update_available": false,
+     "installable": false,
+     "error": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "protocols.mix",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "source": "loaded",
+     "counts": {
+      "ss": 2
+     },
+     "observed_at_ms": 1
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "selected": null,
+     "effective": null,
+     "missing": false,
+     "applied": false,
+     "pending": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tier.transition",
+    "rev": 1,
+    "kind": "edge",
+    "data": {
+     "from": "vanguard",
+     "to": "vanguard",
+     "observed_at_ms": 1,
+     "authority": "observed"
+    },
+    "seq": 1
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "config.changed",
+    "rev": 1,
+    "kind": "edge",
+    "data": {
+     "rev": 1,
+     "files": [
+      "local"
+     ],
+     "sections": [
+      {
+       "section": "network",
+       "saved": true,
+       "applied": true,
+       "effect": "none",
+       "error": null
+      }
+     ],
+     "pending": null,
+     "external_detection": "bridge_writes_only"
+    },
+    "seq": 1
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "example",
+       "name": "example",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "unknown",
+       "reason_code": null,
+       "protocol": "example",
+       "latency_ms": null
+      }
+     ]
+    },
+    "key": "vanguard",
+    "page": {
+     "snapshot_id": "snapshot-1",
+     "index": 0,
+     "complete": false,
+     "next_cursor": "cursor-1"
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "node-2",
+       "name": "example",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "unknown",
+       "reason_code": null,
+       "protocol": "example",
+       "latency_ms": null
+      }
+     ]
+    },
+    "key": "vanguard",
+    "page": {
+     "snapshot_id": "snapshot-1",
+     "index": 1,
+     "complete": true,
+     "next_cursor": null
+    }
+   }
+  }
+ ]
+}

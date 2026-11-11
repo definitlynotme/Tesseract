@@ -1,0 +1,59 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "carrier": "vanguard",
+      "offline_reason": null,
+      "order": [
+        "vanguard",
+        "sentinel",
+        "bastion",
+        "gateway"
+      ],
+      "degraded": true,
+      "fallback": false,
+      "tiers": {
+        "vanguard": {
+          "enabled": true,
+          "total": 4,
+          "usable": 3,
+          "check_interval_s": 30,
+          "pending": 0
+        },
+        "sentinel": {
+          "enabled": true,
+          "total": 4,
+          "usable": 3,
+          "check_interval_s": 60,
+          "pending": -1
+        },
+        "bastion": {
+          "enabled": true,
+          "total": 4,
+          "usable": 3,
+          "check_interval_s": 120,
+          "pending": 0
+        },
+        "gateway": {
+          "enabled": true,
+          "total": 4,
+          "usable": 3,
+          "check_interval_s": 60,
+          "pending": 1
+        }
+      },
+      "pool": {
+        "usable": 6,
+        "total": 8
+      }
+    }
+  },
+  "expected": "type:tiers.summary.tiers.sentinel.pending"
+}

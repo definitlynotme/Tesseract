@@ -1,0 +1,52 @@
+{
+ "core_down": {
+  "hard": "core_down",
+  "repr": "LeaseBusy(hard='core_down', soft='')",
+  "soft": ""
+ },
+ "none": {
+  "hard": "",
+  "repr": "LeaseBusy(hard='', soft='')",
+  "soft": ""
+ },
+ "not_ready": {
+  "hard": "not_ready",
+  "repr": "LeaseBusy(hard='not_ready', soft='')",
+  "soft": ""
+ },
+ "passive_running": {
+  "hard": "releasing",
+  "repr": "LeaseBusy(hard='releasing', soft='')",
+  "soft": ""
+ },
+ "probe_binding": {
+  "hard": "",
+  "repr": "LeaseBusy(hard='', soft='probe_binding')",
+  "soft": "probe_binding"
+ },
+ "recovery_worker": {
+  "hard": "recovery_worker",
+  "repr": "LeaseBusy(hard='recovery_worker', soft='')",
+  "soft": ""
+ },
+ "releasing": {
+  "hard": "releasing",
+  "repr": "LeaseBusy(hard='releasing', soft='')",
+  "soft": ""
+ },
+ "releasing_own": {
+  "hard": "",
+  "repr": "LeaseBusy(hard='', soft='')",
+  "soft": ""
+ },
+ "settled_fixed": {
+  "hard": "",
+  "repr": "LeaseBusy(hard='', soft='')",
+  "soft": ""
+ },
+ "settled_selector": {
+  "hard": "",
+  "repr": "LeaseBusy(hard='', soft='')",
+  "soft": ""
+ }
+}

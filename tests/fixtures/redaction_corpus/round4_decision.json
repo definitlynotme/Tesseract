@@ -1,0 +1,160 @@
+[
+  {
+    "kind": "round4-number-text",
+    "input": "12345678",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-json-string",
+    "input": "{\"value\": \"12345678\"}",
+    "expected": "{\"value\":\"[redacted:password]\"}",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-json-array",
+    "input": "[\"12345678\", {\"value\": \"12345678\"}]",
+    "expected": "[\"[redacted:password]\",{\"value\":\"[redacted:password]\"}]",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-json-key",
+    "input": "{\"12345678\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-json-shaped-key",
+    "input": "{\"{\\\"value\\\": \\\"12345678\\\"}\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-percent",
+    "input": "%31%32%33%34%35%36%37%38",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-number-unicode",
+    "input": "\\u0031\\u0032\\u0033\\u0034\\u0035\\u0036\\u0037\\u0038",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-text",
+    "input": "SyntheticGotifyPadded",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-json-string",
+    "input": "{\"value\": \"SyntheticGotifyPadded\"}",
+    "expected": "{\"value\":\"[redacted:password]\"}",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-json-array",
+    "input": "[\"SyntheticGotifyPadded\", {\"value\": \"SyntheticGotifyPadded\"}]",
+    "expected": "[\"[redacted:password]\",{\"value\":\"[redacted:password]\"}]",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-json-key",
+    "input": "{\"SyntheticGotifyPadded\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-json-shaped-key",
+    "input": "{\"{\\\"value\\\": \\\"SyntheticGotifyPadded\\\"}\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-percent",
+    "input": "%53%79%6E%74%68%65%74%69%63%47%6F%74%69%66%79%50%61%64%64%65%64",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-opaque-unicode",
+    "input": "\\u0053\\u0079\\u006e\\u0074\\u0068\\u0065\\u0074\\u0069\\u0063\\u0047\\u006f\\u0074\\u0069\\u0066\\u0079\\u0050\\u0061\\u0064\\u0064\\u0065\\u0064",
+    "expected": "[redacted:password]",
+    "known_secret_values": {
+      "SyntheticGotifyPadded": "password"
+    }
+  },
+  {
+    "kind": "round4-json-number",
+    "input": "{\"value\":12345678}",
+    "expected": "{\"value\":\"[redacted:password]\"}",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-nested-numbers",
+    "input": "[12345678,{\"nested\":[12345678]}]",
+    "expected": "[\"[redacted:password]\",{\"nested\":[\"[redacted:password]\"]}]",
+    "known_secret_values": {
+      "12345678": "password"
+    }
+  },
+  {
+    "kind": "round4-jwt-hs256-text",
+    "input": "eyAidHlwIjogIkpXVCIsICJhbGciOiAiSFMyNTYiIH0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.K6_wmvVGwqhBIurSdRMUhNbWmpa0kB-petpSVxsr4co",
+    "expected": "[REDACTED]"
+  },
+  {
+    "kind": "round4-jwt-hs256-json-string",
+    "input": "{\"value\": \"eyAidHlwIjogIkpXVCIsICJhbGciOiAiSFMyNTYiIH0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.K6_wmvVGwqhBIurSdRMUhNbWmpa0kB-petpSVxsr4co\"}",
+    "expected": "{\"value\":\"[REDACTED]\"}"
+  },
+  {
+    "kind": "round4-jwt-hs256-json-key",
+    "input": "{\"eyAidHlwIjogIkpXVCIsICJhbGciOiAiSFMyNTYiIH0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.K6_wmvVGwqhBIurSdRMUhNbWmpa0kB-petpSVxsr4co\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}"
+  },
+  {
+    "kind": "round4-jwt-empty-signature-text",
+    "input": "eyJhbGciOiJub25lIn0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.",
+    "expected": "[REDACTED]"
+  },
+  {
+    "kind": "round4-jwt-empty-signature-json-string",
+    "input": "{\"value\": \"eyJhbGciOiJub25lIn0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.\"}",
+    "expected": "{\"value\":\"[REDACTED]\"}"
+  },
+  {
+    "kind": "round4-jwt-empty-signature-json-key",
+    "input": "{\"eyJhbGciOiJub25lIn0.eyAic3ViIjogInN5bnRoZXRpYyIgfQ.\": \"private\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}"
+  }
+]

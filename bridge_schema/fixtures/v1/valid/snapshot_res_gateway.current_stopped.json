@@ -1,0 +1,13 @@
+{
+  "epoch": "v1-fixture",
+  "error": {
+    "code": "snapshot_required",
+    "message_key": "errors.bridge.snapshot_required",
+    "params": {}
+  },
+  "id": 19,
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "t": "snapshot_res",
+  "topic": "gateway.current"
+}

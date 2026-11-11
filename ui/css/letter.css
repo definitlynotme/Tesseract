@@ -1,0 +1,168 @@
+/* ==========================================================================
+   letter.css — the letter for users (11-05; src/letter/letter.js, art.js; DESIGN §6.22)
+   The product name in the sidebar is its entry; an envelope beside it while this edition is
+   unread. The letter is one sheet of paper on the desk, the sheets still to read under it, and a
+   quiet row of controls below. Type carries it: the heading, the page numbers and the signature
+   in the letter's italic (--font-letter), the greeting and the closing wish in the voice, the
+   body in the UI face at 14 px.
+   ========================================================================== */
+
+/* ---- the entry: the product name (a button the size of the wordmark; the brand row keeps its
+   layout, so the launch still lands on it) ------------------------------------------------- */
+.brand-name {
+  position: relative; display: inline-flex; align-items: center; gap: 7px; height: 30px; margin: 0 -8px; padding: 0 8px;
+  border-radius: var(--r-md); color: var(--c-ink);
+  -webkit-app-region: no-drag; app-region: no-drag;
+  transition: background-color .15s var(--ease-out), scale var(--spring-dur) var(--spring);
+}
+.brand-name:hover { background: var(--c-wash); }
+.brand-name:active { background: var(--c-wash-2); scale: .97; transition-duration: .15s, var(--dur-press); }
+.brand-mail {
+  width: 15px; height: 11px; flex: none; overflow: visible; translate: 0 1px;
+  fill: none; stroke: var(--c-accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.brand-mail[hidden] { display: none; }
+.brand-mail.is-waiting { opacity: 0; }
+
+/* ---- the desk ---------------------------------------------------------------------------- */
+.letter {
+  --lt-w: min(540px, calc(100vw - 64px));
+  /* --lt-fit: the longest page of this language (letter.js fit()); the window bounds it */
+  --lt-h: clamp(440px, var(--lt-fit, 560px), calc(100vh - var(--top-h) - 106px));
+  position: absolute; left: 50%; translate: -50% 0;
+  top: max(calc(var(--top-h) + 12px), calc(50vh - (var(--lt-h) + 58px) / 2));
+  width: var(--lt-w); display: flex; flex-direction: column; align-items: center; gap: 18px;
+  -webkit-app-region: no-drag; app-region: no-drag;
+}
+.letter:focus-visible { outline: none; }
+
+/* the sheets still to read, under the paper (data-left: 0–2) */
+.lt-stack { position: absolute; left: 0; top: 0; width: 100%; height: var(--lt-h); pointer-events: none; }
+.lt-stack i {
+  position: absolute; inset: 0; border-radius: var(--r-float); background: var(--c-surface); box-shadow: var(--sh-card-back);
+  transform-origin: 50% 100%; opacity: 0; scale: .96; translate: 0 0;
+  transition: translate var(--spring-soft-dur) var(--spring-soft), scale var(--spring-soft-dur) var(--spring-soft), opacity .24s var(--ease-out);
+}
+.lt-stack i:nth-child(1) { --dy: 7px;  --s: .968; }
+.lt-stack i:nth-child(2) { --dy: 13px; --s: .936; }
+.lt-stack[data-left="2"] i, .lt-stack[data-left="1"] i:nth-child(1) { opacity: 1; translate: 0 var(--dy); scale: var(--s); }
+
+/* the paper */
+.lt-paper { position: relative; width: 100%; height: var(--lt-h); border-radius: var(--r-float); background: var(--c-surface); box-shadow: var(--sh-float); }
+.lt-sheet { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
+.lt-shade { position: absolute; inset: 0; z-index: 1; border-radius: inherit; background: var(--c-ink); opacity: 0; pointer-events: none; }
+/* a sheet being leafed away (or back): lifted off the stack, it tilts from near its lower left
+   corner as a hand slides it aside (letter.js animates the transform) */
+.lt-leaf {
+  position: absolute; inset: 0; z-index: 2; border-radius: inherit; overflow: hidden; background: var(--c-surface);
+  box-shadow: var(--sh-card-lift); transform-origin: 30% 100%; will-change: transform, opacity; pointer-events: none;
+}
+.lt-x { position: absolute; top: 12px; right: 12px; z-index: 3; }
+
+/* the measuring sheet (letter.js fit()): every page laid out at its natural height, unseen */
+.lt-probe { position: absolute; left: 0; top: 0; width: 100%; visibility: hidden; pointer-events: none; }
+.lt-probe > .lt-page { position: static; height: auto; overflow: visible; }
+
+/* ---- a page ------------------------------------------------------------------------------ */
+.lt-page {
+  position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;
+  padding: 38px 56px 36px; color: var(--c-ink);
+}
+.lt-run { display: flex; align-items: baseline; justify-content: space-between; margin: -4px 0 30px; padding-right: 30px; color: var(--c-ink-3); }
+.lt-run-h { font-family: var(--font-letter); font-style: italic; font-size: var(--fs-14); }
+.lt-run-n { font-family: var(--font-letter); font-style: italic; font-size: var(--fs-13); }
+.lt-title { font-size: var(--fs-18); line-height: 26px; font-weight: var(--fw-semi); letter-spacing: -.01em; margin-bottom: 20px; }
+.lt-p, .lt-step, .lt-item { font-size: var(--fs-14); line-height: 24px; }
+.lt-p + .lt-p { margin-top: 12px; }
+.lt-p b, .lt-step b, .lt-item b, .lt-note b { font-weight: var(--fw-semi); }
+.lt-note { margin-top: 18px; font-size: var(--fs-13); line-height: 22px; color: var(--c-ink-2); }
+.lt-page kbd { margin: 0 1px; translate: 0 -1px; }
+
+/* page 1: the letterhead and the greeting */
+.lt-head { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; margin: 6px 0 30px; }
+.lt-mark { width: 30px; height: 30px; overflow: visible; }
+.lt-mark path { fill: none; stroke: var(--c-ink); stroke-width: 5.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.lt-mark-dot { fill: var(--c-accent); transform-box: fill-box; transform-origin: center; }
+.lt-heading { font-family: var(--font-letter); font-style: italic; font-weight: var(--fw-regular); font-size: var(--fs-34); line-height: 1.1; letter-spacing: -.012em; }
+.lt-hello {
+  margin-bottom: 16px; font-family: var(--font-voice); font-style: var(--voice-style); font-weight: var(--voice-weight);
+  font-size: calc(var(--fs-18) * var(--voice-scale)); line-height: 28px; letter-spacing: var(--voice-track);
+}
+
+/* lists: steps with the letter's numerals, things to mind with a glyph */
+.lt-steps, .lt-items { display: flex; flex-direction: column; list-style: none; }
+.lt-steps { gap: 10px; }
+.lt-items { gap: 18px; }
+.lt-step { display: grid; grid-template-columns: 26px minmax(0, 1fr); align-items: baseline; }
+.lt-step-n { font-family: var(--font-letter); font-style: italic; font-size: var(--fs-18); line-height: 1; color: var(--c-accent); }
+.lt-item { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: start; }
+.lt-item > .ic { width: 18px; height: 18px; margin-top: 3px; color: var(--c-ink-2); }
+
+/* the last page: the wish and the signature, at the foot of the page */
+.lt-wish {
+  margin-top: auto; padding-top: 26px; font-family: var(--font-voice); font-style: var(--voice-style); font-weight: var(--voice-weight);
+  font-size: calc(var(--fs-15) * var(--voice-scale)); line-height: 24px; color: var(--c-ink-2);
+}
+.lt-sign { display: flex; flex-direction: column; align-items: flex-start; margin-top: 10px; }
+.lt-sign-n { font-family: var(--font-letter); font-style: italic; font-size: var(--fs-26); line-height: 1.25; letter-spacing: -.005em; }
+.lt-flourish { width: 184px; height: 22px; margin: -1px 0 0 -2px; overflow: visible; }
+.lt-fl-line { fill: none; stroke: var(--c-ink-2); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.lt-fl-dot { fill: var(--c-accent); transform-box: fill-box; transform-origin: center; }
+
+/* ---- the drawings (art.js): ink lines, hairline greys, one accent dot ----------------------- */
+.lt-art { margin: 0 0 24px; }
+.lt-art svg { display: block; overflow: visible; }
+
+/* 三步开始 */
+.lt-steps-art { display: flex; align-items: center; gap: 0; padding: 2px 0 4px; }
+.lt-st-ring { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--c-ink); color: var(--c-ink); }
+.lt-st-ring .ic { width: 18px; height: 18px; }
+.lt-st-run { width: 10px; height: 10px; border-radius: 50%; background: var(--c-accent); }
+.lt-st-ring.is-running { box-shadow: inset 0 0 0 1.5px var(--c-accent); }
+.lt-st-link { width: 58px; height: 0; margin: 0 10px; border-top: 1.5px dashed var(--c-ink-4); transform-origin: 0 50%; }
+
+/* 一层接一层 */
+.lt-relay svg { width: 100%; max-width: 360px; height: auto; }
+.lt-rl-rail { fill: none; stroke: var(--c-ink-4); stroke-width: 1.3; }
+.lt-rl-way { fill: none; stroke: var(--c-ink-4); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 2 5; }
+.lt-rl-way.is-spare { stroke-dasharray: 1.5 7; }
+.lt-rl-on { fill: none; stroke: var(--c-ink); stroke-width: 1.6; stroke-linecap: round; }
+.lt-rl-on.is-rest { opacity: 0; }
+.lt-rl-node { fill: var(--c-surface); stroke: var(--c-ink); stroke-width: 1.5; }
+.lt-rl-name { font-family: var(--font-sans); font-size: 12.5px; font-weight: var(--fw-semi); fill: var(--c-ink); }
+.lt-rl-light { fill: var(--c-accent); }
+
+/* 两种接管方式 */
+.lt-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lt-md { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.lt-md svg { width: 132px; height: 82px; }
+.lt-md figcaption { font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); }
+.lt-md-app { fill: var(--c-surface); stroke: var(--c-ink); stroke-width: 1.4; }
+.lt-md-app.is-out { stroke: var(--c-ink-4); stroke-dasharray: 2 2.6; }
+.lt-md-link { fill: none; stroke: var(--c-ink-3); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.lt-md-hub { fill: var(--c-surface); stroke: var(--c-ink); stroke-width: 1.5; }
+.lt-md-dot { fill: var(--c-accent); }
+
+/* ---- the controls under the paper -------------------------------------------------------- */
+.lt-nav {
+  display: flex; align-items: center; gap: 4px; height: 40px; padding: 0 6px;
+  border-radius: var(--r-pill); background: var(--c-surface); box-shadow: var(--sh-pop);
+}
+.lt-prev { border-radius: var(--r-pill); }
+.lt-dots { display: flex; align-items: center; padding: 0 2px; }
+.lt-dot { display: grid; place-items: center; width: 20px; height: 28px; border-radius: var(--r-xs); }
+.lt-dot::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c-dot-dim);
+  transition: background-color .2s var(--ease-out), scale var(--spring-dur) var(--spring);
+}
+.lt-dot:hover::before { background: var(--c-ink-3); }
+.lt-dot[aria-current="true"]::before { background: var(--c-accent); scale: 1.3; }
+.lt-next { border-radius: var(--r-pill); padding: 0 10px 0 12px; }
+.lt-next.btn-primary { padding: 0 14px; }
+.lt-next.btn-primary > .ic { display: none; }
+
+@media (max-height: 640px) {
+  .lt-page { padding: 30px 48px 28px; }
+  .lt-head { gap: 16px; margin-bottom: 22px; }
+  .lt-art { margin-bottom: 18px; }
+}

@@ -1,0 +1,178 @@
+{
+  "name": "shell_caps_absent",
+  "desc": "S12 能力缺席：hello.caps 只有 P1 命令，没有 exit.verify / mode.set / app.update.*（面板对应命令禁用）",
+  "lang": "zh_CN",
+  "allow_host": [
+    "host_notify_ready",
+    "host_set_page",
+    "host_ready",
+    "host_notify_rendered",
+    "host_confirm_quit",
+    "host_force_restart",
+    "rt_resync"
+  ],
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "service.start",
+            "service.stop",
+            "service.restart",
+            "app.quit"
+          ],
+          "topics": [
+            "service.state",
+            "tiers.summary",
+            "core.info",
+            "jobs"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.state",
+        "rev": 2,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": true,
+            "startup_phase": "running",
+            "shutdown_cleanup_pending": false,
+            "failure_code": null,
+            "failure": null
+          },
+          "core": {
+            "running": true,
+            "pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": false
+          },
+          "readiness": {
+            "state": "ready",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": 120
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "tiers.summary",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "carrier": "vanguard",
+          "offline_reason": null,
+          "order": [
+            "vanguard",
+            "sentinel",
+            "bastion",
+            "gateway"
+          ],
+          "degraded": false,
+          "fallback": false,
+          "tiers": {
+            "vanguard": {
+              "enabled": true,
+              "total": 3,
+              "usable": 2
+            },
+            "sentinel": {
+              "enabled": true,
+              "total": 2,
+              "usable": 1
+            },
+            "bastion": {
+              "enabled": true,
+              "total": 40,
+              "usable": 25
+            },
+            "gateway": {
+              "enabled": false,
+              "total": 0,
+              "usable": 0
+            }
+          },
+          "pool": {
+            "usable": 26,
+            "total": 45
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:language",
+        "language": "zh_CN",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:visibility",
+        "visible": true,
+        "epoch": "rt-fixture-e1"
+      }
+    }
+  ]
+}

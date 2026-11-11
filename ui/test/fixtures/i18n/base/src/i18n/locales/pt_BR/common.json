@@ -1,0 +1,8 @@
+{
+  "common.action.save": "PT save",
+  "common.items": "{n, plural, one {# node one} many {# node many} other {# node other}}",
+  "common.hint": "PT press <kbd>Ctrl K</kbd> to open {name}",
+  "common.mode": "{mode, select, tun {PT TUN} other {PT system proxy}}",
+  "common.tier": "Vanguard PT self-hosted",
+  "common.skipped.timeout": "PT timed out"
+}

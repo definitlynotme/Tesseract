@@ -1,0 +1,170 @@
+{
+  "version": 3,
+  "custom_identity": {
+    "input": "strictly resolved existing absolute config and data directories, in that order",
+    "rules": {
+      "path": "apply Windows ntpath.normpath, remove an extended drive or UNC prefix, then apply ntpath.normpath again",
+      "case_mapping": "map the complete path with LCMapStringEx(LOCALE_NAME_INVARIANT, LCMAP_UPPERCASE); this is Windows invariant-locale UTF-16 mapping, not Unicode default upper/casefold or locale-sensitive casing",
+      "unicode_normalization": "do not apply NFC, NFD, NFKC, or NFKD; preserve combining and compatibility characters after case mapping",
+      "encoding": "remove the terminating UTF-16 NUL returned by LCMapStringEx, then encode the mapped path as UTF-8",
+      "rust": "call windows-sys Win32::Globalization::LCMapStringEx with locale name \"\", LCMAP_UPPERCASE, and a NUL-terminated UTF-16 source using cchSrc=-1; remove the returned terminal NUL and convert the mapped UTF-16 result to UTF-8"
+    },
+    "domain_prefix": "tesseract-instance-scope-v1\u0000",
+    "framing": "prefix bytes, then each path as 4-byte big-endian UTF-8 byte length followed by its UTF-8 bytes",
+    "digest": "first 24 lowercase hex digits of SHA-256",
+    "scope_label": "TESSERACT_INSTANCE_SCOPE opts in but does not alter identity for the same directory pair"
+  },
+  "cases": [
+    {
+      "kind": "default",
+      "id": "default",
+      "names": {
+        "legacy_mutex": "Local\\TesseractProxyManagerSingleInstance",
+        "restore_event": "Local\\TesseractProxyManagerRestoreWindow",
+        "runtime_mutex": "Local\\TesseractRuntime",
+        "shell_mutex": "Local\\TesseractShell",
+        "quitting_event": "Local\\TesseractShellQuitting"
+      }
+    },
+    {
+      "kind": "audit",
+      "id": "0123456789abcdef0123456789abcdef",
+      "names": {
+        "legacy_mutex": "Local\\TesseractAudit-0123456789abcdef0123456789abcdef-instance",
+        "restore_event": "Local\\TesseractAudit-0123456789abcdef0123456789abcdef-restore",
+        "runtime_mutex": "Local\\TesseractAudit-0123456789abcdef0123456789abcdef-runtime",
+        "shell_mutex": "Local\\TesseractAudit-0123456789abcdef0123456789abcdef-shell",
+        "quitting_event": "Local\\TesseractAudit-0123456789abcdef0123456789abcdef-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "config_dir": "C:\\Scope Vectors\\Config",
+      "data_dir": "C:\\Scope Vectors\\Data",
+      "id": "8c60164e0500b5e82f7cc670",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-instance",
+        "restore_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-restore",
+        "runtime_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-runtime",
+        "shell_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-shell",
+        "quitting_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "config_dir": "c:/scope vectors/config/",
+      "data_dir": "c:/scope vectors/data/",
+      "id": "8c60164e0500b5e82f7cc670",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-instance",
+        "restore_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-restore",
+        "runtime_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-runtime",
+        "shell_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-shell",
+        "quitting_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "config_dir": "\\\\?\\C:\\Scope Vectors\\Config",
+      "data_dir": "\\\\?\\C:\\Scope Vectors\\Data",
+      "id": "8c60164e0500b5e82f7cc670",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-instance",
+        "restore_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-restore",
+        "runtime_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-runtime",
+        "shell_mutex": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-shell",
+        "quitting_event": "Local\\TesseractCustom-8c60164e0500b5e82f7cc670-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "config_dir": "\\\\server\\share\\Config",
+      "data_dir": "\\\\server\\share\\Data",
+      "id": "aa1d3155d6dca50c50a140bf",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-instance",
+        "restore_event": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-restore",
+        "runtime_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-runtime",
+        "shell_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-shell",
+        "quitting_event": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "config_dir": "\\\\?\\UNC\\server\\share\\Config",
+      "data_dir": "\\\\?\\UNC\\server\\share\\Data",
+      "id": "aa1d3155d6dca50c50a140bf",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-instance",
+        "restore_event": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-restore",
+        "runtime_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-runtime",
+        "shell_mutex": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-shell",
+        "quitting_event": "Local\\TesseractCustom-aa1d3155d6dca50c50a140bf-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "description": "Chinese directory names",
+      "config_dir": "C:\\实例作用域\\配置",
+      "data_dir": "C:\\实例作用域\\数据",
+      "normalized_config_dir": "C:\\实例作用域\\配置",
+      "normalized_data_dir": "C:\\实例作用域\\数据",
+      "id": "92575185d0282f48dfccf428",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-92575185d0282f48dfccf428-instance",
+        "restore_event": "Local\\TesseractCustom-92575185d0282f48dfccf428-restore",
+        "runtime_mutex": "Local\\TesseractCustom-92575185d0282f48dfccf428-runtime",
+        "shell_mutex": "Local\\TesseractCustom-92575185d0282f48dfccf428-shell",
+        "quitting_event": "Local\\TesseractCustom-92575185d0282f48dfccf428-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "description": "Turkish dotted and dotless I",
+      "config_dir": "C:\\Scope\\İstanbul\\config",
+      "data_dir": "C:\\Scope\\ısparta\\data",
+      "normalized_config_dir": "C:\\SCOPE\\İSTANBUL\\CONFIG",
+      "normalized_data_dir": "C:\\SCOPE\\ıSPARTA\\DATA",
+      "id": "ca75a2d56b091b6c640fefd3",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-ca75a2d56b091b6c640fefd3-instance",
+        "restore_event": "Local\\TesseractCustom-ca75a2d56b091b6c640fefd3-restore",
+        "runtime_mutex": "Local\\TesseractCustom-ca75a2d56b091b6c640fefd3-runtime",
+        "shell_mutex": "Local\\TesseractCustom-ca75a2d56b091b6c640fefd3-shell",
+        "quitting_event": "Local\\TesseractCustom-ca75a2d56b091b6c640fefd3-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "description": "fullwidth characters",
+      "config_dir": "C:\\Ｓｃｏｐｅ\\ｃｏｎｆｉｇ",
+      "data_dir": "C:\\Ｓｃｏｐｅ\\ｄａｔａ",
+      "normalized_config_dir": "C:\\ＳＣＯＰＥ\\ＣＯＮＦＩＧ",
+      "normalized_data_dir": "C:\\ＳＣＯＰＥ\\ＤＡＴＡ",
+      "id": "df1a2633d54f1d2c624b6790",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-df1a2633d54f1d2c624b6790-instance",
+        "restore_event": "Local\\TesseractCustom-df1a2633d54f1d2c624b6790-restore",
+        "runtime_mutex": "Local\\TesseractCustom-df1a2633d54f1d2c624b6790-runtime",
+        "shell_mutex": "Local\\TesseractCustom-df1a2633d54f1d2c624b6790-shell",
+        "quitting_event": "Local\\TesseractCustom-df1a2633d54f1d2c624b6790-quitting"
+      }
+    },
+    {
+      "kind": "custom",
+      "description": "combining characters without Unicode normalization",
+      "config_dir": "C:\\Scope\\Café\\config",
+      "data_dir": "C:\\Scope\\Ångstrom\\data",
+      "normalized_config_dir": "C:\\SCOPE\\CAFÉ\\CONFIG",
+      "normalized_data_dir": "C:\\SCOPE\\ÅNGSTROM\\DATA",
+      "id": "92757806f7e23e5638d9dfab",
+      "names": {
+        "legacy_mutex": "Local\\TesseractCustom-92757806f7e23e5638d9dfab-instance",
+        "restore_event": "Local\\TesseractCustom-92757806f7e23e5638d9dfab-restore",
+        "runtime_mutex": "Local\\TesseractCustom-92757806f7e23e5638d9dfab-runtime",
+        "shell_mutex": "Local\\TesseractCustom-92757806f7e23e5638d9dfab-shell",
+        "quitting_event": "Local\\TesseractCustom-92757806f7e23e5638d9dfab-quitting"
+      }
+    }
+  ]
+}

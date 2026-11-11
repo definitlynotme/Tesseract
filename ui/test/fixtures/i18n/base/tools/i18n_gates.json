@@ -1,0 +1,83 @@
+{
+  "_doc": "fixture: every check hard at p4; p7 hard too",
+  "json": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "id_format": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "icu": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "args": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "plural": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "desc": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "frozen": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "backend_keys": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "catalog": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.common.skipped": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.tiers.reason": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.alerts.test_reason": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.overview.exit_reason": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.alerts.onboarding_reason": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "reason.shell.host_reason": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "orphans": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "missing": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "glossary": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "truncation": {
+    "p4": "hard",
+    "p7": "hard"
+  },
+  "three_catalogs": {
+    "p4": "hard",
+    "p7": "hard"
+  }
+}

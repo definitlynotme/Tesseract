@@ -1,0 +1,8 @@
+# Windows CPython 3.12 x64 only. These hashes are for the exact wheels used by
+# the protected release-signing job; install with --require-hashes --no-deps.
+cffi==2.0.0 \
+    --hash=sha256:da68248800ad6320861f129cd9c1bf96ca849a2771a59e0344e88681905916f5
+cryptography==46.0.7 \
+    --hash=sha256:397655da831414d165029da9bc483bed2fe0e75dde6a1523ec2fe63f3c46046b
+pycparser==3.0 \
+    --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992

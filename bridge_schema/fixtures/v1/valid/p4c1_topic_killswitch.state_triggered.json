@@ -1,0 +1,16 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "killswitch.state",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "enabled": true,
+    "active": true,
+    "admin": true,
+    "error": null,
+    "triggered": true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "jobs",
+  "rev": 2,
+  "kind": "edge",
+  "seq": 42,
+  "data": {
+    "op": "job-43",
+    "name": "service.stop",
+    "state": "failed",
+    "started_at_ms": 1789999999000,
+    "result": {
+      "startup_phase": "stopping",
+      "shutdown_exit_code": null,
+      "cleanup_pending": true
+    },
+    "error": {
+      "code": "timeout",
+      "message_key": "errors.bridge.timeout",
+      "params": {}
+    }
+  }
+}

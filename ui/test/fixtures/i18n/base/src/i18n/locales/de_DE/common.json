@@ -1,0 +1,8 @@
+{
+  "common.action.save": "DE save",
+  "common.items": "{n, plural, one {# node one} other {# node other}}",
+  "common.hint": "DE press <kbd>Ctrl K</kbd> to open {name}",
+  "common.mode": "{mode, select, tun {DE TUN} other {DE system proxy}}",
+  "common.tier": "Vanguard DE self-hosted",
+  "common.skipped.timeout": "DE timed out"
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "base",
+  "expect": "missing",
+  "patch_meta": {
+    "lang": "ja_JP",
+    "id": "common.action.save",
+    "src_hash": "1426923a5f420d7a"
+  }
+}

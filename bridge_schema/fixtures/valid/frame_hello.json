@@ -1,0 +1,45 @@
+{
+  "t": "hello",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "proto": 1,
+  "app_version": "1.0.0",
+  "runtime_pid": 4381,
+  "lang": "zh_CN",
+  "caps": {
+    "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "app.quit"
+    ],
+    "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "traffic.tick",
+      "traffic.history",
+      "logs.batch",
+      "core.info",
+      "jobs"
+    ],
+    "features": []
+  },
+  "scope": {
+    "kind": "default",
+    "id": "default"
+  },
+  "network_recovery": {
+    "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+    },
+    "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+    }
+  }
+}

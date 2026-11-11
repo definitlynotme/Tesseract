@@ -1,0 +1,6 @@
+{
+  "errors.timeout": {
+    "m": "操作超时。检查网络后再试。",
+    "_desc": "通用错误 timeout"
+  }
+}

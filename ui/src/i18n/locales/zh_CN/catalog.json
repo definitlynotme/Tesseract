@@ -1,0 +1,2662 @@
+{
+  "catalog.vless_reality": {
+    "m": "VLESS Reality",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.vless_reality.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（VLESS Reality）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.vless_reality.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（VLESS Reality）：节点名称输入框标题"
+  },
+  "catalog.vless_reality.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（VLESS Reality）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.vless_reality.port": {
+    "m": "端口",
+    "_desc": "导入单节点（VLESS Reality）：字段 port 的标题，属于「身份」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.uuid": {
+    "m": "UUID",
+    "_desc": "导入单节点（VLESS Reality）：字段 uuid 的标题，属于「身份」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.network": {
+    "m": "传输 (tcp/ws/grpc/h2)",
+    "_desc": "导入单节点（VLESS Reality）：字段 network 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.encryption": {
+    "m": "Encryption",
+    "_desc": "导入单节点（VLESS Reality）：字段 encryption 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.security": {
+    "m": "Security",
+    "_desc": "导入单节点（VLESS Reality）：字段 security 的标题，属于「安全」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.flow": {
+    "m": "Flow",
+    "_desc": "导入单节点（VLESS Reality）：字段 flow 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.public_key": {
+    "m": "Reality Public Key (pbk)",
+    "_desc": "导入单节点（VLESS Reality）：字段 public_key 的标题，属于「Reality 参数」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.short_id": {
+    "m": "Reality Short ID (sid)",
+    "_desc": "导入单节点（VLESS Reality）：字段 short_id 的标题，属于「Reality 参数」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（VLESS Reality）：字段 sni 的标题，属于「安全」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.fingerprint": {
+    "m": "指纹 fp",
+    "_desc": "导入单节点（VLESS Reality）：字段 fingerprint 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（VLESS Reality）：字段 alpn 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.host": {
+    "m": "Host (ws/h2)",
+    "_desc": "导入单节点（VLESS Reality）：字段 host 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.path": {
+    "m": "Path (ws/h2)",
+    "_desc": "导入单节点（VLESS Reality）：字段 path 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.grpc_service_name": {
+    "m": "gRPC serviceName",
+    "_desc": "导入单节点（VLESS Reality）：字段 grpc_service_name 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vless_reality.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.vless_reality.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.vless_reality.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.vless_reality.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.vmess": {
+    "m": "VMess WS TLS",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.vmess.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（VMess WS TLS）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.vmess.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（VMess WS TLS）：节点名称输入框标题"
+  },
+  "catalog.vmess.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（VMess WS TLS）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.vmess.port": {
+    "m": "端口",
+    "_desc": "导入单节点（VMess WS TLS）：字段 port 的标题，属于「身份」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.uuid": {
+    "m": "UUID",
+    "_desc": "导入单节点（VMess WS TLS）：字段 uuid 的标题，属于「身份」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.alter_id": {
+    "m": "alterId",
+    "_desc": "导入单节点（VMess WS TLS）：字段 alter_id 的标题，属于「VMess 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.scy": {
+    "m": "VMess cipher (scy)",
+    "_desc": "导入单节点（VMess WS TLS）：字段 scy 的标题，属于「VMess 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.network": {
+    "m": "传输 (ws/grpc/h2/tcp)",
+    "_desc": "导入单节点（VMess WS TLS）：字段 network 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.security": {
+    "m": "Security (tls/none)",
+    "_desc": "导入单节点（VMess WS TLS）：字段 security 的标题，属于「TLS」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（VMess WS TLS）：字段 sni 的标题，属于「TLS」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.host": {
+    "m": "Host",
+    "_desc": "导入单节点（VMess WS TLS）：字段 host 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.path": {
+    "m": "Path",
+    "_desc": "导入单节点（VMess WS TLS）：字段 path 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.fingerprint": {
+    "m": "指纹 fp",
+    "_desc": "导入单节点（VMess WS TLS）：字段 fingerprint 的标题，属于「VMess 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（VMess WS TLS）：字段 alpn 的标题，属于「VMess 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.grpc_service_name": {
+    "m": "gRPC serviceName",
+    "_desc": "导入单节点（VMess WS TLS）：字段 grpc_service_name 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.vmess.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.vmess.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.vmess.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.vmess.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.trojan": {
+    "m": "Trojan TLS",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.trojan.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（Trojan TLS）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.trojan.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（Trojan TLS）：节点名称输入框标题"
+  },
+  "catalog.trojan.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（Trojan TLS）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.trojan.port": {
+    "m": "端口",
+    "_desc": "导入单节点（Trojan TLS）：字段 port 的标题，属于「端口与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.password": {
+    "m": "密码",
+    "_desc": "导入单节点（Trojan TLS）：字段 password 的标题，属于「端口与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.network": {
+    "m": "传输 (tcp/ws)",
+    "_desc": "导入单节点（Trojan TLS）：字段 network 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（Trojan TLS）：字段 sni 的标题，属于「TLS」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.host": {
+    "m": "Host (ws)",
+    "_desc": "导入单节点（Trojan TLS）：字段 host 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.path": {
+    "m": "Path (ws)",
+    "_desc": "导入单节点（Trojan TLS）：字段 path 的标题，属于「传输」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.fingerprint": {
+    "m": "指纹 fp",
+    "_desc": "导入单节点（Trojan TLS）：字段 fingerprint 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（Trojan TLS）：字段 alpn 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.skip_cert_verify": {
+    "m": "skip-cert-verify",
+    "_desc": "导入单节点（Trojan TLS）：字段 skip_cert_verify 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.trojan.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.trojan.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.trojan.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.trojan.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.ss": {
+    "m": "Shadowsocks",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.ss.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（Shadowsocks）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.ss.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（Shadowsocks）：节点名称输入框标题"
+  },
+  "catalog.ss.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（Shadowsocks）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.ss.port": {
+    "m": "端口",
+    "_desc": "导入单节点（Shadowsocks）：字段 port 的标题，属于「加密与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.ss.password": {
+    "m": "密码",
+    "_desc": "导入单节点（Shadowsocks）：字段 password 的标题，属于「加密与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.ss.method": {
+    "m": "Cipher",
+    "_desc": "导入单节点（Shadowsocks）：字段 method 的标题，属于「加密与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.ss.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.ss.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.ss.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.ss.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.anytls": {
+    "m": "AnyTLS",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.anytls.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（AnyTLS）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.anytls.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（AnyTLS）：节点名称输入框标题"
+  },
+  "catalog.anytls.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（AnyTLS）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.anytls.port": {
+    "m": "端口",
+    "_desc": "导入单节点（AnyTLS）：字段 port 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.password": {
+    "m": "密码",
+    "_desc": "导入单节点（AnyTLS）：字段 password 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（AnyTLS）：字段 sni 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（AnyTLS）：字段 alpn 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.fingerprint": {
+    "m": "指纹 fp",
+    "_desc": "导入单节点（AnyTLS）：字段 fingerprint 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.skip_cert_verify": {
+    "m": "skip-cert-verify",
+    "_desc": "导入单节点（AnyTLS）：字段 skip_cert_verify 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.anytls.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.anytls.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.anytls.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.anytls.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.naive": {
+    "m": "Naive HTTPS",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.naive.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（Naive HTTPS）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.naive.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（Naive HTTPS）：节点名称输入框标题"
+  },
+  "catalog.naive.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（Naive HTTPS）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.naive.port": {
+    "m": "端口",
+    "_desc": "导入单节点（Naive HTTPS）：字段 port 的标题，属于「连接」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.naive.username": {
+    "m": "用户名",
+    "_desc": "导入单节点（Naive HTTPS）：字段 username 的标题，属于「身份认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.naive.password": {
+    "m": "密码",
+    "_desc": "导入单节点（Naive HTTPS）：字段 password 的标题，属于「身份认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.naive.security": {
+    "m": "Security (tls/none)",
+    "_desc": "导入单节点（Naive HTTPS）：字段 security 的标题，属于「连接」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.naive.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（Naive HTTPS）：字段 sni 的标题，属于「连接」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.naive.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.naive.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.naive.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.naive.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.socks5": {
+    "m": "SOCKS5",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.socks5.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（SOCKS5）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.socks5.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（SOCKS5）：节点名称输入框标题"
+  },
+  "catalog.socks5.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（SOCKS5）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.socks5.port": {
+    "m": "端口",
+    "_desc": "导入单节点（SOCKS5）：字段 port 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.socks5.username": {
+    "m": "用户名",
+    "_desc": "导入单节点（SOCKS5）：字段 username 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.socks5.password": {
+    "m": "密码",
+    "_desc": "导入单节点（SOCKS5）：字段 password 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.socks5.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.socks5.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.socks5.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.socks5.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.hysteria2": {
+    "m": "Hysteria2",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.hysteria2.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（Hysteria2）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.hysteria2.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（Hysteria2）：节点名称输入框标题"
+  },
+  "catalog.hysteria2.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（Hysteria2）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.hysteria2.port": {
+    "m": "端口",
+    "_desc": "导入单节点（Hysteria2）：字段 port 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.password": {
+    "m": "密码",
+    "_desc": "导入单节点（Hysteria2）：字段 password 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（Hysteria2）：字段 sni 的标题，属于「连接与认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.obfs": {
+    "m": "Obfs (salamander)",
+    "_desc": "导入单节点（Hysteria2）：字段 obfs 的标题，属于「混淆」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.obfs_password": {
+    "m": "Obfs password",
+    "_desc": "导入单节点（Hysteria2）：字段 obfs_password 的标题，属于「混淆」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（Hysteria2）：字段 alpn 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.skip_cert_verify": {
+    "m": "skip-cert-verify",
+    "_desc": "导入单节点（Hysteria2）：字段 skip_cert_verify 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.hysteria2.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.hysteria2.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.hysteria2.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.hysteria2.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.tuic": {
+    "m": "TUIC v5",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.tuic.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（TUIC v5）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.tuic.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（TUIC v5）：节点名称输入框标题"
+  },
+  "catalog.tuic.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（TUIC v5）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.tuic.port": {
+    "m": "端口",
+    "_desc": "导入单节点（TUIC v5）：字段 port 的标题，属于「连接」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.uuid": {
+    "m": "UUID",
+    "_desc": "导入单节点（TUIC v5）：字段 uuid 的标题，属于「身份认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.password": {
+    "m": "Token / 密码",
+    "_desc": "导入单节点（TUIC v5）：字段 password 的标题，属于「身份认证」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（TUIC v5）：字段 sni 的标题，属于「连接」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.alpn": {
+    "m": "ALPN",
+    "_desc": "导入单节点（TUIC v5）：字段 alpn 的标题，属于「QUIC 调优」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.udp_relay_mode": {
+    "m": "udp_relay_mode",
+    "_desc": "导入单节点（TUIC v5）：字段 udp_relay_mode 的标题，属于「QUIC 调优」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.congestion_control": {
+    "m": "congestion_control",
+    "_desc": "导入单节点（TUIC v5）：字段 congestion_control 的标题，属于「QUIC 调优」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.skip_cert_verify": {
+    "m": "skip-cert-verify",
+    "_desc": "导入单节点（TUIC v5）：字段 skip_cert_verify 的标题，属于「QUIC 调优」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.tuic.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.tuic.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.tuic.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.tuic.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.wireguard": {
+    "m": "WireGuard",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.wireguard.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（WireGuard）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.wireguard.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（WireGuard）：节点名称输入框标题"
+  },
+  "catalog.wireguard.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（WireGuard）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.wireguard.port": {
+    "m": "端口",
+    "_desc": "导入单节点（WireGuard）：字段 port 的标题，属于「端点」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.private_key": {
+    "m": "Private Key (本机)",
+    "_desc": "导入单节点（WireGuard）：字段 private_key 的标题，属于「密钥」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.public_key": {
+    "m": "Peer Public Key",
+    "_desc": "导入单节点（WireGuard）：字段 public_key 的标题，属于「密钥」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.local_address": {
+    "m": "本机地址",
+    "_desc": "导入单节点（WireGuard）：字段 local_address 的标题，属于「隧道地址」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.allowed_ips": {
+    "m": "Allowed IPs",
+    "_desc": "导入单节点（WireGuard）：字段 allowed_ips 的标题，属于「路由」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.reserved": {
+    "m": "Reserved",
+    "_desc": "导入单节点（WireGuard）：字段 reserved 的标题，属于「高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.mtu": {
+    "m": "MTU",
+    "_desc": "导入单节点（WireGuard）：字段 mtu 的标题，属于「高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.wireguard.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.wireguard.tier.choice.sentinel": {
+    "m": "Sentinel",
+    "_desc": "导入单节点：层级选择框的选项 sentinel（层级代号，不译）"
+  },
+  "catalog.wireguard.tier.choice.bastion": {
+    "m": "Bastion",
+    "_desc": "导入单节点：层级选择框的选项 bastion（层级代号，不译）"
+  },
+  "catalog.wireguard.tier.choice.gateway": {
+    "m": "Gateway",
+    "_desc": "导入单节点：层级选择框的选项 gateway（层级代号，不译）"
+  },
+  "catalog.argo_xhttp": {
+    "m": "Argo XHTTP",
+    "_desc": "导入单节点：协议名（import.specs 的 label_id）。协议名，一般不译"
+  },
+  "catalog.argo_xhttp.tier": {
+    "m": "层级",
+    "_desc": "导入单节点（Argo XHTTP）：节点放进哪个层级的选择框标题"
+  },
+  "catalog.argo_xhttp.name": {
+    "m": "节点名称",
+    "_desc": "导入单节点（Argo XHTTP）：节点名称输入框标题"
+  },
+  "catalog.argo_xhttp.server": {
+    "m": "服务器地址",
+    "_desc": "导入单节点（Argo XHTTP）：服务器地址（域名或 IP）输入框标题"
+  },
+  "catalog.argo_xhttp.port": {
+    "m": "本地监听端口",
+    "_desc": "导入单节点（Argo XHTTP）：字段 port 的标题，属于「本地监听」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.uuid": {
+    "m": "UUID",
+    "_desc": "导入单节点（Argo XHTTP）：字段 uuid 的标题，属于「身份」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.security": {
+    "m": "Security (tls/none)",
+    "_desc": "导入单节点（Argo XHTTP）：字段 security 的标题，属于「TLS」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.sni": {
+    "m": "SNI",
+    "_desc": "导入单节点（Argo XHTTP）：字段 sni 的标题，属于「TLS」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.host": {
+    "m": "Host",
+    "_desc": "导入单节点（Argo XHTTP）：字段 host 的标题，属于「XHTTP 上游」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.path": {
+    "m": "Path",
+    "_desc": "导入单节点（Argo XHTTP）：字段 path 的标题，属于「XHTTP 上游」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.fingerprint": {
+    "m": "指纹 fp",
+    "_desc": "导入单节点（Argo XHTTP）：字段 fingerprint 的标题，属于「TLS 高级」一组。技术名词（UUID、SNI、ALPN 等）通常不译"
+  },
+  "catalog.argo_xhttp.tier.choice.vanguard": {
+    "m": "Vanguard",
+    "_desc": "导入单节点：层级选择框的选项 vanguard（层级代号，不译）"
+  },
+  "catalog.argo_xhttp.security.choice.none": {
+    "m": "不加密",
+    "_desc": "导入单节点：argo_xhttp 的 security 选项 none"
+  },
+  "catalog.argo_xhttp.security.choice.tls": {
+    "m": "TLS",
+    "_desc": "导入单节点：argo_xhttp 的 security 选项 tls"
+  },
+  "catalog.naive.security.choice.none": {
+    "m": "不加密",
+    "_desc": "导入单节点：naive 的 security 选项 none"
+  },
+  "catalog.naive.security.choice.tls": {
+    "m": "TLS",
+    "_desc": "导入单节点：naive 的 security 选项 tls"
+  },
+  "catalog.ss.method.choice.2022-blake3-aes-128-gcm": {
+    "m": "2022-blake3-aes-128-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 2022-blake3-aes-128-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.2022-blake3-aes-256-gcm": {
+    "m": "2022-blake3-aes-256-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 2022-blake3-aes-256-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.2022-blake3-chacha20-poly1305": {
+    "m": "2022-blake3-chacha20-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 2022-blake3-chacha20-poly1305。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aegis-128l": {
+    "m": "aegis-128l",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aegis-128l。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aegis-256": {
+    "m": "aegis-256",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aegis-256。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-128-ccm": {
+    "m": "aes-128-ccm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-128-ccm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-128-cfb": {
+    "m": "aes-128-cfb",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-128-cfb。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-128-ctr": {
+    "m": "aes-128-ctr",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-128-ctr。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-128-gcm": {
+    "m": "aes-128-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-128-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-128-gcm-siv": {
+    "m": "aes-128-gcm-siv",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-128-gcm-siv。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-192-ccm": {
+    "m": "aes-192-ccm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-192-ccm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-192-cfb": {
+    "m": "aes-192-cfb",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-192-cfb。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-192-ctr": {
+    "m": "aes-192-ctr",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-192-ctr。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-192-gcm": {
+    "m": "aes-192-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-192-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-256-ccm": {
+    "m": "aes-256-ccm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-256-ccm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-256-cfb": {
+    "m": "aes-256-cfb",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-256-cfb。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-256-ctr": {
+    "m": "aes-256-ctr",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-256-ctr。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-256-gcm": {
+    "m": "aes-256-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-256-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aes-256-gcm-siv": {
+    "m": "aes-256-gcm-siv",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aes-256-gcm-siv。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.aez-384": {
+    "m": "aez-384",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 aez-384。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.chacha20": {
+    "m": "chacha20",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 chacha20。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.chacha20-ietf": {
+    "m": "chacha20-ietf",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 chacha20-ietf。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.chacha20-ietf-poly1305": {
+    "m": "chacha20-ietf-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 chacha20-ietf-poly1305。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.chacha8-ietf-poly1305": {
+    "m": "chacha8-ietf-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 chacha8-ietf-poly1305。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.deoxys-ii-256-128": {
+    "m": "deoxys-ii-256-128",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 deoxys-ii-256-128。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.lea-128-gcm": {
+    "m": "lea-128-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 lea-128-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.lea-192-gcm": {
+    "m": "lea-192-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 lea-192-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.lea-256-gcm": {
+    "m": "lea-256-gcm",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 lea-256-gcm。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.none": {
+    "m": "none（不加密）",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 none。算法名原样显示，不译；none 表示不加密"
+  },
+  "catalog.ss.method.choice.rabbit128-poly1305": {
+    "m": "rabbit128-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 rabbit128-poly1305。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.rc4-md5": {
+    "m": "rc4-md5",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 rc4-md5。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.xchacha20": {
+    "m": "xchacha20",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 xchacha20。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.xchacha20-ietf-poly1305": {
+    "m": "xchacha20-ietf-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 xchacha20-ietf-poly1305。算法名原样显示，不译"
+  },
+  "catalog.ss.method.choice.xchacha8-ietf-poly1305": {
+    "m": "xchacha8-ietf-poly1305",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选项 xchacha8-ietf-poly1305。算法名原样显示，不译"
+  },
+  "catalog.trojan.network.choice.tcp": {
+    "m": "TCP",
+    "_desc": "导入单节点：trojan 的 network 选项 tcp"
+  },
+  "catalog.trojan.network.choice.ws": {
+    "m": "WebSocket",
+    "_desc": "导入单节点：trojan 的 network 选项 ws"
+  },
+  "catalog.tuic.congestion_control.choice.bbr": {
+    "m": "BBR",
+    "_desc": "导入单节点：tuic 的 congestion_control 选项 bbr"
+  },
+  "catalog.tuic.congestion_control.choice.cubic": {
+    "m": "CUBIC",
+    "_desc": "导入单节点：tuic 的 congestion_control 选项 cubic"
+  },
+  "catalog.tuic.congestion_control.choice.new_reno": {
+    "m": "NewReno",
+    "_desc": "导入单节点：tuic 的 congestion_control 选项 new_reno"
+  },
+  "catalog.tuic.udp_relay_mode.choice.native": {
+    "m": "native",
+    "_desc": "导入单节点：tuic 的 udp_relay_mode 选项 native"
+  },
+  "catalog.tuic.udp_relay_mode.choice.quic": {
+    "m": "quic",
+    "_desc": "导入单节点：tuic 的 udp_relay_mode 选项 quic"
+  },
+  "catalog.vless_reality.network.choice.grpc": {
+    "m": "gRPC",
+    "_desc": "导入单节点：vless_reality 的 network 选项 grpc"
+  },
+  "catalog.vless_reality.network.choice.h2": {
+    "m": "HTTP/2",
+    "_desc": "导入单节点：vless_reality 的 network 选项 h2"
+  },
+  "catalog.vless_reality.network.choice.tcp": {
+    "m": "TCP",
+    "_desc": "导入单节点：vless_reality 的 network 选项 tcp"
+  },
+  "catalog.vless_reality.network.choice.ws": {
+    "m": "WebSocket",
+    "_desc": "导入单节点：vless_reality 的 network 选项 ws"
+  },
+  "catalog.vless_reality.security.choice.none": {
+    "m": "不加密",
+    "_desc": "导入单节点：vless_reality 的 security 选项 none"
+  },
+  "catalog.vless_reality.security.choice.reality": {
+    "m": "Reality",
+    "_desc": "导入单节点：vless_reality 的 security 选项 reality"
+  },
+  "catalog.vless_reality.security.choice.tls": {
+    "m": "TLS",
+    "_desc": "导入单节点：vless_reality 的 security 选项 tls"
+  },
+  "catalog.vmess.network.choice.grpc": {
+    "m": "gRPC",
+    "_desc": "导入单节点：vmess 的 network 选项 grpc"
+  },
+  "catalog.vmess.network.choice.h2": {
+    "m": "HTTP/2",
+    "_desc": "导入单节点：vmess 的 network 选项 h2"
+  },
+  "catalog.vmess.network.choice.tcp": {
+    "m": "TCP",
+    "_desc": "导入单节点：vmess 的 network 选项 tcp"
+  },
+  "catalog.vmess.network.choice.ws": {
+    "m": "WebSocket",
+    "_desc": "导入单节点：vmess 的 network 选项 ws"
+  },
+  "catalog.vmess.security.choice.none": {
+    "m": "不加密",
+    "_desc": "导入单节点：vmess 的 security 选项 none"
+  },
+  "catalog.vmess.security.choice.tls": {
+    "m": "TLS",
+    "_desc": "导入单节点：vmess 的 security 选项 tls"
+  },
+  "catalog.notice.ss_none_unencrypted": {
+    "m": "加密方式为 none 时不加密，流量以明文传输。",
+    "_desc": "导入单节点（Shadowsocks）：加密方式选了 none 时，表单下方的提示（conditions.notices 的 code ss_none_unencrypted）"
+  },
+  "catalog.alerts.desktop": {
+    "m": "桌面通知",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.desktop.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（桌面通知）"
+  },
+  "catalog.alerts.desktop.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（桌面通知）"
+  },
+  "catalog.alerts.desktop.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（桌面通知）"
+  },
+  "catalog.alerts.desktop.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（桌面通知）"
+  },
+  "catalog.alerts.desktop.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（桌面通知）"
+  },
+  "catalog.alerts.desktop.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（桌面通知）"
+  },
+  "catalog.alerts.discord": {
+    "m": "Discord",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.discord.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Discord）"
+  },
+  "catalog.alerts.discord.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Discord）"
+  },
+  "catalog.alerts.discord.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Discord）"
+  },
+  "catalog.alerts.discord.headers": {
+    "m": "请求头",
+    "_desc": "Discord 提醒方式的字段 headers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.discord.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Discord）"
+  },
+  "catalog.alerts.discord.message_template": {
+    "m": "消息模板",
+    "_desc": "Discord 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.discord.payload": {
+    "m": "自定义 JSON 负载",
+    "_desc": "Discord 提醒方式的字段 payload 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.discord.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Discord）"
+  },
+  "catalog.alerts.discord.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Discord）"
+  },
+  "catalog.alerts.discord.url": {
+    "m": "Webhook 地址",
+    "_desc": "Discord 提醒方式的字段 url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid": {
+    "m": "SendGrid 邮件",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.email_sendgrid.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.api_key": {
+    "m": "API Key",
+    "_desc": "SendGrid 邮件 提醒方式的字段 api_key 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid.api_url": {
+    "m": "API 地址",
+    "_desc": "SendGrid 邮件 提醒方式的字段 api_url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid.body_template": {
+    "m": "正文模板",
+    "_desc": "SendGrid 邮件 提醒方式的字段 body_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.from_addr": {
+    "m": "发件人",
+    "_desc": "SendGrid 邮件 提醒方式的字段 from_addr 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.subject_template": {
+    "m": "主题模板",
+    "_desc": "SendGrid 邮件 提醒方式的字段 subject_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_sendgrid.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（SendGrid 邮件）"
+  },
+  "catalog.alerts.email_sendgrid.to_addrs": {
+    "m": "收件人",
+    "_desc": "SendGrid 邮件 提醒方式的字段 to_addrs 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp": {
+    "m": "SMTP 邮件",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.email_smtp.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.body_template": {
+    "m": "正文模板",
+    "_desc": "SMTP 邮件 提醒方式的字段 body_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.from_addr": {
+    "m": "发件人",
+    "_desc": "SMTP 邮件 提醒方式的字段 from_addr 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.host": {
+    "m": "服务器",
+    "_desc": "SMTP 邮件 提醒方式的字段 host 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.password": {
+    "m": "密码",
+    "_desc": "SMTP 邮件 提醒方式的字段 password 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.port": {
+    "m": "端口",
+    "_desc": "SMTP 邮件 提醒方式的字段 port 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.ssl": {
+    "m": "使用 SSL",
+    "_desc": "SMTP 邮件 提醒方式的字段 ssl 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.starttls": {
+    "m": "使用 STARTTLS",
+    "_desc": "SMTP 邮件 提醒方式的字段 starttls 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.subject_template": {
+    "m": "主题模板",
+    "_desc": "SMTP 邮件 提醒方式的字段 subject_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（SMTP 邮件）"
+  },
+  "catalog.alerts.email_smtp.to_addrs": {
+    "m": "收件人",
+    "_desc": "SMTP 邮件 提醒方式的字段 to_addrs 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.email_smtp.username": {
+    "m": "用户名",
+    "_desc": "SMTP 邮件 提醒方式的字段 username 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook": {
+    "m": "通用 Webhook",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.generic_webhook.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.body_format": {
+    "m": "正文格式",
+    "_desc": "通用 Webhook 提醒方式的字段 body_format 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook.body_template": {
+    "m": "正文模板",
+    "_desc": "通用 Webhook 提醒方式的字段 body_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.headers": {
+    "m": "请求头",
+    "_desc": "通用 Webhook 提醒方式的字段 headers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.message_template": {
+    "m": "消息模板",
+    "_desc": "通用 Webhook 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook.payload": {
+    "m": "自定义 JSON 负载",
+    "_desc": "通用 Webhook 提醒方式的字段 payload 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.generic_webhook.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（通用 Webhook）"
+  },
+  "catalog.alerts.generic_webhook.url": {
+    "m": "地址",
+    "_desc": "通用 Webhook 提醒方式的字段 url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.google_chat": {
+    "m": "Google Chat",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.google_chat.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Google Chat）"
+  },
+  "catalog.alerts.google_chat.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Google Chat）"
+  },
+  "catalog.alerts.google_chat.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Google Chat）"
+  },
+  "catalog.alerts.google_chat.headers": {
+    "m": "请求头",
+    "_desc": "Google Chat 提醒方式的字段 headers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.google_chat.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Google Chat）"
+  },
+  "catalog.alerts.google_chat.message_template": {
+    "m": "消息模板",
+    "_desc": "Google Chat 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.google_chat.payload": {
+    "m": "自定义 JSON 负载",
+    "_desc": "Google Chat 提醒方式的字段 payload 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.google_chat.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Google Chat）"
+  },
+  "catalog.alerts.google_chat.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Google Chat）"
+  },
+  "catalog.alerts.google_chat.url": {
+    "m": "Webhook 地址",
+    "_desc": "Google Chat 提醒方式的字段 url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.gotify": {
+    "m": "Gotify",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.gotify.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Gotify）"
+  },
+  "catalog.alerts.gotify.app_token": {
+    "m": "应用 Token",
+    "_desc": "Gotify 提醒方式的字段 app_token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.gotify.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Gotify）"
+  },
+  "catalog.alerts.gotify.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Gotify）"
+  },
+  "catalog.alerts.gotify.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Gotify）"
+  },
+  "catalog.alerts.gotify.message_template": {
+    "m": "消息模板",
+    "_desc": "Gotify 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.gotify.priority": {
+    "m": "优先级",
+    "_desc": "Gotify 提醒方式的字段 priority 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.gotify.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Gotify）"
+  },
+  "catalog.alerts.gotify.server": {
+    "m": "服务器",
+    "_desc": "Gotify 提醒方式的字段 server 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.gotify.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Gotify）"
+  },
+  "catalog.alerts.gotify.title_template": {
+    "m": "主题模板",
+    "_desc": "Gotify 提醒方式的字段 title_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy": {
+    "m": "ntfy",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.ntfy.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（ntfy）"
+  },
+  "catalog.alerts.ntfy.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（ntfy）"
+  },
+  "catalog.alerts.ntfy.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（ntfy）"
+  },
+  "catalog.alerts.ntfy.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（ntfy）"
+  },
+  "catalog.alerts.ntfy.message_template": {
+    "m": "消息模板",
+    "_desc": "ntfy 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.priority": {
+    "m": "优先级",
+    "_desc": "ntfy 提醒方式的字段 priority 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（ntfy）"
+  },
+  "catalog.alerts.ntfy.server": {
+    "m": "服务器",
+    "_desc": "ntfy 提醒方式的字段 server 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.tags": {
+    "m": "标签",
+    "_desc": "ntfy 提醒方式的字段 tags 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（ntfy）"
+  },
+  "catalog.alerts.ntfy.title_template": {
+    "m": "主题模板",
+    "_desc": "ntfy 提醒方式的字段 title_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.token": {
+    "m": "Token",
+    "_desc": "ntfy 提醒方式的字段 token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.ntfy.topic": {
+    "m": "主题",
+    "_desc": "ntfy 提醒方式的字段 topic 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover": {
+    "m": "Pushover",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.pushover.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Pushover）"
+  },
+  "catalog.alerts.pushover.app_token": {
+    "m": "应用 Token",
+    "_desc": "Pushover 提醒方式的字段 app_token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.device": {
+    "m": "设备",
+    "_desc": "Pushover 提醒方式的字段 device 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Pushover）"
+  },
+  "catalog.alerts.pushover.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Pushover）"
+  },
+  "catalog.alerts.pushover.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Pushover）"
+  },
+  "catalog.alerts.pushover.message_template": {
+    "m": "消息模板",
+    "_desc": "Pushover 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.priority": {
+    "m": "优先级",
+    "_desc": "Pushover 提醒方式的字段 priority 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Pushover）"
+  },
+  "catalog.alerts.pushover.sound": {
+    "m": "声音",
+    "_desc": "Pushover 提醒方式的字段 sound 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Pushover）"
+  },
+  "catalog.alerts.pushover.title_template": {
+    "m": "主题模板",
+    "_desc": "Pushover 提醒方式的字段 title_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.pushover.user_key": {
+    "m": "用户 Key",
+    "_desc": "Pushover 提醒方式的字段 user_key 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.slack": {
+    "m": "Slack",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.slack.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Slack）"
+  },
+  "catalog.alerts.slack.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Slack）"
+  },
+  "catalog.alerts.slack.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Slack）"
+  },
+  "catalog.alerts.slack.headers": {
+    "m": "请求头",
+    "_desc": "Slack 提醒方式的字段 headers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.slack.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Slack）"
+  },
+  "catalog.alerts.slack.message_template": {
+    "m": "消息模板",
+    "_desc": "Slack 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.slack.payload": {
+    "m": "自定义 JSON 负载",
+    "_desc": "Slack 提醒方式的字段 payload 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.slack.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Slack）"
+  },
+  "catalog.alerts.slack.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Slack）"
+  },
+  "catalog.alerts.slack.url": {
+    "m": "Webhook 地址",
+    "_desc": "Slack 提醒方式的字段 url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio": {
+    "m": "Twilio 短信",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.sms_twilio.account_sid": {
+    "m": "账户 SID",
+    "_desc": "Twilio 短信 提醒方式的字段 account_sid 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.api_url": {
+    "m": "API 地址",
+    "_desc": "Twilio 短信 提醒方式的字段 api_url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.auth_token": {
+    "m": "Auth Token",
+    "_desc": "Twilio 短信 提醒方式的字段 auth_token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.body_template": {
+    "m": "正文模板",
+    "_desc": "Twilio 短信 提醒方式的字段 body_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.from_number": {
+    "m": "发信号码",
+    "_desc": "Twilio 短信 提醒方式的字段 from_number 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.messaging_service_sid": {
+    "m": "Messaging Service SID",
+    "_desc": "Twilio 短信 提醒方式的字段 messaging_service_sid 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sms_twilio.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Twilio 短信）"
+  },
+  "catalog.alerts.sms_twilio.to_numbers": {
+    "m": "接收号码",
+    "_desc": "Twilio 短信 提醒方式的字段 to_numbers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sound": {
+    "m": "声音提示",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.sound.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（声音提示）"
+  },
+  "catalog.alerts.sound.duration_ms": {
+    "m": "时长（毫秒）",
+    "_desc": "声音提示 提醒方式的字段 duration_ms 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sound.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（声音提示）"
+  },
+  "catalog.alerts.sound.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（声音提示）"
+  },
+  "catalog.alerts.sound.frequency": {
+    "m": "频率（Hz）",
+    "_desc": "声音提示 提醒方式的字段 frequency 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.sound.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（声音提示）"
+  },
+  "catalog.alerts.sound.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（声音提示）"
+  },
+  "catalog.alerts.sound.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（声音提示）"
+  },
+  "catalog.alerts.teams": {
+    "m": "Microsoft Teams",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.teams.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.headers": {
+    "m": "请求头",
+    "_desc": "Microsoft Teams 提醒方式的字段 headers 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.teams.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.message_template": {
+    "m": "消息模板",
+    "_desc": "Microsoft Teams 提醒方式的字段 message_template 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.teams.payload": {
+    "m": "自定义 JSON 负载",
+    "_desc": "Microsoft Teams 提醒方式的字段 payload 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.teams.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Microsoft Teams）"
+  },
+  "catalog.alerts.teams.url": {
+    "m": "Webhook 地址",
+    "_desc": "Microsoft Teams 提醒方式的字段 url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram": {
+    "m": "Telegram",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.telegram.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（Telegram）"
+  },
+  "catalog.alerts.telegram.bot_token": {
+    "m": "机器人 Token",
+    "_desc": "Telegram 提醒方式的字段 bot_token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.chat_id": {
+    "m": "聊天 ID",
+    "_desc": "Telegram 提醒方式的字段 chat_id 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.disable_link_preview": {
+    "m": "禁用链接预览",
+    "_desc": "Telegram 提醒方式的字段 disable_link_preview 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（Telegram）"
+  },
+  "catalog.alerts.telegram.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（Telegram）"
+  },
+  "catalog.alerts.telegram.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（Telegram）"
+  },
+  "catalog.alerts.telegram.message_thread_id": {
+    "m": "Topic ID",
+    "_desc": "Telegram 提醒方式的字段 message_thread_id 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.parse_mode": {
+    "m": "消息格式",
+    "_desc": "Telegram 提醒方式的字段 parse_mode 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.protect_content": {
+    "m": "保护内容",
+    "_desc": "Telegram 提醒方式的字段 protect_content 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（Telegram）"
+  },
+  "catalog.alerts.telegram.silent": {
+    "m": "静默发送",
+    "_desc": "Telegram 提醒方式的字段 silent 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.telegram.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（Telegram）"
+  },
+  "catalog.alerts.whatsapp": {
+    "m": "WhatsApp",
+    "_desc": "提醒方式的名称（alerts.catalog 的 label_id）：图块、抽屉标题、测试记录里显示；产品名不译"
+  },
+  "catalog.alerts.whatsapp.access_token": {
+    "m": "访问令牌",
+    "_desc": "WhatsApp 提醒方式的字段 access_token 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.alert_types": {
+    "m": "提醒级别",
+    "_desc": "提醒方式抽屉：按严重程度过滤的分段控件标题（仅紧急 / 异常与恢复 / 全部）（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.api_url": {
+    "m": "API 地址",
+    "_desc": "WhatsApp 提醒方式的字段 api_url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.enabled": {
+    "m": "启用此提醒方式",
+    "_desc": "提醒方式抽屉：启用开关的标题（也作开关的无障碍名称）（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.event_groups": {
+    "m": "提醒范围",
+    "_desc": "提醒方式抽屉：按事件类别过滤的一组复选框的标题（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.graph_api_version": {
+    "m": "API 版本",
+    "_desc": "WhatsApp 提醒方式的字段 graph_api_version 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.label": {
+    "m": "名称",
+    "_desc": "提醒方式：这一个渠道的自定义名称（可留空），多实例时区分用（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.mode": {
+    "m": "发送模式",
+    "_desc": "WhatsApp 提醒方式的字段 mode 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.phone_number_id": {
+    "m": "发送号码 ID",
+    "_desc": "WhatsApp 提醒方式的字段 phone_number_id 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.preview_url": {
+    "m": "显示链接预览",
+    "_desc": "WhatsApp 提醒方式的字段 preview_url 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.retries": {
+    "m": "失败重试",
+    "_desc": "提醒方式抽屉「高级」：失败重试次数输入框标题（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.template_body_params": {
+    "m": "模板参数",
+    "_desc": "WhatsApp 提醒方式的字段 template_body_params 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.template_language": {
+    "m": "模板语言",
+    "_desc": "WhatsApp 提醒方式的字段 template_language 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.template_name": {
+    "m": "模板名称",
+    "_desc": "WhatsApp 提醒方式的字段 template_name 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.whatsapp.timeout": {
+    "m": "请求超时",
+    "_desc": "提醒方式抽屉「高级」：请求超时（秒）输入框标题（WhatsApp）"
+  },
+  "catalog.alerts.whatsapp.to": {
+    "m": "接收号码",
+    "_desc": "WhatsApp 提醒方式的字段 to 的标题；技术名词（Token、SID、API Key 等）通常不译"
+  },
+  "catalog.alerts.desktop.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；桌面通知 的过滤项"
+  },
+  "catalog.alerts.desktop.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），桌面通知 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.desktop.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），桌面通知 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.desktop.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），桌面通知 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.desktop.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），桌面通知 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.desktop.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），桌面通知 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.discord.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Discord 的过滤项"
+  },
+  "catalog.alerts.discord.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Discord 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.discord.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Discord 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.discord.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Discord 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.discord.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Discord 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.discord.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Discord 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；SendGrid 邮件 的过滤项"
+  },
+  "catalog.alerts.email_sendgrid.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），SendGrid 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_sendgrid.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），SendGrid 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_sendgrid.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），SendGrid 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_sendgrid.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），SendGrid 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_sendgrid.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），SendGrid 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；SMTP 邮件 的过滤项"
+  },
+  "catalog.alerts.email_smtp.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），SMTP 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_smtp.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），SMTP 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_smtp.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），SMTP 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_smtp.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），SMTP 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.email_smtp.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），SMTP 邮件 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；通用 Webhook 的过滤项"
+  },
+  "catalog.alerts.generic_webhook.body_format.choice.json": {
+    "m": "JSON",
+    "_desc": "通用 Webhook：body_format 的选项 json"
+  },
+  "catalog.alerts.generic_webhook.body_format.choice.raw": {
+    "m": "原始",
+    "_desc": "通用 Webhook：body_format 的选项 raw"
+  },
+  "catalog.alerts.generic_webhook.body_format.choice.text": {
+    "m": "文本",
+    "_desc": "通用 Webhook：body_format 的选项 text"
+  },
+  "catalog.alerts.generic_webhook.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），通用 Webhook 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.generic_webhook.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），通用 Webhook 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.generic_webhook.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），通用 Webhook 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.generic_webhook.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），通用 Webhook 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.generic_webhook.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），通用 Webhook 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Google Chat 的过滤项"
+  },
+  "catalog.alerts.google_chat.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Google Chat 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.google_chat.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Google Chat 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.google_chat.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Google Chat 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.google_chat.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Google Chat 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.google_chat.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Google Chat 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.gotify.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Gotify 的过滤项"
+  },
+  "catalog.alerts.gotify.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Gotify 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.gotify.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Gotify 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.gotify.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Gotify 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.gotify.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Gotify 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.gotify.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Gotify 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；ntfy 的过滤项"
+  },
+  "catalog.alerts.ntfy.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），ntfy 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.ntfy.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），ntfy 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.ntfy.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），ntfy 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.ntfy.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），ntfy 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.ntfy.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），ntfy 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.pushover.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Pushover 的过滤项"
+  },
+  "catalog.alerts.pushover.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Pushover 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.pushover.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Pushover 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.pushover.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Pushover 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.pushover.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Pushover 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.pushover.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Pushover 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.slack.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Slack 的过滤项"
+  },
+  "catalog.alerts.slack.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Slack 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.slack.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Slack 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.slack.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Slack 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.slack.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Slack 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.slack.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Slack 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Twilio 短信 的过滤项"
+  },
+  "catalog.alerts.sms_twilio.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Twilio 短信 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sms_twilio.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Twilio 短信 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sms_twilio.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Twilio 短信 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sms_twilio.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Twilio 短信 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sms_twilio.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Twilio 短信 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sound.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；声音提示 的过滤项"
+  },
+  "catalog.alerts.sound.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），声音提示 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sound.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），声音提示 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sound.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），声音提示 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sound.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），声音提示 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.sound.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），声音提示 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.teams.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Microsoft Teams 的过滤项"
+  },
+  "catalog.alerts.teams.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Microsoft Teams 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.teams.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Microsoft Teams 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.teams.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Microsoft Teams 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.teams.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Microsoft Teams 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.teams.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Microsoft Teams 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.telegram.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；Telegram 的过滤项"
+  },
+  "catalog.alerts.telegram.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），Telegram 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.telegram.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），Telegram 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.telegram.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），Telegram 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.telegram.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），Telegram 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.telegram.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），Telegram 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.BACKUP_REMINDER": {
+    "m": "备份提醒",
+    "_desc": "提醒级别的取值 BACKUP_REMINDER（AlertType）：降级时的配置备份提醒；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.CRITICAL": {
+    "m": "严重",
+    "_desc": "提醒级别的取值 CRITICAL（AlertType）：严重故障（如某层全部不可用）；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.EMERGENCY": {
+    "m": "紧急",
+    "_desc": "提醒级别的取值 EMERGENCY（AlertType）：紧急（所有层级都不可用、需要人工介入）；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.KILL_SWITCH_DISABLED": {
+    "m": "熔断保护不可用",
+    "_desc": "提醒级别的取值 KILL_SWITCH_DISABLED（AlertType）：熔断保护无法启用；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.KILL_SWITCH_OFF": {
+    "m": "熔断保护已解除",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OFF（AlertType）：熔断保护停止拦截；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.KILL_SWITCH_ON": {
+    "m": "熔断保护已触发",
+    "_desc": "提醒级别的取值 KILL_SWITCH_ON（AlertType）：熔断保护开始拦截流量；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.KILL_SWITCH_OVERRIDE": {
+    "m": "熔断保护被手动覆盖",
+    "_desc": "提醒级别的取值 KILL_SWITCH_OVERRIDE（AlertType）：用户手动越过熔断保护；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.POOL_UPDATE": {
+    "m": "节点池更新",
+    "_desc": "提醒级别的取值 POOL_UPDATE（AlertType）：节点池更新（当前不会发出）；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.RECOVERY": {
+    "m": "恢复",
+    "_desc": "提醒级别的取值 RECOVERY（AlertType）：故障后恢复；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.alert_types.choice.WARNING": {
+    "m": "警告",
+    "_desc": "提醒级别的取值 WARNING（AlertType）：一般警告；WhatsApp 的过滤项"
+  },
+  "catalog.alerts.whatsapp.event_groups.choice.backup": {
+    "m": "备份提醒",
+    "_desc": "提醒范围的一项（事件类别 backup），WhatsApp 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.event_groups.choice.emergency_fallback": {
+    "m": "Bastion 的启用与耗尽",
+    "_desc": "提醒范围的一项（事件类别 emergency_fallback），WhatsApp 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.event_groups.choice.protection": {
+    "m": "熔断保护触发与解除",
+    "_desc": "提醒范围的一项（事件类别 protection），WhatsApp 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.event_groups.choice.route_health": {
+    "m": "层级回退与恢复",
+    "_desc": "提醒范围的一项（事件类别 route_health），WhatsApp 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.event_groups.choice.vanguard_nodes": {
+    "m": "Vanguard 的节点变化",
+    "_desc": "提醒范围的一项（事件类别 vanguard_nodes），WhatsApp 抽屉的复选框。「Vanguard 自建」「Bastion 应急」是层级代号加角色词：代号不译，角色词与 tier.<id>.role 一致"
+  },
+  "catalog.alerts.whatsapp.mode.choice.template": {
+    "m": "模板",
+    "_desc": "WhatsApp：mode 的选项 template"
+  },
+  "catalog.alerts.whatsapp.mode.choice.text": {
+    "m": "文本",
+    "_desc": "WhatsApp：mode 的选项 text"
+  },
+  "catalog.alerts.group.built_in": {
+    "m": "内置",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 built_in；后端没有 label_id，本单命名）：应用自带、无需配置账号的提醒方式。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.group.chat": {
+    "m": "聊天 / 团队",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 chat；后端没有 label_id，本单命名）：Telegram、Slack 等聊天工具。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.group.push": {
+    "m": "个人推送",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 push；后端没有 label_id，本单命名）：ntfy、Pushover 等手机推送服务。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.group.email": {
+    "m": "邮件",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 email；后端没有 label_id，本单命名）：邮件。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.group.sms": {
+    "m": "短信",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 sms；后端没有 label_id，本单命名）：短信。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.group.generic": {
+    "m": "通用",
+    "_desc": "提醒方式的分组名（alert_config.ALERT_CHANNEL_GROUPS 的 generic；后端没有 label_id，本单命名）：通用 Webhook。图库里的分组小标题和抽屉副标题，空间紧"
+  },
+  "catalog.alerts.preset.urgent": {
+    "m": "仅紧急",
+    "_desc": "提醒级别的预设（alert_scope_templates.ALERT_TIMING_PRESETS 的 urgent；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.preset.urgent.desc": {
+    "m": "只在所有层级都不可用、熔断保护触发时提醒。",
+    "_desc": "提醒级别预设「仅紧急」的说明，显示在分段按钮下方"
+  },
+  "catalog.alerts.preset.abnormal_recovery": {
+    "m": "异常与恢复",
+    "_desc": "提醒级别的预设（alert_scope_templates.ALERT_TIMING_PRESETS 的 abnormal_recovery；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.preset.abnormal_recovery.desc": {
+    "m": "层级降级、回退、恢复和熔断时提醒。",
+    "_desc": "提醒级别预设「异常与恢复」的说明，显示在分段按钮下方"
+  },
+  "catalog.alerts.preset.all": {
+    "m": "全部",
+    "_desc": "提醒级别的预设（alert_scope_templates.ALERT_TIMING_PRESETS 的 all；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.preset.all.desc": {
+    "m": "另外包括服务启动、停止和日常检测结果。",
+    "_desc": "提醒级别预设「全部」的说明，显示在分段按钮下方"
+  },
+  "catalog.alerts.sound.preset.soft": {
+    "m": "轻柔",
+    "_desc": "提示音的预设（alert_scope_templates.SOUND_ALERT_PRESETS 的 soft；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.sound.preset.standard": {
+    "m": "标准",
+    "_desc": "提示音的预设（alert_scope_templates.SOUND_ALERT_PRESETS 的 standard；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.sound.preset.prominent": {
+    "m": "醒目",
+    "_desc": "提示音的预设（alert_scope_templates.SOUND_ALERT_PRESETS 的 prominent；后端没有 label_id，本单命名）：分段按钮，空间紧"
+  },
+  "catalog.alerts.scope.all": {
+    "m": "全部告警",
+    "_desc": "提醒范围的模板（alert_scope_templates.ALERT_SCOPE_TEMPLATES 的 all；后端没有 label_id，本单命名，预留给 T-P4-05e）"
+  },
+  "catalog.alerts.scope.key_events": {
+    "m": "关键事件",
+    "_desc": "提醒范围的模板（alert_scope_templates.ALERT_SCOPE_TEMPLATES 的 key_events；后端没有 label_id，本单命名，预留给 T-P4-05e）"
+  },
+  "catalog.alerts.email_smtp.preset.gmail": {
+    "m": "Gmail",
+    "_desc": "SMTP 服务商预设（notification_onboarding.SMTP_PROVIDER_PRESETS 的 gmail；alerts.catalog 中 email_smtp 的 host/port/starttls/ssl 的 conditions.presets，后端没有 label_id，T-P2-H11 命名）：Gmail。预设下拉或分段按钮，空间紧"
+  },
+  "catalog.alerts.email_smtp.preset.google": {
+    "m": "Google（Gmail）",
+    "_desc": "SMTP 服务商预设（notification_onboarding.SMTP_PROVIDER_PRESETS 的 google；alerts.catalog 中 email_smtp 的 host/port/starttls/ssl 的 conditions.presets，后端没有 label_id，T-P2-H11 命名）：与 gmail 相同的取值，conditions.preset_aliases 标为 gmail 的别名。预设下拉或分段按钮，空间紧"
+  },
+  "catalog.alerts.email_smtp.preset.outlook": {
+    "m": "Outlook / Microsoft 365",
+    "_desc": "SMTP 服务商预设（notification_onboarding.SMTP_PROVIDER_PRESETS 的 outlook；alerts.catalog 中 email_smtp 的 host/port/starttls/ssl 的 conditions.presets，后端没有 label_id，T-P2-H11 命名）：Outlook / Microsoft 365。预设下拉或分段按钮，空间紧"
+  },
+  "catalog.alerts.email_smtp.preset.office365": {
+    "m": "Office 365",
+    "_desc": "SMTP 服务商预设（notification_onboarding.SMTP_PROVIDER_PRESETS 的 office365；alerts.catalog 中 email_smtp 的 host/port/starttls/ssl 的 conditions.presets，后端没有 label_id，T-P2-H11 命名）：与 outlook 相同的取值，conditions.preset_aliases 标为 outlook 的别名。预设下拉或分段按钮，空间紧"
+  },
+  "catalog.alerts.email_smtp.preset.custom": {
+    "m": "自定义",
+    "_desc": "SMTP 服务商预设（notification_onboarding.SMTP_PROVIDER_PRESETS 的 custom；alerts.catalog 中 email_smtp 的 host/port/starttls/ssl 的 conditions.presets，后端没有 label_id，T-P2-H11 命名）：不预填任何字段（各字段的预设值为 null），保留用户自己填写的服务器与端口。预设下拉或分段按钮，空间紧"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "//": "11-05: the letter modules are ES modules; this lets node:test load them without the MODULE_TYPELESS_PACKAGE_JSON warning (as src/rt/package.json). esbuild bundles them either way.",
+  "type": "module"
+}

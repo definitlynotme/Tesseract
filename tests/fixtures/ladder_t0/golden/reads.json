@@ -1,0 +1,266 @@
+{
+ "all_dead": {
+  "admission": null,
+  "leaf": {
+   "n1": {
+    "alive": false,
+    "name": "n1"
+   },
+   "n2": {
+    "alive": false,
+    "name": "n2"
+   },
+   "zz": "raised:MihomoAPIError"
+  },
+  "leaf_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "zz"
+    ]
+   ]
+  },
+  "route": {
+   "alive": {
+    "n1": false,
+    "n2": false,
+    "n3": false
+   },
+   "all_loaded_dead": true,
+   "demoted_n1": false,
+   "fixed": "",
+   "judge_order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "now": "n1",
+   "order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "unknown": []
+  },
+  "route_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "TIER3-AUTO"
+    ]
+   ]
+  }
+ },
+ "healthy": {
+  "admission": null,
+  "leaf": {
+   "n1": {
+    "alive": true,
+    "name": "n1"
+   },
+   "n2": {
+    "alive": true,
+    "name": "n2"
+   },
+   "zz": "raised:MihomoAPIError"
+  },
+  "leaf_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "zz"
+    ]
+   ]
+  },
+  "route": {
+   "alive": {
+    "n1": true,
+    "n2": true,
+    "n3": true
+   },
+   "all_loaded_dead": false,
+   "demoted_n1": false,
+   "fixed": "",
+   "judge_order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "now": "n1",
+   "order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "unknown": []
+  },
+  "route_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "TIER3-AUTO"
+    ]
+   ]
+  }
+ },
+ "n1_dead": {
+  "admission": null,
+  "leaf": {
+   "n1": {
+    "alive": false,
+    "name": "n1"
+   },
+   "n2": {
+    "alive": true,
+    "name": "n2"
+   },
+   "zz": "raised:MihomoAPIError"
+  },
+  "leaf_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "zz"
+    ]
+   ]
+  },
+  "route": {
+   "alive": {
+    "n1": false,
+    "n2": true,
+    "n3": true
+   },
+   "all_loaded_dead": false,
+   "demoted_n1": true,
+   "fixed": "",
+   "judge_order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "now": "n2",
+   "order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "unknown": []
+  },
+  "route_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "TIER3-AUTO"
+    ]
+   ]
+  }
+ },
+ "pinned_n2": {
+  "admission": null,
+  "leaf": {
+   "n1": {
+    "alive": true,
+    "name": "n1"
+   },
+   "n2": {
+    "alive": true,
+    "name": "n2"
+   },
+   "zz": "raised:MihomoAPIError"
+  },
+  "leaf_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ],
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "zz"
+    ]
+   ]
+  },
+  "route": {
+   "alive": {
+    "n1": true,
+    "n2": true,
+    "n3": true
+   },
+   "all_loaded_dead": false,
+   "demoted_n1": false,
+   "fixed": "n2",
+   "judge_order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "now": "n2",
+   "order": [
+    "n1",
+    "n2",
+    "n3"
+   ],
+   "unknown": []
+  },
+  "route_calls": {
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "TIER3-AUTO"
+    ]
+   ]
+  }
+ }
+}

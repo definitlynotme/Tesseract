@@ -1,0 +1,25 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "alerts.desktop",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "delivery_id": "desktop-test-example",
+    "event_ids": [
+      "example"
+    ],
+    "severity": "info",
+    "title": "Example text",
+    "detail": "Example text",
+    "members": [
+      "example"
+    ],
+    "target": "overview",
+    "version": null,
+    "force": true
+  },
+  "seq": 1
+}

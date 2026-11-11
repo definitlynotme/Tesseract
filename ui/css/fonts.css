@@ -1,0 +1,90 @@
+/* ==========================================================================
+   fonts.css — self-hosted web fonts (T-P4-08a; P4 architecture §8). No
+   external resource is loaded: every woff2 lives in ui/fonts/ and esbuild
+   emits it as assets/<name>.<hash>.woff2.
+   - Instrument Sans, Geist Mono: copied from the pinned Fontsource packages
+     into ui/fonts/ by build/fonts.mjs. Only the latin and latin-ext subsets.
+   - Tesseract Kai, the zh voice (tokens.css): a local font, the subset of
+     霞鹜文楷 GB 屏幕阅读版 (LXGW WenKai GB Screen 1.530) renamed as the OFL
+     requires. ui/fonts/tesseract-kai-zh.woff2 is a source file, cut by
+     tools/zh_voice_font.py to the CJK characters of the zh_CN catalogs; re-run
+     it when they gain new ones (it also updates the unicode-range below;
+     test/unit/fonts.test.mjs fails until then).
+   Licence: SIL OFL 1.1 (assets/OFL-<id>.<hash>.txt, THIRD_PARTY_NOTICES.md).
+
+   Every unicode-range is the font's real cmap intersected with the Fontsource
+   subset range (Tesseract Kai: its whole cmap) — nothing is declared that the
+   file cannot draw. Regenerate with `node ui/tools/font_cmap.mjs --emit-css`;
+   `--report` and test/unit/fonts.test.mjs check it. No family has Cyrillic or
+   Greek in these subsets (V11), so :lang(ru) uses system fonts (tokens.css).
+   ========================================================================== */
+
+/* Instrument Sans 400 700 · latin-ext · @fontsource-variable/instrument-sans */
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2");
+  unicode-range: U+0100-0107, U+010A-0113, U+0116-011B, U+011E-0123, U+0126-0127, U+012A-012B, U+012E-0130, U+0132-0133, U+0136-0137, U+0139-013E, U+0141-0148, U+014A-014D, U+0150-0151, U+0154-015B, U+015E-0161, U+0164-0165, U+016A-017E, U+01CD-01CE, U+0218-021B, U+0237, U+02C7, U+02DD, U+0304, U+0308, U+1E80-1E85, U+1E9E, U+1EF2-1EF3;
+}
+
+/* Instrument Sans 400 700 · latin · @fontsource-variable/instrument-sans */
+@font-face {
+  font-family: "Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/instrument-sans-latin-wght-normal.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0-00A3, U+00A5, U+00A7-00AB, U+00AE-00B0, U+00B4, U+00B6-00B8, U+00BA-00BB, U+00BF-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2039-203A, U+20AC, U+2122, U+2191, U+2193, U+2212;
+}
+
+/* Geist Mono 400 · latin-ext · @fontsource/geist-mono */
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/geist-mono-latin-ext-400-normal.woff2") format("woff2");
+  unicode-range: U+0100-0113, U+0116-012B, U+012E-0130, U+0134-0137, U+0139-013E, U+0141-0148, U+014A-014D, U+0150-0151, U+0154-017E, U+018F, U+0192, U+01A0-01A1, U+01AF-01B0, U+01CD-01CE, U+01E4-01E9, U+0218-021B, U+0237, U+0259, U+02B9, U+02C7-02C8, U+02DD, U+0304, U+0308, U+1E20-1E21, U+1E80-1E85, U+1E9E, U+1EF2-1EF9, U+2020, U+20AA, U+20B1, U+20B4, U+20B9, U+20BD, U+A78B-A78C;
+}
+
+/* Geist Mono 400 · latin · @fontsource/geist-mono */
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/geist-mono-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0-00AC, U+00AE-00FF, U+0131, U+0152-0153, U+02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212;
+}
+
+/* Geist Mono 500 · latin-ext · @fontsource/geist-mono */
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/geist-mono-latin-ext-500-normal.woff2") format("woff2");
+  unicode-range: U+0100-0113, U+0116-012B, U+012E-0130, U+0134-0137, U+0139-013E, U+0141-0148, U+014A-014D, U+0150-0151, U+0154-017E, U+018F, U+0192, U+01A0-01A1, U+01AF-01B0, U+01CD-01CE, U+01E4-01E9, U+0218-021B, U+0237, U+0259, U+02B9, U+02C7-02C8, U+02DD, U+0304, U+0308, U+1E20-1E21, U+1E80-1E85, U+1E9E, U+1EF2-1EF9, U+2020, U+20AA, U+20B1, U+20B4, U+20B9, U+20BD, U+A78B-A78C;
+}
+
+/* Geist Mono 500 · latin · @fontsource/geist-mono */
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/geist-mono-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0020-007E, U+00A0-00AC, U+00AE-00FF, U+0131, U+0152-0153, U+02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+2013-2014, U+2018-201A, U+201C-201E, U+2022, U+2026, U+2032-2033, U+2039-203A, U+2044, U+20AC, U+2122, U+2191, U+2193, U+2212;
+}
+
+/* Tesseract Kai 400 · zh-ui · local: subset of LXGW WenKai GB Screen 1.530 (tools/zh_voice_font.py) */
+@font-face {
+  font-family: "Tesseract Kai";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/tesseract-kai-zh.woff2") format("woff2");
+  unicode-range: U+00B7, U+2014, U+2026, U+3001-3002, U+300C-300D, U+4E00, U+4E09-4E0B, U+4E0D-4E0E, U+4E14, U+4E1A, U+4E1C, U+4E22, U+4E24-4E25, U+4E2A, U+4E2D, U+4E34, U+4E3A-4E3B, U+4E48-4E49, U+4E4B, U+4E5F, U+4E66, U+4E86, U+4E8B-4E8C, U+4E8E, U+4E9B, U+4EA4, U+4EAB-4EAC, U+4EBA, U+4EC5, U+4ECA, U+4ECD-4ECE, U+4ED3, U+4ED6, U+4EE3-4EE5, U+4EF6, U+4EFB, U+4EFD, U+4F01, U+4F18, U+4F1A, U+4F20, U+4F30, U+4F46, U+4F4D-4F4E, U+4F53, U+4F55, U+4F59, U+4F5C, U+4F60, U+4F7F, U+4F8B, U+4F9B, U+4FA7, U+4FDD, U+4FE1, U+4FEE, U+5019, U+503C, U+505A, U+505C, U+5065, U+513F, U+5141, U+5145, U+5148, U+514D, U+5165, U+5168, U+516C, U+5171, U+5173, U+5176-5177, U+5185, U+518C-518D, U+5199, U+51B2, U+51C0, U+51C6, U+51CF, U+51E0, U+51ED, U+51FA-51FB, U+5206-5207, U+5212, U+5217, U+5219-521B, U+5220, U+5224, U+522B, U+5230, U+5236-5237, U+523B, U+524D, U+5269-526A, U+529B, U+529F-52A1, U+52A8-52A9, U+52BF, U+52FE-52FF, U+5305, U+5316, U+5339-533A, U+5347, U+534F, U+5355, U+5360-5361, U+5373, U+5386, U+539F, U+53BB, U+53C2, U+53CA, U+53CD, U+53D1, U+53D6-53D8, U+53E3, U+53E6, U+53EA, U+53EF-53F0, U+53F2-53F3, U+53F7, U+5404, U+5408, U+540C-540E, U+5411, U+5426, U+542B-542C, U+542F, U+544A, U+5458, U+547D, U+548C, U+54CD, U+54EA, U+5546, U+5668, U+56DE, U+56E0, U+56E2, U+56F4, U+56FA, U+56FD-56FE, U+5728, U+5730, U+5740, U+5747, U+578B, U+57DF, U+586B, U+5883, U+5899, U+589E, U+58F0, U+5904, U+5907, U+590D, U+5916, U+591A, U+591F, U+5927, U+5929-592A, U+5931, U+5934, U+5939, U+597D, U+5982, U+59CB, U+5B50, U+5B57-5B58, U+5B83, U+5B88-5B89, U+5B8C, U+5B9A, U+5B9E, U+5BB6, U+5BB9, U+5BBD, U+5BC6, U+5BF9, U+5BFC, U+5C01, U+5C0F, U+5C11, U+5C1A, U+5C31, U+5C3D-5C3E, U+5C40, U+5C42, U+5C4F, U+5C55, U+5C5E, U+5DE5-5DE6, U+5DF1-5DF2, U+5E03, U+5E26, U+5E2E, U+5E38, U+5E72-5E73, U+5E76, U+5E7F, U+5E8F, U+5E93-5E94, U+5E9F, U+5EA6, U+5EAD, U+5EB7, U+5EF6, U+5EFA, U+5F00, U+5F02-5F03, U+5F0F, U+5F15, U+5F20, U+5F3A, U+5F52-5F53, U+5F55, U+5F71, U+5F80, U+5F84-5F85, U+5F97, U+5FAA, U+5FC3, U+5FC5, U+5FD7, U+5FD9, U+5FEB, U+6001, U+600E, U+6025, U+603B, U+6062, U+606F, U+60C5, U+60F3, U+610F, U+611F, U+6162, U+620F-6210, U+6216, U+622A, U+6237, U+6240, U+624B, U+624D, U+6253, U+6258, U+6267, U+6269, U+6270, U+6279, U+627E-6280, U+628A, U+6295, U+62A4, U+62D2, U+62D6, U+62DF, U+62E6, U+62E9, U+62EC, U+62FC, U+6301, U+6307, U+6309, U+6324, U+6362, U+636E, U+6388-6389, U+6392, U+63A5, U+63A7-63A8, U+63D0, U+641C, U+642D, U+64A4, U+64AD, U+64CD, U+652F, U+6536, U+6539, U+653E, U+6548, U+654F, U+6570, U+6574, U+6587, U+65AD, U+65B0, U+65B9, U+65E0, U+65E5, U+65E7, U+65E9, U+65F6, U+660E, U+6628, U+662F, U+663E, U+666E, U+6682, U+66F2, U+66F4, U+66FF-6700, U+6709, U+670D, U+671F, U+672A, U+672C, U+672F, U+673A, U+6743, U+675F, U+6761, U+6765, U+677F, U+6790, U+679C, U+67D4, U+67E5, U+6807, U+680F, U+6837-6838, U+683C, U+6846, U+684C, U+68C0, U+695A, U+6A21, U+6B21, U+6B62-6B65, U+6BB5, U+6BCD, U+6BCF, U+6BD4, U+6BEB, U+6C42, U+6C60, U+6C70, U+6CA1, U+6CD5, U+6CE8, U+6D41, U+6D4B, U+6D4F, U+6D88, U+6DD8, U+6DF7, U+6DFB, U+6E05, U+6E20, U+6E38, U+6E90, U+6EE1, U+6EE4, U+6F0F, U+706B, U+70B9, U+7136, U+7167, U+7194, U+7247-7248, U+724C, U+7279, U+72B6, U+72EC, U+7387, U+73AF-73B0, U+7406, U+751F, U+7528, U+7531, U+7535, U+7545, U+754C, U+7559, U+767B, U+767D, U+7684, U+76D1, U+76D6, U+76D8, U+76EE, U+76F4, U+76F8, U+770B, U+771F, U+773C, U+7740, U+77E5, U+77ED, U+7801, U+786E, U+78C1, U+793A, U+795D, U+7981, U+79BB, U+79C1, U+79CD, U+79D2, U+79F0, U+79FB, U+7A0B, U+7A0D, U+7A33, U+7A3F, U+7A7A, U+7A81, U+7A97, U+7ACB, U+7AD9, U+7AEF, U+7B26, U+7B2C, U+7B49, U+7B5B, U+7B7E, U+7B80, U+7BA1, U+7C7B, U+7C98, U+7CFB, U+7D22, U+7D27, U+7D2F, U+7E41, U+7EA6-7EA7, U+7EAF, U+7EB3, U+7EB9, U+7EBF, U+7EC4, U+7EC8, U+7ECF, U+7ED3, U+7ED5, U+7ED9, U+7EDC-7EDD, U+7EDF, U+7EE7, U+7EEA, U+7EED, U+7EF4, U+7F00, U+7F16, U+7F3A, U+7F51, U+7F6E, U+8005, U+800C, U+8017, U+804A, U+80FD, U+8111, U+81EA, U+81F3-81F4, U+822A, U+822C, U+8272, U+8282, U+8303, U+8349, U+83B7, U+8425, U+853D, U+85CF, U+865A, U+884C, U+8865, U+8868, U+88AB, U+88C5, U+8981, U+8986, U+89C1, U+89C4, U+89C6, U+89C8, U+89D2, U+89E3, U+89E6, U+8A00, U+8A9E, U+8B66, U+8BA1-8BA2, U+8BA4, U+8BA9, U+8BAE, U+8BB0, U+8BB2, U+8BB8, U+8BBE-8BBF, U+8BC1, U+8BC4, U+8BC6, U+8BCA, U+8BCD, U+8BD5, U+8BDD, U+8BE2, U+8BE5-8BE6, U+8BED, U+8BEF, U+8BF4, U+8BF7, U+8BFB, U+8C01, U+8C03, U+8C22, U+8D1F, U+8D25-8D26, U+8D28, U+8D34, U+8D39, U+8D70, U+8D77, U+8D85, U+8D8A, U+8DB3, U+8DDF, U+8DEF, U+8DF3, U+8EAB, U+8F6E-8F6F, U+8F7B, U+8F7D, U+8F83, U+8F91, U+8F93, U+8FB9, U+8FBE, U+8FC7, U+8FD0-8FD1, U+8FD4, U+8FD8-8FD9, U+8FDB, U+8FDE-8FDF, U+9000-9001, U+9009, U+9012, U+9014, U+9017, U+901A, U+901F, U+9047, U+9053, U+9075, U+90A3, U+90AE, U+90E8, U+90FD, U+914D, U+9192, U+91C7, U+91CC-91CD, U+91CF, U+9488, U+949F, U+94A5, U+94FE, U+9500, U+9519, U+952E, U+957F, U+95ED-95EE, U+95F4, U+9605, U+961F, U+9632, U+963B, U+9646, U+964D, U+9650, U+9664, U+968F-9690, U+9694, U+96C6, U+9700, U+9732, U+9759, U+9762, U+97F3, U+9875, U+9879-987B, U+9884, U+9891, U+9898, U+9988, U+9996, U+9A8C, U+9AA8, U+9AD8, U+9ED8, U+FF08-FF09, U+FF0C, U+FF1A-FF1B, U+FF1F;
+}

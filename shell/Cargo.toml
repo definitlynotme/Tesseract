@@ -1,0 +1,3 @@
+[workspace]
+members = ["bridge_host", "headless_shell", "app"]
+resolver = "2"

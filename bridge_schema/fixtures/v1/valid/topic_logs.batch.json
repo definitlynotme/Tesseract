@@ -1,0 +1,30 @@
+{
+  "data": {
+    "dropped": 0,
+    "dropped_total": 0,
+    "from_seq": 1,
+    "gap": false,
+    "records": [
+      {
+        "category": "other",
+        "detail": "",
+        "key": "",
+        "level": "info",
+        "raw": "Bridge subscription active",
+        "rx_ms": 1791400577584,
+        "seq": 1,
+        "source": "TESSERACT",
+        "title": "Bridge subscription active",
+        "ts_ms": 1791400577584
+      }
+    ]
+  },
+  "epoch": "v1-fixture",
+  "kind": "edge",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "seq": 1,
+  "t": "evt",
+  "topic": "logs.batch"
+}

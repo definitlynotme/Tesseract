@@ -1,0 +1,937 @@
+{
+  "name": "overview_exit_v6_only",
+  "desc": "T-P4-05a: 只有 IPv6：IPv4 失败（identity_unavailable），IPv6 地址与自己的国家。ASCII data only.",
+  "lang": "zh_CN",
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "app.info",
+            "app.quit",
+            "config.snapshot",
+            "exit.verify",
+            "mode.set",
+            "service.restart",
+            "service.start",
+            "service.stop"
+          ],
+          "topics": [
+            "bastion.pool",
+            "config.changed",
+            "core.info",
+            "exit.identity",
+            "gateway.current",
+            "jobs",
+            "killswitch.state",
+            "network.mode",
+            "nodes.list",
+            "protocols.mix",
+            "route.published",
+            "service.collect",
+            "service.state",
+            "tier.transition",
+            "tiers.summary",
+            "traffic.history",
+            "traffic.tick"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "restored",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.state",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": true,
+            "startup_phase": "running",
+            "shutdown_cleanup_pending": false,
+            "failure_code": null,
+            "failure": null
+          },
+          "core": {
+            "running": true,
+            "pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": false
+          },
+          "readiness": {
+            "state": "ready",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": 120
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "route.published",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "publication_revision": 20,
+          "owner": {
+            "process_pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "selected_chain": [
+            "TIER1",
+            "HK-01"
+          ],
+          "leaf": "HK-01",
+          "managed_tier": "vanguard",
+          "observed_at_ms": 1790000000000,
+          "valid": true,
+          "invalid_reason": null,
+          "fail_closed_confirmed": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "tiers.summary",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "carrier": "vanguard",
+          "offline_reason": null,
+          "order": [
+            "vanguard",
+            "sentinel",
+            "bastion",
+            "gateway"
+          ],
+          "degraded": true,
+          "fallback": false,
+          "tiers": {
+            "vanguard": {
+              "enabled": true,
+              "total": 3,
+              "usable": 2
+            },
+            "sentinel": {
+              "enabled": true,
+              "total": 2,
+              "usable": 1
+            },
+            "bastion": {
+              "enabled": true,
+              "total": 40,
+              "usable": 25
+            },
+            "gateway": {
+              "enabled": true,
+              "total": 2,
+              "usable": 2
+            }
+          },
+          "pool": {
+            "usable": 5,
+            "total": 7
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.collect",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "generation": 1,
+          "tiers": [
+            {
+              "tier": "bastion",
+              "generation": 1,
+              "first_check": "complete",
+              "source_count": 2,
+              "healthy": 2,
+              "required": 1,
+              "observed_at_ms": 1790000000000
+            },
+            {
+              "tier": "gateway",
+              "generation": 1,
+              "first_check": "complete",
+              "source_count": 2,
+              "healthy": 2,
+              "required": 1,
+              "observed_at_ms": 1790000000000
+            },
+            {
+              "tier": "sentinel",
+              "generation": 1,
+              "first_check": "complete",
+              "source_count": 2,
+              "healthy": 2,
+              "required": 1,
+              "observed_at_ms": 1790000000000
+            },
+            {
+              "tier": "vanguard",
+              "generation": 1,
+              "first_check": "complete",
+              "source_count": 2,
+              "healthy": 2,
+              "required": 1,
+              "observed_at_ms": 1790000000000
+            }
+          ],
+          "observed_at_ms": 1790000000000
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "network.mode",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "mode": "system",
+          "admin": true,
+          "switching": false,
+          "proxy_state": "owned",
+          "drift": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "killswitch.state",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "enabled": true,
+          "active": false,
+          "admin": true,
+          "error": null,
+          "triggered": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "bastion.pool",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "runtime_alive": 25,
+          "user_alive": 0,
+          "capacity": 60,
+          "min_alive_nodes": 10,
+          "target_alive": 25,
+          "collecting": false,
+          "observed_at_ms": 1790000000000
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "protocols.mix",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "source": "loaded",
+          "counts": {
+            "vless": 3,
+            "shadowsocks": 2,
+            "trojan": 1,
+            "hysteria2": 1
+          },
+          "observed_at_ms": 1790000000000
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "gateway.current",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "selected": null,
+          "effective": null,
+          "missing": false,
+          "applied": false,
+          "pending": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "exit.identity",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "current": {
+            "request_id": "auto-1",
+            "generation": 8,
+            "binding_id": "b-1",
+            "status": "partial",
+            "reason_code": null,
+            "v4": {
+              "status": "failed",
+              "address": null,
+              "country": null,
+              "reason_code": "identity_unavailable",
+              "observed_at_ms": null
+            },
+            "v6": {
+              "status": "ok",
+              "address": "2001:db8::24",
+              "country": "SG",
+              "reason_code": null,
+              "observed_at_ms": 1790654280000
+            },
+            "fresh": true,
+            "observed_at_ms": 1790654280000,
+            "native_fallback_verified": false,
+            "native_fallback_verified_commit_rejected": false,
+            "native_fallback_unverified_budget": false,
+            "manual_execution_binding_stale": false,
+            "trigger": "auto"
+          },
+          "previous": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "traffic.tick",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "t_ms": 1790000000000,
+          "up_bps": 2048,
+          "down_bps": 8192,
+          "session": {
+            "up_bytes": 512000,
+            "down_bytes": 1024000
+          },
+          "running": true,
+          "error_code": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "traffic.history",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "sampled_at_ms": 1790000000000,
+          "source": "temporary_snapshot",
+          "h24": [
+            {
+              "t_ms": 1789996400000,
+              "down_bps": 4096,
+              "up_bps": 1535,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789996700000,
+              "down_bps": 5078,
+              "up_bps": 1490,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997000000,
+              "down_bps": 5819,
+              "up_bps": 1330,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997300000,
+              "down_bps": 6139,
+              "up_bps": 1096,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997600000,
+              "down_bps": 5958,
+              "up_bps": 844,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997900000,
+              "down_bps": 5322,
+              "up_bps": 637,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998200000,
+              "down_bps": 4385,
+              "up_bps": 524,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998500000,
+              "down_bps": 3378,
+              "up_bps": 533,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998800000,
+              "down_bps": 2546,
+              "up_bps": 663,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999100000,
+              "down_bps": 2094,
+              "up_bps": 881,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999400000,
+              "down_bps": 2132,
+              "up_bps": 1134,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999700000,
+              "down_bps": 2651,
+              "up_bps": 1360,
+              "sample_count": 300
+            }
+          ],
+          "live": [
+            {
+              "t_ms": 1789999970000,
+              "down_bps": 8192,
+              "up_bps": 2661
+            },
+            {
+              "t_ms": 1789999971000,
+              "down_bps": 10156,
+              "up_bps": 2193
+            },
+            {
+              "t_ms": 1789999972000,
+              "down_bps": 11639,
+              "up_bps": 1689
+            },
+            {
+              "t_ms": 1789999973000,
+              "down_bps": 12278,
+              "up_bps": 1273
+            },
+            {
+              "t_ms": 1789999974000,
+              "down_bps": 11916,
+              "up_bps": 1047
+            },
+            {
+              "t_ms": 1789999975000,
+              "down_bps": 10643,
+              "up_bps": 1066
+            },
+            {
+              "t_ms": 1789999976000,
+              "down_bps": 8770,
+              "up_bps": 1326
+            },
+            {
+              "t_ms": 1789999977000,
+              "down_bps": 6755,
+              "up_bps": 1762
+            },
+            {
+              "t_ms": 1789999978000,
+              "down_bps": 5092,
+              "up_bps": 2268
+            },
+            {
+              "t_ms": 1789999979000,
+              "down_bps": 4188,
+              "up_bps": 2721
+            },
+            {
+              "t_ms": 1789999980000,
+              "down_bps": 4264,
+              "up_bps": 3009
+            },
+            {
+              "t_ms": 1789999981000,
+              "down_bps": 5302,
+              "up_bps": 3061
+            },
+            {
+              "t_ms": 1789999982000,
+              "down_bps": 7048,
+              "up_bps": 2866
+            },
+            {
+              "t_ms": 1789999983000,
+              "down_bps": 9073,
+              "up_bps": 2470
+            },
+            {
+              "t_ms": 1789999984000,
+              "down_bps": 10883,
+              "up_bps": 1971
+            },
+            {
+              "t_ms": 1789999985000,
+              "down_bps": 12034,
+              "up_bps": 1491
+            },
+            {
+              "t_ms": 1789999986000,
+              "down_bps": 12244,
+              "up_bps": 1147
+            },
+            {
+              "t_ms": 1789999987000,
+              "down_bps": 11463,
+              "up_bps": 1024
+            },
+            {
+              "t_ms": 1789999988000,
+              "down_bps": 9880,
+              "up_bps": 1152
+            },
+            {
+              "t_ms": 1789999989000,
+              "down_bps": 7884,
+              "up_bps": 1499
+            },
+            {
+              "t_ms": 1789999990000,
+              "down_bps": 5964,
+              "up_bps": 1980
+            },
+            {
+              "t_ms": 1789999991000,
+              "down_bps": 4589,
+              "up_bps": 2478
+            },
+            {
+              "t_ms": 1789999992000,
+              "down_bps": 4096,
+              "up_bps": 2871
+            },
+            {
+              "t_ms": 1789999993000,
+              "down_bps": 4606,
+              "up_bps": 3062
+            },
+            {
+              "t_ms": 1789999994000,
+              "down_bps": 5994,
+              "up_bps": 3005
+            },
+            {
+              "t_ms": 1789999995000,
+              "down_bps": 7920,
+              "up_bps": 2714
+            },
+            {
+              "t_ms": 1789999996000,
+              "down_bps": 9913,
+              "up_bps": 2259
+            },
+            {
+              "t_ms": 1789999997000,
+              "down_bps": 11484,
+              "up_bps": 1753
+            },
+            {
+              "t_ms": 1789999998000,
+              "down_bps": 12250,
+              "up_bps": 1319
+            },
+            {
+              "t_ms": 1789999999000,
+              "down_bps": 12021,
+              "up_bps": 1064
+            }
+          ]
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "core.info",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "running": true,
+          "pid": 7654,
+          "version": "1.19.27",
+          "generation": 8,
+          "cleanup_pending": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "nodes.list",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "items": [
+            {
+              "id": "000000000000000000000001",
+              "name": "HK-01",
+              "tier": "vanguard",
+              "kind": "manual",
+              "enabled": true,
+              "status": "healthy",
+              "reason_code": null,
+              "protocol": "vless",
+              "latency_ms": 42
+            },
+            {
+              "id": "000000000000000000000002",
+              "name": "HK-02",
+              "tier": "vanguard",
+              "kind": "manual",
+              "enabled": true,
+              "status": "healthy",
+              "reason_code": null,
+              "protocol": "vless",
+              "latency_ms": 88
+            },
+            {
+              "id": "000000000000000000000003",
+              "name": "HK-03",
+              "tier": "vanguard",
+              "kind": "manual",
+              "enabled": true,
+              "status": "failed",
+              "reason_code": "timeout",
+              "protocol": "vless",
+              "latency_ms": null
+            }
+          ]
+        },
+        "key": "vanguard"
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "nodes.list",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "items": [
+            {
+              "id": "000000000000000000000004",
+              "name": "SUB-JP-01",
+              "tier": "sentinel",
+              "kind": "manual",
+              "enabled": true,
+              "status": "healthy",
+              "reason_code": null,
+              "protocol": "trojan",
+              "latency_ms": 120
+            },
+            {
+              "id": "000000000000000000000005",
+              "name": "SUB-JP-02",
+              "tier": "sentinel",
+              "kind": "manual",
+              "enabled": true,
+              "status": "failed",
+              "reason_code": "timeout",
+              "protocol": "trojan",
+              "latency_ms": null
+            }
+          ]
+        },
+        "key": "sentinel"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:language",
+        "language": "zh_CN",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:visibility",
+        "visible": true,
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "on_invoke": {
+        "cmd": "app.info"
+      },
+      "reply": [
+        {
+          "t": "res",
+          "epoch": "rt-fixture-e1",
+          "produced_at_ms": 1790000000000,
+          "sent_at_ms": 1790000000001,
+          "id": 1,
+          "req_id": "$req_id",
+          "owner": "$owner",
+          "cmd": "app.info",
+          "ok": true,
+          "data": {
+            "version": "1.0.0",
+            "language": "zh_CN",
+            "caps": [],
+            "listeners": [
+              {
+                "kind": "mixed",
+                "host": "127.0.0.1",
+                "port": 7890,
+                "available": true
+              },
+              {
+                "kind": "controller",
+                "host": "127.0.0.1",
+                "port": 9090,
+                "available": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "on_invoke": {
+        "cmd": "config.snapshot"
+      },
+      "reply": [
+        {
+          "t": "res",
+          "epoch": "rt-fixture-e1",
+          "produced_at_ms": 1790000000000,
+          "sent_at_ms": 1790000000001,
+          "id": 2,
+          "req_id": "$req_id",
+          "owner": "$owner",
+          "cmd": "config.snapshot",
+          "ok": true,
+          "data": {
+            "rev": 7,
+            "values": {
+              "network": {
+                "allow_lan": false,
+                "ipv6": true,
+                "mihomo_mixed_port": 7890,
+                "mode": "system",
+                "system_proxy": {
+                  "bypass": [
+                    "localhost",
+                    "127.*",
+                    "192.168.*"
+                  ]
+                },
+                "subscription": {
+                  "port": 25500
+                },
+                "egress_recovery": {
+                  "enabled": true,
+                  "retry_source_refresh": false
+                }
+              },
+              "dns": {
+                "mode": "custom",
+                "respect_rules": true,
+                "nameserver": [
+                  "https://dns.example.net/dns-query"
+                ],
+                "proxy_server_nameserver": [
+                  "tls://dot.example.net"
+                ],
+                "default_nameserver": [
+                  "192.0.2.53"
+                ]
+              },
+              "routing": {
+                "rules": {
+                  "direct": [
+                    "suffix:example.cn",
+                    "geoip:CN"
+                  ],
+                  "proxy": [
+                    "suffix:example.io"
+                  ],
+                  "reject": [
+                    "keyword:ads"
+                  ],
+                  "compatibility_defaults": [
+                    {
+                      "rule_type": "direct",
+                      "value": "suffix:example.com"
+                    }
+                  ]
+                }
+              },
+              "latency": {
+                "primary_gateway_max_latency_ms": 800
+              },
+              "sources": [
+                {
+                  "id": "src-gh-1",
+                  "kind": "github_repos",
+                  "display": "GitHub",
+                  "enabled": true,
+                  "hint": "e•••/f•••"
+                },
+                {
+                  "id": "src-sub-1",
+                  "kind": "subscription_urls",
+                  "display": "Subscription",
+                  "enabled": true
+                }
+              ],
+              "alerts": {
+                "channels": []
+              },
+              "ui": {
+                "language": "zh_CN",
+                "overview_auto_exit_lookup": true,
+                "start_in_tray_on_autostart": false
+              },
+              "autostart": {
+                "enabled": true
+              },
+              "killswitch": {
+                "enabled": true,
+                "allow_lan": true,
+                "allow_dns": true,
+                "dns_whitelist": [
+                  "192.0.2.53"
+                ],
+                "additional_whitelist": [
+                  "LocalSubnet",
+                  "203.0.113.5"
+                ]
+              },
+              "bastion": {
+                "enabled": true,
+                "min_alive_nodes": 5
+              }
+            },
+            "secret_fields_set": [],
+            "read_errors": [],
+            "pending": null
+          }
+        }
+      ]
+    }
+  ]
+}

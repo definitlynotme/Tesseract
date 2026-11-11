@@ -1,0 +1,14 @@
+{
+  "epoch": "v1-fixture",
+  "error": {
+    "code": "not_allowed",
+    "message_key": "errors.bridge.not_allowed",
+    "params": {}
+  },
+  "id": 1022,
+  "owner": "window-1",
+  "produced_at_ms": 1790812800000,
+  "req_id": "req-1022",
+  "sent_at_ms": 1790812800001,
+  "t": "error"
+}

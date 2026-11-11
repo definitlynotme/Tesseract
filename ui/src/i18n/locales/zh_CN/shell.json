@@ -1,0 +1,558 @@
+{
+  "shell.brand.title": {
+    "m": "Tesseract · {run, select, stopped {已停止} starting {启动中} running {运行中} stopping {停止中} failed {启动失败} unknown {正在连接} other {正在连接}}",
+    "_desc": "侧栏品牌标识的悬停提示：产品名 + 服务状态。run：stopped 已停止、starting 启动中、running 运行中、stopping 停止中、failed 启动失败、unknown 还没连上后台服务（正在连接）；other 是将来新增的、还没有专门措辞的状态（暂与 unknown 同词，含义待定）"
+  },
+  "shell.foot.update.aria": {
+    "m": "{status}，前往配置 · 应用",
+    "_desc": "页脚更新按钮的无障碍名称：status 为按钮上的更新状态（shell.foot.update.label 的结果）；点击后打开配置页的「应用」区（「配置 · 应用」是页面名 · 区块名）"
+  },
+  "shell.foot.update.label": {
+    "m": "{state, select, found {有新版本 {version}} found_nover {有新版本} checking {正在检查更新} fail {检查更新失败} dl {正在下载更新} verify {更新已就绪} ready {正在安装更新} updated {已更新} disabled {未启用应用内更新} unknown {检查更新} other {已是最新}}",
+    "_desc": "侧栏页脚的更新状态按钮（在版本号旁，长语言下会换到下一行）。state：found 有新版本（version 为新版本号）、found_nover 有新版本但版本号未知、checking 正在检查、fail 检查失败、dl 下载中（没有百分比）、verify 已下载并校验完、可以安装、ready 正在安装、updated 本次启动是刚完成的更新、disabled 本构建没有启用应用内更新、unknown 还没收到更新状态（不声称已是最新，点击前往配置检查）；other 已是最新"
+  },
+  "shell.nav.aria": {
+    "m": "主导航",
+    "_desc": "侧栏里四个页面入口这一组的无障碍名称（不显示）"
+  },
+  "shell.nav.logs": {
+    "m": "运行日志",
+    "_desc": "侧栏主导航第 3 项，前往运行日志页；空间紧"
+  },
+  "shell.nav.overview": {
+    "m": "总览",
+    "_desc": "侧栏主导航第 1 项，前往总览页；空间紧：侧栏宽约 200 px，与图标和快捷键键帽同一行"
+  },
+  "shell.nav.profiles": {
+    "m": "层级",
+    "_desc": "侧栏主导航第 2 项，前往层级页（节点按层级管理）；空间紧"
+  },
+  "shell.nav.settings": {
+    "m": "配置",
+    "_desc": "侧栏主导航第 4 项，前往配置页；空间紧"
+  },
+  "shell.notice.banner.severity": {
+    "m": "{kind, select, error {错误} other {警告}}",
+    "_desc": "横幅标题旁的级别小字（颜色之外再用文字说明级别）；空间紧"
+  },
+  "shell.notice.banner.title": {
+    "m": "{kind, select, error {出现错误} other {需要注意}}",
+    "_desc": "横幅的调用方没有给标题时的默认标题。kind：error 错误横幅；other 警告横幅"
+  },
+  "shell.notice.close": {
+    "m": "关闭通知",
+    "_desc": "顶栏提示条和横幅右侧 × 按钮的无障碍名称与悬停提示"
+  },
+  "shell.notice.fallback.action": {
+    "m": "查看层级",
+    "_desc": "层级回退横幅上的按钮，打开层级页；空间紧"
+  },
+  "shell.notice.fallback.body": {
+    "m": "{from} 暂不可用。",
+    "_desc": "层级回退横幅的正文：哪个层级暂不可用。from 为层级称呼（tier.label，代号 + 角色词）；标题已说现在由谁承载（代码另传 to、from_name，正文不用）"
+  },
+  "shell.notice.fallback.title": {
+    "m": "已回退到 {to}",
+    "_desc": "层级回退时的警告横幅标题（与提醒卡片 notice.fallback.title 同一说法）。to 为现在承载流量的层级代号（不译）"
+  },
+  "shell.notice.mode_switched": {
+    "m": "接管方式已切换为{mode}。",
+    "_desc": "接管方式切换完成的提示条（用户不在总览和配置页时）。mode 为模式名（mode.*.label，如「虚拟网卡模式」）"
+  },
+  "shell.notice.recover": {
+    "m": "{kind, select, latency {{tier} 的延迟已恢复正常。} other {已回到 {tier}。}}",
+    "_desc": "层级恢复后的提示条。kind：latency 只是延迟升高后恢复（没有发生回退）；other 回退后切回。tier 为层级代号（不译；代码另传的 name 不再使用）"
+  },
+  "shell.notice.started": {
+    "m": "服务已启动。",
+    "_desc": "服务从启动中变为运行中时的提示条（用户不在总览页时才出现）"
+  },
+  "shell.notice.stopped": {
+    "m": "服务已停止。",
+    "_desc": "服务停止后的提示条（用户不在总览页、且不是取消启动时）"
+  },
+  "shell.page.logs.title": {
+    "m": "运行日志",
+    "_desc": "页面标题（运行日志页）：顶栏面包屑、窗口标题里的页面名、页面区域的无障碍名称"
+  },
+  "shell.page.overview.title": {
+    "m": "总览",
+    "_desc": "页面标题：顶栏面包屑、窗口标题里的页面名、页面区域的无障碍名称"
+  },
+  "shell.page.profiles.title": {
+    "m": "层级",
+    "_desc": "页面标题（层级页）：顶栏面包屑、窗口标题里的页面名、页面区域的无障碍名称"
+  },
+  "shell.page.settings.title": {
+    "m": "配置",
+    "_desc": "页面标题（配置页）：顶栏面包屑、窗口标题里的页面名、页面区域的无障碍名称"
+  },
+  "shell.palette.aria": {
+    "m": "命令面板",
+    "_desc": "命令面板对话框的无障碍名称"
+  },
+  "shell.palette.cmd.go_logs": {
+    "m": "运行日志",
+    "_desc": "命令面板「前往」组：前往运行日志页"
+  },
+  "shell.palette.cmd.go_overview": {
+    "m": "总览",
+    "_desc": "命令面板「前往」组：前往总览页"
+  },
+  "shell.palette.cmd.go_profiles": {
+    "m": "层级",
+    "_desc": "命令面板「前往」组：前往层级页"
+  },
+  "shell.palette.cmd.go_settings": {
+    "m": "配置",
+    "_desc": "命令面板「前往」组：前往配置页"
+  },
+  "shell.palette.cmd.mode_mixed": {
+    "m": "系统代理 + 虚拟网卡",
+    "_desc": "命令面板「切换接管方式」组：系统代理和虚拟网卡同时开启"
+  },
+  "shell.palette.cmd.mode_system": {
+    "m": "系统代理",
+    "_desc": "命令面板「切换网络模式」组：切换到系统代理模式"
+  },
+  "shell.palette.cmd.mode_tun": {
+    "m": "虚拟网卡模式（TUN）",
+    "_desc": "命令面板「切换接管方式」组：只用虚拟网卡模式；TUN 是虚拟网卡的技术名，不译"
+  },
+  "shell.palette.cmd.svc_copy": {
+    "m": "复制出口 IPv4",
+    "_desc": "命令面板命令：把出口 IPv4 地址复制到剪贴板（右侧显示该地址）"
+  },
+  "shell.palette.cmd.svc_exit": {
+    "m": "验证出口 IP",
+    "_desc": "命令面板命令：重新检查出口 IP（会切到总览页）"
+  },
+  "shell.palette.cmd.svc_restart": {
+    "m": "重启服务",
+    "_desc": "命令面板命令：重启代理服务"
+  },
+  "shell.palette.cmd.svc_toggle": {
+    "m": "{action, select, stop {停止服务} cancel {取消启动} other {启动服务}}",
+    "_desc": "命令面板「服务」组第 1 条，随服务状态变化。action：stop 运行中时停止服务；cancel 启动中时取消启动；other 启动服务"
+  },
+  "shell.palette.copied": {
+    "m": "已复制 {ip}",
+    "_desc": "「复制出口 IPv4」执行后的提示条；ip 为复制的地址"
+  },
+  "shell.palette.empty": {
+    "m": "没有匹配的命令",
+    "_desc": "命令面板里输入的词没有匹配到任何命令时显示"
+  },
+  "shell.palette.foot.pages": {
+    "m": "<kbd>Ctrl</kbd><kbd>1</kbd>–<kbd>4</kbd> 切换页面",
+    "_desc": "命令面板底部的操作提示：Ctrl 加 1 到 4 切换四个页面；空间紧"
+  },
+  "shell.palette.foot.run": {
+    "m": "<kbd>Enter</kbd> 执行",
+    "_desc": "命令面板底部的操作提示：回车执行所选命令；空间紧"
+  },
+  "shell.palette.foot.select": {
+    "m": "<kbd>↑</kbd><kbd>↓</kbd> 选择",
+    "_desc": "命令面板底部的操作提示：上下方向键选择命令。<kbd> 是键帽；空间紧"
+  },
+  "shell.palette.group.go": {
+    "m": "前往",
+    "_desc": "命令面板的分组标题：前往各页面"
+  },
+  "shell.palette.group.logs": {
+    "m": "运行日志",
+    "_desc": "命令面板的分组标题：运行日志页自己的命令"
+  },
+  "shell.palette.group.mode": {
+    "m": "切换接管方式",
+    "_desc": "命令面板的分组标题：三种接管方式（只用系统代理 / 只用虚拟网卡 / 两者都开）"
+  },
+  "shell.palette.group.overview": {
+    "m": "总览",
+    "_desc": "命令面板的分组标题：总览页自己的命令"
+  },
+  "shell.palette.group.profiles": {
+    "m": "层级",
+    "_desc": "命令面板的分组标题：层级页自己的命令"
+  },
+  "shell.palette.group.service": {
+    "m": "服务",
+    "_desc": "命令面板的分组标题：启动、停止、重启服务等"
+  },
+  "shell.palette.group.settings": {
+    "m": "配置",
+    "_desc": "命令面板的分组标题：配置页自己的命令"
+  },
+  "shell.palette.hint.admin": {
+    "m": "需要管理员权限",
+    "_desc": "命令面板里模式命令右侧的小字：没有管理员权限，这个模式不能用"
+  },
+  "shell.palette.hint.current": {
+    "m": "当前",
+    "_desc": "命令面板里模式命令右侧的小字：这是正在使用的模式；空间紧"
+  },
+  "shell.palette.input.aria": {
+    "m": "搜索命令",
+    "_desc": "命令面板输入框的无障碍名称"
+  },
+  "shell.palette.input.placeholder": {
+    "m": "搜索命令或页面…",
+    "_desc": "命令面板输入框的占位文字"
+  },
+  "shell.palette.keywords.go_logs": {
+    "m": "rizhi 日志",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：前往运行日志"
+  },
+  "shell.palette.keywords.go_overview": {
+    "m": "zonglan 首页",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：前往总览"
+  },
+  "shell.palette.keywords.go_profiles": {
+    "m": "cengji 节点",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：前往层级"
+  },
+  "shell.palette.keywords.go_settings": {
+    "m": "peizhi 设置",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：前往配置"
+  },
+  "shell.palette.keywords.mode_mixed": {
+    "m": "hunhe liangzhe 系统代理 虚拟网卡 混合 接管方式 网络模式",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词（保留旧称「混合」「网络模式」）。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：系统代理和虚拟网卡同时开启"
+  },
+  "shell.palette.keywords.mode_system": {
+    "m": "xitong daili 接管方式 网络模式",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词（保留旧称「网络模式」）。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：只用系统代理"
+  },
+  "shell.palette.keywords.mode_tun": {
+    "m": "xuni wangka quanju 虚拟网卡 全局 接管方式 网络模式",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词（保留旧称「全局」「网络模式」）。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：只用虚拟网卡模式"
+  },
+  "shell.palette.keywords.svc_copy": {
+    "m": "fuzhi 复制",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：复制出口 IPv4"
+  },
+  "shell.palette.keywords.svc_exit": {
+    "m": "yanzheng chukou 刷新 出口",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：验证出口 IP"
+  },
+  "shell.palette.keywords.svc_restart": {
+    "m": "chongqi 重启",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：重启服务"
+  },
+  "shell.palette.keywords.svc_toggle": {
+    "m": "qidong tingzhi 启动 停止 取消",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：启动 / 停止 / 取消启动服务"
+  },
+  "shell.side.aria": {
+    "m": "侧边栏",
+    "_desc": "侧栏区域的无障碍名称（读屏软件朗读，不显示）"
+  },
+  "shell.topbar.cmd.aria": {
+    "m": "搜索与命令（Ctrl+K）",
+    "_desc": "顶栏「搜索与命令」按钮的无障碍名称，带快捷键"
+  },
+  "shell.topbar.cmd.label": {
+    "m": "搜索与命令",
+    "_desc": "顶栏右侧按钮的文字，打开命令面板；空间紧：后面跟着 Ctrl K 键帽"
+  },
+  "shell.window.minimize": {
+    "m": "最小化",
+    "_desc": "窗口右上角的窗口按钮（应用自己画的标题栏，代替系统标题栏）：把窗口最小化到任务栏。用作按钮的无障碍名称和悬停提示，沿用 Windows 自己的说法"
+  },
+  "shell.window.maximize": {
+    "m": "最大化",
+    "_desc": "窗口右上角的窗口按钮：让窗口铺满屏幕。窗口已最大化时这个按钮改用 shell.window.restore。用作按钮的无障碍名称和悬停提示，沿用 Windows 自己的说法"
+  },
+  "shell.window.restore": {
+    "m": "向下还原",
+    "_desc": "窗口右上角的窗口按钮，窗口已最大化时显示：把窗口还原到最大化之前的大小。用作按钮的无障碍名称和悬停提示，沿用 Windows 自己的说法（「向下还原」）"
+  },
+  "shell.window.close": {
+    "m": "关闭",
+    "_desc": "窗口右上角的窗口按钮：关闭窗口，与 Alt+F4 和系统标题栏的关闭按钮相同（有托盘时窗口收进托盘，应用在后台继续运行，不是退出应用）。用作按钮的无障碍名称和悬停提示"
+  },
+  "shell.window.title": {
+    "m": "Tesseract · {page}",
+    "_desc": "窗口标题（任务栏与标签页）；page 为当前页面的标题（shell.page.*.title）。Tesseract 是产品名，不译"
+  },
+  "shell.brand.stale": {
+    "m": "Tesseract · 状态未更新",
+    "_desc": "侧栏品牌标识的悬停提示：后台服务的状态已有一阵没有更新（品牌点改成灰色，不再显示运行中）"
+  },
+  "shell.notice.more": {
+    "m": "另有 {count, plural, other {# 条提醒}}",
+    "_desc": "通知超过 5 条时，合并显示其余提醒的一行。count 是还在排队、没有逐条显示的提醒数"
+  },
+  "shell.notify.view": {
+    "m": "查看",
+    "_desc": "外壳转来的桌面提醒（应用内显示）上的动作：前往提醒相关的页面"
+  },
+  "shell.command_error.title": {
+    "m": "操作没有完成",
+    "_desc": "命令失败时的通用错误横幅标题，正文是具体原因"
+  },
+  "shell.sidecar.restarting.title": {
+    "m": "后台服务意外退出",
+    "_desc": "后台服务（侧车）崩溃、外壳正在自动重启它时的警告横幅标题"
+  },
+  "shell.sidecar.restarting.body": {
+    "m": "正在重新启动（第 {n}/{limit} 次）。",
+    "_desc": "后台服务自动重启中的横幅正文。n 是这是第几次重启，limit 是 5 分钟内最多重启的次数"
+  },
+  "shell.sidecar.restarted": {
+    "m": "后台服务已重新启动。",
+    "_desc": "后台服务崩溃后自动重启成功的一次性提示"
+  },
+  "shell.sidecar.unrecoverable.title": {
+    "m": "后台服务无法恢复",
+    "_desc": "后台服务多次崩溃、外壳已停止自动重启时的错误横幅标题"
+  },
+  "shell.sidecar.unrecoverable.body": {
+    "m": "后台服务多次意外退出，已停止自动重启。{code, select, none {} other {最后一次的退出代码是 {code}。}}",
+    "_desc": "后台服务无法恢复时的横幅正文（横幅上有「打开后台服务日志」按钮）。code 是最后一次退出代码（数字，原样显示），未知时为 none"
+  },
+  "shell.sidecar.unresponsive.title": {
+    "m": "后台服务没有响应",
+    "_desc": "后台服务 15 秒没有回应外壳时的错误横幅标题"
+  },
+  "shell.sidecar.force_restart": {
+    "m": "强制重启后台服务",
+    "_desc": "后台服务无响应横幅上的按钮：结束后台服务进程并重新启动"
+  },
+  "shell.action.open_logs": {
+    "m": "打开后台服务日志",
+    "_desc": "后台服务崩溃横幅上的按钮：在资源管理器中打开数据目录下的 logs 子目录（外壳 host.openFolder{kind:logs}，里面是 sidecar-stderr.log、shell.log）。运行日志页的「打开日志文件夹」打开的是整个数据目录（提示「已打开数据目录」），这里只打开后台服务的日志所在的文件夹，所以文案不同（T-P4-H2）"
+  },
+  "shell.action.open_data": {
+    "m": "打开数据目录",
+    "_desc": "横幅上的按钮：在资源管理器中打开数据目录（里面有 restore_proxy.bat、unkill.bat）"
+  },
+  "shell.startup.title": {
+    "m": "启动失败",
+    "_desc": "服务启动失败的错误横幅标题，正文是具体原因（后端的 errors.start.*）"
+  },
+  "shell.stop.failed.title": {
+    "m": "停止服务失败",
+    "_desc": "停止服务的操作失败时的错误横幅标题，正文是具体原因"
+  },
+  "shell.stop.cleanup.title": {
+    "m": "上一次的网络清理还没完成",
+    "_desc": "服务已不在运行、但代理核心的清理还没完成时的警告横幅标题"
+  },
+  "shell.stop.cleanup.body": {
+    "m": "代理核心还没有完全退出，网络设置可能还没恢复。",
+    "_desc": "清理未完成横幅的正文（横幅上有「停止服务」按钮）"
+  },
+  "shell.stop.action": {
+    "m": "停止服务",
+    "_desc": "清理未完成横幅上的按钮：再次停止服务以完成清理"
+  },
+  "shell.recovery.title": {
+    "m": "上次退出时的网络设置没有确认恢复",
+    "_desc": "启动时后台服务报告上次的系统代理或防火墙设置没能确认已恢复（不说「已恢复」）的警告横幅标题"
+  },
+  "shell.recovery.body": {
+    "m": "系统代理：{proxy, select, not_needed {不需要恢复} restored {已确认} not_owned {已被其他程序接管} permission_required {需要管理员权限} failed {恢复失败} other {无法确认}}；防火墙：{firewall, select, not_needed {不需要恢复} restored {已确认} not_owned {已被其他程序接管} permission_required {需要管理员权限} failed {恢复失败} other {无法确认}}。可以在数据目录里运行 restore_proxy.bat 或 unkill.bat 手动恢复。",
+    "_desc": "网络恢复未确认横幅的正文。proxy、firewall 是两个恢复域各自的状态；restore_proxy.bat、unkill.bat 是文件名，不译"
+  },
+  "shell.recovery.not_owned.title": {
+    "m": "系统代理被其他程序改写",
+    "_desc": "系统代理已被其他程序接管时的警告横幅标题，与总览的系统代理被改写提示同一说法（不是恢复失败）"
+  },
+  "shell.recovery.not_owned.body": {
+    "m": "浏览器流量未走 Tesseract。",
+    "_desc": "系统代理已被其他程序接管时的横幅正文：后果（标题已说系统代理被改写）"
+  },
+  "shell.stale.title": {
+    "m": "部分列表数据可能过时",
+    "_desc": "外壳报告有列表（节点、订阅、来源或配置项）的数据没能更新时的警告横幅标题"
+  },
+  "shell.stale.body": {
+    "m": "{count, plural, other {有 # 个列表没能取到最新数据}}{exhausted, select, yes {，自动重试已经停止} other {}}。",
+    "_desc": "列表数据可能过时横幅的正文（横幅上有「重新加载」按钮）。count 是受影响的列表数；exhausted=yes 表示外壳已经连续 3 次没取到，不再自动重试"
+  },
+  "shell.stale.reload": {
+    "m": "重新加载",
+    "_desc": "列表数据可能过时横幅上的按钮：让外壳重新投递这些列表的完整数据"
+  },
+  "shell.update.found.title": {
+    "m": "发现新版本 {version}",
+    "_desc": "检查到新版本时的提示横幅标题（每个版本只提醒一次）。version 为新版本号（不译）"
+  },
+  "shell.update.found.body": {
+    "m": "{has_current, select, yes {当前版本 {current}} other {}}",
+    "_desc": "发现新版本横幅的正文：正在运行的版本号。current 是版本号（不译）；has_current=no 时正文为空（横幅只有标题和按钮）"
+  },
+  "shell.update.view": {
+    "m": "查看更新",
+    "_desc": "发现新版本横幅上的按钮：前往配置页的更新区"
+  },
+  "shell.update.install": {
+    "m": "立即更新",
+    "_desc": "发现新版本横幅上的按钮：下载并安装新版本（会先确认）"
+  },
+  "shell.update.confirm.title": {
+    "m": "现在更新到 {version}？",
+    "_desc": "立即更新前的确认对话框标题。version 为新版本号（不译）"
+  },
+  "shell.update.confirm.body": {
+    "m": "Tesseract 会退出并安装，代理会暂时中断。",
+    "_desc": "立即更新确认对话框的正文"
+  },
+  "shell.update.confirm.ok": {
+    "m": "更新",
+    "_desc": "立即更新确认对话框的确认按钮"
+  },
+  "shell.update.done": {
+    "m": "已从 {previous} 升级到 {current}。",
+    "_desc": "更新完成后首次启动时的一次性提示。previous、current 为版本号（不译）"
+  },
+  "shell.host_reason.args_not_object": {
+    "m": "请求参数的格式不对。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = args_not_object（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.cmd": {
+    "m": "不支持这个命令。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = cmd（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.dialog_failed": {
+    "m": "没能打开保存对话框。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = dialog_failed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.dialog_open": {
+    "m": "另一个对话框还开着，关掉后再试。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = dialog_open（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.duplicate_failed": {
+    "m": "没能把文件交给后台服务写入。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = duplicate_failed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.epoch_changed": {
+    "m": "后台服务已经重启，请再试一次。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = epoch_changed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.extension_mismatch": {
+    "m": "文件扩展名与所选格式不符。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = extension_mismatch（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.file_missing": {
+    "m": "文件已经不在了。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = file_missing（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.folder_missing": {
+    "m": "文件夹不存在。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = folder_missing（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.format": {
+    "m": "不支持这种文件格式。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = format（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.grant_not_sent": {
+    "m": "保存授权没能发给后台服务。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = grant_not_sent（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.grant_refused": {
+    "m": "后台服务拒绝了这次保存。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = grant_refused（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.grant_timeout": {
+    "m": "等待后台服务确认保存超时。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = grant_timeout（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.grant_unsupported": {
+    "m": "当前的后台服务不支持另存为。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = grant_unsupported（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.host": {
+    "m": "这个网址不在允许打开的网站列表里。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = host（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.kind": {
+    "m": "不能打开这类文件夹。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = kind（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.missing_field": {
+    "m": "请求缺少必要的参数。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = missing_field（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.open_failed": {
+    "m": "系统没能打开它。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = open_failed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.outbox_full": {
+    "m": "待处理的请求太多，稍后再试。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = outbox_full（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.port": {
+    "m": "网址用了不允许的端口。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = port（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.purpose": {
+    "m": "不支持这种导出用途。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = purpose（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.purpose_format": {
+    "m": "这种导出不支持所选格式。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = purpose_format（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.ref": {
+    "m": "文件引用无效。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = ref（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.reveal_failed": {
+    "m": "没能在文件夹中显示这个文件。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = reveal_failed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.scheme": {
+    "m": "只能打开 https 网址。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = scheme（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.scope_unknown": {
+    "m": "还不知道数据目录在哪里，稍后再试。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = scope_unknown（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.session_ended": {
+    "m": "后台服务已退出，请再试一次。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = session_ended（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.sidecar_changed": {
+    "m": "后台服务已更换，请再试一次。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = sidecar_changed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.sidecar_not_live": {
+    "m": "后台服务还没有就绪，稍后再试。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = sidecar_not_live（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.target_open_failed": {
+    "m": "没能创建或打开目标文件。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = target_open_failed（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.unknown_field": {
+    "m": "请求带有不认识的参数。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = unknown_field（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.unknown_ref": {
+    "m": "这个文件已过期，或不属于本窗口。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = unknown_ref（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.url_args": {
+    "m": "打开网址的参数不对。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = url_args（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.url_parse": {
+    "m": "网址格式不对。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = url_parse（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.url_text": {
+    "m": "网址里有不允许的字符。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = url_text（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.url_type": {
+    "m": "网址必须是文本。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = url_type（shell/app/src/host.rs）"
+  },
+  "shell.host_reason.userinfo": {
+    "m": "网址里不能带用户名或密码。",
+    "_desc": "外壳执行宿主命令（另存为、打开文件夹、打开网址、在文件夹中显示）失败的原因，reason_code = userinfo（shell/app/src/host.rs）"
+  }
+}

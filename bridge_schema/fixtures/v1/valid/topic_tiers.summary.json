@@ -1,0 +1,47 @@
+{
+  "data": {
+    "carrier": null,
+    "degraded": false,
+    "fallback": false,
+    "offline_reason": "stopped",
+    "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+    ],
+    "pool": {
+      "total": 0,
+      "usable": 0
+    },
+    "tiers": {
+      "bastion": {
+        "enabled": false,
+        "total": 0,
+        "usable": 0
+      },
+      "gateway": {
+        "enabled": false,
+        "total": 0,
+        "usable": 0
+      },
+      "sentinel": {
+        "enabled": true,
+        "total": 0,
+        "usable": 0
+      },
+      "vanguard": {
+        "enabled": true,
+        "total": 0,
+        "usable": 0
+      }
+    }
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "tiers.summary"
+}

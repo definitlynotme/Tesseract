@@ -1,0 +1,243 @@
+{
+  "name": "shell_stop_failed",
+  "desc": "S3 停止失败与清理未完成：service.stop 作业失败（rt:replayed 之后的实时边沿）+ core.cleanup_pending，横幅带重试、保留「停止服务」",
+  "lang": "zh_CN",
+  "allow_host": [
+    "host_notify_ready",
+    "host_set_page",
+    "host_ready",
+    "host_notify_rendered",
+    "host_confirm_quit",
+    "host_force_restart",
+    "rt_resync"
+  ],
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:caps",
+        "invokes": [
+          "host_notify_ready",
+          "host_set_page",
+          "host_ready",
+          "host_notify_rendered",
+          "host_confirm_quit",
+          "host_force_restart",
+          "rt_resync"
+        ],
+        "events": [
+          "rt:replayed"
+        ]
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "service.start",
+            "service.stop",
+            "service.restart",
+            "app.quit",
+            "exit.verify",
+            "mode.set",
+            "app.update.check",
+            "app.update.install"
+          ],
+          "topics": [
+            "service.state",
+            "route.published",
+            "tiers.summary",
+            "traffic.tick",
+            "traffic.history",
+            "logs.batch",
+            "core.info",
+            "jobs",
+            "network.mode",
+            "killswitch.state",
+            "exit.identity",
+            "update.state",
+            "tier.transition"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.state",
+        "rev": 3,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": false,
+            "startup_phase": "failed",
+            "shutdown_cleanup_pending": false,
+            "failure_code": "lifecycle_busy",
+            "failure": {
+              "code": "lifecycle_busy",
+              "reason_code": "cleanup_pending",
+              "message_key": "errors.start.cleanup_pending",
+              "params": {}
+            }
+          },
+          "core": {
+            "running": true,
+            "pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": true
+          },
+          "readiness": {
+            "state": "fail_closed",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": null
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "update.state",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "state": "idle",
+          "version": null,
+          "update_available": false,
+          "installable": false,
+          "error": null,
+          "current_version": "1.0.0",
+          "previous_version": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "jobs",
+        "rev": 2,
+        "kind": "edge",
+        "data": {
+          "op": "op-start-0",
+          "name": "service.start",
+          "state": "failed",
+          "started_at_ms": 1790000000000,
+          "progress": null,
+          "result": null,
+          "error": {
+            "code": "superseded",
+            "message_key": "errors.superseded",
+            "params": {}
+          }
+        },
+        "seq": 1
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:language",
+        "language": "zh_CN",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:visibility",
+        "visible": true,
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "rt:replayed",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "advance_ms": 100
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "jobs",
+        "rev": 4,
+        "kind": "edge",
+        "data": {
+          "op": "op-stop-1",
+          "name": "service.stop",
+          "state": "failed",
+          "started_at_ms": 1790000000000,
+          "progress": null,
+          "result": null,
+          "error": {
+            "code": "timeout",
+            "message_key": "errors.timeout",
+            "params": {}
+          }
+        },
+        "seq": 2
+      }
+    }
+  ]
+}

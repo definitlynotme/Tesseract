@@ -1,0 +1,450 @@
+/* ==========================================================================
+   pages/tiers.css — 层级
+   A fill page: the tier switcher, Bastion's safety line, one toolbar, then the
+   stage (one scroller per view). The switcher is two wells: the fallback
+   track (Vanguard › Sentinel › Bastion) and a detached Gateway well; one
+   white thumb glides across both, and the 「承载流量」 pill travels to the
+   tier that carries traffic. The side panel docks under the toolbar and the
+   list gives it room (compact columns), so nothing is hidden under it.
+   Fits 1280×800 and 1060×700; only the list regions scroll.
+   ========================================================================== */
+.page-profiles { --tiers-gap: 14px; }
+@media (max-height: 760px) { .page-profiles { --tiers-gap: 10px; } }
+
+.tiers { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; min-width: 0; }
+
+/* ---- the switcher ------------------------------------------------------------ */
+.tiers-sw {
+  position: relative; flex: none; display: grid; min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1fr) 18px minmax(0, 1fr) 12px minmax(0, 1fr);
+}
+.tiers-well { grid-row: 1; border-radius: var(--r-panel); background: var(--c-well); }
+.tiers-well-a { grid-column: 1 / 6; }
+.tiers-well-b { grid-column: 7 / 8; }
+.tiers-chev { grid-row: 1; place-self: center; z-index: 1; color: var(--c-ink-4); pointer-events: none; }
+.tiers-chev .ic { width: 14px; height: 14px; }
+.tiers-chev.c1 { grid-column: 2; }
+.tiers-chev.c2 { grid-column: 4; }
+/* the landing line of a one-line hand-off from 总览 (sized in landFrom; never seen) */
+.tiers-land { position: absolute; left: 0; top: 0; width: 0; height: 0; visibility: hidden; pointer-events: none; }
+.tiers-thumb { position: absolute; left: 0; top: 0; z-index: 1; border-radius: var(--r-md); background: var(--c-surface); box-shadow: var(--sh-raise); pointer-events: none; }
+
+.tiers-cell {
+  position: relative; z-index: 2; grid-row: 1; display: block; min-width: 0; margin: 3px; padding: 9px 12px 9px;
+  border-radius: var(--r-md); text-align: left; color: var(--c-ink-2);
+  transition: background-color .15s var(--ease-out), color .15s var(--ease-out);
+}
+.tiers-cell[data-tier="vanguard"] { grid-column: 1; }
+.tiers-cell[data-tier="sentinel"] { grid-column: 3; }
+.tiers-cell[data-tier="bastion"] { grid-column: 5; }
+.tiers-cell[data-tier="gateway"] { grid-column: 7; }
+.tiers-cell:not(.is-sel):hover { background: var(--c-wash); }
+.tiers-cell:hover, .tiers-cell.is-sel { color: var(--c-ink); }
+.tiers-cell:focus-visible { outline-offset: -2px; }
+/* the press lands on the cell's content (the thumb under it stays put) */
+.tiers-cell-in { display: flex; flex-direction: column; gap: 5px; min-width: 0; transition: scale var(--spring-dur) var(--spring); }
+.tiers-cell:active .tiers-cell-in { scale: .975; transition-duration: var(--dur-press); }
+.tiers-l1 { display: flex; align-items: center; gap: 7px; height: 20px; min-width: 0; white-space: nowrap; overflow: hidden; }
+.tiers-l1 .ic { width: 16px; height: 16px; color: var(--c-ink-3); transition: color .15s var(--ease-out); }
+.tiers-cell:hover .tiers-l1 .ic { color: var(--c-ink-2); }
+.tiers-cell.is-sel .tiers-l1 .ic { color: var(--c-accent); }
+.tiers-nm { font-size: var(--fs-14); line-height: 20px; font-weight: var(--fw-semi); }
+/* T-P5-13 (form b): a slot word that does not fit its cell steps out (tiers.js fitWords; the tab's
+   name keeps it, its line's tip shows it); the unit word beside the count gives way first */
+.tiers-cell.slot-out .tiers-slot, .tiers-cell.unit-out .tiers-cnt-u { display: none; }
+.tiers-l2 { display: flex; align-items: center; gap: 8px; height: 22px; min-width: 0; font-size: var(--fs-12); line-height: 16px; white-space: nowrap; }
+.tiers-slot { min-width: 0; overflow: hidden; color: var(--c-ink-2); }
+.tiers-slot.mute { color: var(--c-ink-3); }
+.tiers-slot.err { color: var(--c-fail); font-weight: var(--fw-semi); }
+.tiers-slot > .sw { overflow: hidden; text-overflow: ellipsis; }
+.tiers-slot .st { font-size: var(--fs-12); }
+/* the current Gateway's name (data, any length): the status chip fits the slot, the name ends in
+   an ellipsis (P5 #29, T-P4-H4) */
+.tiers-slot .st { max-width: 100%; min-width: 0; }
+.tiers-slot .st > .st-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tiers-r { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; flex: none; }
+.tiers-cnt { display: inline-flex; align-items: baseline; gap: 3px; font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+.tiers-cell.is-sel .tiers-cnt { color: var(--c-ink); }
+.tiers-cnt-u { font-size: var(--fs-12); font-weight: var(--fw-regular); color: var(--c-ink-3); }
+/* Bastion's count while bastion.pool is stale: the last figure, dimmed */
+.tiers-cnt.is-old, .tiers-cell.is-sel .tiers-cnt.is-old { color: var(--c-ink-3); }
+.tiers-dots { display: inline-flex; align-items: center; }
+/* dot shapes (较慢 half, 待检查 dashed, last-known dimmed): the library's .dots variants */
+.tiers-mm { width: 40px; height: 4px; min-width: 0; }
+/* narrow window: the Gateway cell keeps the current exit's name and the count; its dots step out */
+@media (max-width: 1180px) { .tiers-cell[data-tier="gateway"] .tiers-dots { display: none; } }
+
+/* the carrying marker: one pill that travels between cells (JS spring on translate) */
+.tiers-pill { position: absolute; left: 0; top: 0; z-index: 3; opacity: 0; pointer-events: none;
+  transition: background-color .3s var(--ease-out), color .3s var(--ease-out), box-shadow .3s var(--ease-out); }
+.tiers-pill .sdot { transition: background-color .3s var(--ease-out); }
+/* Its invisible twin in the carrying cell's second line keeps the pill's room in the flow: the
+   slot (the Gateway's name) and the count come after it, never under the pill (T-P5-03; 10th-wave
+   ruling item 3). The floating pill takes the twin's width (placePill). The pill's words are never
+   cut (T-P5-06 ruling 1): they show whole or not at all. When the line is short of room the
+   Gateway's name gives way first (it is data and ends in an ellipsis) down to a floor of 3.5em;
+   then, while the twin's words still do not fit (placePill measures them), the unit word steps out
+   (.tight-1), then the dots (.tight-2), then the count (.tight-3), and last the pill folds to its
+   dot (.tight-4 on the cell, .is-dot on the pill: the words stay in its accessible name and its
+   hover tip); the room the words gave back then lets the count, the dots and the unit word return
+   (last out first in) while they fit. The twin may shrink below its words only for that
+   measurement; it is invisible.
+   The slot's flex basis is 0 (it takes the line's free room, down to its floor): a shrink shared
+   in proportion to basis x flex-shrink would cut the twin by a fraction of a pixel even while the
+   name is far above its floor, and that fraction would fold the pill (T-P5-06 fix round 1). */
+.tiers-pill-ph { visibility: hidden; flex: 0 1 auto; min-width: 22px; overflow: hidden; }
+.tiers-pill-ph-t { min-width: 0; overflow: hidden; }
+.tiers-cell[data-tier="gateway"] .tiers-pill-ph:not([hidden]) ~ .tiers-slot { flex: 1 1 0; min-width: 3.5em; }
+.tiers-cell.tight-1 .tiers-cnt-u, .tiers-cell.tight-2 .tiers-dots, .tiers-cell.tight-3 .tiers-cnt { display: none; }
+.tiers-pill { box-sizing: border-box; overflow: hidden; }
+.tiers-pill-t { min-width: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr); }
+/* the roll's faces clip as before; their ellipsis is only a net (placePill folds the pill to its dot
+   before its words would be cut; render case tiers_i18n_pill_* asserts no cut at all) */
+.tiers-pill-t > .sw { overflow: hidden; text-overflow: ellipsis; }
+/* the dot form: a 22 px round pill (the dot centred), the words out of the layout */
+.tiers-cell.tight-4 .tiers-pill-ph, .tiers-pill.is-dot { padding: 0 8px; }
+.tiers-cell.tight-4 .tiers-pill-ph-t, .tiers-pill.is-dot .tiers-pill-t { display: none; }
+/* only the dot form takes the pointer (its hover tip); a click on it selects the carrying cell */
+.tiers-pill.is-dot { pointer-events: auto; cursor: pointer; }
+
+/* ---- toolbar ------------------------------------------------------------------ */
+/* 11-05: no context line under the switcher (Bastion's safety note went); the toolbar keeps the
+   switcher's gap on every tier */
+.tiers-tb { flex: none; margin-top: var(--tiers-gap); }
+/* T-P5-15: the placeholder shows whole. --tiers-search-need (fitSearch) is the width the language's
+   longest placeholder needs, icon and Ctrl F keycap included; the box never goes below the old width,
+   stops at max-width, and still shrinks with the toolbar (flex 0 1 auto). Past that the placeholder
+   steps down to the box's short name (tiers.js fitSearch) */
+.tiers-search { width: max(260px, var(--tiers-search-need, 0px)); max-width: 400px; }
+@media (max-width: 1180px) { .tiers-search { width: max(240px, var(--tiers-search-need, 0px)); } }
+.tiers-tb > .is-away { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .09s var(--ease-in), visibility 0s linear .09s; }
+
+/* ---- stage + views --------------------------------------------------------------- */
+.tiers-stage { position: relative; flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; min-width: 0; margin-top: 12px; }
+.tiers-view { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; min-width: 0; }
+.tiers-view.is-leaving { position: absolute; inset: 0; pointer-events: none; }
+.tiers-scroll { position: relative; flex: 1 1 0; min-height: 0; overflow-y: auto; overflow-x: hidden; margin: 0 -12px; padding: 0 12px 16px; --cols: var(--cols-w); }
+.tiers.has-panel .tiers-scroll { --cols: var(--cols-c); }
+.tiers-head {
+  position: sticky; top: 0; z-index: 4; display: grid; grid-template-columns: var(--cols); gap: 12px; align-items: center;
+  height: 30px; padding: 0 12px; background: var(--c-bg); box-shadow: inset 0 -1px 0 var(--c-line);
+  font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); white-space: nowrap;
+}
+.tiers-head .c-num { text-align: right; }
+.tiers-list { padding-top: 4px; }
+.tiers-scroll.has-head .list-g { top: 30px; }
+/* with the side panel open the list keeps name · 延迟 · 状态 · actions (the rest is in the panel): the
+   optional cells carry .c-opt (协议; 地区 B-03 and 走势 B-04 only behind their features), so the rule
+   does not count columns (T-P4-05b: the two hidden columns left the grid, mapping_tiers risk 9) */
+.tiers.has-panel .tiers-head > .c-opt,
+.tiers.has-panel .tiers-row > .c-opt { display: none; }
+/* the list's state lines: not up to date (paging, a base_rev mismatch, a new generation), loading */
+.tiers-stale { display: flex; align-items: center; gap: 10px; min-height: 24px; padding: 2px 12px 4px; }
+.tiers-stale[hidden] { display: none; }
+.tiers-stale-p { flex: none; width: 56px; }
+.tiers-loading .spin { width: 12px; height: 12px; border-width: 1.6px; }
+
+/* ---- rows --------------------------------------------------------------------------- */
+.tiers-row .li-main { gap: 1px; }
+.tiers-t { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tiers-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tiers-cur { display: none; }
+.tiers-row.is-cur .tiers-cur { display: inline-flex; }
+.tiers-sub .tech { color: var(--c-ink-3); }
+/* why a node or a refresh failed: a quoted reason, so it speaks in the voice, in clay (F-02) */
+.tiers-why { color: var(--c-fail); font-family: var(--font-voice); font-style: var(--voice-style); font-size: calc(1em * var(--voice-scale)); font-weight: var(--voice-weight); letter-spacing: var(--voice-track); }
+.tiers-proto[data-tip] { cursor: default; }
+.tiers-dash { color: var(--c-ink-3); }
+.tiers-spin { width: 12px; height: 12px; border-width: 1.6px; color: var(--c-ink-3); vertical-align: -2px; }
+/* a rolled latency keeps its space before 「ms」 (.lat's nowrap would collapse the odometer's space cell) */
+.tiers .lat.odo { white-space: pre; }
+/* drafts step back by ink, not opacity (opacity would drop the name under 4.5:1) */
+.tiers-row.is-off > :not(.li-act) { opacity: 1; }
+.tiers-row.is-off .tiers-name { color: var(--c-ink-2); }
+/* not running: the list shows the last results */
+.tiers.is-stale .tiers-row .lat:not(.lat-slow):not(.lat-down) { color: var(--c-ink-2); font-weight: var(--fw-regular); }
+/* …and a status is the last known one: T.ui.status(k, { last: true }) (.st-last, the library's) */
+.tiers-row .li-act { align-items: center; }
+/* 设为当前: a labelled button in the full list, an icon beside the side panel (the panel repeats it) */
+.tiers-use-i { display: none; }
+.tiers.has-panel .tiers-use { display: none; }
+.tiers.has-panel .tiers-use-i { display: inline-grid; }
+/* the trend column: 30 minutes of latency, quiet ink, only where there is room */
+.tiers-sp { min-width: 0; }
+.tiers-trend.spk { width: 100%; max-width: 128px; height: 22px; min-width: 0; }
+.tiers-trend.spk .l { stroke-width: 1.25; }
+@media (max-width: 1180px) { .tiers-trend, .tiers-trend-h { display: none; } }
+/* its head (B-04 only) shares the flexible column with the trend: a long word ellipsizes */
+.tiers-trend-h { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* a node being re-checked keeps its trend, stepped back until the new result is in */
+.tiers-row .tiers-trend { transition: opacity .2s var(--ease-out); }
+.tiers-row.is-pend .tiers-trend { opacity: .45; }
+
+/* group rows (subscriptions, the Bastion pool): drill in on click */
+.tiers-grp { grid-template-columns: 26px minmax(0, 1fr) 150px 112px 56px 16px; min-height: 58px; cursor: pointer; }
+.tiers-grp .li-act { grid-column: 5; }
+.tiers-gic { display: grid; place-items: center; width: 26px; height: 26px; border-radius: var(--r-ctl); background: var(--c-well); color: var(--c-ink-2); }
+.tiers-gic .ic { width: 15px; height: 15px; }
+.tiers-gt { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tiers-gn { font-weight: var(--fw-semi); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tiers-gsub .spin { width: 11px; height: 11px; border-width: 1.5px; margin-right: 6px; vertical-align: -1px; }
+.tiers-gh { display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: var(--fs-12); color: var(--c-ink-2); white-space: nowrap; }
+.tiers-ght b { font-size: var(--fs-13); font-weight: var(--fw-semi); color: var(--c-ink); font-variant-numeric: tabular-nums; }
+.tiers-ght .tiers-note { margin-left: 1px; }   /* + the space before it (tiers.js, fix round 1 of T-P5-11) ≈ 4 px */
+.tiers-gm { width: 44px; height: 4px; min-width: 0; flex: none; }
+.tiers-gup { text-align: right; font-size: var(--fs-12); }
+/* T-P5-13: a group row's lines are read whole: when it was updated (de Aktualisiert vor 10 Minuten
+   in the 112 px column), what its last refresh did, a node's reason line: they wrap (a row has room
+   for two lines and grows past that) */
+.tiers-grp .tiers-gup { white-space: normal; overflow: visible; overflow-wrap: break-word; line-height: 16px; }
+.tiers-row .tiers-sub, .tiers-grp .tiers-gsub { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+/* T-P5-11: a state word longer than its column wraps inside it (a row has room for two lines)
+   instead of running into the next column: the node rows' state column (tiers.js colsFor: de Nicht
+   verfügbar, es Sin comprobar / Nueva comprobación) and the group rows' health (es / pt Nueva
+   comprobación). Words are never broken. */
+.tiers-st { min-width: 0; }
+.tiers-st .swap-box, .tiers-st .sw, .tiers-st .st { min-width: 0; white-space: normal; }
+.tiers-gh { white-space: normal; min-width: 0; }
+.tiers-ght { text-align: right; }
+.tiers-ght .st { white-space: normal; }
+.tiers-gchev { display: grid; place-items: center; color: var(--c-ink-3); transition: translate .2s var(--ease-out), color .15s var(--ease-out); }
+.tiers-gchev .ic { width: 16px; height: 16px; }
+.tiers-grp:hover .tiers-gchev { translate: 2px 0; color: var(--c-ink); }
+.tiers-gprog { position: absolute; left: 12px; right: 12px; bottom: 2px; opacity: 0; transition: opacity .2s var(--ease-out); }
+.tiers-grp.is-busy .tiers-gprog { opacity: 1; }
+.tiers.has-panel .tiers-grp { grid-template-columns: 26px minmax(0, 1fr) 124px 16px; }
+.tiers.has-panel .tiers-grp .tiers-gup, .tiers.has-panel .tiers-grp .li-act { display: none; }
+
+/* group labels (sticky inside the scroller) */
+.tiers-lbl { gap: 6px; margin-top: 6px; }
+.tiers-list > .tiers-lbl:first-of-type, .tiers-list > .list-hl + .tiers-lbl { margin-top: 0; }
+.tiers-lbl-t { color: var(--c-ink-2); }
+.tiers-lbl-n { color: var(--c-ink-3); font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
+.tiers-lbl-a { margin-left: auto; }
+/* T-P5-13: a group label grows past its 30 px floor when its words wrap (F-01: its hints are gone) */
+.tiers-lbl { height: auto; min-height: 30px; padding-top: 5px; padding-bottom: 5px; }
+/* a side panel section's head: its actions (取消 · 正在检测 while a diagnosis runs) move under the
+   title when the two do not fit the panel (de Verbindungsdiagnose beside Abbrechen · Wird getestet;
+   found when T-P5-13 ran the zh_CN-only cases in nine languages) */
+.tiers-pn .tiers-sec > .sh { flex-wrap: wrap; row-gap: 4px; }
+.tiers-pn .tiers-sec > .sh > .sh-a { margin-left: auto; }
+/* a subscriptions section captions its own columns (健康 over the health, 更新 over the date): they
+   sit exactly over the group rows' columns (26 · 1fr · 150 · 112 · 56 · 16, gap 12, padding 12) */
+.tiers-lbl-cap { position: absolute; top: 0; bottom: 0; right: 108px; display: flex; align-items: center; gap: 12px; pointer-events: none; font-weight: var(--fw-regular); }
+.tiers-lbl-cap > span { width: 150px; text-align: right; }
+.tiers-lbl-cap > .tiers-lbl-cap-u { width: 112px; }
+.tiers.has-panel .tiers-lbl-cap { right: 40px; }
+.tiers.has-panel .tiers-lbl-cap > span { width: 124px; }
+.tiers.has-panel .tiers-lbl-cap-u, .tiers.is-compacting .tiers-lbl-cap,
+.tiers.has-panel .tiers-lbl:has(.tiers-lbl-a) .tiers-lbl-cap { display: none; }   /* its button takes that corner */
+.tiers-offrow { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 12px; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-3); }
+.tiers-offrow .ic { width: 16px; height: 16px; flex: none; }
+.tiers-offrow b { margin-right: 8px; font-weight: var(--fw-medium); color: var(--c-ink-2); }
+.tiers-offrow-t { min-width: 0; overflow-wrap: anywhere; }
+.tiers-offrow-n { color: var(--c-ink); font-weight: var(--fw-medium); }
+.tiers-offrow-a { display: flex; flex: none; align-items: center; gap: 6px; margin-left: auto; }
+/* G37: the configured exit is missing — the row speaks up (warning ink), its two ways out on the right */
+.tiers-offrow.is-warn { color: var(--c-ink-2); }
+.tiers-offrow.is-warn > .ic { color: var(--c-warn); }
+.tiers-why-mute { color: var(--c-ink-3); }
+.tiers-ok-t { color: var(--c-ink-2); }
+
+/* ---- drill-in bar ------------------------------------------------------------------ */
+.tiers-bar { position: relative; flex: none; display: flex; align-items: center; gap: 10px; height: 44px; margin-top: -6px; min-width: 0; box-shadow: inset 0 -1px 0 var(--c-line); }
+.tiers-back { margin-left: -8px; }
+.tiers-bar-t { display: inline-flex; align-items: center; gap: 7px; flex: none; font-size: var(--fs-14); line-height: 20px; white-space: nowrap; }
+.tiers-bar-t .ic { width: 15px; height: 15px; color: var(--c-ink-3); }
+.tiers-bar-t b { font-weight: var(--fw-semi); }
+.tiers-bar-m { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-12); color: var(--c-ink-3); }
+/* T-P5-13: the drill-in bar's note wraps (two lines fit the 44 px bar; the bar grows past that) */
+.tiers-bar { height: auto; min-height: 44px; }
+/* (the note keeps at least 12em beside the title and the actions, else it takes a line of its own
+   under them: the pseudo language's long title and buttons) */
+.tiers-bar { flex-wrap: wrap; column-gap: 10px; row-gap: 0; }
+.tiers-bar-m { flex: 1 1 12em; }
+.tiers-bar-m { white-space: normal; overflow: visible; overflow-wrap: break-word; line-height: 16px; padding: 4px 0; }
+.tiers-bar-prog { position: absolute; left: 0; right: 0; bottom: 0; opacity: 0; transition: opacity .2s var(--ease-out); }
+.tiers-bar.is-busy .tiers-bar-prog { opacity: 1; }
+.tiers-bar-err { flex: none; }
+.tiers-bar-err > .callout { margin: 10px 0 2px; }
+.tiers-bar + .tiers-bar-err + .tiers-scroll .tiers-list { padding-top: 6px; }
+
+/* the shared title that flies between a group row and the bar */
+.tiers-fly { position: fixed; z-index: 65; margin: 0; pointer-events: none; transform-origin: 0 0; white-space: nowrap; }
+
+/* ---- Bastion: the pool (on) ---------------------------------------------------------- */
+.tiers-pool { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px 40px; padding: 2px 0 16px; margin-bottom: 8px; box-shadow: inset 0 -1px 0 var(--c-line); }
+.tiers-pool-l { min-width: 0; }
+.tiers-pool-hd { display: flex; align-items: center; gap: 10px; }
+.tiers-pool-t { font-size: var(--fs-14); line-height: 20px; font-weight: var(--fw-semi); }
+.tiers-pool-hd .pill .sdot { transition: background-color .3s var(--ease-out); }
+.tiers-pool-fig { display: flex; align-items: baseline; gap: 2px; margin-top: 8px; max-width: 520px; }
+/* the way into the pool's nodes, at the end of the meter's line */
+.tiers-pool-go { margin-left: auto; align-self: center; }
+.tiers-pool-n { font-size: var(--fs-18); line-height: 24px; font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; }
+.tiers-pool-of { font-size: var(--fs-13); color: var(--c-ink-2); margin-left: 2px; }
+.tiers-pool.is-old .tiers-pool-n { color: var(--c-ink-3); }
+.tiers-pool-m { margin-top: 8px; max-width: 520px; }
+.tiers-pool-line { margin-top: 8px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13: the pool's line wraps. F-01: it names the fastest node only; empty, it takes no room */
+.tiers-pool-line { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.tiers-pool-line:empty { display: none; }
+.tiers-pool-r { display: flex; align-items: flex-end; gap: 12px; }
+.tiers-pool-min .input { width: 128px; }
+/* 停用 is rare and has a confirmation: a quiet link on the input's line, never the page's only red */
+.tiers-pool-off { margin-bottom: 25px; }
+.tiers-pool-of { white-space: nowrap; }
+/* beside the side panel the controls stack, so the figure line keeps its room */
+.tiers.has-panel .tiers-pool { gap: 12px 24px; }
+.tiers.has-panel .tiers-pool-r { flex-direction: column; align-items: flex-start; gap: 8px; }
+.tiers.has-panel .tiers-pool-off { margin: 0 0 0 -8px; }
+
+/* ---- Bastion: the honest off state ------------------------------------------------------ */
+/* G39: the explanation leads the scroller and your own sources and nodes follow it (the toolbar stays:
+   search and import still apply to them) */
+.tiers-bx { max-width: 660px; padding: 6px 0 4px; margin-bottom: 8px; box-shadow: inset 0 -1px 0 var(--c-line); }
+.tiers-bx-hd { display: flex; align-items: center; gap: 14px; }   /* (F-01: the title alone beside the icon) */
+.tiers-bx-ic { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: var(--r-float); background: var(--c-well); color: var(--c-ink-2); }
+.tiers-bx-ic .ic { width: 22px; height: 22px; }
+.tiers-bx-t { font-size: var(--fs-15); line-height: 22px; font-weight: var(--fw-semi); }
+.tiers-bx-min { margin: 24px 0 0 58px; max-width: 420px; }
+.tiers-bx-min .input { width: 140px; }
+/* K-7 absent: the minimum is read-only, and no switch is offered (nor a way to the settings page) */
+.tiers-pool-ro { display: flex; flex-direction: column; gap: 2px; }
+.tiers-pool-ro b { font-size: var(--fs-14); line-height: 20px; font-weight: var(--fw-semi); }
+.tiers-bx-ro { display: flex; align-items: flex-start; gap: 7px; margin: 14px 0 16px 58px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.tiers-bx-ro .ic { width: 13px; height: 13px; flex: none; margin-top: 2.5px; }
+/* the primary action never scrolls away: in a short window it stays at the bottom */
+.tiers-bx-act { position: sticky; bottom: 0; z-index: 1; display: flex; align-items: center; gap: 14px; padding: 16px 0 20px 58px; background: var(--c-bg); }
+.tiers-bx.is-under .tiers-bx-act { box-shadow: inset 0 1px 0 var(--c-line); }
+@media (max-height: 760px) { .tiers-bx-min { margin-top: 18px; } }
+
+/* ---- shared small text ------------------------------------------------------------------- */
+.tiers-note { font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-regular); color: var(--c-ink-3); }
+.tiers-host { font-size: var(--fs-12); color: var(--c-ink); }
+
+/* ---- the side panel: the library's docked panel in the stage (square, left hairline), as 运行日志's reader */
+.drawer.tiers-panel .ovl-head { min-height: 58px; }
+.drawer.tiers-panel .ovl-extra .st.chip-st + .st.chip-st { margin-left: 0; }
+.tiers-pn { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.tiers-kv dd .tiers-note { margin-left: 2px; }
+/* the endpoint and its two buttons stay on one line; a long host ellipsizes */
+.tiers-kv dd:has(> .tiers-host) { display: flex; flex-wrap: nowrap; align-items: center; gap: 2px; min-width: 0; }
+.tiers-kv .tiers-host { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tiers-kv dd:has(> .tiers-host) > button { flex: none; }
+.tiers-kv dd .copy { margin: -4px 0; }
+.tiers-kv dd .icon-btn { margin: -2px 0; }
+.tiers-kv-why dd { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.tiers-kv-why .tiers-note { margin-left: 0; line-height: 18px; }
+.tiers-sec { min-width: 0; }
+.tiers-sec > .sh { min-height: 28px; }
+.tiers-spk { height: 48px; margin-top: 8px; }
+.tiers-chain { display: flex; flex-direction: column; margin-top: 4px; }
+.tiers-chain li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto 64px 64px; align-items: center; gap: 10px; min-height: 34px; box-shadow: inset 0 -1px 0 var(--c-line); font-size: var(--fs-13); }
+.tiers-chain li:last-child { box-shadow: none; }
+.tiers-chain-p { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tiers-chain-port { font-size: var(--fs-12); color: var(--c-ink-3); }
+.tiers-rank { display: grid; place-items: center; width: 20px; height: 20px; border-radius: var(--r-xs); background: var(--c-well); color: var(--c-ink-2); font-size: var(--fs-12); font-weight: var(--fw-semi); font-variant-numeric: tabular-nums; }
+.tiers-dopt { display: flex; align-items: center; gap: 10px; margin-top: 8px; min-width: 0; }
+.tiers-dopt-l { font-size: var(--fs-12); color: var(--c-ink-3); }
+.tiers-dopt .tiers-note { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* T-P5-11 (ruling 2): the option's note says which way the diagnosis goes (de Über Vanguard · zu
+   diesem Ausgang): it wraps beside its switch instead of being cut */
+.tiers-dopt .tiers-note { overflow: visible; white-space: normal; }
+.tiers-dopt .tiers-note.swap { grid-template-columns: minmax(0, 1fr); }
+.tiers-dopt .tiers-note .sw { white-space: normal; }
+.tiers-res { margin-top: 8px; }
+.tiers-res:empty { display: none; }
+.tiers-res-hint, .tiers-spk-none { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.tiers-spk-none { margin-top: 6px; }
+.tiers-res-ok { display: flex; align-items: center; gap: 8px; min-height: 22px; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); }
+.tiers-res-ok .ic { width: 15px; height: 15px; color: var(--c-ok); }
+.tiers-res-ok b { font-weight: var(--fw-semi); color: var(--c-ink); }
+.tiers-res-ok .tiers-note { margin-left: auto; }
+.tiers-res-ok.is-last .ic { color: var(--c-ink-3); }
+.tiers-dopt.is-disabled { opacity: .55; pointer-events: none; }
+.tiers-tg { padding: 12px 0; box-shadow: inset 0 1px 0 var(--c-line), inset 0 -1px 0 var(--c-line); }
+.tiers-tg .toggle-t small:empty { display: none; }   /* (F-01: the line under the switch is only K-11's) */
+.tiers-fold { display: inline-flex; align-items: center; gap: 6px; height: 30px; margin-left: -6px; padding: 0 8px 0 6px; border-radius: var(--r-ctl); font-size: var(--fs-13); font-weight: var(--fw-medium); color: var(--c-ink-2); --press: .97; }
+.tiers-fold:hover { color: var(--c-ink); background: var(--c-wash); }
+.tiers-params { margin-top: 4px; }
+.tiers-params dd .mono { font-size: var(--fs-12); }
+/* a revealed value is text in the panel's memory only (never an attribute): long links wrap */
+.tiers-params dd, .tiers-url { display: flex; align-items: flex-start; gap: 4px; min-width: 0; }
+.tiers-secv, .tiers-url .tiers-host { min-width: 0; overflow-wrap: anywhere; }
+.tiers-pn-res:empty { display: none; }
+.tiers-pn-note:empty { display: none; }
+.tiers-pn-go { margin-top: -4px; }
+
+/* ---- inline edit + the chain editor ------------------------------------------------------------ */
+.tiers-edit { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.tiers-hp { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 12px; }
+.input .tiers-eye { margin-right: -6px; }
+.tiers-ce-list { position: relative; display: flex; flex-direction: column; min-width: 0; }
+.tiers-ce { display: grid; grid-template-columns: 20px 20px minmax(0, 1fr) 84px 24px; align-items: center; gap: 0 8px; min-height: 48px; padding: 0 4px; border-radius: var(--r-ctl); box-shadow: inset 0 -1px 0 var(--c-line); background: var(--c-surface); }
+/* the name, and under it the protocol's parameter state: 「参数 · 4 项必填」 opens its fields */
+.tiers-ce-nm { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 5px 0; }
+.tiers-ce-tg { display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 -5px; padding: 0 5px; border-radius: var(--r-xs); font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-2); white-space: nowrap; }
+.tiers-ce-tg:hover { background: var(--c-wash); color: var(--c-ink); }
+.tiers-ce.is-done .tiers-ce-tg { color: var(--c-ink-3); }
+.tiers-ce-chev { width: 13px; height: 13px; transition: rotate .2s var(--ease-out); }
+.tiers-ce.is-open .tiers-ce-chev { rotate: 180deg; }
+.tiers-ce-pf { grid-column: 3 / -1; padding: 2px 0 14px; }
+.tiers-ce-pf .field-lab { font-size: var(--fs-12); }
+/* a chain problem colours the message only; the input that is wrong marks itself */
+.tiers-ce-err > .field-msg { color: var(--c-err); }
+.tiers-ce-p { max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-13); }
+.tiers-ce .input.sm { padding: 0 8px; }
+.tiers-ce .input.num input { text-align: left; }
+.tiers-ce-add { margin-top: 8px; }
+
+/* ---- import sheet ---------------------------------------------------------------------------- */
+.tiers-imp-tabs { margin: -6px 0 14px; }
+.tiers-imp-p { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tiers-imp-ta textarea { min-height: 96px; }
+.tiers-imp-sum { display: flex; align-items: center; gap: 14px; min-height: 20px; margin-top: -4px; font-size: var(--fs-12); }
+.tiers-imp-sum:empty { display: none; }
+/* T-P5-11: an error sentence alone in the summary (frame_too_large) wraps in the sheet; the counts
+   (N importable / N rejected) keep their one line and the note beside them wraps instead (fix
+   round 1: the counts no longer shrink under the note) */
+.tiers-imp-sum > .st:only-child { flex: 0 1 auto; white-space: normal; min-width: 0; }
+.tiers-imp-sum .tiers-note { margin-left: auto; min-width: 0; white-space: normal; }
+.tiers-imp-busy { display: inline-flex; align-items: center; gap: 7px; color: var(--c-ink-3); }
+.tiers-imp-busy .spin { width: 11px; height: 11px; border-width: 1.5px; }
+.tiers-imp-prev { margin: -4px -10px 0; --cols: minmax(0, 1fr) 92px minmax(0, 190px) 84px; }
+.tiers-imp-prev:empty { display: none; }
+.tiers-imp-row { cursor: default; }
+.tiers-imp-prev .li.two { min-height: 44px; padding-top: 4px; padding-bottom: 4px; }
+.tiers-imp-row .li-sub .link-btn { height: 18px; margin: 0; padding: 0 4px; vertical-align: 0; color: var(--c-accent-ink); }
+.tiers-imp-kind { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+/* the two-column field grids of the forms (inline style --f-cols moved here, mapping_tiers 14.3) */
+.tiers-f2 { --f-cols: 2; }
+.tiers-w220 { width: 220px; }
+.tiers-mf-box { min-width: 0; }
+.tiers-ce-port { width: 84px; }
+/* the paste result: recognised nodes by physical node (G38, when import.preview has groups), and why
+   the batch cannot be imported (the rejected reasons, counted) */
+.tiers-imp-det { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tiers-imp-det:empty { display: none; }
+.tiers-imp-gh { margin-bottom: 4px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); }
+.tiers-imp-groups { margin: 0 -10px; }
+.tiers-imp-groups .tiers-imp-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; padding: 0 10px; }
+.tiers-imp-groups .li-main { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tiers-imp-why { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-12); line-height: 18px; }
+.tiers-imp-wr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.tiers-imp-tosub { height: 18px; padding: 0 4px; color: var(--c-accent-ink); }
+/* a required select that was skipped reads like an invalid input */
+.tiers-mf .field.is-invalid .select, .tiers-pf .field.is-invalid .select { box-shadow: inset 0 0 0 1px var(--c-err); }
+/* F-01: the protocol's message line holds only 先选择协议 or a sidecar error now; empty, it takes no
+   room (the fields follow at the form's gap) */
+.tiers-mf [data-f="protocol"] .field-msg:empty { display: none; }
+.tiers-pf { margin-top: 12px; }
+.tiers-pf:empty { display: none; }
+.tiers-mf-chain { margin-top: 14px; }
+
+/* ---- making room for the side panel ------------------------------------------------------------ */
+/* the columns the panel repeats fade out while it slides in (then the list narrows, see compact()) */
+.tiers.is-compacting .tiers-head > .c-opt,
+.tiers.is-compacting .tiers-row > .c-opt,
+.tiers.is-compacting .tiers-grp .tiers-gup, .tiers.is-compacting .tiers-grp .tiers-gh,
+.tiers.is-compacting .tiers-grp .li-act { opacity: 0; transition: opacity .1s var(--ease-in); }

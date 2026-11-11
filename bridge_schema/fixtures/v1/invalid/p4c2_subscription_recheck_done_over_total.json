@@ -1,0 +1,46 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "items": [
+        {
+          "id": "0a1b2c3d4e5f60718293a4b5",
+          "name": "Example sub",
+          "tier": "sentinel",
+          "enabled": true,
+          "display": "Example sub",
+          "total": 10,
+          "healthy": 0,
+          "visibility": "pending",
+          "refreshing": false,
+          "recheck": {
+            "done": 11,
+            "total": 10
+          },
+          "last_refresh_at_ms": 1790809200000
+        },
+        {
+          "id": "1b2c3d4e5f60718293a4b5c6",
+          "name": "Never refreshed",
+          "tier": "sentinel",
+          "enabled": true,
+          "display": "Never refreshed",
+          "total": 0,
+          "healthy": 0,
+          "visibility": "unknown",
+          "refreshing": false,
+          "last_refresh_at_ms": null
+        }
+      ]
+    },
+    "key": "sentinel"
+  },
+  "expected": "invariant:subscriptions.list.items[0].recheck.done"
+}

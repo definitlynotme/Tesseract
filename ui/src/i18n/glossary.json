@@ -1,0 +1,743 @@
+[
+  {
+    "term_id": "tier_vanguard",
+    "zh": "Vanguard",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Vanguard",
+      "de_DE": "Vanguard",
+      "es_ES": "Vanguard",
+      "fr_FR": "Vanguard",
+      "ja_JP": "Vanguard",
+      "ko_KR": "Vanguard",
+      "pt_BR": "Vanguard",
+      "ru_RU": "Vanguard"
+    },
+    "note": "层级代号（第 1 层，自建），各语言原样保留，只译角色词"
+  },
+  {
+    "term_id": "tier_sentinel",
+    "zh": "Sentinel",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Sentinel",
+      "de_DE": "Sentinel",
+      "es_ES": "Sentinel",
+      "fr_FR": "Sentinel",
+      "ja_JP": "Sentinel",
+      "ko_KR": "Sentinel",
+      "pt_BR": "Sentinel",
+      "ru_RU": "Sentinel"
+    },
+    "note": "层级代号（第 2 层，订阅）"
+  },
+  {
+    "term_id": "tier_bastion",
+    "zh": "Bastion",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Bastion",
+      "de_DE": "Bastion",
+      "es_ES": "Bastion",
+      "fr_FR": "Bastion",
+      "ja_JP": "Bastion",
+      "ko_KR": "Bastion",
+      "pt_BR": "Bastion",
+      "ru_RU": "Bastion"
+    },
+    "note": "层级代号（第 3 层，应急）"
+  },
+  {
+    "term_id": "tier_gateway",
+    "zh": "Gateway",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Gateway",
+      "de_DE": "Gateway",
+      "es_ES": "Gateway",
+      "fr_FR": "Gateway",
+      "ja_JP": "Gateway",
+      "ko_KR": "Gateway",
+      "pt_BR": "Gateway",
+      "ru_RU": "Gateway"
+    },
+    "note": "层级代号（固定出口）"
+  },
+  {
+    "term_id": "pool_garrison",
+    "zh": "Garrison",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Garrison",
+      "de_DE": "Garrison",
+      "es_ES": "Garrison",
+      "fr_FR": "Garrison",
+      "ja_JP": "Garrison",
+      "ko_KR": "Garrison",
+      "pt_BR": "Garrison",
+      "ru_RU": "Garrison"
+    },
+    "note": "Bastion 里自动收集、自动补充的公共节点的代号（F-04 起代替「自动节点池」）；各语言原样保留"
+  },
+  {
+    "term_id": "product_tesseract",
+    "zh": "Tesseract",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Tesseract",
+      "de_DE": "Tesseract",
+      "es_ES": "Tesseract",
+      "fr_FR": "Tesseract",
+      "ja_JP": "Tesseract",
+      "ko_KR": "Tesseract",
+      "pt_BR": "Tesseract",
+      "ru_RU": "Tesseract"
+    },
+    "note": "产品名"
+  },
+  {
+    "term_id": "engine_mihomo",
+    "zh": "Mihomo",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "Mihomo",
+      "de_DE": "Mihomo",
+      "es_ES": "Mihomo",
+      "fr_FR": "Mihomo",
+      "ja_JP": "Mihomo",
+      "ko_KR": "Mihomo",
+      "pt_BR": "Mihomo",
+      "ru_RU": "Mihomo"
+    },
+    "note": "代理核心的实现名，只出现在来源列、日志来源和版本行（DESIGN §8）"
+  },
+  {
+    "term_id": "role_vanguard",
+    "zh": "自建",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "self-hosted",
+      "de_DE": "selbst gehostet",
+      "es_ES": "autoalojado",
+      "fr_FR": "auto-hébergé",
+      "ja_JP": "セルフホスト",
+      "ko_KR": "자체 호스팅",
+      "pt_BR": "auto-hospedado",
+      "ru_RU": "собствен"
+    },
+    "note": "Vanguard 的角色词，写作「Vanguard 自建」。tr 核对说明（i18n_check 按子串、不分大小写核对）：ru собствен = собственный/собственные 的词干"
+  },
+  {
+    "term_id": "role_sentinel",
+    "zh": "订阅",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "subscription",
+      "de_DE": "Abonnement",
+      "es_ES": "suscripci",
+      "fr_FR": "abonnement",
+      "ja_JP": "サブスク",
+      "ko_KR": "구독",
+      "pt_BR": "assinatura",
+      "ru_RU": "подписк"
+    },
+    "note": "Sentinel 的角色词；也指订阅地址。tr 核对说明：es suscripci 覆盖 suscripción/suscripciones；ja サブスク 覆盖全称サブスクリプション与缩写；ru подписк 覆盖 подписка/подписки/подписку；「在手机上订阅」（ntfy 的动词义）各语言写成动词时可能需要 i18n_allow 条目"
+  },
+  {
+    "term_id": "role_bastion",
+    "zh": "应急",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "emergency",
+      "de_DE": "Notfall",
+      "es_ES": "emergencia",
+      "fr_FR": "secours",
+      "ja_JP": "緊急",
+      "ko_KR": "비상",
+      "pt_BR": "emergência",
+      "ru_RU": "резерв"
+    },
+    "note": "Bastion 的角色词，琥珀色"
+  },
+  {
+    "term_id": "role_gateway",
+    "zh": "固定出口",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "fixed exit",
+      "de_DE": "fester Ausgang",
+      "es_ES": "salida fija",
+      "fr_FR": "sortie fixe",
+      "ja_JP": "固定出口",
+      "ko_KR": "고정 출구",
+      "pt_BR": "saída fixa",
+      "ru_RU": "фиксированн"
+    },
+    "note": "Gateway 的角色词。tr 核对说明：ru фиксированн = фиксированный выход 各格的词干；de 句中斜格 festen Ausgang 不含 fester Ausgang，尽量写成标签式「Gateway fester Ausgang」"
+  },
+  {
+    "term_id": "tier",
+    "zh": "层级",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "tier",
+      "de_DE": "Stufe",
+      "es_ES": "nivel",
+      "fr_FR": "niveau",
+      "ja_JP": "階層",
+      "ko_KR": "계층",
+      "pt_BR": "camada",
+      "ru_RU": "уров"
+    },
+    "note": "Vanguard / Sentinel / Bastion / Gateway 的统称，总带角色词；不用「线路」。tr 核对说明：ru уров 覆盖 уровень/уровня/уровни（уровень 与 уровн- 交替，只能取 уров）"
+  },
+  {
+    "term_id": "node",
+    "zh": "节点",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "node",
+      "de_DE": "Knoten",
+      "es_ES": "nodo",
+      "fr_FR": "nœud",
+      "ja_JP": "ノード",
+      "ko_KR": "노드",
+      "pt_BR": "nó",
+      "ru_RU": "сервер"
+    },
+    "note": "一个服务器。tr 核对说明：ru 用 сервер（各格都含此串；узел/узла 交替无法稳定核对，且本条定义即「一个服务器」）；pt nó 覆盖 nós"
+  },
+  {
+    "term_id": "fallback",
+    "zh": "回退",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "fallback",
+      "de_DE": "Fallback",
+      "es_ES": "respaldo",
+      "fr_FR": "repli",
+      "ja_JP": "フォールバック",
+      "ko_KR": "폴백",
+      "pt_BR": "contingência",
+      "ru_RU": "переключ"
+    },
+    "note": "流量移到下一个层级（层级回退、已回退到 Sentinel 订阅）。tr 核对说明：ru переключ 覆盖 переключение/переключено（ru 的 резерв 已给 Bastion 角色词，避免一词两义）；de 用名词 Fallback（Fallback-Reihenfolge、Fallback auf …）"
+  },
+  {
+    "term_id": "proxy_core",
+    "zh": "代理核心",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "proxy core",
+      "de_DE": "Proxy-Kern",
+      "es_ES": "núcleo del proxy",
+      "fr_FR": "noyau du proxy",
+      "ja_JP": "プロキシコア",
+      "ko_KR": "프록시 코어",
+      "pt_BR": "núcleo do proxy",
+      "ru_RU": "прокси-ядр"
+    },
+    "note": "引擎在所有消息里都叫代理核心；不写运行时、缓冲区、回退组等内部词。tr 核对说明：ru прокси-ядр 覆盖 прокси-ядро/прокси-ядра"
+  },
+  {
+    "term_id": "exit",
+    "zh": "出口",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "exit",
+      "de_DE": "Ausgang",
+      "es_ES": "salida",
+      "fr_FR": "sortie",
+      "ja_JP": "出口",
+      "ko_KR": "출구",
+      "pt_BR": "saída",
+      "ru_RU": "выход"
+    },
+    "note": "流量最终离开的地址（当前出口、验证出口）"
+  },
+  {
+    "term_id": "status_ok",
+    "zh": "可用",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "available",
+      "de_DE": "verfügbar",
+      "es_ES": "disponible",
+      "fr_FR": "disponible",
+      "ja_JP": "利用",
+      "ko_KR": "사용",
+      "pt_BR": "disponív",
+      "ru_RU": "доступ"
+    },
+    "note": "节点状态词（DESIGN §8 固定词表）。tr 核对说明：zh 的「不可用」「可用于」都含「可用」，所以 tr 取能同时出现在两者里的词：ja 状态词写「利用可能」，tr 取词干「利用」（覆盖 利用不可/利用できます）；ko 状态词写「사용 가능」，tr 取「사용」；pt disponív 覆盖 disponível/disponíveis/indisponível；ru доступ 覆盖 доступен/недоступен"
+  },
+  {
+    "term_id": "status_slow",
+    "zh": "较慢",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "slow",
+      "de_DE": "langsam",
+      "es_ES": "lent",
+      "fr_FR": "lent",
+      "ja_JP": "低速",
+      "ko_KR": "느림",
+      "pt_BR": "lent",
+      "ru_RU": "медлен"
+    },
+    "note": "节点状态词，也是延迟档位词。tr 核对说明：es/pt lent 覆盖 lento/lenta；ru медлен 覆盖 медленный/медленно"
+  },
+  {
+    "term_id": "status_down",
+    "zh": "不可用",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "unavailable",
+      "de_DE": "nicht verfügbar",
+      "es_ES": "no disponible",
+      "fr_FR": "indisponible",
+      "ja_JP": "利用不可",
+      "ko_KR": "사용 불가",
+      "pt_BR": "indisponív",
+      "ru_RU": "недоступ"
+    },
+    "note": "节点状态词，也是延迟档位词。tr 核对说明：pt indisponív 覆盖 indisponível/indisponíveis；ru недоступ 覆盖 недоступен/недоступна/недоступны；ja/ko 句中也写「利用不可」「사용 불가」"
+  },
+  {
+    "term_id": "status_pending",
+    "zh": "待检查",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "unchecked",
+      "de_DE": "ungeprüft",
+      "es_ES": "sin comprobar",
+      "fr_FR": "non vérifié",
+      "ja_JP": "未確認",
+      "ko_KR": "미확인",
+      "pt_BR": "não verificado",
+      "ru_RU": "не проверен"
+    },
+    "note": "节点状态词"
+  },
+  {
+    "term_id": "status_recheck",
+    "zh": "待复检",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "recheck",
+      "de_DE": "Nachprüfung",
+      "es_ES": "nueva comprobación",
+      "fr_FR": "revérification",
+      "ja_JP": "再確認",
+      "ko_KR": "재확인",
+      "pt_BR": "nova verificação",
+      "ru_RU": "перепровер"
+    },
+    "note": "节点状态词。tr 核对说明：ru перепровер 覆盖 перепроверка/перепроверки"
+  },
+  {
+    "term_id": "status_draft",
+    "zh": "草稿",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "draft",
+      "de_DE": "Entwurf",
+      "es_ES": "borrador",
+      "fr_FR": "brouillon",
+      "ja_JP": "下書き",
+      "ko_KR": "초안",
+      "pt_BR": "rascunho",
+      "ru_RU": "черновик"
+    },
+    "note": "节点状态词（停用的节点）"
+  },
+  {
+    "term_id": "status_current",
+    "zh": "当前",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "current",
+      "de_DE": "aktuell",
+      "es_ES": "actual",
+      "fr_FR": "actuel",
+      "ja_JP": "現在",
+      "ko_KR": "현재",
+      "pt_BR": "atual",
+      "ru_RU": "текущ"
+    },
+    "note": "节点状态词（正在使用）。tr 核对说明：zh「当前」也作副词（当前没有…），en current 覆盖 currently、es actual 覆盖 actualmente、fr actuel 覆盖 actuellement；ru текущ 覆盖 текущий/текущая/текущего（句中尽量用 текущ- 而不是 сейчас）"
+  },
+  {
+    "term_id": "status_disabled_tier",
+    "zh": "未启用",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "off",
+      "de_DE": "nicht aktiv",
+      "es_ES": "desactivad",
+      "fr_FR": "désactivé",
+      "ja_JP": "無効",
+      "ko_KR": "비활성",
+      "pt_BR": "desativad",
+      "ru_RU": "отключ"
+    },
+    "note": "停用的层级。tr 核对说明：es desactivad / pt desativad 覆盖阳性与阴性；ru отключ 覆盖 отключён/отключено"
+  },
+  {
+    "term_id": "lat_ok",
+    "zh": "正常",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "normal",
+      "de_DE": "normal",
+      "es_ES": "normal",
+      "fr_FR": "normal",
+      "ja_JP": "正常",
+      "ko_KR": "정상",
+      "pt_BR": "normal",
+      "ru_RU": "норм"
+    },
+    "note": "延迟档位词。tr 核对说明：zh「恢复正常」「正常退出」也含「正常」；ru норм 覆盖 нормальный/нормально/в норме"
+  },
+  {
+    "term_id": "run_stopped",
+    "zh": "已停止",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "stopped",
+      "de_DE": "gestoppt",
+      "es_ES": "detenid",
+      "fr_FR": "arrêté",
+      "ja_JP": "停止",
+      "ko_KR": "중지",
+      "pt_BR": "parad",
+      "ru_RU": "останов"
+    },
+    "note": "运行状态词，所有位置同一个词。tr 核对说明：es detenid / pt parad 覆盖阳性与阴性；ja 停止、ko 중지 是词干（停止しました / 중지됨 / 중지되었습니다）；ru останов 覆盖 остановлен/остановлено"
+  },
+  {
+    "term_id": "run_starting",
+    "zh": "启动中",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "starting",
+      "de_DE": "startet",
+      "es_ES": "iniciando",
+      "fr_FR": "démarrage",
+      "ja_JP": "起動中",
+      "ko_KR": "시작 중",
+      "pt_BR": "iniciando",
+      "ru_RU": "запуск"
+    },
+    "note": "运行状态词。tr 核对说明：de startet 覆盖 Startet… 与 wird gestartet"
+  },
+  {
+    "term_id": "run_running",
+    "zh": "运行中",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "running",
+      "de_DE": "läuft",
+      "es_ES": "en ejecución",
+      "fr_FR": "en marche",
+      "ja_JP": "実行中",
+      "ko_KR": "실행 중",
+      "pt_BR": "em execução",
+      "ru_RU": "работа"
+    },
+    "note": "运行状态词。tr 核对说明：ru работа 覆盖 работает/работающий"
+  },
+  {
+    "term_id": "run_stopping",
+    "zh": "停止中",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "stopping",
+      "de_DE": "stoppt",
+      "es_ES": "deteniendo",
+      "fr_FR": "arrêt en cours",
+      "ja_JP": "停止中",
+      "ko_KR": "중지 중",
+      "pt_BR": "parando",
+      "ru_RU": "остановка"
+    },
+    "note": "运行状态词。tr 核对说明：de stoppt 覆盖 Stoppt… 与 wird gestoppt"
+  },
+  {
+    "term_id": "run_cancelling",
+    "zh": "取消中",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "canceling",
+      "de_DE": "wird abgebrochen",
+      "es_ES": "cancelando",
+      "fr_FR": "annulation",
+      "ja_JP": "キャンセル中",
+      "ko_KR": "취소 중",
+      "pt_BR": "cancelando",
+      "ru_RU": "отмен"
+    },
+    "note": "运行状态词。en 按 en_US 拼写 canceling"
+  },
+  {
+    "term_id": "geosite",
+    "zh": "网站分类",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "website categories",
+      "de_DE": "Website-Kategorie",
+      "es_ES": "categorías de sitios",
+      "fr_FR": "catégories de sites",
+      "ja_JP": "サイト分類",
+      "ko_KR": "사이트 분류",
+      "pt_BR": "categorias de sites",
+      "ru_RU": "категори"
+    },
+    "note": "按回答的问题命名数据（技术名只作小字说明）。tr 核对说明：ru категори 覆盖 категории/категорий（сайтов）"
+  },
+  {
+    "term_id": "geoip",
+    "zh": "IP 归属地",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "IP location",
+      "de_DE": "IP-Standort",
+      "es_ES": "ubicación de IP",
+      "fr_FR": "localisation IP",
+      "ja_JP": "IP 所在地",
+      "ko_KR": "IP 위치",
+      "pt_BR": "localização de IP",
+      "ru_RU": "геолокац"
+    },
+    "note": "按回答的问题命名数据。tr 核对说明：ru геолокац 覆盖 геолокация/геолокации；ja「IP 所在地」中间有半角空格"
+  },
+  {
+    "term_id": "direct",
+    "zh": "直连",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "direct",
+      "de_DE": "direkt",
+      "es_ES": "direct",
+      "fr_FR": "direct",
+      "ja_JP": "直接",
+      "ko_KR": "직접",
+      "pt_BR": "diret",
+      "ru_RU": "прям"
+    },
+    "note": "不写 DIRECT。tr 核对说明：es/fr direct、pt diret 覆盖 directo/directement/direto/diretamente；ru прям 覆盖 напрямую/прямое"
+  },
+  {
+    "term_id": "reject",
+    "zh": "屏蔽",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "block",
+      "de_DE": "blockier",
+      "es_ES": "bloque",
+      "fr_FR": "bloqu",
+      "ja_JP": "ブロック",
+      "ko_KR": "차단",
+      "pt_BR": "bloque",
+      "ru_RU": "блокир"
+    },
+    "note": "不写 REJECT。tr 核对说明：de blockier、es/pt bloque、fr bloqu、ru блокир 是词干（blockieren/blockiert、bloquear/bloqueado、bloquer/bloqué、блокировать/заблокировано）"
+  },
+  {
+    "term_id": "domain_suffix",
+    "zh": "域名后缀",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "domain suffix",
+      "de_DE": "Domain-Suffix",
+      "es_ES": "sufijo de dominio",
+      "fr_FR": "suffixe de domaine",
+      "ja_JP": "ドメインサフィックス",
+      "ko_KR": "도메인 접미사",
+      "pt_BR": "sufixo de domínio",
+      "ru_RU": "суффикс домена"
+    },
+    "note": "不写 DOMAIN-SUFFIX"
+  },
+  {
+    "term_id": "killswitch",
+    "zh": "熔断保护",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "kill switch",
+      "de_DE": "Kill-Switch",
+      "es_ES": "kill switch",
+      "fr_FR": "kill switch",
+      "ja_JP": "キルスイッチ",
+      "ko_KR": "킬 스위치",
+      "pt_BR": "kill switch",
+      "ru_RU": "Kill Switch"
+    },
+    "note": "断网保护功能名"
+  },
+  {
+    "term_id": "subscription",
+    "zh": "订阅地址",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "subscription URL",
+      "de_DE": "Abonnement-URL",
+      "es_ES": "URL de suscripción",
+      "fr_FR": "URL d’abonnement",
+      "ja_JP": "サブスクリプション URL",
+      "ko_KR": "구독 URL",
+      "pt_BR": "URL da assinatura",
+      "ru_RU": "URL подписки"
+    },
+    "note": "订阅的 URL。tr 核对说明：同时满足「订阅」条目（订阅地址含订阅）；fr 用排版撇号 ’（U+2019）"
+  },
+  {
+    "term_id": "source",
+    "zh": "来源",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "source",
+      "de_DE": "Quelle",
+      "es_ES": "fuente",
+      "fr_FR": "source",
+      "ja_JP": "ソース",
+      "ko_KR": "소스",
+      "pt_BR": "fonte",
+      "ru_RU": "источник"
+    },
+    "note": "节点来源（订阅、仓库、频道、文件）"
+  },
+  {
+    "term_id": "log",
+    "zh": "日志",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "log",
+      "de_DE": "Protokoll",
+      "es_ES": "registro",
+      "fr_FR": "journa",
+      "ja_JP": "ログ",
+      "ko_KR": "로그",
+      "pt_BR": "registro",
+      "ru_RU": "журнал"
+    },
+    "note": "T-P5-14：运行日志（日志页、日志文件、日志流）。tr 取各语言目录的现行统一用词（以导航 shell.nav.logs 与日志页标题为准），按子串、不分大小写核对，所以写词干：en log 覆盖 logs；de Protokoll 覆盖 Protokolle、Rohprotokolle；es / pt registro 覆盖 registros（pt 自 T-P5-12 统一为 registros）；fr journa 覆盖 journal / journaux；ru журнал 覆盖 журнала / журналы / журналов / журнале。放行（tools/i18n_allow.json，term_id log）四类：①「条日志」按条数说时用条目词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись）；② ru 在指列表里单条记录的句子里用 запись / записи；③ 事件视图空状态「暂无事件日志」说成「还没有事件」（en / fr / pt / ru；de / es / ja / ko 带「日志」，跨语言分歧待各语言复核）；④ en logs.follow.tip_paused 省掉了名词。同形异义提醒：es / pt 的 registro 也指 Windows 注册表（errors.autostart.registry_unavailable「Registro do Windows」「registro de Windows」）与提醒的投递记录（pt registros de entrega），这些 zh 原文不含「日志」，本条不管；de 的 Protokoll 也是「协议」（如 tiers.panel.diag.proto），en 的 log 是 catalog、dialog、login 的子串——按子串核对时门禁分不出这些误判，复核时看词义而不只看门禁；命令面板关键词（shell.palette.keywords.go_logs）与 Mihomo 的 /logs 路径含 log / logs 不受影响（本条只要求含 tr，不禁止别的词）"
+  }
+]

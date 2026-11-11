@@ -1,0 +1,8 @@
+{
+  "common.action.save": "JA save",
+  "common.items": "{n, plural, other {# node other}}",
+  "common.hint": "JA press <kbd>Ctrl K</kbd> to open {name}",
+  "common.mode": "{mode, select, tun {JA TUN} other {JA system proxy}}",
+  "common.tier": "Vanguard JA self-hosted",
+  "common.skipped.timeout": "JA timed out"
+}

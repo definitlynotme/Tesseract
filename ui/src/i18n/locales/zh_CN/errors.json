@@ -1,0 +1,1106 @@
+{
+  "errors.admin_required": {
+    "m": "这个操作需要管理员权限。以管理员身份运行 Tesseract，或只使用系统代理。",
+    "_desc": "通用错误（code = admin_required）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.alerts.delivery_failed": {
+    "m": "桌面通知没能送达。检查 Windows 的通知设置后再试。",
+    "_desc": "提醒：桌面通知送达失败（bridge_alerts_desktop）"
+  },
+  "errors.alerts.receipt_persist_pending": {
+    "m": "桌面通知已经显示，但送达记录还在写入，暂时没有确认。不需要操作，写完后告警历史会自动更新。",
+    "_desc": "桌面通知送达回执（alerts.desktopDelivered，code timeout，reason receipt_persist_pending）：写盘超过 30 秒；外壳通常只记日志，诊断或日志里可能显示"
+  },
+  "errors.autostart.development_mode": {
+    "m": "开发版不能设置开机自启。用正式安装的 Tesseract 设置。",
+    "_desc": "开机自启（配置页启动设置，reason development_mode）"
+  },
+  "errors.autostart.read_failed": {
+    "m": "无法读取开机自启设置。检查注册表访问权限后再试。",
+    "_desc": "开机自启（配置页启动设置，reason read_failed）"
+  },
+  "errors.autostart.registration_invalid": {
+    "m": "开机自启项的格式不对。关闭后重新打开开机自启。",
+    "_desc": "开机自启（配置页启动设置，reason registration_invalid）"
+  },
+  "errors.autostart.registry_unavailable": {
+    "m": "无法访问 Windows 注册表，不能设置开机自启。",
+    "_desc": "开机自启（配置页启动设置，reason registry_unavailable）"
+  },
+  "errors.autostart.shell_missing": {
+    "m": "找不到 Tesseract 主程序，无法设置开机自启。重新安装后再试。",
+    "_desc": "开机自启（配置页启动设置，reason shell_missing）"
+  },
+  "errors.autostart.shell_path_invalid": {
+    "m": "Tesseract 的安装位置不符合要求，无法设置开机自启。重新安装后再试。",
+    "_desc": "开机自启（配置页启动设置，reason shell_path_invalid）"
+  },
+  "errors.bridge.admin_required": {
+    "m": "这个操作需要管理员权限。以管理员身份运行 Tesseract，或只使用系统代理。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.admin_required）；显示在发起操作的位置"
+  },
+  "errors.bridge.cancelled": {
+    "m": "操作已取消。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.cancelled）；显示在发起操作的位置"
+  },
+  "errors.bridge.conflict": {
+    "m": "状态已经变了，这次操作没有执行。刷新后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.conflict）；显示在发起操作的位置"
+  },
+  "errors.bridge.epoch_mismatch": {
+    "m": "Tesseract 后台刚刚重启过，这次操作针对的是旧会话，没有执行。等界面刷新后再试一次。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.epoch_mismatch）；显示在发起操作的位置"
+  },
+  "errors.bridge.frame_too_large": {
+    "m": "这次提交的内容太大，没有执行。减少内容（例如分批导入）后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.frame_too_large）；显示在发起操作的位置"
+  },
+  "errors.bridge.internal": {
+    "m": "出现了意外错误，操作没有完成。再试一次；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.internal）；显示在发起操作的位置"
+  },
+  "errors.bridge.invalid_enum": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.invalid_enum）；显示在发起操作的位置"
+  },
+  "errors.bridge.invalid_json": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.invalid_json）；显示在发起操作的位置"
+  },
+  "errors.bridge.invalid_type": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.invalid_type）；显示在发起操作的位置"
+  },
+  "errors.bridge.invalid_utf8": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.invalid_utf8）；显示在发起操作的位置"
+  },
+  "errors.bridge.io": {
+    "m": "读写文件或网络时出错，操作没有完成。检查磁盘空间、文件权限和网络后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.io）；显示在发起操作的位置"
+  },
+  "errors.bridge.job_capacity": {
+    "m": "正在排队的操作太多，这次没有执行。等前面的操作完成后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.job_capacity）；显示在发起操作的位置"
+  },
+  "errors.bridge.lifecycle_busy": {
+    "m": "服务正在启动、停止或清理，这次操作没有执行。等当前过程结束后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.lifecycle_busy）；显示在发起操作的位置"
+  },
+  "errors.bridge.missing_field": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.missing_field）；显示在发起操作的位置"
+  },
+  "errors.bridge.needs_route": {
+    "m": "当前没有可用的层级，操作无法完成。检查节点与订阅，或等层级恢复后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.needs_route）；显示在发起操作的位置"
+  },
+  "errors.bridge.no_sources": {
+    "m": "没有启用任何节点来源。在配置里添加或启用来源后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.no_sources）；显示在发起操作的位置"
+  },
+  "errors.bridge.not_allowed": {
+    "m": "当前状态下不能执行这个操作。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.not_allowed）；显示在发起操作的位置"
+  },
+  "errors.bridge.not_cancellable": {
+    "m": "这个操作已经无法取消，会继续完成。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.not_cancellable）；显示在发起操作的位置"
+  },
+  "errors.bridge.not_object": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.not_object）；显示在发起操作的位置"
+  },
+  "errors.bridge.not_running": {
+    "m": "服务没有运行。先启动服务，再执行这个操作。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.not_running）；显示在发起操作的位置"
+  },
+  "errors.bridge.proto_mismatch": {
+    "m": "界面与 Tesseract 后台的版本不一致，操作没有执行。重新启动 Tesseract 后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.proto_mismatch）；显示在发起操作的位置"
+  },
+  "errors.bridge.recovery_pending": {
+    "m": "上次的网络设置还在恢复，暂时不能执行这个操作。等恢复完成后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.recovery_pending）；显示在发起操作的位置"
+  },
+  "errors.bridge.runtime_gone": {
+    "m": "Tesseract 后台已重启，这次操作被中断。等界面重新连上后再试一次。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.runtime_gone）；显示在发起操作的位置"
+  },
+  "errors.bridge.runtime_listener_conflict": {
+    "m": "代理需要的端口已被其他程序占用。关闭占用该端口的程序，或在配置里换一个端口。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.runtime_listener_conflict）；显示在发起操作的位置"
+  },
+  "errors.bridge.runtime_listener_unavailable": {
+    "m": "无法在所需端口上开始监听。检查防火墙和安全软件的设置，或换一个端口后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.runtime_listener_unavailable）；显示在发起操作的位置"
+  },
+  "errors.bridge.runtime_unavailable": {
+    "m": "Tesseract 后台暂时不可用。稍等几秒后再试；仍不行就重启 Tesseract。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.runtime_unavailable）；显示在发起操作的位置"
+  },
+  "errors.bridge.sequence_gap": {
+    "m": "界面漏收了一部分更新，正在重新同步。稍后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.sequence_gap）；显示在发起操作的位置"
+  },
+  "errors.bridge.session_end_in_progress": {
+    "m": "Windows 正在注销或关机，Tesseract 正在收尾，不再接受新的操作。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.session_end_in_progress）；显示在发起操作的位置"
+  },
+  "errors.bridge.shutting_down": {
+    "m": "Tesseract 正在退出，不再接受新的操作。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.shutting_down）；显示在发起操作的位置"
+  },
+  "errors.bridge.snapshot_required": {
+    "m": "界面的数据需要先刷新，这次操作没有执行。稍等片刻，界面刷新后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.snapshot_required）；显示在发起操作的位置"
+  },
+  "errors.bridge.source_supply_no_egress": {
+    "m": "获取节点来源时没有可用的出口。检查本机网络，或启用一个可直连的层级后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.source_supply_no_egress）；显示在发起操作的位置"
+  },
+  "errors.bridge.superseded": {
+    "m": "这次操作已被之后的操作取代，以最新一次的结果为准。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.superseded）；显示在发起操作的位置"
+  },
+  "errors.bridge.timeout": {
+    "m": "操作超时，没有在规定时间内完成。检查网络后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.timeout）；显示在发起操作的位置"
+  },
+  "errors.bridge.validation": {
+    "m": "填写的内容有误。按提示修改后再试。",
+    "_desc": "侧车拒绝请求或查询失败（errors.bridge.validation）；显示在发起操作的位置"
+  },
+  "errors.cancelled": {
+    "m": "操作已取消。",
+    "_desc": "通用错误（code = cancelled）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.config.autostart_read": {
+    "m": "无法读取开机自启的当前状态，配置页里这一项可能不准。检查注册表访问权限后刷新。",
+    "_desc": "读取配置快照（config.snapshot）时开机自启状态读取失败（desktop_runtime）；显示在配置页启动设置"
+  },
+  "errors.config.local_read": {
+    "m": "无法读取本机配置文件，部分设置可能显示为默认值。检查配置目录的访问权限后刷新。",
+    "_desc": "读取配置快照时本机配置（local config）读取失败（desktop_runtime）"
+  },
+  "errors.config.sources_read": {
+    "m": "无法读取节点来源列表，配置页里的来源可能不完整。检查配置文件后刷新。",
+    "_desc": "读取配置快照时来源列表读取失败（desktop_runtime）；显示在配置页来源节"
+  },
+  "errors.conflict": {
+    "m": "状态已经变了，这次操作没有执行。刷新后再试。",
+    "_desc": "通用错误（code = conflict）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.diagnose.cancelled": {
+    "m": "节点检测已中止。",
+    "_desc": "节点检测（nodes.diagnose，reason cancelled）：层级页节点面板"
+  },
+  "errors.diagnose.chain_requires_gateway": {
+    "m": "链式检测需要先设置 Gateway。在层级页设置后再检测。",
+    "_desc": "节点检测（nodes.diagnose，reason chain_requires_gateway）：层级页节点面板"
+  },
+  "errors.diagnose.cleanup_failed": {
+    "m": "检测结束后临时进程没能清理干净。重启服务后再检测。",
+    "_desc": "节点检测（nodes.diagnose，reason cleanup_failed）：层级页节点面板"
+  },
+  "errors.diagnose.component_missing": {
+    "m": "缺少检测所需的组件。重新安装 Tesseract 后再检测。",
+    "_desc": "节点检测（nodes.diagnose，reason component_missing）：层级页节点面板"
+  },
+  "errors.diagnose.diagnostic_in_progress": {
+    "m": "这个节点正在检测中。等这次检测结束。",
+    "_desc": "节点检测（nodes.diagnose，reason diagnostic_in_progress）：层级页节点面板"
+  },
+  "errors.diagnose.diagnostic_unavailable": {
+    "m": "节点检测暂不可用。稍后再试。",
+    "_desc": "节点检测（nodes.diagnose，reason diagnostic_unavailable）：层级页节点面板"
+  },
+  "errors.diagnose.invalid_request": {
+    "m": "检测请求无效。刷新后再试。",
+    "_desc": "节点检测（nodes.diagnose，reason invalid_request）：层级页节点面板"
+  },
+  "errors.diagnose.node_changed": {
+    "m": "节点在检测前已被修改。刷新后重新检测。",
+    "_desc": "节点检测（nodes.diagnose，reason node_changed）：层级页节点面板"
+  },
+  "errors.diagnose.node_index_unavailable": {
+    "m": "节点列表还没准备好。稍后再检测。",
+    "_desc": "节点检测（nodes.diagnose，reason node_index_unavailable）：层级页节点面板"
+  },
+  "errors.diagnose.node_not_found": {
+    "m": "找不到这个节点，它可能已被删除。刷新列表后再试。",
+    "_desc": "节点检测（nodes.diagnose，reason node_not_found）：层级页节点面板"
+  },
+  "errors.diagnose.probe_failed": {
+    "m": "节点没有通过检测（连接失败或超时）。检查节点设置，或换一个节点。",
+    "_desc": "节点检测（nodes.diagnose，reason probe_failed）：层级页节点面板"
+  },
+  "errors.diagnose.request_id_reused": {
+    "m": "检测请求重复了。刷新后重新检测。",
+    "_desc": "节点检测（nodes.diagnose，reason request_id_reused）：层级页节点面板"
+  },
+  "errors.diagnose.service_closed": {
+    "m": "服务已停止，检测中止。启动服务后再检测。",
+    "_desc": "节点检测（nodes.diagnose，reason service_closed）：层级页节点面板"
+  },
+  "errors.diagnose.setup_failed": {
+    "m": "无法准备检测环境。稍后再试；仍失败时重启服务。",
+    "_desc": "节点检测（nodes.diagnose，reason setup_failed）：层级页节点面板"
+  },
+  "errors.diagnose.startup_failed": {
+    "m": "检测用的临时代理核心没能启动。稍后再试；仍失败时重启服务。",
+    "_desc": "节点检测（nodes.diagnose，reason startup_failed）：层级页节点面板"
+  },
+  "errors.diagnose.tier3_auto_pool_self_check": {
+    "m": "自动收集的 Bastion 节点由 Tesseract 自行检测，不能手动检测。",
+    "_desc": "节点检测（nodes.diagnose，reason tier3_auto_pool_self_check）：层级页节点面板"
+  },
+  "errors.diagnose.timeout": {
+    "m": "节点检测超时。检查节点是否可用，或稍后再试。",
+    "_desc": "节点检测（nodes.diagnose，reason timeout）：层级页节点面板"
+  },
+  "errors.diagnose.unavailable": {
+    "m": "节点检测暂不可用。稍后再试。",
+    "_desc": "节点检测（nodes.diagnose，reason unavailable）：层级页节点面板"
+  },
+  "errors.diagnose.unsupported_protocol": {
+    "m": "这个节点的协议暂不支持检测。",
+    "_desc": "节点检测（nodes.diagnose，reason unsupported_protocol）：层级页节点面板"
+  },
+  "errors.diagnose.upstream_missing": {
+    "m": "链路检测需要的 Gateway 出口不存在。检查 Gateway 的设置。",
+    "_desc": "节点检测（nodes.diagnose，reason upstream_missing）：层级页节点面板"
+  },
+  "errors.epoch_mismatch": {
+    "m": "Tesseract 后台刚刚重启过，这次操作针对的是旧会话，没有执行。等界面刷新后再试一次。",
+    "_desc": "通用错误（code = epoch_mismatch）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.exit.connection_not_ready": {
+    "m": "连接还没准备好，暂时无法验证出口。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason connection_not_ready）：总览出口卡片的提示"
+  },
+  "errors.exit.core_generation_changed": {
+    "m": "验证期间代理核心重启了，这次结果作废。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason core_generation_changed）：总览出口卡片的提示"
+  },
+  "errors.exit.core_not_running": {
+    "m": "代理核心没有运行，无法验证出口。先启动服务。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason core_not_running）：总览出口卡片的提示"
+  },
+  "errors.exit.data_plane_unavailable": {
+    "m": "代理通道暂不可用，无法验证出口。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason data_plane_unavailable）：总览出口卡片的提示"
+  },
+  "errors.exit.exit_unreachable": {
+    "m": "无法连到出口检测服务。检查当前节点是否可用后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason exit_unreachable）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_conflict": {
+    "m": "两次检测得到的出口地址不一致，暂不显示。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_conflict）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_rate_limited": {
+    "m": "出口检测服务暂时限制了查询次数。稍等一会儿再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_rate_limited）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_rotating": {
+    "m": "出口地址正在变化（节点可能在轮换出口），暂不显示。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_rotating）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_stale": {
+    "m": "出口结果已过期。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_stale）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_timeout": {
+    "m": "出口查询超时。检查网络后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_timeout）：总览出口卡片的提示"
+  },
+  "errors.exit.identity_unavailable": {
+    "m": "无法查询出口地址。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason identity_unavailable）：总览出口卡片的提示"
+  },
+  "errors.exit.in_progress": {
+    "m": "出口验证已在进行中。等这次完成。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason in_progress）：总览出口卡片的提示"
+  },
+  "errors.exit.lifecycle_changed": {
+    "m": "验证期间服务状态变了，这次结果作废。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason lifecycle_changed）：总览出口卡片的提示"
+  },
+  "errors.exit.lookup_unavailable": {
+    "m": "出口查询暂不可用。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason lookup_unavailable）：总览出口卡片的提示"
+  },
+  "errors.exit.manual_execution_binding_stale": {
+    "m": "验证期间所用的节点已经变化，这次结果没有采用。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason manual_execution_binding_stale）：总览出口卡片的提示"
+  },
+  "errors.exit.manual_validation_execution_changed": {
+    "m": "验证期间路由变了，这次结果作废。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason manual_validation_execution_changed）：总览出口卡片的提示"
+  },
+  "errors.exit.native_fallback_unverified_budget": {
+    "m": "代理核心自行切换了节点，但没来得及核实。稍后重新验证出口。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason native_fallback_unverified_budget）：总览出口卡片的提示"
+  },
+  "errors.exit.native_fallback_verified": {
+    "m": "代理核心自行切换到了另一个节点，新节点已核实可用。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason native_fallback_verified）：总览出口卡片的提示"
+  },
+  "errors.exit.native_fallback_verified_commit_rejected": {
+    "m": "代理核心切换到的节点已核实，但没有被采纳为当前选择。重新验证一次；仍出现时检查层级设置。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason native_fallback_verified_commit_rejected）：总览出口卡片的提示"
+  },
+  "errors.exit.network_changed": {
+    "m": "验证期间网络环境变了，这次结果作废。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason network_changed）：总览出口卡片的提示"
+  },
+  "errors.exit.owner_revoked": {
+    "m": "验证已取消：发起验证的窗口或页面已关闭。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason owner_revoked）：总览出口卡片的提示"
+  },
+  "errors.exit.partial_validation": {
+    "m": "出口只验证了一部分（IPv4 或 IPv6 有一路没有结果）。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason partial_validation）：总览出口卡片的提示"
+  },
+  "errors.exit.probe_busy": {
+    "m": "后台检测繁忙，暂时无法验证出口。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason probe_busy）：总览出口卡片的提示"
+  },
+  "errors.exit.probe_target_error": {
+    "m": "出口检测服务返回了错误。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason probe_target_error）：总览出口卡片的提示"
+  },
+  "errors.exit.probe_unavailable": {
+    "m": "出口检测暂不可用。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason probe_unavailable）：总览出口卡片的提示"
+  },
+  "errors.exit.route_changed": {
+    "m": "验证期间当前节点变了，这次结果作废。重新验证一次。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason route_changed）：总览出口卡片的提示"
+  },
+  "errors.exit.route_contract_failed": {
+    "m": "当前层级的节点没有通过 Google 连通检查，也没有可用的备用节点。检查该层级的节点后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason route_contract_failed）：总览出口卡片的提示"
+  },
+  "errors.exit.route_unconfirmed": {
+    "m": "还不能确认流量经过哪个节点。稍后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason route_unconfirmed）：总览出口卡片的提示"
+  },
+  "errors.exit.runtime_stop_requested": {
+    "m": "服务正在停止，验证已中止。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason runtime_stop_requested）：总览出口卡片的提示"
+  },
+  "errors.exit.service_stopped": {
+    "m": "服务已停止，无法验证出口。先启动服务。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason service_stopped）：总览出口卡片的提示"
+  },
+  "errors.exit.system_proxy_capture_inactive": {
+    "m": "系统代理没有生效（可能被其他代理软件改掉了），浏览器的流量可能没有经过 Tesseract。关闭其他代理软件后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason system_proxy_capture_inactive）：总览出口卡片的提示"
+  },
+  "errors.exit.system_proxy_host_path_unverified": {
+    "m": "无法确认本机经系统代理的流量路径。检查系统代理设置后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason system_proxy_host_path_unverified）：总览出口卡片的提示"
+  },
+  "errors.exit.timeout": {
+    "m": "出口验证超时。检查网络后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason timeout）：总览出口卡片的提示"
+  },
+  "errors.exit.unavailable": {
+    "m": "出口验证暂不可用。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason unavailable）：总览出口卡片的提示"
+  },
+  "errors.exit.validation_cancelled": {
+    "m": "出口验证已取消。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason validation_cancelled）：总览出口卡片的提示"
+  },
+  "errors.exit.validation_timeout": {
+    "m": "出口验证超时。检查当前节点后重新验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason validation_timeout）：总览出口卡片的提示"
+  },
+  "errors.exit.waiting_connection": {
+    "m": "正在等待连接建立，暂时无法验证出口。稍后再验证。",
+    "_desc": "出口验证（exit.verify / exit.identity，reason waiting_connection）：总览出口卡片的提示"
+  },
+  "errors.frame_too_large": {
+    "m": "这次提交的内容太大，没有执行。减少内容（例如分批导入）后再试。",
+    "_desc": "通用错误（code = frame_too_large）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.gateway.apply_failed": {
+    "m": "Gateway 的选择没能生效。重启服务后再试。",
+    "_desc": "选择 Gateway 固定出口（gateway.select）的结果错误 apply_failed"
+  },
+  "errors.gateway.apply_unconfirmed": {
+    "m": "无法确认 Gateway 已生效。稍后刷新查看。",
+    "_desc": "选择 Gateway 固定出口（gateway.select）的结果错误 apply_unconfirmed"
+  },
+  "errors.gateway.node_unusable": {
+    "m": "这个 Gateway 节点现在不可用，代理核心里没有它，暂时不能选它。等它恢复可用后再选。",
+    "_desc": "按节点选择 Gateway 固定出口（gateway.select 带 node_id）失败（code conflict，reason node_unusable）：该节点当前不在代理核心的导出里（没有通过检测或被临时排除），没有可选的代理名（T-P2-H5）"
+  },
+  "errors.gateway.not_gateway_node": {
+    "m": "这个节点不在 Gateway 层，不能作为固定出口。",
+    "_desc": "按节点选择 Gateway 固定出口（gateway.select 带 node_id）失败（code conflict，reason not_gateway_node）：node_id 指向的是其他层级的节点（T-P2-H5）"
+  },
+  "errors.gateway.reload_unconfirmed": {
+    "m": "Gateway 已选择，但无法确认代理核心已载入。重启服务后再看。",
+    "_desc": "选择 Gateway 固定出口（gateway.select）的结果错误 reload_unconfirmed"
+  },
+  "errors.gateway.selection_unconfirmed": {
+    "m": "无法确认 Gateway 的选择。刷新后查看当前选择。",
+    "_desc": "选择 Gateway 固定出口（gateway.select）的结果错误 selection_unconfirmed"
+  },
+  "errors.gateway.superseded": {
+    "m": "这次选择已被之后的选择取代。",
+    "_desc": "选择 Gateway 固定出口（gateway.select）的结果错误 superseded"
+  },
+  "errors.gateway.unknown_node": {
+    "m": "找不到这个节点，节点列表可能已经更新。刷新后再选。",
+    "_desc": "按节点选择 Gateway 固定出口（gateway.select 带 node_id）失败（code conflict，reason unknown_node）：node_id 不存在，或已随运行时代次变化而过期（T-P2-H5）"
+  },
+  "errors.geo.disabled": {
+    "m": "网站分类和 IP 归属地数据的自动更新已在配置中关闭，这次没有更新。先在配置里打开它再更新。",
+    "_desc": "geo.update 作业失败（code conflict，reason disabled）：配置 geo_update.enabled 为 false，更新器不下载（T-P2-H2）"
+  },
+  "errors.geo.status_unknown": {
+    "m": "无法读取网站分类和 IP 归属地数据的状态。稍后刷新再看。",
+    "_desc": "geo.status 查询：数据状态未知"
+  },
+  "errors.geo.update_failed": {
+    "m": "网站分类和 IP 归属地数据更新失败。检查网络后重新更新。",
+    "_desc": "geo.status 查询：上次更新失败"
+  },
+  "errors.host.conflict": {
+    "m": "已经有一个对话框打开着。先关闭它再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code conflict；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.invalid_enum": {
+    "m": "界面发出的请求格式不对，没有执行。关闭并重新打开窗口后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code invalid_enum；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.invalid_type": {
+    "m": "界面发出的请求格式不对，没有执行。关闭并重新打开窗口后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code invalid_type；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.io": {
+    "m": "文件或系统操作失败。检查文件位置和权限后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code io；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.job_capacity": {
+    "m": "请求太多，这次没有执行。稍后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code job_capacity；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.missing_field": {
+    "m": "界面发出的请求格式不对，没有执行。关闭并重新打开窗口后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code missing_field；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.not_allowed": {
+    "m": "这个链接或位置不允许打开。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code not_allowed；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.runtime_gone": {
+    "m": "Tesseract 后台已重启，这次操作被中断。再试一次。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code runtime_gone；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.runtime_unavailable": {
+    "m": "Tesseract 后台暂不可用，无法完成这个操作。稍后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code runtime_unavailable；细分原因见 shell.host_reason.*"
+  },
+  "errors.host.validation": {
+    "m": "文件类型和用途不匹配。换一个文件后再试。",
+    "_desc": "外壳命令（打开链接、选择或保存文件等 host.*）失败，code validation；细分原因见 shell.host_reason.*"
+  },
+  "errors.import.ambiguous_authenticated_http": {
+    "m": "无法判断这个 HTTP 代理的用户名和密码。在节点表单里分开填写后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason ambiguous_authenticated_http）：导入抽屉里的提示"
+  },
+  "errors.import.apply_unconfirmed": {
+    "m": "节点已导入，但无法确认代理核心已载入。重启服务后再看。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason apply_unconfirmed）：导入抽屉里的提示"
+  },
+  "errors.import.batch_aborted": {
+    "m": "前面的订阅出错，后面的订阅没有导入。处理错误后重新导入剩下的订阅。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason batch_aborted）：导入抽屉里的提示"
+  },
+  "errors.import.chain_duplicate_protocol": {
+    "m": "链式节点里有重复的协议。每种协议只用一次。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason chain_duplicate_protocol）：导入抽屉里的提示"
+  },
+  "errors.import.chain_length_invalid": {
+    "m": "链式节点的层数不对（需要 2 到 16 层）。调整后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason chain_length_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.chain_tier_not_allowed": {
+    "m": "只有 Vanguard 可以添加链式节点。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason chain_tier_not_allowed）：导入抽屉里的提示"
+  },
+  "errors.import.core_reload_failed": {
+    "m": "节点已导入，但代理核心没能载入。重启服务后生效。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason core_reload_failed）：导入抽屉里的提示"
+  },
+  "errors.import.draft_invalid": {
+    "m": "节点信息不完整或格式不对。检查表单后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason draft_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.duplicate_node": {
+    "m": "这个节点已经存在。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason duplicate_node）：导入抽屉里的提示"
+  },
+  "errors.import.duplicate_subscription": {
+    "m": "这个订阅已经添加过了。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason duplicate_subscription）：导入抽屉里的提示"
+  },
+  "errors.import.exactly_one_node_required": {
+    "m": "这里一次只能导入一个节点。分开导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason exactly_one_node_required）：导入抽屉里的提示"
+  },
+  "errors.import.field_invalid": {
+    "m": "这一项的值无效。按提示修改后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason field_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.field_required": {
+    "m": "这一项必须填写。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason field_required）：导入抽屉里的提示"
+  },
+  "errors.import.field_unknown": {
+    "m": "表单里有无法识别的字段。刷新后重新填写。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason field_unknown）：导入抽屉里的提示"
+  },
+  "errors.import.import_failed": {
+    "m": "导入失败。检查内容后再试。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason import_failed）：导入抽屉里的提示"
+  },
+  "errors.import.import_plan_changed": {
+    "m": "导入内容或识别结果已经变化。重新预览后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason import_plan_changed）：导入抽屉里的提示"
+  },
+  "errors.import.import_rejected": {
+    "m": "导入的内容没有通过检查。按预览里的提示修改后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason import_rejected）：导入抽屉里的提示"
+  },
+  "errors.import.incomplete_socks5_credentials": {
+    "m": "SOCKS5 节点的用户名和密码要一起填写。补全另一项，或两项都留空，然后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason incomplete_socks5_credentials）：导入抽屉里的提示"
+  },
+  "errors.import.initial_refresh_failed": {
+    "m": "订阅已添加，但第一次更新失败。检查订阅地址和网络后手动更新。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason initial_refresh_failed）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_base64": {
+    "m": "Base64 内容无法解析（节点之间的分隔不明确）。检查内容是否完整。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_base64）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_node": {
+    "m": "这一条不是有效的节点。检查链接是否完整。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_node）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_node_uri": {
+    "m": "节点链接无效。重新复制完整的链接。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_node_uri）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_port": {
+    "m": "端口无效（应为 1–65535）。修改后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_port）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_ss_2022_key_base64": {
+    "m": "Shadowsocks 2022 密钥不是有效的 Base64。重新复制密钥。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_ss_2022_key_base64）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_ss_2022_key_length": {
+    "m": "Shadowsocks 2022 密钥的长度与加密方式不符。检查密钥和加密方式。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_ss_2022_key_length）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_subscription_url": {
+    "m": "订阅地址必须以 http:// 或 https:// 开头。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_subscription_url）：导入抽屉里的提示"
+  },
+  "errors.import.invalid_vmess_alter_id": {
+    "m": "VMess 节点的 alterId 无效（应为 0 或正整数）。修改后再导入；不确定时填 0。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason invalid_vmess_alter_id）：导入抽屉里的提示"
+  },
+  "errors.import.missing_address": {
+    "m": "多协议节点缺少服务器地址。补全后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_address）：导入抽屉里的提示"
+  },
+  "errors.import.missing_cipher_or_password": {
+    "m": "这个节点缺少加密方式或密码。两项都填写后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_cipher_or_password）：导入抽屉里的提示"
+  },
+  "errors.import.missing_password": {
+    "m": "这个节点缺少密码。在链接或节点表单里补上密码后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_password）：导入抽屉里的提示"
+  },
+  "errors.import.missing_reality_keys": {
+    "m": "VLESS Reality 节点缺少公钥或 short ID。向节点提供方要到这两项，补全后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_reality_keys）：导入抽屉里的提示"
+  },
+  "errors.import.missing_ss_2022_key": {
+    "m": "Shadowsocks 2022 需要填写密钥。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_ss_2022_key）：导入抽屉里的提示"
+  },
+  "errors.import.missing_ss_password": {
+    "m": "Shadowsocks 需要填写密码。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_ss_password）：导入抽屉里的提示"
+  },
+  "errors.import.missing_tuic_credentials": {
+    "m": "TUIC 节点缺少凭据。填写 token，或同时填写 UUID 和密码，然后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_tuic_credentials）：导入抽屉里的提示"
+  },
+  "errors.import.missing_uuid": {
+    "m": "这个节点缺少 UUID。在链接或节点表单里补上 UUID 后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_uuid）：导入抽屉里的提示"
+  },
+  "errors.import.missing_wireguard_address": {
+    "m": "WireGuard 节点缺少本机 IP 地址。填写配置里的 Address（例如 10.0.0.2/32）后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_wireguard_address）：导入抽屉里的提示"
+  },
+  "errors.import.missing_wireguard_keys": {
+    "m": "WireGuard 节点缺少私钥或对端公钥。两项都填写后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason missing_wireguard_keys）：导入抽屉里的提示"
+  },
+  "errors.import.no_supported_nodes": {
+    "m": "内容里没有可识别的节点。检查格式后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason no_supported_nodes）：导入抽屉里的提示"
+  },
+  "errors.import.plan_config_changed": {
+    "m": "预览之后配置已经变化。重新预览后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_config_changed）：导入抽屉里的提示"
+  },
+  "errors.import.plan_expired": {
+    "m": "预览已过期（超过 10 分钟）。重新预览后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_expired）：导入抽屉里的提示"
+  },
+  "errors.import.plan_missing": {
+    "m": "找不到这次预览。重新预览后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_missing）：导入抽屉里的提示"
+  },
+  "errors.import.plan_owner_mismatch": {
+    "m": "这次预览属于另一个窗口。在当前窗口重新预览。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_owner_mismatch）：导入抽屉里的提示"
+  },
+  "errors.import.plan_rejected": {
+    "m": "预览里没有可导入的节点。修改内容后重新预览。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_rejected）：导入抽屉里的提示"
+  },
+  "errors.import.plan_tier_mismatch": {
+    "m": "预览时选择的层级和现在不同。重新预览后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason plan_tier_mismatch）：导入抽屉里的提示"
+  },
+  "errors.import.port_invalid": {
+    "m": "端口无效（应为 1–65535）。修改后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason port_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.protocol_not_allowed": {
+    "m": "这个层级不支持该协议。换一个层级或协议。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason protocol_not_allowed）：导入抽屉里的提示"
+  },
+  "errors.import.rejected_truncated": {
+    "m": "被拒绝的条目太多，只列出了前一部分。修正后重新预览查看其余的。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason rejected_truncated）：导入抽屉里的提示"
+  },
+  "errors.import.reload_unconfirmed": {
+    "m": "节点已导入，但无法确认代理核心已载入。重启服务后再看。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason reload_unconfirmed）：导入抽屉里的提示"
+  },
+  "errors.import.runtime_reload_failed": {
+    "m": "节点已导入，但没能载入运行中的服务。重启服务后生效。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason runtime_reload_failed）：导入抽屉里的提示"
+  },
+  "errors.import.save_outcome_unknown": {
+    "m": "无法确认导入是否已保存。刷新节点列表查看，必要时重新导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason save_outcome_unknown）：导入抽屉里的提示"
+  },
+  "errors.import.secret_registry_failed": {
+    "m": "无法安全地处理这次导入的密钥，导入已停止。关闭并重新打开窗口后再试。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason secret_registry_failed）：导入抽屉里的提示"
+  },
+  "errors.import.ss_credential_invalid": {
+    "m": "Shadowsocks 的加密方式或密码无效。检查后再导入。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason ss_credential_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.subscription_tier_not_allowed": {
+    "m": "这个层级不能添加订阅。订阅只能加到 Sentinel、Bastion 或 Gateway。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason subscription_tier_not_allowed）：导入抽屉里的提示"
+  },
+  "errors.import.subscription_url_not_node": {
+    "m": "这是订阅地址，不是节点链接。改用添加订阅。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason subscription_url_not_node）：导入抽屉里的提示"
+  },
+  "errors.import.subscription_url_required": {
+    "m": "需要填写订阅地址。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason subscription_url_required）：导入抽屉里的提示"
+  },
+  "errors.import.subscription_urls_invalid": {
+    "m": "订阅地址无效：必须以 http:// 或 https:// 开头，一次最多 32 个。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason subscription_urls_invalid）：导入抽屉里的提示"
+  },
+  "errors.import.unsupported_cipher": {
+    "m": "不支持这个加密方式。换一个受支持的加密方式。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason unsupported_cipher）：导入抽屉里的提示"
+  },
+  "errors.import.unsupported_structured_format": {
+    "m": "不支持这种配置格式。改为粘贴节点链接或订阅地址。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason unsupported_structured_format）：导入抽屉里的提示"
+  },
+  "errors.import.unsupported_uri_scheme": {
+    "m": "不支持这种链接类型。检查链接开头的协议名。",
+    "_desc": "导入节点或订阅（import.preview / import.apply，reason unsupported_uri_scheme）：导入抽屉里的提示"
+  },
+  "errors.internal": {
+    "m": "出现了意外错误，操作没有完成。再试一次；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = internal）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.invalid_enum": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = invalid_enum）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.invalid_json": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = invalid_json）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.invalid_type": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = invalid_type）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.invalid_utf8": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = invalid_utf8）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.io": {
+    "m": "读写文件或网络时出错，操作没有完成。检查磁盘空间、文件权限和网络后再试。",
+    "_desc": "通用错误（code = io）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.job_capacity": {
+    "m": "正在排队的操作太多，这次没有执行。等前面的操作完成后再试。",
+    "_desc": "通用错误（code = job_capacity）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.killswitch.command_failed": {
+    "m": "熔断保护的操作失败，防火墙规则可能没有更改。再试一次；仍失败时以管理员身份运行 Tesseract。",
+    "_desc": "熔断保护命令失败（bridge_killswitch）"
+  },
+  "errors.lifecycle_busy": {
+    "m": "服务正在启动、停止或清理，这次操作没有执行。等当前过程结束后再试。",
+    "_desc": "通用错误（code = lifecycle_busy）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.missing_field": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = missing_field）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.mode.apply_failed": {
+    "m": "接管方式已保存，但没能生效。重启服务后再试。",
+    "_desc": "切换接管方式（mode.set）的结果错误 apply_failed"
+  },
+  "errors.mode.core_not_restarted": {
+    "m": "接管方式已保存，代理核心还没按新的方式重启。重启服务后生效。",
+    "_desc": "切换接管方式（mode.set）的结果错误 core_not_restarted"
+  },
+  "errors.mode.mode_unconfirmed": {
+    "m": "无法确认接管方式已切换。刷新后查看当前设置。",
+    "_desc": "切换接管方式（mode.set）的结果错误 mode_unconfirmed"
+  },
+  "errors.mode.readback_failed": {
+    "m": "无法读回接管方式，切换结果未确认。刷新后查看当前设置。",
+    "_desc": "切换接管方式（mode.set）的结果错误 readback_failed"
+  },
+  "errors.mode.restart_failed": {
+    "m": "接管方式已保存，但重启代理核心失败。重启服务后再试。",
+    "_desc": "切换接管方式（mode.set）的结果错误 restart_failed"
+  },
+  "errors.mode.restart_unconfirmed": {
+    "m": "接管方式已保存，但无法确认代理核心已按新的方式运行。重启服务后再看。",
+    "_desc": "切换接管方式（mode.set）的结果错误 restart_unconfirmed"
+  },
+  "errors.mode.save_unconfirmed": {
+    "m": "无法确认接管方式已保存。刷新后查看当前设置，必要时重新切换。",
+    "_desc": "切换接管方式（mode.set）的结果错误 save_unconfirmed"
+  },
+  "errors.mode.scope_isolated": {
+    "m": "开发实例只能使用系统代理，不能开启虚拟网卡模式。用正式安装的 Tesseract 切换。",
+    "_desc": "切换接管方式（mode.set）被拒（code not_allowed，reason scope_isolated）：custom 开发作用域不接管宿主网络，设置未保存（T-P2-H2）"
+  },
+  "errors.needs_route": {
+    "m": "当前没有可用的层级，操作无法完成。检查节点与订阅，或等层级恢复后再试。",
+    "_desc": "通用错误（code = needs_route）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.no_sources": {
+    "m": "没有启用任何节点来源。在配置里添加或启用来源后再试。",
+    "_desc": "通用错误（code = no_sources）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.nodes.core_reload_failed": {
+    "m": "节点已保存，但代理核心没能载入。重启服务后生效。",
+    "_desc": "修改或删除节点（nodes.update / nodes.delete）的结果错误 core_reload_failed"
+  },
+  "errors.nodes.reload_unconfirmed": {
+    "m": "节点已保存，但无法确认代理核心已载入。重启服务后再看。",
+    "_desc": "修改或删除节点（nodes.update / nodes.delete）的结果错误 reload_unconfirmed"
+  },
+  "errors.nodes.rollback_unconfirmed": {
+    "m": "保存失败，而且无法确认已恢复原来的节点设置。检查节点列表，必要时重新修改。",
+    "_desc": "修改或删除节点（nodes.update / nodes.delete）的结果错误 rollback_unconfirmed"
+  },
+  "errors.nodes.rolled_back": {
+    "m": "保存失败，已恢复原来的节点设置。再试一次。",
+    "_desc": "修改或删除节点（nodes.update / nodes.delete）的结果错误 rolled_back"
+  },
+  "errors.nodes.runtime_reload_failed": {
+    "m": "节点已保存，但没能载入运行中的服务。重启服务后生效。",
+    "_desc": "修改或删除节点（nodes.update / nodes.delete）的结果错误 runtime_reload_failed"
+  },
+  "errors.not_allowed": {
+    "m": "当前状态下不能执行这个操作。",
+    "_desc": "通用错误（code = not_allowed）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.not_object": {
+    "m": "界面和 Tesseract 后台的通信出了问题，这次操作没有执行。关闭并重新打开窗口后再试；反复出现时导出诊断包反馈。",
+    "_desc": "通用错误（code = not_object）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.not_running": {
+    "m": "服务没有运行。先启动服务，再执行这个操作。",
+    "_desc": "通用错误（code = not_running）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.proto_mismatch": {
+    "m": "界面与 Tesseract 后台的版本不一致，操作没有执行。重新启动 Tesseract 后再试。",
+    "_desc": "通用错误（code = proto_mismatch）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.runtime_gone": {
+    "m": "Tesseract 后台已重启，这次操作被中断。等界面重新连上后再试一次。",
+    "_desc": "通用错误（code = runtime_gone）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.runtime_listener_conflict": {
+    "m": "代理需要的端口已被其他程序占用。关闭占用该端口的程序，或在配置里换一个端口。",
+    "_desc": "通用错误（code = runtime_listener_conflict）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.runtime_listener_unavailable": {
+    "m": "无法在所需端口上开始监听。检查防火墙和安全软件的设置，或换一个端口后再试。",
+    "_desc": "通用错误（code = runtime_listener_unavailable）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.runtime_unavailable": {
+    "m": "Tesseract 后台暂时不可用。稍等几秒后再试；仍不行就重启 Tesseract。",
+    "_desc": "通用错误（code = runtime_unavailable）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.sequence_gap": {
+    "m": "界面漏收了一部分更新，正在重新同步。稍后再试。",
+    "_desc": "通用错误（code = sequence_gap）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.settings.apply_cancelled": {
+    "m": "服务已停止，这次待应用的设置没有生效。下次启动服务时按已保存的设置运行。",
+    "_desc": "延后应用的设置因服务停止被取消（runtime_settings_apply / settings.apply 的 PendingApply.error）"
+  },
+  "errors.settings.apply_failed": {
+    "m": "设置已保存，但没能生效。重新启动服务后会按新设置运行。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 apply_failed；显示在保存条或对应节"
+  },
+  "errors.settings.apply_start_failed": {
+    "m": "设置已保存，但服务没能按新设置启动。检查启动失败的原因后重新启动服务。",
+    "_desc": "延后应用时服务启动失败（runtime_settings_apply）"
+  },
+  "errors.settings.apply_superseded": {
+    "m": "这次设置已被之后保存的设置取代，以最新保存的为准。",
+    "_desc": "延后应用被更新的配置或新的服务代次取代（runtime_settings_apply）"
+  },
+  "errors.settings.apply_unavailable": {
+    "m": "设置已保存，但后台暂时无法应用。稍后重新启动服务即可生效。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 apply_unavailable；显示在保存条或对应节"
+  },
+  "errors.settings.conflict": {
+    "m": "配置已在别处被修改，这次没有保存。刷新后重新修改再保存。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 conflict；显示在保存条或对应节"
+  },
+  "errors.settings.invalid_field": {
+    "m": "这一项的值无效。按提示修改后再保存。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 invalid_field；显示在保存条或对应节"
+  },
+  "errors.settings.rule_local_only": {
+    "m": "局域网和本机地址始终直连，不能设为代理或屏蔽。",
+    "_desc": "保存分流规则被拒（routing_rules local_only）：一条规则只针对本机或局域网地址，却设成了代理或屏蔽"
+  },
+  "errors.settings.rule_reserved_host": {
+    "m": "这个地址由 Tesseract 自己使用，只能走代理。",
+    "_desc": "保存分流规则被拒（reserved_host）：规则针对 Tesseract 自己使用的地址（出口检测、规则数据下载），只能走代理。Tesseract 不译"
+  },
+  "errors.settings.rule_own_program": {
+    "m": "Tesseract 自己的程序不能设置规则。",
+    "_desc": "保存分流规则被拒（own_program）：规则针对 Tesseract 自己的程序。Tesseract 不译"
+  },
+  "errors.settings.rule_unknown_set": {
+    "m": "规则用到的规则集不存在。",
+    "_desc": "保存分流规则被拒（unknown_set）：规则用到的规则集不存在"
+  },
+  "errors.settings.rule_too_many": {
+    "m": "规则太多：最多 2000 条。",
+    "_desc": "保存分流规则被拒（too_many）：规则超过 2000 条"
+  },
+  "errors.settings.rule_set_duplicate": {
+    "m": "规则集的名称重复了。",
+    "_desc": "保存规则集被拒（duplicate）：两个规则集同名（不分大小写）"
+  },
+  "errors.settings.rule_set_url": {
+    "m": "规则集网址需以 http:// 或 https:// 开头，且不能带账号或查询参数。",
+    "_desc": "保存规则集被拒（url）：网址不是 http(s)，或带账号、查询参数"
+  },
+  "errors.settings.rule_set_in_use": {
+    "m": "还有规则在用这个规则集：先删除或修改那些规则。",
+    "_desc": "保存规则集被拒（in_use）：被删的规则集还有规则在用"
+  },
+  "errors.settings.lifecycle_busy": {
+    "m": "服务正在启动或停止，暂时不能保存。等当前过程结束后再保存。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 lifecycle_busy；显示在保存条或对应节"
+  },
+  "errors.settings.save_failed": {
+    "m": "设置没能保存。检查配置文件所在磁盘的空间和写入权限后再试。",
+    "_desc": "配置保存/应用（settings.apply）的节级错误 save_failed；显示在保存条或对应节"
+  },
+  "errors.snapshot_required": {
+    "m": "界面的数据需要先刷新，这次操作没有执行。稍等片刻，界面刷新后再试。",
+    "_desc": "通用错误（code = snapshot_required）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.source_supply_no_egress": {
+    "m": "获取节点来源时没有可用的出口。检查本机网络，或启用一个可直连的层级后再试。",
+    "_desc": "通用错误（code = source_supply_no_egress）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.start.admin_required": {
+    "m": "启动失败：虚拟网卡模式需要管理员权限。以管理员身份运行 Tesseract，或只使用系统代理。",
+    "_desc": "启动失败（PROTOCOL §14，reason admin_required）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.cleanup_pending": {
+    "m": "启动失败：上一次的网络设置还在清理。稍等片刻再启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason cleanup_pending）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.core_missing": {
+    "m": "启动失败：找不到代理核心文件。重新安装 Tesseract 后再启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason core_missing）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.core_not_running": {
+    "m": "启动失败：代理核心意外退出。重新启动服务；反复出现时导出诊断包反馈。",
+    "_desc": "启动失败（PROTOCOL §14，reason core_not_running）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.core_start_timeout": {
+    "m": "启动失败：代理核心没有按时启动。重新启动服务；仍失败时重启电脑后再试。",
+    "_desc": "启动失败（PROTOCOL §14，reason core_start_timeout）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.fallback_warmup_failed": {
+    "m": "启动失败：准备层级回退时出错。检查各层级的节点后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason fallback_warmup_failed）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.geodata_download_failed": {
+    "m": "启动失败：网站分类和 IP 归属地数据下载失败。检查网络后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason geodata_download_failed）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.geodata_missing": {
+    "m": "启动失败：缺少网站分类和 IP 归属地数据，而自动更新已关闭。打开自动更新或手动更新数据后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason geodata_missing）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.geodata_needs_route": {
+    "m": "启动失败：下载网站分类和 IP 归属地数据需要可用的出口。先确保有可用的节点，再重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason geodata_needs_route）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.insufficient_validated_nodes": {
+    "m": "启动失败：检测通过的节点不够。添加或更新节点后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason insufficient_validated_nodes）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.listener_conflict": {
+    "m": "启动失败：代理需要的端口已被其他程序占用。关闭占用端口的程序，或在配置的网络设置里换一个端口，然后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason listener_conflict）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.listener_unavailable": {
+    "m": "启动失败：无法在所需端口上监听。检查防火墙或安全软件是否拦截了 Tesseract，然后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason listener_unavailable）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.no_sources": {
+    "m": "启动失败：没有启用任何节点来源。在配置里添加或启用来源后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason no_sources）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.no_validated_nodes": {
+    "m": "启动失败：没有检测通过的节点。检查节点与订阅是否可用，然后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason no_validated_nodes）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.route_verification_failed": {
+    "m": "启动失败：无法确认流量经过所选的节点。检查节点是否可用后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason route_verification_failed）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.source_supply_no_egress": {
+    "m": "启动失败：获取节点来源时没有可用的出口。检查本机网络，或启用一个可直连的层级后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason source_supply_no_egress）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.source_supply_terminal": {
+    "m": "启动失败：节点来源无法获取。检查来源设置和网络后重新启动。",
+    "_desc": "启动失败（PROTOCOL §14，reason source_supply_terminal）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.superseded": {
+    "m": "启动已取消：收到了停止请求。",
+    "_desc": "启动失败（PROTOCOL §14，reason superseded）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.start.unexpected": {
+    "m": "启动失败：出现了意外错误。重新启动服务；反复出现时导出诊断包反馈。",
+    "_desc": "启动失败（PROTOCOL §14，reason unexpected）：总览英雄区与通知；先说问题再说办法"
+  },
+  "errors.subscriptions.apply_unconfirmed": {
+    "m": "订阅已更新，但无法确认代理核心已载入。重启服务后再看。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 apply_unconfirmed"
+  },
+  "errors.subscriptions.core_reload_failed": {
+    "m": "订阅已更新，但代理核心没能载入新节点。重启服务后生效。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 core_reload_failed"
+  },
+  "errors.subscriptions.empty_subscription": {
+    "m": "订阅返回的内容是空的。检查订阅地址是否正确、是否已过期。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 empty_subscription"
+  },
+  "errors.subscriptions.lifecycle_busy": {
+    "m": "服务正在启动或停止，暂时不能更新订阅。等当前过程结束后再更新。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 lifecycle_busy"
+  },
+  "errors.subscriptions.recovery_pending": {
+    "m": "上次的网络设置还在恢复，暂时不能更新订阅。稍后再试。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 recovery_pending"
+  },
+  "errors.subscriptions.refresh_failed": {
+    "m": "订阅更新失败。检查订阅地址和网络后再试。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 refresh_failed"
+  },
+  "errors.subscriptions.refresh_in_progress": {
+    "m": "这个订阅正在更新。等这次完成。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 refresh_in_progress"
+  },
+  "errors.subscriptions.refresh_rejected": {
+    "m": "订阅更新没有被接受。检查订阅设置后再试。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 refresh_rejected"
+  },
+  "errors.subscriptions.refresh_unconfirmed": {
+    "m": "无法确认订阅已更新。稍后刷新查看。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 refresh_unconfirmed"
+  },
+  "errors.subscriptions.unknown_item": {
+    "m": "找不到这个订阅，它可能已被删除。刷新列表后再试。",
+    "_desc": "更新订阅（subscriptions.refresh）的结果错误 unknown_item"
+  },
+  "errors.superseded": {
+    "m": "这次操作已被之后的操作取代，以最新一次的结果为准。",
+    "_desc": "通用错误（code = superseded）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.timeout": {
+    "m": "操作超时，没有在规定时间内完成。检查网络后再试。",
+    "_desc": "通用错误（code = timeout）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.unknown": {
+    "m": "出现了无法识别的错误。再试一次；反复出现时导出诊断包反馈。",
+    "_desc": "兜底：后端给出的 message_key 不在目录里时使用（架构 §3.1）"
+  },
+  "errors.update.operation_failed": {
+    "m": "更新操作失败。检查网络后重新检查更新。",
+    "_desc": "应用更新的检查、下载或安装失败（bridge_update）"
+  },
+  "errors.validation": {
+    "m": "填写的内容有误。按提示修改后再试。",
+    "_desc": "通用错误（code = validation）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
+  },
+  "errors.validation.field": {
+    "m": "这一项的值无效。按提示修改后再保存。",
+    "_desc": "字段校验失败（PROTOCOL fixture sensitive_error_detail 中出现的键）"
+  },
+  "errors.settings.alerts_endpoint_changed": {
+    "m": "发送地址改了。为了不把已保存的密钥发往新地址，这次没有保存。请重新填写或清除这个渠道的密钥、令牌和凭据请求头后再保存。",
+    "_desc": "配置保存（settings.apply）提醒渠道的字段级错误，reason_code = alerts_endpoint_changed（T-P2-H11，31b-10 的保存路径兜底）：渠道的服务器、地址、端口或加密方式与已保存的不同，而某个已保存的凭据（含凭据请求头）没有重新填写也没有清除；显示在 Error.field 指向的那一项旁边，这一节没有保存"
+  }
+}

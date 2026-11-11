@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN et proxy système ensemble",
+  "mode.mixed.label": "Proxy système + TUN",
+  "mode.mixed.short": "Les deux",
+  "mode.switch.confirm.body": "{mode, select, tun {Le service proxy va redémarrer et le trafic sera brièvement interrompu. Le mode TUN capture tout le trafic de cet ordinateur.} mixed {Le service proxy va redémarrer et le trafic sera brièvement interrompu. Le mode TUN capture tout le trafic de cet ordinateur.} other {Le service proxy va redémarrer et le trafic sera brièvement interrompu.}}",
+  "mode.switch.confirm.ok": "Basculer",
+  "mode.switch.confirm.title": "Activer « {label} » ?",
+  "mode.system.desc": "Concerne uniquement les applications qui utilisent le proxy système",
+  "mode.system.label": "Proxy système",
+  "mode.system.short": "Système",
+  "mode.tun.desc": "Capture tout le trafic via une carte réseau virtuelle (TUN)",
+  "mode.tun.label": "Mode TUN",
+  "mode.tun.short": "TUN"
+}

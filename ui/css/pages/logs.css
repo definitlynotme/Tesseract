@@ -1,0 +1,376 @@
+/* ==========================================================================
+   pages/logs.css — 运行日志
+   A fill page: the command bar, then ONE framed log panel whose head is the
+   current-run summary, whose body is the only scroller (关键事件 list or the
+   原始日志 grid, swapped in place) and whose foot is the feed status line.
+   The side reader is the library's modeless drawer, docked in the panel's body
+   (between the run summary and the status line, inside the frame).
+   原始日志 rows are divs grouped in chunks of ~64 lines with content-visibility, so a
+   long log costs layout and paint only for what is on screen (a <table> relaid out
+   every row for each new line). 关键事件 is sparse and stays a plain list.
+   ========================================================================== */
+.page-logs { --logs-gap: 12px; --logs-th: 30px; }
+@media (max-height: 760px) { .page-logs { --logs-gap: 10px; } }
+
+.logs { flex: 1 1 0; min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: var(--logs-gap); }
+
+/* ---- command bar (one 32 px line of 28 px controls) --------------------------------- */
+/* (a command bar that no longer fits, e.g. in a long language, wraps instead of being clipped) */
+.logs-bar { flex: none; flex-wrap: wrap; min-height: 32px; gap: 8px; }
+/* controls keep their size; only the search field yields width (a paused state, an active filter) */
+.logs-bar > * { flex: none; }
+.logs-bar > .spacer { flex: 1 1 0; }
+.logs-search { flex: 0 1 280px; min-width: 120px; container-type: inline-size; }
+/* a narrow field (1060 px, a filter on) keeps the query in view: the Ctrl F hint and the count
+   yield (the status line carries 「显示 N / M 条」) */
+@container (max-width: 176px) { .logs-search .search-kbd { display: none; } }
+@container (max-width: 220px) { .logs-search .search-count { display: none; } }
+.logs-filter .badge { height: 16px; min-width: 16px; padding: 0 4px; margin: 0 -3px 0 1px; }
+.logs-filter.is-on { background: var(--c-well); box-shadow: inset 0 0 0 1px var(--c-line-3); }
+.logs-filter.is-on .badge { background: var(--c-surface); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line-2); }
+.logs-filter[aria-expanded="true"] { box-shadow: inset 0 0 0 1px var(--c-line-3); background: var(--c-well); }
+
+/* follow / pause: the glyph states what is happening (following the tail ↓ / paused); hovering
+   reveals what a click does. It is not a health dot: source health lives in the status line. */
+.logs-follow { gap: 7px; padding: 0 10px 0 9px; }
+.logs-fl { position: relative; width: 15px; height: 15px; }
+.logs-fl-a, .logs-fl-b { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity .15s var(--ease-out), scale .22s var(--ease-out); }
+.logs-fl-b { opacity: 0; scale: .6; }
+.logs-follow:hover .logs-fl-a, .logs-follow:focus-visible .logs-fl-a { opacity: 0; scale: .6; }
+.logs-follow:hover .logs-fl-b, .logs-follow:focus-visible .logs-fl-b { opacity: 1; scale: 1; }
+.logs-fl .ic { width: 15px; height: 15px; }
+.logs-follow .logs-fl-a { color: var(--c-ink-2); }
+.logs-follow.is-paused, .logs-follow.is-paused:hover { color: var(--c-ink); background: var(--c-well); box-shadow: inset 0 0 0 1px var(--c-line-2); }
+.logs-follow.is-paused .logs-fl-a { color: inherit; }
+.logs-follow.is-paused:active:not(:disabled) { background: var(--c-well-2); }
+
+/* ---- the log panel: one hairline frame (drawn inset; content sits inside it), head / body / foot */
+.logs-panel {
+  position: relative; flex: 1 1 0; min-height: 0; min-width: 0; display: flex; flex-direction: column; padding: 1px;
+  background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line); border-radius: var(--r-panel); overflow: hidden;
+}
+
+/* head: the current run at a glance (本次运行 · 已运行 · 错误 / 警告; the carrying tier is the overview's and
+   the tiers page's, and 只看本次运行 is a filter in 筛选) */
+.logs-run { flex: none; display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px 0 16px; min-width: 0; white-space: nowrap; box-shadow: inset 0 -1px 0 var(--c-line); }
+.logs-run > .toolbar-sep { height: 16px; }
+.logs-run-t { flex: none; font-size: var(--fs-13); line-height: 20px; font-weight: var(--fw-semi); color: var(--c-ink); }
+.logs-run-m { min-width: 0; overflow: hidden; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+.logs-cnts { flex: none; display: flex; align-items: center; gap: 2px; }
+.logs-cnt { display: inline-flex; align-items: center; height: 26px; padding: 0 7px; margin: 0 -1px; border-radius: var(--r-ctl); --press: .95; }
+.logs-cnt:hover { background: var(--c-wash); }
+.logs-cnt:active:not(:disabled) { background: var(--c-wash-2); }
+.logs-cnt .sev, .logs-cnt-ok { font-size: var(--fs-13); line-height: 20px; gap: 6px; }
+.logs-cnt .sev::before, .logs-cnt-ok::before { width: 14px; height: 14px; }
+.logs-cn { font-weight: var(--fw-semi); }
+.logs-cnt-ok { padding: 0 6px; }
+/* L-11: the run state is not fresh (service.state stale): a quiet tag after the meta line.
+   F-02: a word in the voice (it may no longer be true), no chip */
+.logs-stale { flex: none; padding: 0; background: none; color: var(--c-voice); font-family: var(--font-voice); font-style: var(--voice-style); font-size: calc(var(--fs-12) * var(--voice-scale)); font-weight: var(--voice-weight); letter-spacing: var(--voice-track); }
+
+/* body: two scrollers stacked in one place (only one is shown) */
+.logs-body { position: relative; flex: 1 1 0; min-height: 0; }
+.logs-scroll { position: absolute; inset: 0; z-index: 1; overflow: auto; overscroll-behavior: contain; background: var(--c-surface); }
+/* the view that is not shown keeps its rendering under the shown one (content-visibility: hidden:
+   skipped, not focusable, not in the accessibility tree), so a switch re-uses it instead of styling
+   and laying out a whole list (base.css hides [hidden] with display: none !important) */
+.logs-scroll[hidden] { display: block !important; z-index: 0; content-visibility: hidden; }
+/* the level column (T-P5-04): logs.js measures the current language's widest level word
+   (--logs-lvw, all six logs.level.*) and the 原始日志 column header (--logs-lvh) in .logs-lvprobe,
+   set in the badge's font (.sev: 12 px, medium). A badge is its icon (13 px + 5 px gap) and the
+   word; a 原始日志 cell adds 10 px padding on each side. 原始日志: 62 px (two CJK characters, zh_CN
+   as designed) up to 108 px; 关键事件 (no cell padding): 50 px up to 88 px, the same 70 px of room
+   for the word (the widest real word, es_ES「Depuración」, is 65 px: a few pixels to spare for a
+   font revision). Before the first measurement (and in a page never shown) the zh_CN widths hold. */
+.logs-body {
+  --logs-lvc: clamp(62px, calc(max(var(--logs-lvw, 24px) + 18px, var(--logs-lvh, 24px)) + 20px), 108px);
+  --logs-lve: clamp(50px, calc(var(--logs-lvw, 24px) + 18px), 88px);
+  /* T-P5-13 (决定_P5裁定 P5-e #5: interface words are read whole): the 原始日志 source column is as
+     wide as the language's widest source word or its header (--logs-srcw, the same probe), 90 px as
+     designed up to 150 px (82 px from 1180 px down); the 26 px rows never wrap */
+  --logs-srcc: clamp(90px, calc(var(--logs-srcw, 50px) + 20px), 150px);
+}
+.logs-lvprobe { position: absolute; top: 0; left: 0; height: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
+.logs-lvprobe > div { width: max-content; }
+.logs-lvprobe span { display: block; font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-medium); white-space: nowrap; }
+/* T-P5-13 fix round 1: the source words in the font of their cells (regular; the header stays
+   medium, as .logs-gh): measured medium, ko_KR「알 수 없는 소스」was 84.95 px in the probe and
+   85.06 px in its row, an ellipsis of 0.06 px */
+.logs-lvprobe > div:nth-child(3) > span:not(:last-child) { font-weight: var(--fw-regular); }
+
+/* ---- 关键事件: dense 30 px rows (the log-row token), problems in full ink, information lighter */
+.logs-events { position: relative; padding: 0 6px 8px; }
+.list.logs-events .li { --cols: 60px var(--logs-lve) minmax(0, 1fr) 14px; gap: 10px; padding: 0 8px 0 12px; scroll-margin: 70px 0 8px; }
+.logs-time { font-size: var(--fs-12); line-height: 20px; color: var(--c-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.logs-main { display: flex; align-items: baseline; gap: 10px; min-width: 0; overflow: hidden; white-space: nowrap; }
+.logs-t { flex: 0 1 auto; max-width: 64%; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-ink); }
+.logs-main > .logs-fold { flex: none; align-self: center; margin: 0 -4px 0 -6px; }
+.logs-d { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-ink-2); }
+.logs-row.lv-warn .logs-t, .logs-row.lv-error .logs-t, .logs-row.lv-critical .logs-t { font-weight: var(--fw-semi); }
+.logs-row.is-dim .logs-t { color: var(--c-ink-2); }
+.logs-row.is-dim .logs-d { color: var(--c-ink-3); }
+.logs-events .li-act { color: var(--c-ink-3); }
+.logs-events .li-act .ic { width: 14px; height: 14px; }
+
+/* tier names inside a row are part of the sentence: the weight and colour of the text around
+   them, so a headline reads as one phrase and a detail line carries no extra bold. A hover
+   underline says it is a link. */
+.logs-main .logs-tt { vertical-align: baseline; color: inherit; font-weight: inherit; }
+.logs-main .logs-tt b { font-weight: inherit; }
+.logs-main .logs-tt:hover { background: none; }
+.logs-main .logs-tt:hover b { text-decoration: underline; text-decoration-color: var(--c-line-3); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+/* ×N: the count is the fold toggle (the row itself opens the reader) */
+.logs-fold { display: inline-flex; align-items: center; gap: 3px; height: 22px; padding: 0 3px 0 2px; border-radius: var(--r-xs); color: var(--c-ink-3); --press: .92; }
+.logs-fold:hover { background: var(--c-wash); color: var(--c-ink); }
+.logs-fold .fold-chev { width: 12px; height: 12px; }
+.logs-fold .badge { transition: background-color .15s var(--ease-out), color .15s var(--ease-out); }
+.logs-fold:hover .badge, .logs-fold[aria-expanded="true"] .badge { background: var(--c-surface); color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-line-2); }
+.list.logs-events .li.logs-kid { min-height: 26px; padding-left: 12px; }
+.logs-events .li.logs-kid::before { left: 101px; top: -3px; bottom: 0; }
+.logs-events .li.logs-kid.is-end::before { bottom: 50%; }
+.logs-kid-n { margin-right: 10px; font-size: var(--fs-12); color: var(--c-ink-3); }
+.logs-kid-raw { font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-medium); letter-spacing: -.01em; word-spacing: normal; color: var(--c-ink-2); }
+
+/* day groups (sticky) and run separators */
+.logs-day.list-g { justify-content: space-between; margin: 0 -6px; padding: 0 20px 0 18px; }
+.logs-day-n { font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
+.logs-sep { padding: 0 6px; margin-top: 4px; }
+.logs-sep-m { font-weight: var(--fw-regular); }
+.list-sep > span { white-space: nowrap; }
+/* T-P5-11: a run separator's words (de Fortsetzung vom Vortag · Gestartet um 21:58:00 beside the
+   reader) wrap instead of running out of the list */
+.logs-sep { height: auto; min-height: 32px; white-space: normal; }
+.logs-sep > span { white-space: normal; min-width: 0; }
+
+/* our own rows (T-P4-05c), in both views and never filtered: a gap in the live stream (L-5), the
+   restart of the backend (L-7), a source boundary of Mihomo's log (L-6). Labels, not rows. */
+.logs-gap { display: flex; align-items: center; min-height: 30px; padding: 4px 10px 4px 12px; font-size: var(--fs-12); line-height: 18px; color: var(--c-warn); }
+.logs-gap-t { display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-medium); }
+.logs-gap-t .ic { width: 14px; height: 14px; flex: none; }
+.logs-tgap { padding-left: 14px; box-shadow: inset 0 -1px 0 var(--c-line); background: var(--c-warn-tint); }
+.logs-restart { padding: 0 6px; margin-top: 4px; }
+.logs-bound { display: flex; align-items: center; gap: 10px; min-height: 26px; padding: 2px 10px 2px 12px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.logs-bound::before { content: ""; flex: none; width: 18px; height: 0; border-top: 1px dashed var(--c-line-3); }
+.logs-bound-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* T-P5-13 (决定_P5裁定 P5-e #5: interface words are read whole): a source boundary's sentence (what
+   changed, that entries may be missing here) wraps; these rows are not in a 26 px chunk */
+.logs-bound { align-items: flex-start; }
+.logs-bound::before { margin-top: 9px; }
+.logs-bound-t { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.logs-bound-time { flex: none; margin-left: auto; font-variant-numeric: tabular-nums; }
+.logs-tbound { padding-left: 14px; box-shadow: inset 0 -1px 0 var(--c-line); }
+
+/* the history boundary: where the in-memory record starts and where the rest is */
+.logs-origin { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-height: 44px; padding: 8px 10px 8px 12px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.logs-origin-t { display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-medium); color: var(--c-ink-2); }
+.logs-origin-t .ic { width: 14px; height: 14px; color: var(--c-ink-3); }
+.logs-origin .link-btn { margin-left: auto; }
+
+/* ---- 原始日志: the verbatim table, drawn as a grid of rows (the dense table's look: sticky
+   header, 26 px rows, hairlines, mono time and message) --------------------------------------- */
+.logs-grid { position: relative; min-width: 0; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink); --gcols: 78px var(--logs-lvc) var(--logs-srcc) minmax(0, 1fr); }
+.logs-gh, .logs-rrow { display: grid; grid-template-columns: var(--gcols); align-items: center; }
+.logs-gh { position: sticky; top: 0; z-index: 4; height: var(--logs-th); background: var(--c-surface); box-shadow: inset 0 -1px 0 var(--c-line-2); font-weight: var(--fw-medium); color: var(--c-ink-3); white-space: nowrap; }
+.logs-gh > span { min-width: 0; padding: 0 10px; overflow: hidden; text-overflow: ellipsis; }
+.logs-gh > :first-child, .logs-rrow > .logs-c:first-child { padding-left: 14px; }
+.logs-gb { position: relative; }
+/* chunks of ~64 lines: off-screen chunks skip layout and paint; their height is set from the row
+   count (every row is exactly 26 px, so a skipped chunk is as tall as a rendered one) */
+.logs-chunk { content-visibility: auto; }
+.logs-rrow {
+  position: relative; height: 26px; box-shadow: inset 0 -1px 0 var(--c-line); scroll-margin: 62px 0 8px;
+  transition: background-color .12s var(--ease-out);
+}
+.logs-rrow:hover { background: var(--c-hover); }
+.logs-rrow[aria-selected="true"] { background: var(--c-sel); }
+/* several rows picked (G44: Ctrl / Shift click, Ctrl A): the selection tint, in both views */
+.logs-rrow.is-picked, .list.logs-events .li.is-picked { background: var(--c-sel); }
+.logs-rrow:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -2px; }
+.logs-rrow.fold { background: var(--c-ghost-1); }
+.logs-rrow.fold:hover { background: var(--c-ghost-3); }
+.logs-rrow.fold[aria-selected="true"] { background: var(--c-sel); }
+.logs-c { min-width: 0; padding: 4px 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.logs-ctime { padding-right: 4px; text-overflow: clip; font-family: var(--font-mono); font-weight: var(--fw-medium); letter-spacing: -.01em; word-spacing: normal; color: var(--c-ink-3); font-variant-numeric: tabular-nums; }
+.logs-rrow .sev { display: flex; }
+.logs-src { color: var(--c-ink-2); }
+.logs-msg { font-family: var(--font-mono); font-weight: var(--fw-medium); letter-spacing: -.01em; word-spacing: normal; color: var(--c-ink); }
+.logs-rrow.is-dim .logs-msg, .logs-rrow.fold-kid .logs-msg { color: var(--c-ink-2); }
+.logs-rrow.fold-kid > .logs-c:first-child { padding-left: 24px; }
+.logs-more, .logs-at { font-family: var(--font-sans); font-weight: var(--fw-regular); letter-spacing: 0; color: var(--c-ink-3); word-spacing: .15em; }
+.logs-more { margin-left: 8px; }
+/* T-P5-13 (an ellipsis is for data): a verbatim line ends in its own ellipsis, the words around it
+   (第 N 行, 另有 N 行) stay whole: the cell is a row of its runs, the line gives way */
+.logs-msg:has(> .logs-rawt) { display: flex; align-items: baseline; text-overflow: clip; }
+.logs-msg > .logs-rawt { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.logs-msg > .logs-more, .logs-msg > .logs-at { flex: none; }
+.logs-at { margin-right: 8px; }
+.logs-tfold { height: 20px; gap: 5px; padding: 0 6px 0 2px; margin: -1px 0; font-family: var(--font-sans); font-size: var(--fs-12); font-weight: var(--fw-medium); letter-spacing: 0; color: var(--c-ink-2); vertical-align: middle; }
+.logs-fsum { margin-left: 8px; color: var(--c-ink-3); }
+.logs-fsum-n { font-family: var(--font-sans); font-weight: var(--fw-regular); letter-spacing: 0; word-spacing: .15em; color: var(--c-ink-2); }
+/* full-width rows: the day label (sticky under the header), the run separator, the history note */
+.logs-gb > .logs-tday { position: sticky; top: var(--logs-th); z-index: 3; }
+.logs-tday {
+  display: flex; align-items: center; justify-content: space-between; height: 28px; padding: 0 14px;
+  background: var(--c-surface); box-shadow: inset 0 -1px 0 var(--c-line); font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--c-ink-3); white-space: nowrap;
+}
+.logs-tsep { height: 32px; margin: 0; padding: 0 12px 0 8px; }
+.logs-torigin { padding-left: 14px; }
+
+/* ---- filter motion (viewMotion): arriving rows come in on an opaque ground over the rows that
+   leave (ghosts, below everything); rows that stay glide above both --------------------------- */
+.logs-ghosts { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.logs-ghosts > * { pointer-events: none; box-sizing: border-box; content-visibility: visible; }
+:is(.logs-events, .logs-gb, .logs-chunk) > .logs-in:not(.logs-day) { position: relative; z-index: 1; background-color: var(--c-surface); }
+:is(.logs-events, .logs-gb, .logs-chunk) > .logs-mv:not(.logs-day) { position: relative; z-index: 2; background-color: var(--c-surface); }
+.logs-chunk > .logs-rrow.fold:is(.logs-in, .logs-mv) { background-color: var(--c-ghost-1); }
+:is(.logs-events, .logs-chunk) > .logs-mv[aria-selected="true"] { background-color: var(--c-sel); }
+
+/* ---- search hits, row feedback ------------------------------------------------------------ */
+/* a row that just arrived (or was located) glows once: the library's .is-new (components.css) */
+.logs-hit { background: var(--c-selection); color: inherit; border-radius: var(--r-xs); box-shadow: 0 0 0 1px var(--c-selection); }
+.logs-copied {
+  position: absolute; right: 28px; top: 50%; translate: 0 -50%; z-index: 2; display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px 0 5px;
+  border-radius: var(--r-xs); background: var(--c-ok-tint); color: var(--c-ok); font-family: var(--font-sans); font-size: var(--fs-12); font-weight: var(--fw-medium); letter-spacing: 0; word-spacing: normal; pointer-events: none;
+}
+.logs-copied .ic { width: 13px; height: 13px; }
+.logs-rrow .logs-copied { right: 8px; }
+
+/* ---- 「N 条新日志 ↓」 (while paused it also says · 继续: the held count lives here alone) ------ */
+.logs-pill {
+  position: absolute; left: 50%; bottom: 14px; z-index: 5; translate: -50% 0;
+  display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px 0 13px; border-radius: var(--r-pill);
+  background: var(--c-surface); box-shadow: var(--sh-pop); font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--c-ink); white-space: nowrap;
+  transition: opacity .18s var(--ease-out), translate .26s var(--ease-out), visibility 0s, background-color .15s var(--ease-out), scale var(--spring-dur) var(--spring);
+  --press: .95;
+}
+.logs-pill .ic { width: 14px; height: 14px; margin-left: 2px; color: var(--c-ink-2); }
+.logs-pill:hover { background: var(--c-surface-hover); }
+.logs-pill.is-away { opacity: 0; translate: -50% 8px; visibility: hidden; pointer-events: none; transition: opacity .14s var(--ease-in), translate .2s var(--ease-in), visibility 0s linear .2s; }
+.logs-pill-n { font-weight: var(--fw-semi); }
+.logs-pill-go { display: none; color: var(--c-ink-2); }
+.logs-pill.is-held .logs-pill-go { display: inline; }
+
+/* ---- empty states --------------------------------------------------------------------------- */
+.logs-empty { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; padding: 16px; background: var(--c-surface); }
+/* the seed is loading (L-1): skeleton rows over the list; the widths are set here, never inline */
+.logs-skel { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; background: var(--c-surface); pointer-events: none; }
+.logs-skel .skel-row:nth-child(3n + 1) .skel-t:not(.logs-skel-end) { width: 48%; }
+.logs-skel .skel-row:nth-child(3n + 2) .skel-t:not(.logs-skel-end) { width: 36%; }
+.logs-skel .skel-row:nth-child(3n) .skel-t:not(.logs-skel-end) { width: 58%; }
+.logs-skel .logs-skel-end { width: 12%; margin-left: auto; }
+.logs-pill-cut { color: var(--c-warn); }
+.logs-pill-cut:empty { display: none; }
+
+/* ---- status line (full width: the reader stops above it) ------------------------------------- */
+.logs-foot { flex: none; display: flex; align-items: center; gap: 12px; height: 34px; padding: 0 10px 0 14px; min-width: 0; overflow: hidden; box-shadow: inset 0 1px 0 var(--c-line); font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); white-space: nowrap; }
+.logs-feed { display: inline-flex; align-items: center; gap: 6px; min-width: 0; color: var(--c-ink-2); }
+.logs-feed > * { flex: none; }
+.logs-feed .sdot { width: 6px; height: 6px; }
+.logs-feed-s { color: var(--c-ink-3); }
+.logs-feed-s.is-off { color: var(--c-ink-2); }
+.logs-feed > .logs-feed-r { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--c-ink-3); }
+.logs-feed-r::before { content: "·"; margin-right: 6px; }
+.logs-foot-sep { flex: none; width: 1px; height: 12px; background: var(--c-line-2); }
+/* T-P5-11: the status line wraps at every width (it did below 1060 px only): fr Mihomo non démarré ·
+   la collecte commence au démarrage du service and the update time no longer run out of their place */
+.logs-foot { flex-wrap: wrap; row-gap: 2px; height: auto; min-height: 34px; padding-top: 8px; padding-bottom: 8px; }
+.logs-feed { flex-wrap: wrap; }
+.logs-upd { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.logs-upd .tnum { color: var(--c-ink-2); }
+.logs-total b { font-weight: var(--fw-medium); color: var(--c-ink); }
+/* F-02: the footer's tags are marks (no chip): 调试 in ink-2, the dropped count bold umber */
+.logs-debug, .logs-drop { padding: 0; background: none; font-family: var(--font-sans); letter-spacing: var(--track-mark); }
+.logs-debug { color: var(--c-ink-2); }
+.logs-drop { color: var(--c-warn); font-weight: var(--fw-semi); }
+
+/* ---- the reader (T.drawer, modeless), docked: square, a left hairline, no float shadow ------ */
+.drawer.logs-reader .ovl-head { min-height: 52px; padding-top: 10px; padding-bottom: 10px; }
+.drawer.logs-reader .ovl-body { padding-top: 14px; }
+.drawer.logs-reader .ovl-foot { padding-top: 10px; padding-bottom: 10px; }
+.logs-rd-sev { margin-right: 4px; }
+.logs-rd { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.logs-rd-d { font-size: var(--fs-13); line-height: 21px; color: var(--c-ink-2); }
+.logs-mute { color: var(--c-ink-3); }
+.logs-fix .callout-body > span { display: block; }
+.logs-fix-go { margin: 4px 0 -2px -6px; padding-left: 6px; }
+.logs-rd-kv > div { padding-top: 7px; padding-bottom: 7px; }
+.logs-rd-kv .chip { margin: -1px 0; }
+.logs-kv-sp { display: inline-block; width: 6px; }
+.logs-rd-hosts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.logs-rd-hosts > span { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.logs-rd-hosts .tech { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.logs-rd-hn { flex: none; color: var(--c-ink-3); font-variant-numeric: tabular-nums; }
+.logs-rd-sh { min-height: 28px; margin-bottom: -6px; }
+.logs-rd-sh .sh-a { gap: 2px; }
+.logs-rd [data-wrap][aria-pressed="true"] { color: var(--c-ink); background: var(--c-well); }
+/* 复制原文 sits near the drawer's right edge: its ✓ 已复制 opens to the left, over the empty
+   middle of the head. The idle clip keeps the face's right 28 px whatever the label's width. */
+.logs-copy-l .copy-face { left: auto; right: 0; justify-content: flex-end; padding: 0 6px 0 0; clip-path: inset(0 0 0 calc(100% - 28px) round 14px); }
+.logs-copy-l .copy-face .ic-b { order: 0; }
+.logs-copy-l .copy-lab { order: 1; }
+.logs-copy-l .copy-face .ic-a { order: 2; }
+.logs-copy-l.is-done .copy-face { justify-content: center; padding: 0; clip-path: inset(0 0 0 0 round 14px); }
+.logs-raw {
+  margin: 0; padding: 10px 12px; border-radius: var(--r-md); background: var(--c-well); max-height: 300px; overflow: auto;
+  font-family: var(--font-mono); font-size: var(--fs-12); font-weight: var(--fw-medium); line-height: 19px; letter-spacing: -.01em; color: var(--c-ink); white-space: pre;
+}
+.logs-raw.is-wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+.logs-rd-more { align-self: flex-start; margin: -2px 0 -4px -8px; padding-left: 8px; }
+.logs-rd-more .ic { transition: rotate .22s var(--ease-out); }
+.logs-rd-more:hover .ic { translate: 0 0; }
+.logs-rd-more[aria-expanded="true"] .ic { rotate: 180deg; }
+.logs-rd-diag .kv dd { font-size: var(--fs-12); }
+/* the reader's splitter (对等台账 #181): its left edge, dragged to resize (the width is remembered) */
+.logs-rd-grip { position: absolute; left: -3px; top: 0; bottom: 0; z-index: 3; width: 7px; cursor: col-resize; touch-action: none; }
+.logs-rd-grip::after { content: ""; position: absolute; left: 3px; top: 0; bottom: 0; width: 1px; background: transparent; transition: background-color .15s var(--ease-out); }
+.logs-rd-grip:hover::after, .logs-rd-grip.is-drag::after, .logs-rd-grip:focus-visible::after { background: var(--c-accent); }
+.logs-rd-grip:focus-visible { outline: none; }
+
+/* ---- popovers: filters and the saved diagnostic bundle -------------------------------------- */
+.logs-flt { display: flex; flex-direction: column; gap: 14px; }
+.logs-flt-h { margin-bottom: 8px; font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-medium); color: var(--c-ink-3); }
+.logs-flt-foot { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 10px; box-shadow: inset 0 1px 0 var(--c-line); }
+.logs-flt .link-btn:disabled { color: var(--c-ink-4); background: none; }
+.logs-exp { display: flex; flex-direction: column; gap: 12px; }
+.logs-exp-file { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.logs-exp-ic { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--r-md); background: var(--c-well); color: var(--c-ink-2); }
+.logs-exp-ic .ic { width: 18px; height: 18px; }
+.logs-exp-fn { min-width: 0; }
+.logs-exp-title { font-size: var(--fs-13); font-weight: var(--fw-semi); line-height: 18px; color: var(--c-ink); }
+.logs-exp-meta { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.logs-exp-list { display: flex; flex-direction: column; gap: 2px; }
+.logs-exp-list li { display: flex; align-items: center; gap: 7px; font-size: var(--fs-12); line-height: 20px; color: var(--c-ink-2); }
+.logs-exp-list .ic { width: 13px; height: 13px; color: var(--c-ok); }
+.logs-exp-fname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-weight: var(--fw-medium); letter-spacing: -.01em; }
+.logs-exp-more { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.logs-exp-act { display: flex; gap: 6px; }
+
+/* ---- sidebar badge: something needs a look (errors and route changes only) ---------------- */
+.logs-navbadge {
+  display: inline-flex; align-items: center; gap: 3px; height: 18px; padding: 0 6px 0 4px; margin-left: -4px; border-radius: var(--r-pill);
+  font-size: 11px; font-weight: var(--fw-semi); line-height: 1; font-variant-numeric: tabular-nums;
+}
+.logs-navbadge::before { content: ""; width: 11px; height: 11px; background: currentColor; -webkit-mask: var(--m-oct) center / contain no-repeat; mask: var(--m-oct) center / contain no-repeat; }
+/* F-02: the count on the well, its glyph and digits in the level's muted hue (no tint) */
+.logs-navbadge.is-err { background: var(--c-well); color: var(--c-err); }
+.logs-navbadge.is-warn { background: var(--c-well); color: var(--c-warn); }
+.logs-navbadge.is-warn::before { -webkit-mask-image: var(--m-tri); mask-image: var(--m-tri); }
+
+/* ---- narrower windows ---------------------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .logs-body { --logs-lve: clamp(48px, calc(var(--logs-lvw, 24px) + 18px), 88px); }
+  .list.logs-events .li { --cols: 58px var(--logs-lve) minmax(0, 1fr) 14px; }
+  .logs-body { --logs-srcc: clamp(82px, calc(var(--logs-srcw, 50px) + 20px), 150px); }
+  .logs-grid { --gcols: 78px var(--logs-lvc) var(--logs-srcc) minmax(0, 1fr); }
+  /* with the reader open the message keeps the width: 来源 folds away (the reader names it) */
+  .logs-panel.has-reader .logs-grid { --gcols: 78px var(--logs-lvc) 0 minmax(0, 1fr); }
+  .logs-panel.has-reader .logs-grid :is(.logs-gh, .logs-rrow) > :nth-child(3) { padding: 0; visibility: hidden; }
+}
+/* narrow fallback (< 1060 px, web builds only): the bars wrap instead of clipping */
+@media (max-width: 1059px) {
+  .logs-bar { flex-wrap: wrap; }
+  .logs-panel { min-height: 420px; }
+  .logs-run { flex-wrap: wrap; row-gap: 4px; height: auto; min-height: 44px; padding-top: 6px; padding-bottom: 6px; white-space: normal; }
+  .logs-foot { flex-wrap: wrap; row-gap: 2px; height: auto; min-height: 34px; padding-top: 8px; padding-bottom: 8px; }
+}

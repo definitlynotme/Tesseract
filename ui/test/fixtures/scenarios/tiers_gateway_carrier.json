@@ -1,0 +1,3108 @@
+{
+ "name": "tiers_gateway_carrier",
+ "desc": "T-P4-H2 (05a review 1 S2, 8th-wave ruling item 4): tiers_running with Gateway chosen, in the runtime shape: FINAL-EXIT -> EXIT-SELECT -> osa02-exit, route.published.managed_tier gateway, tiers.summary.carrier gateway (order gateway first, fallback false; degraded: the Gateway tier has an unusable node), gateway.current.effective = the route leaf. The fallback tier under the Gateway (its dialer-proxy PROXY-FALLBACK) is not reported, so no fallback tier row is current.",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "nodes.diagnose",
+      "nodes.cancelDiagnose",
+      "nodes.update",
+      "nodes.delete",
+      "nodes.reveal",
+      "subscriptions.refresh",
+      "import.preview",
+      "import.apply",
+      "gateway.select",
+      "settings.apply",
+      "config.snapshot",
+      "nodes.detail",
+      "import.specs"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "nodes.list",
+      "subscriptions.list",
+      "config.items",
+      "gateway.current",
+      "bastion.pool",
+      "core.info",
+      "jobs"
+     ],
+     "features": [
+      "B-01",
+      "B-03",
+      "B-04",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08",
+      "B-09",
+      "B-10",
+      "B-11",
+      "B-12",
+      "B-13",
+      "B-14",
+      "B-15",
+      "B-16",
+      "B-17",
+      "B-18",
+      "B-37"
+     ]
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": true,
+      "startup_phase": "running",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": true,
+      "pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": 120
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "route.published",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "publication_revision": 20,
+     "owner": {
+      "process_pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "selected_chain": [
+      "FINAL-EXIT",
+      "EXIT-SELECT",
+      "osa02-exit"
+     ],
+     "leaf": "osa02-exit",
+     "managed_tier": "gateway",
+     "observed_at_ms": 1790000000000,
+     "valid": true,
+     "invalid_reason": null,
+     "fail_closed_confirmed": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "gateway",
+     "offline_reason": null,
+     "order": [
+      "gateway",
+      "vanguard",
+      "sentinel",
+      "bastion"
+     ],
+     "degraded": true,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 4,
+       "usable": 2,
+       "check_interval_s": 30
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 6,
+       "usable": 3,
+       "check_interval_s": 60
+      },
+      "bastion": {
+       "enabled": true,
+       "total": 5,
+       "usable": 3,
+       "check_interval_s": 120
+      },
+      "gateway": {
+       "enabled": true,
+       "total": 3,
+       "usable": 2,
+       "check_interval_s": 60
+      }
+     },
+     "pool": {
+      "usable": 3,
+      "total": 5
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "hysteria2",
+       "latency_ms": 42,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654383000
+      },
+      {
+       "id": "v-tyo01",
+       "name": "tyo01-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless_reality",
+       "latency_ms": 388,
+       "subscription_id": null,
+       "slow": true,
+       "last_checked_at_ms": 1790654375000
+      },
+      {
+       "id": "v-sg02",
+       "name": "sg02-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "tls_failed",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654391000
+      },
+      {
+       "id": "v-new01",
+       "name": "new01-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "pending",
+       "reason_code": null,
+       "protocol": "naive",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": null
+      },
+      {
+       "id": "v-old",
+       "name": "old-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": false,
+       "status": "disabled",
+       "reason_code": "disabled",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": null
+      }
+     ]
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "s-fra04",
+       "name": "fra04-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vmess",
+       "latency_ms": 120,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-sel01",
+       "name": "sel01-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 96,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-osa03",
+       "name": "osa03-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "connection_timeout",
+       "protocol": "shadowsocks",
+       "latency_ms": null,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-lax02",
+       "name": "lax02-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "pending",
+       "reason_code": "subscription_recheck_pending",
+       "protocol": "vmess",
+       "latency_ms": null,
+       "subscription_id": "sub-aurora",
+       "slow": false,
+       "last_checked_at_ms": null
+      },
+      {
+       "id": "s-sin01",
+       "name": "sin01-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 210,
+       "subscription_id": "sub-aurora",
+       "slow": false,
+       "last_checked_at_ms": 1790654350000
+      },
+      {
+       "id": "s-solo",
+       "name": "solo-node",
+       "tier": "sentinel",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "anytls",
+       "latency_ms": 160,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654360000
+      }
+     ]
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "b-p1",
+       "name": "pool-a1",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "shadowsocks",
+       "latency_ms": 140,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-p2",
+       "name": "pool-a2",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vmess",
+       "latency_ms": 310,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-p3",
+       "name": "pool-a3",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "connection_refused",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-u1",
+       "name": "my-emergency",
+       "tier": "bastion",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 220,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-s1",
+       "name": "src-node-1",
+       "tier": "bastion",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "shadowsocks",
+       "latency_ms": 260,
+       "subscription_id": "sub-mysrc",
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      }
+     ]
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless_reality",
+       "latency_ms": 64,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      },
+      {
+       "id": "g-tyo01",
+       "name": "tyo01-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 81,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      },
+      {
+       "id": "g-sel03",
+       "name": "sel03-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "dns_resolution_failed",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      }
+     ]
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-nebula",
+       "name": "nebula",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "nebula.example.com",
+       "total": 3,
+       "healthy": 2,
+       "visibility": "current",
+       "refreshing": false,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-aurora",
+       "name": "aurora",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "aurora.example.com",
+       "total": 2,
+       "healthy": 1,
+       "visibility": "pending",
+       "refreshing": false,
+       "recheck": {
+        "done": 1,
+        "total": 2
+       },
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-orion",
+       "name": "orion",
+       "tier": "sentinel",
+       "enabled": false,
+       "display": "orion.example.com",
+       "total": 4,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-vega",
+       "name": "vega",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "vega.example.com",
+       "total": 5,
+       "healthy": 4,
+       "visibility": "previous",
+       "refreshing": true,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-lyra",
+       "name": "lyra",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "lyra.example.com",
+       "total": 0,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": null
+      }
+     ]
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-mysrc",
+       "name": "my-source",
+       "tier": "bastion",
+       "enabled": true,
+       "display": "my-source.example.com",
+       "total": 1,
+       "healthy": 1,
+       "visibility": "current",
+       "refreshing": false
+      }
+     ]
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-exits",
+       "name": "exit-feed",
+       "tier": "gateway",
+       "enabled": true,
+       "display": "exit-feed.example.com",
+       "total": 0,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": null
+      }
+     ]
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "config.items",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-tyo01",
+       "name": "tyo01-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-sg02",
+       "name": "sg02-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-new01",
+       "name": "new01-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-old",
+       "name": "old-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-draft2",
+       "name": "draft-two",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "s-solo",
+       "name": "solo-node",
+       "kind": "node",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "b-u1",
+       "name": "my-emergency",
+       "kind": "node",
+       "section": "bastion",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-tyo01",
+       "name": "tyo01-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-sel03",
+       "name": "sel03-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-gdraft",
+       "name": "exit-draft",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "sub-nebula",
+       "name": "nebula",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-aurora",
+       "name": "aurora",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-orion",
+       "name": "orion",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "sub-vega",
+       "name": "vega",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-lyra",
+       "name": "lyra",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-mysrc",
+       "name": "my-source",
+       "kind": "subscription",
+       "section": "bastion",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-exits",
+       "name": "exit-feed",
+       "kind": "subscription",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "selected": "osa02-exit",
+     "effective": "osa02-exit",
+     "missing": false,
+     "applied": true,
+     "pending": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "bastion.pool",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "runtime_alive": 2,
+     "user_alive": 1,
+     "capacity": 60,
+     "min_alive_nodes": 3,
+     "target_alive": 24,
+     "collecting": false,
+     "observed_at_ms": 1790000000000
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "core.info",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "running": true,
+     "pid": 7654,
+     "version": "1.19.27",
+     "generation": 8,
+     "cleanup_pending": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:language",
+    "language": "zh_CN",
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:visibility",
+    "visible": true,
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "v-hk03"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "hysteria2",
+       "latency_ms": 42,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654383000
+      },
+      "config_item": {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      "last_diagnostic": {
+       "request_id": "diag-prev",
+       "mode": "direct",
+       "state": "ok",
+       "latency_ms": 44,
+       "reason_code": null,
+       "status_applied": true,
+       "cleanup_pending": false
+      },
+      "check_interval_s": 30,
+      "endpoint": {
+       "host_masked": "h•••.net",
+       "port": 443
+      },
+      "protocols": [
+       {
+        "name": "hysteria2",
+        "port": 443,
+        "node_id": "v-hk03"
+       },
+       {
+        "name": "vless_reality",
+        "port": 8443,
+        "node_id": "v-hk03-r"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "g-osa02"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless_reality",
+       "latency_ms": 64,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      },
+      "config_item": {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      "last_diagnostic": null,
+      "check_interval_s": 30,
+      "endpoint": {
+       "host_masked": "o•••.net",
+       "port": 443
+      }
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "s-fra04"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "s-fra04",
+       "name": "fra04-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vmess",
+       "latency_ms": 120,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      "config_item": null,
+      "last_diagnostic": null,
+      "check_interval_s": 30
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "b-p1"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "b-p1",
+       "name": "pool-a1",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "shadowsocks",
+       "latency_ms": 140,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      "config_item": null,
+      "last_diagnostic": null,
+      "check_interval_s": 30
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "v-old"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "v-old",
+       "name": "old-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": false,
+       "status": "disabled",
+       "reason_code": "disabled",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": null
+      },
+      "config_item": {
+       "id": "cfg-old",
+       "name": "old-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": false,
+       "secret_set": true
+      },
+      "last_diagnostic": null,
+      "check_interval_s": 30,
+      "endpoint": {
+       "host_masked": "h•••.net",
+       "port": 443
+      }
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "import.specs"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "import.specs",
+     "ok": true,
+     "data": {
+      "protocols": [
+       {
+        "id": "vless_reality",
+        "label_id": "catalog.vless_reality",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.vless_reality.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.vless_reality.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.vless_reality.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.vless_reality.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "identity",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "uuid",
+          "label_id": "catalog.vless_reality.uuid",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "identity",
+           "advanced": false
+          }
+         },
+         {
+          "id": "network",
+          "label_id": "catalog.vless_reality.network",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "tcp",
+           "ws",
+           "grpc",
+           "h2"
+          ],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "implicit_default": "tcp"
+          }
+         },
+         {
+          "id": "encryption",
+          "label_id": "catalog.vless_reality.encryption",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false
+          }
+         },
+         {
+          "id": "security",
+          "label_id": "catalog.vless_reality.security",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "reality",
+           "tls",
+           "none"
+          ],
+          "conditions": {
+           "group": "security",
+           "advanced": false,
+           "implicit_default": "reality"
+          }
+         },
+         {
+          "id": "flow",
+          "label_id": "catalog.vless_reality.flow",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "public_key",
+          "label_id": "catalog.vless_reality.public_key",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "reality",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "reality"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "short_id",
+          "label_id": "catalog.vless_reality.short_id",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "reality",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "reality"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.vless_reality.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "security",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls",
+              "reality"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls",
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "fingerprint",
+          "label_id": "catalog.vless_reality.fingerprint",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls",
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.vless_reality.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls",
+              "reality"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "host",
+          "label_id": "catalog.vless_reality.host",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "path",
+          "label_id": "catalog.vless_reality.path",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "grpc_service_name",
+          "label_id": "catalog.vless_reality.grpc_service_name",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "grpc"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "grpc"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       },
+       {
+        "id": "vmess",
+        "label_id": "catalog.vmess",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.vmess.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.vmess.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.vmess.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.vmess.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "identity",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "uuid",
+          "label_id": "catalog.vmess.uuid",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "identity",
+           "advanced": false
+          }
+         },
+         {
+          "id": "alter_id",
+          "label_id": "catalog.vmess.alter_id",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "vmess_advanced",
+           "advanced": true,
+           "min": 0,
+           "max": 2147483647
+          }
+         },
+         {
+          "id": "scy",
+          "label_id": "catalog.vmess.scy",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "vmess_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "network",
+          "label_id": "catalog.vmess.network",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "ws",
+           "grpc",
+           "h2",
+           "tcp"
+          ],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "implicit_default": "ws"
+          }
+         },
+         {
+          "id": "security",
+          "label_id": "catalog.vmess.security",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "tls",
+           "none"
+          ],
+          "conditions": {
+           "group": "tls",
+           "advanced": false,
+           "implicit_default": "tls"
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.vmess.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "host",
+          "label_id": "catalog.vmess.host",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "path",
+          "label_id": "catalog.vmess.path",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws",
+              "h2"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "fingerprint",
+          "label_id": "catalog.vmess.fingerprint",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "vmess_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.vmess.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "vmess_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "grpc_service_name",
+          "label_id": "catalog.vmess.grpc_service_name",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "grpc"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "grpc"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       },
+       {
+        "id": "trojan",
+        "label_id": "catalog.trojan",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.trojan.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.trojan.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.trojan.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.trojan.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.trojan.password",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false
+          }
+         },
+         {
+          "id": "network",
+          "label_id": "catalog.trojan.network",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "tcp",
+           "ws"
+          ],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "implicit_default": "tcp"
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.trojan.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls",
+           "advanced": false
+          }
+         },
+         {
+          "id": "host",
+          "label_id": "catalog.trojan.host",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "path",
+          "label_id": "catalog.trojan.path",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "transport",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "network",
+             "values": [
+              "ws"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "fingerprint",
+          "label_id": "catalog.trojan.fingerprint",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.trojan.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "skip_cert_verify",
+          "label_id": "catalog.trojan.skip_cert_verify",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "ss",
+        "label_id": "catalog.ss",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.ss.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.ss.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.ss.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.ss.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "cipher",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.ss.password",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "cipher",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "method",
+             "excluded_values": [
+              "none"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "method",
+             "excluded_values": [
+              "none"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "method",
+          "label_id": "catalog.ss.method",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "aes-256-gcm",
+           "aes-128-ctr",
+           "aes-192-ctr",
+           "aes-256-ctr",
+           "aes-128-cfb",
+           "aes-192-cfb",
+           "aes-256-cfb",
+           "aes-128-gcm",
+           "aes-192-gcm",
+           "aes-128-ccm",
+           "aes-192-ccm",
+           "aes-256-ccm",
+           "aes-128-gcm-siv",
+           "aes-256-gcm-siv",
+           "chacha20-ietf",
+           "chacha20",
+           "xchacha20",
+           "chacha20-ietf-poly1305",
+           "xchacha20-ietf-poly1305",
+           "chacha8-ietf-poly1305",
+           "xchacha8-ietf-poly1305",
+           "2022-blake3-aes-128-gcm",
+           "2022-blake3-aes-256-gcm",
+           "2022-blake3-chacha20-poly1305",
+           "lea-128-gcm",
+           "lea-192-gcm",
+           "lea-256-gcm",
+           "rabbit128-poly1305",
+           "aegis-128l",
+           "aegis-256",
+           "aez-384",
+           "deoxys-ii-256-128",
+           "rc4-md5",
+           "none"
+          ],
+          "conditions": {
+           "group": "cipher",
+           "advanced": false,
+           "implicit_default": "aes-256-gcm",
+           "notices": [
+            {
+             "code": "ss_none_unencrypted",
+             "visible_when": [
+              {
+               "field": "method",
+               "values": [
+                "none"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       },
+       {
+        "id": "anytls",
+        "label_id": "catalog.anytls",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.anytls.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.anytls.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.anytls.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.anytls.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.anytls.password",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.anytls.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.anytls.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "fingerprint",
+          "label_id": "catalog.anytls.fingerprint",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "skip_cert_verify",
+          "label_id": "catalog.anytls.skip_cert_verify",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "naive",
+        "label_id": "catalog.naive",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.naive.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.naive.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.naive.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.naive.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "username",
+          "label_id": "catalog.naive.username",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.naive.password",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false
+          }
+         },
+         {
+          "id": "security",
+          "label_id": "catalog.naive.security",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "tls",
+           "none"
+          ],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "implicit_default": "tls"
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.naive.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       },
+       {
+        "id": "socks5",
+        "label_id": "catalog.socks5",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.socks5.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.socks5.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.socks5.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.socks5.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "username",
+          "label_id": "catalog.socks5.username",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false,
+           "required_when": [
+            {
+             "field": "password",
+             "present": true
+            }
+           ]
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.socks5.password",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false,
+           "required_when": [
+            {
+             "field": "username",
+             "present": true
+            }
+           ]
+          }
+         }
+        ]
+       },
+       {
+        "id": "hysteria2",
+        "label_id": "catalog.hysteria2",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.hysteria2.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.hysteria2.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.hysteria2.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.hysteria2.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.hysteria2.password",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.hysteria2.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false
+          }
+         },
+         {
+          "id": "obfs",
+          "label_id": "catalog.hysteria2.obfs",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "obfuscation",
+           "advanced": true
+          }
+         },
+         {
+          "id": "obfs_password",
+          "label_id": "catalog.hysteria2.obfs_password",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "obfuscation",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "obfs",
+             "present": true
+            }
+           ],
+           "required_when": [
+            {
+             "field": "obfs",
+             "present": true
+            }
+           ]
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.hysteria2.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "skip_cert_verify",
+          "label_id": "catalog.hysteria2.skip_cert_verify",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "tuic",
+        "label_id": "catalog.tuic",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.tuic.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.tuic.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.tuic.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.tuic.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "uuid",
+          "label_id": "catalog.tuic.uuid",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.tuic.password",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "authentication",
+           "advanced": false
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.tuic.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "connection",
+           "advanced": false
+          }
+         },
+         {
+          "id": "alpn",
+          "label_id": "catalog.tuic.alpn",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "quic_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "udp_relay_mode",
+          "label_id": "catalog.tuic.udp_relay_mode",
+          "type": "choice",
+          "required": false,
+          "choices": [
+           "native",
+           "quic"
+          ],
+          "conditions": {
+           "group": "quic_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "congestion_control",
+          "label_id": "catalog.tuic.congestion_control",
+          "type": "choice",
+          "required": false,
+          "choices": [
+           "bbr",
+           "cubic",
+           "new_reno"
+          ],
+          "conditions": {
+           "group": "quic_advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "skip_cert_verify",
+          "label_id": "catalog.tuic.skip_cert_verify",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "quic_advanced",
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "wireguard",
+        "label_id": "catalog.wireguard",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.wireguard.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard",
+           "sentinel",
+           "bastion",
+           "gateway"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": true
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.wireguard.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.wireguard.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.wireguard.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "endpoint",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "private_key",
+          "label_id": "catalog.wireguard.private_key",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "keys",
+           "advanced": false
+          }
+         },
+         {
+          "id": "public_key",
+          "label_id": "catalog.wireguard.public_key",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "keys",
+           "advanced": false
+          }
+         },
+         {
+          "id": "local_address",
+          "label_id": "catalog.wireguard.local_address",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "tunnel",
+           "advanced": false
+          }
+         },
+         {
+          "id": "allowed_ips",
+          "label_id": "catalog.wireguard.allowed_ips",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "routing",
+           "advanced": true
+          }
+         },
+         {
+          "id": "reserved",
+          "label_id": "catalog.wireguard.reserved",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "advanced",
+           "advanced": true
+          }
+         },
+         {
+          "id": "mtu",
+          "label_id": "catalog.wireguard.mtu",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "advanced",
+           "advanced": true,
+           "min": 576,
+           "max": 65535
+          }
+         }
+        ]
+       },
+       {
+        "id": "argo_xhttp",
+        "label_id": "catalog.argo_xhttp",
+        "fields": [
+         {
+          "id": "tier",
+          "label_id": "catalog.argo_xhttp.tier",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "vanguard"
+          ],
+          "conditions": {
+           "scope": "protocol",
+           "advanced": false,
+           "chain_allowed": false
+          }
+         },
+         {
+          "id": "name",
+          "label_id": "catalog.argo_xhttp.name",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.argo_xhttp.server",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "base",
+           "advanced": false
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.argo_xhttp.port",
+          "type": "integer",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "local_listener",
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "uuid",
+          "label_id": "catalog.argo_xhttp.uuid",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "identity",
+           "advanced": false
+          }
+         },
+         {
+          "id": "security",
+          "label_id": "catalog.argo_xhttp.security",
+          "type": "choice",
+          "required": true,
+          "choices": [
+           "tls",
+           "none"
+          ],
+          "conditions": {
+           "group": "tls",
+           "advanced": false,
+           "implicit_default": "tls"
+          }
+         },
+         {
+          "id": "sni",
+          "label_id": "catalog.argo_xhttp.sni",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls",
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "host",
+          "label_id": "catalog.argo_xhttp.host",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "upstream",
+           "advanced": false
+          }
+         },
+         {
+          "id": "path",
+          "label_id": "catalog.argo_xhttp.path",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "group": "upstream",
+           "advanced": false
+          }
+         },
+         {
+          "id": "fingerprint",
+          "label_id": "catalog.argo_xhttp.fingerprint",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "group": "tls_advanced",
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "security",
+             "values": [
+              "tls"
+             ]
+            }
+           ]
+          }
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

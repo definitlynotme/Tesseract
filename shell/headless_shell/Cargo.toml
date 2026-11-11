@@ -1,0 +1,8 @@
+[package]
+name = "headless_shell"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bridge_host = { path = "../bridge_host" }
+serde_json = "1.0.151"

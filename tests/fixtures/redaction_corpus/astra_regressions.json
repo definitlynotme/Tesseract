@@ -1,0 +1,352 @@
+[
+  {
+    "kind": "path-raw-nora",
+    "input": "C:\\\u0055sers\\nora\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "Users",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-unc-nora",
+    "input": "\\\\synthetic-host\\Users\\nora\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "synthetic-host",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-json-escaped-text-nora",
+    "input": "C:\\\\\u0055sers\\\\nora\\\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-json-value-nora",
+    "input": "{\"path\": \"C:\\\\\u0055sers\\\\nora\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "nora",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-unc-json-value-nora",
+    "input": "{\"path\": \"\\\\\\\\synthetic-host\\\\Users\\\\nora\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "nora",
+      "synthetic-host"
+    ]
+  },
+  {
+    "kind": "path-raw-bruce",
+    "input": "C:\\\u0055sers\\bruce\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "bruce",
+      "Users",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-unc-bruce",
+    "input": "\\\\synthetic-host\\Users\\bruce\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "bruce",
+      "synthetic-host",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-json-escaped-text-bruce",
+    "input": "C:\\\\\u0055sers\\\\bruce\\\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "bruce",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-json-value-bruce",
+    "input": "{\"path\": \"C:\\\\\u0055sers\\\\bruce\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "bruce",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-unc-json-value-bruce",
+    "input": "{\"path\": \"\\\\\\\\synthetic-host\\\\Users\\\\bruce\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "bruce",
+      "synthetic-host"
+    ]
+  },
+  {
+    "kind": "path-raw-tessa",
+    "input": "C:\\\u0055sers\\tessa\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "tessa",
+      "Users",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-unc-tessa",
+    "input": "\\\\synthetic-host\\Users\\tessa\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "tessa",
+      "synthetic-host",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-json-escaped-text-tessa",
+    "input": "C:\\\\\u0055sers\\\\tessa\\\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "tessa",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-json-value-tessa",
+    "input": "{\"path\": \"C:\\\\\u0055sers\\\\tessa\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "tessa",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-unc-json-value-tessa",
+    "input": "{\"path\": \"\\\\\\\\synthetic-host\\\\Users\\\\tessa\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "tessa",
+      "synthetic-host"
+    ]
+  },
+  {
+    "kind": "path-raw-riley",
+    "input": "C:\\\u0055sers\\riley\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "riley",
+      "Users",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-unc-riley",
+    "input": "\\\\synthetic-host\\Users\\riley\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "riley",
+      "synthetic-host",
+      "config.yaml"
+    ]
+  },
+  {
+    "kind": "path-json-escaped-text-riley",
+    "input": "C:\\\\\u0055sers\\\\riley\\\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "riley",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-json-value-riley",
+    "input": "{\"path\": \"C:\\\\\u0055sers\\\\riley\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "riley",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-unc-json-value-riley",
+    "input": "{\"path\": \"\\\\\\\\synthetic-host\\\\Users\\\\riley\\\\config.yaml\"}",
+    "expected": "{\"path\":\"[USER_PATH]\"}",
+    "absent": [
+      "riley",
+      "synthetic-host"
+    ]
+  },
+  {
+    "kind": "path-percent",
+    "input": "C%3A%5CUsers%5Cnora%5Cconfig.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-unicode",
+    "input": "C:\\u005cUsers\\u005cnora\\u005cconfig.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-mixed-unicode-control",
+    "input": "C:\\u005cUsers\\nora\\config.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "nora",
+      "Users"
+    ]
+  },
+  {
+    "kind": "path-percent-unc",
+    "input": "%5C%5Csynthetic-host%5CUsers%5Ctessa%5Cconfig.yaml",
+    "expected": "[USER_PATH]",
+    "absent": [
+      "tessa",
+      "synthetic-host"
+    ]
+  },
+  {
+    "kind": "json-key-url",
+    "input": "{\"https://example.invalid/sub?token=synthetic\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "https://example.invalid/sub?token=synthetic",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-url",
+    "input": "{\"outer\": [{\"https://example.invalid/sub?token=synthetic\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "https://example.invalid/sub?token=synthetic",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-proxy",
+    "input": "{\"socks5://synthetic:password@192.0.2.1:1080\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "socks5://synthetic:password@192.0.2.1:1080",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-proxy",
+    "input": "{\"outer\": [{\"socks5://synthetic:password@192.0.2.1:1080\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "socks5://synthetic:password@192.0.2.1:1080",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-path",
+    "input": "{\"C:\\\\\u0055sers\\\\nora\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "C:\\\u0055sers\\nora\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-path",
+    "input": "{\"outer\": [{\"C:\\\\\u0055sers\\\\nora\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "C:\\\u0055sers\\nora\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-unc",
+    "input": "{\"\\\\\\\\synthetic-host\\\\Users\\\\bruce\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "\\\\synthetic-host\\Users\\bruce\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-unc",
+    "input": "{\"outer\": [{\"\\\\\\\\synthetic-host\\\\Users\\\\bruce\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "\\\\synthetic-host\\Users\\bruce\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-encoded-url",
+    "input": "{\"https%3A%2F%2Fexample.invalid%2Fsub\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "https%3A%2F%2Fexample.invalid%2Fsub",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-encoded-url",
+    "input": "{\"outer\": [{\"https%3A%2F%2Fexample.invalid%2Fsub\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "https%3A%2F%2Fexample.invalid%2Fsub",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-encoded-path",
+    "input": "{\"C:\\\\u005cUsers\\\\nora\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "C:\\u005cUsers\\nora\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-encoded-path",
+    "input": "{\"outer\": [{\"C:\\\\u005cUsers\\\\nora\\\\config.yaml\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "C:\\u005cUsers\\nora\\config.yaml",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-key-credential",
+    "input": "{\"Bearer syntheticABC123\": \"private-value\", \"safe\": \"kept\"}",
+    "expected": "{\"safe\":\"kept\"}",
+    "absent": [
+      "Bearer syntheticABC123",
+      "private-value"
+    ]
+  },
+  {
+    "kind": "json-nested-key-credential",
+    "input": "{\"outer\": [{\"Bearer syntheticABC123\": \"private-value\", \"safe\": \"kept\"}]}",
+    "expected": "{\"outer\":[{\"safe\":\"kept\"}]}",
+    "absent": [
+      "Bearer syntheticABC123",
+      "private-value"
+    ]
+  }
+]

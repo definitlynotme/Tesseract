@@ -1,0 +1,23 @@
+{
+  "data": {
+    "name": "service.stop",
+    "op": "job-2",
+    "owner": "window-1",
+    "req_id": "req-1001",
+    "result": {
+      "cleanup_pending": false,
+      "shutdown_exit_code": null,
+      "startup_phase": "stopped"
+    },
+    "started_at_ms": 1791400592409,
+    "state": "done"
+  },
+  "epoch": "v1-fixture",
+  "kind": "edge",
+  "produced_at_ms": 1790812800000,
+  "rev": 6,
+  "sent_at_ms": 1790812800001,
+  "seq": 1,
+  "t": "evt",
+  "topic": "jobs"
+}

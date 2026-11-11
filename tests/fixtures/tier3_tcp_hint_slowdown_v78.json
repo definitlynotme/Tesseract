@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "kind": "characterization_not_executable_trace",
+  "session_started_at": "2026-09-08T18:35:13.057993+08:00",
+  "executable_sha256": "5db90d0343749a34eaac35d76df4f76607444cac027209417b3184d14f17d260",
+  "runtime_identity_match": true,
+  "source_digests": {
+    "tier3_candidate_scheduler.py": "96450aa1ccaca986b16c0a0ce139e2348ead759fe0d0cb0fd04759ca19345966",
+    "manager.py": "e5d31c5d5d34583002665bbe7849e874a31c1838c50f152a4fcaaf91a68ece6f"
+  },
+  "target": 25,
+  "final_net_new": 24,
+  "n20": 10,
+  "net_new_commit_elapsed_ms": [2484, 3234, 3640, 4047, 4187, 5203, 7765, 8312, 8390, 19984, 102047, 167984, 176359, 184390, 192625, 195875, 198047, 198203, 198562, 199797, 199984, 200953, 201437, 330500],
+  "unique_candidates": 7952,
+  "tcp_start_acked": 4265,
+  "scheduler_selected": 4268,
+  "selected_counter_difference_unreconciled": 3,
+  "tcp_responsive": 783,
+  "prestart_high_water": 16,
+  "prestart_stalls": 0,
+  "peak_helpers": 16,
+  "fast_completions": 772,
+  "fast_passes": 21,
+  "deep_completions": 132,
+  "deep_passes": 3,
+  "committed": 24,
+  "explicit_skip": 0,
+  "visibility": {
+    "validated_positive": {"start": 30, "responsive": 20, "fast_pass": 9, "net_new": 11},
+    "validated_reprobe": {"start": 75, "responsive": 10, "fast_pass": 0, "net_new": 0},
+    "tcp_only": {"start": 265, "responsive": 242, "fast_pass": 6, "net_new": 6},
+    "unknown": {"start": 3890, "responsive": 513, "fast_pass": 6, "net_new": 7},
+    "observed_nonpositive": {"start": 5, "responsive": 1, "fast_pass": 0, "net_new": 0}
+  },
+  "tcp_hint_policy": {"limited": true, "coverage_limit": 1, "limited_count": 2, "restored_by_net_new_count": 1},
+  "service_reward": {"selected": 14, "responsive": 9, "fast_pass": 6, "net_new": 6},
+  "decision_ring_evidence": {
+    "one_leaf_unknown_selections_with_tcp_history_inventory": 7,
+    "same_leaf_unknown_tcp_dead": 7,
+    "different_leaf_service_committed": 6
+  },
+  "unavailable": ["per_candidate_transport_trace", "global_hint_limit_activation_times", "paired_same_payload_network_run"],
+  "acceptance": "failed_target_and_tail_latency"
+}

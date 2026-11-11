@@ -1,0 +1,54 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "res",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "id": 1,
+    "req_id": "request-1",
+    "owner": "window-1",
+    "cmd": "nodes.detail",
+    "ok": true,
+    "data": {
+      "node": {
+        "id": "1f0e2d3c4b5a69788796a5b4",
+        "name": "HK-01 :: VLESS Reality",
+        "tier": "vanguard",
+        "kind": "manual",
+        "enabled": true,
+        "status": "healthy",
+        "reason_code": null,
+        "protocol": "vless",
+        "latency_ms": 180,
+        "subscription_id": null,
+        "last_checked_at_ms": 1790812775000,
+        "slow": true
+      },
+      "config_item": null,
+      "last_diagnostic": null,
+      "check_interval_s": 30,
+      "endpoint": {
+        "host_masked": "g•••.org",
+        "port": 443
+      },
+      "protocols": [
+        {
+          "name": "vless_reality",
+          "port": 443,
+          "node_id": "1f0e2d3c4b5a69788796a5b4"
+        },
+        {
+          "name": "hysteria2",
+          "port": 0,
+          "node_id": "2a1b0c9d8e7f6a5b4c3d2e1f"
+        },
+        {
+          "name": "trojan",
+          "port": 8444
+        }
+      ]
+    }
+  },
+  "expected": "type:data.protocols[1].port"
+}

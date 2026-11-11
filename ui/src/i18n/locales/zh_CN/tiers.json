@@ -1,0 +1,1474 @@
+{
+  "tiers.action.disable": {
+    "m": "停用",
+    "_desc": "停用类的按钮（确认框的危险按钮、Gateway 当前出口详情的按钮）"
+  },
+  "tiers.ago_sec": {
+    "m": "{s, plural, =0 {刚刚} other {# 秒前}}",
+    "_desc": "一分钟以内的相对时间（检测间隔只有 30–120 秒，所以精确到秒）：s=0 为刚刚"
+  },
+  "tiers.busy.deleting": {
+    "m": "删除中",
+    "_desc": "「删除」按钮进行中的文字；空间紧"
+  },
+  "tiers.busy.disabled": {
+    "m": "已停用",
+    "_desc": "「停用」按钮完成后的文字；空间紧"
+  },
+  "tiers.busy.disabling": {
+    "m": "正在停用…",
+    "_desc": "「停用」按钮进行中的文字；空间紧"
+  },
+  "tiers.busy.enabled": {
+    "m": "已启用",
+    "_desc": "「启用」按钮完成后的文字；空间紧"
+  },
+  "tiers.busy.enabling": {
+    "m": "正在启用…",
+    "_desc": "「启用」按钮进行中的文字；空间紧"
+  },
+  "tiers.busy.fetching_sub": {
+    "m": "正在获取订阅…",
+    "_desc": "「添加订阅」按钮进行中的文字；空间紧"
+  },
+  "tiers.busy.imported": {
+    "m": "已导入",
+    "_desc": "「导入」按钮完成后的文字；空间紧"
+  },
+  "tiers.busy.importing": {
+    "m": "导入中",
+    "_desc": "「导入」按钮进行中的文字；空间紧"
+  },
+  "tiers.busy.saved_updating": {
+    "m": "已保存 · 正在更新",
+    "_desc": "「管理订阅」保存了新的订阅地址后按钮的文字（随后会立即更新订阅）；空间紧"
+  },
+  "tiers.busy.saving": {
+    "m": "保存中",
+    "_desc": "「保存」按钮进行中的文字；空间紧"
+  },
+  "tiers.bx.enable": {
+    "m": "启用 Bastion",
+    "_desc": "Bastion 关闭卡片的主按钮（会先确认）；Bastion 为层级代号（不译）"
+  },
+  "tiers.bx.off_confirm.body": {
+    "m": "Vanguard 与 Sentinel 都不可用时，不再改用公共节点。你添加的来源会保留。",
+    "_desc": "确认框正文：停用 Bastion 的后果；Vanguard、Sentinel 为层级代号（不译）"
+  },
+  "tiers.bx.off_confirm.title": {
+    "m": "停用 Bastion？",
+    "_desc": "确认框标题：停用 Bastion；Bastion 为层级代号（不译）"
+  },
+  "tiers.bx.on_confirm.body": {
+    "m": "公共节点来源不可信。Bastion 承载流量时，请勿登录任何账号。",
+    "_desc": "确认框正文：启用 Bastion 前的安全警告；Bastion 为层级代号（不译）"
+  },
+  "tiers.bx.on_confirm.ok": {
+    "m": "启用",
+    "_desc": "确认框按钮：启用 Bastion"
+  },
+  "tiers.bx.on_confirm.title": {
+    "m": "启用 Bastion？",
+    "_desc": "确认框标题：启用 Bastion；Bastion 为层级代号（不译）"
+  },
+  "tiers.bx.readonly": {
+    "m": "这个版本还不能在这里启用 Bastion。",
+    "_desc": "Bastion 关闭卡片下的只读说明（K-7：没有 Bastion 写入口时，启停与最少值只读显示，不引导到配置页）；Bastion 为层级代号（不译）"
+  },
+  "tiers.bx.title": {
+    "m": "Bastion 未启用",
+    "_desc": "Bastion 关闭时整页卡片的标题（也是卡片的读屏名称）；Bastion 为层级代号（不译）"
+  },
+  "tiers.cell.aria": {
+    "m": "{name}{has_word, select, yes {，{word}} other {}}{has_count, select, yes {，{ok}/{total} 可用} ok_only {，{ok} 可用} other {}}",
+    "_desc": "层级格子的读屏名称。name 为层级代号（不译）；word 为状态（tiers.cell.word.* 或格子第二行的词），has_word=yes 时读出；has_count=yes 时读出「可用数/总数 可用」，ok_only 时只读可用数（Bastion：整个层级，自有节点加自动池）"
+  },
+  "tiers.cell.count_aria": {
+    "m": "{ok}/{total} 可用",
+    "_desc": "层级格子计数（滚动数字）的读屏名称：可用节点数/节点总数"
+  },
+  "tiers.cell.slot.collecting": {
+    "m": "收集中…",
+    "_desc": "层级格子第二行：服务启动中、这个层级还在收集节点；空间紧"
+  },
+  "tiers.cell.slot.filling": {
+    "m": "正在补充",
+    "_desc": "Bastion 格子第二行：应急池正在补充可用节点；空间紧"
+  },
+  "tiers.cell.slot.missing": {
+    "m": "出口已缺失",
+    "_desc": "Gateway 层级格的槽位文字：配置的当前出口不在候选里（G37）；空间紧"
+  },
+  "tiers.cell.slot.nodes": {
+    "m": "{n, plural, other {# 个节点}}",
+    "_desc": "层级格子第二行：服务没有运行时只显示节点数；空间紧"
+  },
+  "tiers.cell.slot.service_off": {
+    "m": "服务未启动",
+    "_desc": "Bastion 格子第二行：应急池已启用但服务没有运行；空间紧"
+  },
+  "tiers.cell.slot.standby": {
+    "m": "待命",
+    "_desc": "层级格子第二行：这个层级可用，但当前不承载流量；空间紧"
+  },
+  "tiers.cell.slot.starting": {
+    "m": "启动中",
+    "_desc": "层级格子第二行：服务启动中，这个层级将最先承载流量；空间紧"
+  },
+  "tiers.cell.slot.unavailable": {
+    "m": "不可用",
+    "_desc": "层级格子第二行：这个层级的节点都不可用；红色显示；空间紧"
+  },
+  "tiers.cell.slot.unknown": {
+    "m": "状态未知",
+    "_desc": "层级格的槽位文字：还没有收到这一层的状态；空间紧"
+  },
+  "tiers.cell.slot.unused": {
+    "m": "未使用",
+    "_desc": "Gateway 格子第二行：没有设置固定出口；空间紧"
+  },
+  "tiers.cell.usable_unit": {
+    "m": "可用",
+    "_desc": "层级格子里计数「2/3」后面的单位词，只在宽窗口显示；空间紧"
+  },
+  "tiers.cell.word.bastion_off": {
+    "m": "未启用",
+    "_desc": "Bastion 格子的状态词（应急池未启用）：显示在格子第二行，也拼进读屏的 tiers.cell.aria；空间紧"
+  },
+  "tiers.cell.word.carrying": {
+    "m": "承载流量",
+    "_desc": "读屏用：这个层级正在承载流量；拼进 tiers.cell.aria"
+  },
+  "tiers.cell.word.fallback_carrying": {
+    "m": "已回退，承载流量",
+    "_desc": "读屏用：前面的层级不可用，流量已回退到这个层级；拼进 tiers.cell.aria"
+  },
+  "tiers.cell.word.gateway_current": {
+    "m": "当前 {name}",
+    "_desc": "读屏用：Gateway 格子的状态，name 为当前固定出口的节点名（数据，不译）；拼进 tiers.cell.aria"
+  },
+  "tiers.cell.word.gateway_unused": {
+    "m": "未使用 Gateway",
+    "_desc": "读屏用：Gateway 格子的状态（没有选当前出口）；拼进 tiers.cell.aria；Gateway 不译"
+  },
+  "tiers.cell.word.stopped": {
+    "m": "服务未启动，显示上次结果",
+    "_desc": "读屏用：服务没有运行时层级格子的状态；拼进 tiers.cell.aria"
+  },
+  "tiers.chain.add": {
+    "m": "添加协议",
+    "_desc": "协议回退列表下的按钮：添加一个协议"
+  },
+  "tiers.chain.fill_params": {
+    "m": "先填好 <x>{proto}</x> 的参数",
+    "_desc": "协议回退列表的错误提示；<x> 内的 proto 为协议名（数据，不译）"
+  },
+  "tiers.chain.grip_aria_plain": {
+    "m": "拖动调整顺序",
+    "_desc": "协议回退顺序里拖动把手的无障碍名称"
+  },
+  "tiers.chain.max": {
+    "m": "{n, plural, other {多协议节点最多 # 个协议}}",
+    "_desc": "多协议节点的协议数超过上限；n 为上限（16）"
+  },
+  "tiers.chain.min_two": {
+    "m": "{n, plural, other {多协议节点至少需要 # 个协议}}",
+    "_desc": "协议回退列表的错误提示：n 为最少协议数（2）"
+  },
+  "tiers.chain.need_more": {
+    "m": "{n, plural, other {还需添加 # 个协议}}",
+    "_desc": "协议回退列表下的说明：多协议节点还差几个协议"
+  },
+  "tiers.chain.params": {
+    "m": "参数",
+    "_desc": "多协议链每一行展开参数的按钮；空间紧"
+  },
+  "tiers.chain.port_aria_plain": {
+    "m": "端口",
+    "_desc": "多协议链每一行端口输入框的无障碍名称"
+  },
+  "tiers.chain.port_invalid": {
+    "m": "<x>{proto}</x> 的端口需在 1–65535 之间",
+    "_desc": "协议回退列表的错误提示；<x> 内的 proto 为协议名（数据，不译）"
+  },
+  "tiers.chain.remove": {
+    "m": "移除",
+    "_desc": "协议回退列表里移除按钮的提示"
+  },
+  "tiers.cmd.import": {
+    "m": "导入到 {tier}",
+    "_desc": "命令面板（层级组）：打开导入表单；tier 为当前层级的代号（不译）"
+  },
+  "tiers.cmd.keywords.go": {
+    "m": "cengji 层级 节点",
+    "_desc": "命令面板搜索关键词（跳到某个层级）：本语言的同义词，空格分隔；zh_CN 带拼音；不显示"
+  },
+  "tiers.cmd.keywords.import": {
+    "m": "daoru 导入 节点 订阅",
+    "_desc": "命令面板搜索关键词（导入）：本语言的同义词，空格分隔；zh_CN 带拼音；不显示"
+  },
+  "tiers.cmd.keywords.test": {
+    "m": "jiance 检测 延迟 全部",
+    "_desc": "命令面板搜索关键词（检测全部节点）：本语言的同义词，空格分隔；zh_CN 带拼音；不显示"
+  },
+  "tiers.cmd.keywords.update_all": {
+    "m": "gengxin 更新 订阅 全部",
+    "_desc": "命令面板搜索关键词（更新全部订阅）：本语言的同义词，空格分隔；zh_CN 带拼音；不显示"
+  },
+  "tiers.cmd.test": {
+    "m": "检测当前列表的全部节点",
+    "_desc": "命令面板（层级组）：检测当前列表的全部节点"
+  },
+  "tiers.cmd.update_all": {
+    "m": "更新 Sentinel 的全部订阅",
+    "_desc": "命令面板（层级组）：更新 Sentinel 层的全部订阅；Sentinel 为层级代号（不译）"
+  },
+  "tiers.col.lat": {
+    "m": "延迟",
+    "_desc": "节点列表表头：延迟列；空间紧"
+  },
+  "tiers.col.name": {
+    "m": "名称",
+    "_desc": "节点列表表头：节点名列；空间紧"
+  },
+  "tiers.col.proto": {
+    "m": "协议",
+    "_desc": "节点列表表头：协议列；空间紧"
+  },
+  "tiers.col.region": {
+    "m": "地区",
+    "_desc": "节点列表表头：地区列；空间紧"
+  },
+  "tiers.col.state": {
+    "m": "状态",
+    "_desc": "节点列表表头：状态列；空间紧"
+  },
+  "tiers.col.trend": {
+    "m": "最近 30 分钟",
+    "_desc": "节点列表表头：延迟走势小图列（最近 30 分钟的延迟）；空间紧"
+  },
+  "tiers.delete_confirm.body": {
+    "m": "{cur, select, yes {它正在{role, select, exit {作为当前出口} other {承载流量}}，删除后会切换到{has_next, select, yes {「{next}」} other {下一个可用节点}}，连接会短暂中断。} other {}}{last, select, yes {这是 {tier} 最后一个{role, select, exit {候选出口} other {参与回退的节点}}，删除后这一层就没有节点了。} other {}}删除后需要重新导入才能恢复。",
+    "_desc": "删除节点的确认框正文（G18：先警告再允许）。cur=yes 时它正在承载流量或作为当前出口；role：exit 为 Gateway 出口，其余为回退层；last=yes 时它是这一层最后一个节点；tier 为层级代号（不译）；has_next=yes 时 next 为接替节点的名字（数据，B-18 提供时），否则通用说法"
+  },
+  "tiers.delete_confirm.ok": {
+    "m": "删除",
+    "_desc": "确认框的危险按钮：删除"
+  },
+  "tiers.delete_confirm.title": {
+    "m": "删除「{name}」？",
+    "_desc": "确认框标题：删除节点或订阅；name 为节点名或订阅名（数据，不译）"
+  },
+  "tiers.discard.body": {
+    "m": "{has_name, select, yes {「{name}」的修改还没有保存。} other {这个节点的修改还没有保存。}}",
+    "_desc": "确认框正文；name 为正在编辑的节点名（数据，不译）；has_name=no 时节点已不在列表里"
+  },
+  "tiers.discard.cancel": {
+    "m": "留下",
+    "_desc": "确认框的取消按钮：留在编辑中"
+  },
+  "tiers.discard.ok": {
+    "m": "放弃更改",
+    "_desc": "确认框的危险按钮：放弃未保存的修改并离开"
+  },
+  "tiers.discard.title": {
+    "m": "放弃未保存的更改？",
+    "_desc": "确认框标题：编辑节点时有未保存的修改，用户要离开"
+  },
+  "tiers.draft_confirm.body": {
+    "m": "{cur, select, yes {它正在{role, select, exit {作为当前出口} other {承载流量}}，设为草稿后会切换到{has_next, select, yes {「{next}」} other {下一个可用节点}}，连接会短暂中断。} other {}}{last, select, yes {这是 {tier} 最后一个{role, select, exit {候选出口} other {参与回退的节点}}，设为草稿后这一层就没有可用节点了。} other {}}",
+    "_desc": "把节点设为草稿的确认框正文（G18：先警告再允许；只在它正在承载流量或是这一层最后一个节点时询问）。cur、role、last、tier、has_next、next 同删除确认（next 只在 B-18 提供时出现）"
+  },
+  "tiers.draft_confirm.ok": {
+    "m": "设为草稿",
+    "_desc": "确认框按钮：设为草稿"
+  },
+  "tiers.draft_confirm.title": {
+    "m": "把「{name}」设为草稿？",
+    "_desc": "确认框标题：把正在使用的节点设为草稿；name 为节点名（数据，不译）"
+  },
+  "tiers.drill.back": {
+    "m": "返回 {tier}",
+    "_desc": "钻入订阅或应急池后返回按钮的名称和提示；tier 为层级代号（不译）"
+  },
+  "tiers.drill.meta": {
+    "m": "{total, plural, other {# 个节点}}{has_ago, select, yes { · 更新于 {ago}} other {}}",
+    "_desc": "订阅钻入条的元信息：节点数；has_ago=yes 时附本层订阅最近一次刷新的时间（K-6，按层统计，与列表行的「更新于」同一个时间）；ago 为相对时间"
+  },
+  "tiers.drill.rechecking": {
+    "m": "正在复检 {done}/{total}",
+    "_desc": "钻入订阅后标题栏的说明：服务重启后正在复检；done/total 为进度"
+  },
+  "tiers.edit.chip": {
+    "m": "编辑中",
+    "_desc": "节点详情头部的小标签：正在编辑；空间紧"
+  },
+  "tiers.edit.host_keep": {
+    "m": "留空保持原地址",
+    "_desc": "编辑节点「地址」输入框下的说明：地址只显示掩码，不预填"
+  },
+  "tiers.edit.link.hysteria2_link": {
+    "m": "Hysteria2 分享链接",
+    "_desc": "编辑 Vanguard 节点：替换 Hysteria2 协议的分享链接（留空保持原样）；Hysteria2 为协议名"
+  },
+  "tiers.edit.link.naive_link": {
+    "m": "Naive 分享链接",
+    "_desc": "编辑 Vanguard 节点：替换 Naive 协议的分享链接（留空保持原样）；Naive 为协议名"
+  },
+  "tiers.edit.link.uri": {
+    "m": "替换分享链接",
+    "_desc": "编辑其他层的节点：整条替换分享链接（G16，留空保持原样）"
+  },
+  "tiers.edit.link.vless_link": {
+    "m": "VLESS 分享链接",
+    "_desc": "编辑 Vanguard 节点：替换 VLESS 协议的分享链接（留空保持原样）；VLESS 为协议名"
+  },
+  "tiers.edit.sec_hint": {
+    "m": "不改就保持原样",
+    "_desc": "编辑节点时密钥输入框下的说明：留空或不改则保持原值"
+  },
+  "tiers.empty.gateway.title": {
+    "m": "没有候选出口",
+    "_desc": "Gateway 层没有候选出口时的空状态标题（G34）"
+  },
+  "tiers.empty.import": {
+    "m": "导入节点",
+    "_desc": "空层级空状态的操作按钮（G34）"
+  },
+  "tiers.empty.sentinel.action": {
+    "m": "导入订阅",
+    "_desc": "Sentinel 空状态的操作按钮：打开导入表单的订阅页签（G34）"
+  },
+  "tiers.empty.sentinel.title": {
+    "m": "还没有订阅",
+    "_desc": "Sentinel 层没有订阅和节点时的空状态标题（G34）"
+  },
+  "tiers.empty.vanguard.title": {
+    "m": "还没有自己的节点",
+    "_desc": "Vanguard 层没有节点时的空状态标题（G34）"
+  },
+  "tiers.form.advanced": {
+    "m": "高级设置",
+    "_desc": "手动导入表单里可选的高级参数折叠区（G19）"
+  },
+  "tiers.form.auto.label": {
+    "m": "自动更新",
+    "_desc": "表单字段名：订阅的自动更新间隔"
+  },
+  "tiers.form.cancel": {
+    "m": "取消",
+    "_desc": "表单和抽屉的取消按钮"
+  },
+  "tiers.form.chain.label": {
+    "m": "协议回退顺序",
+    "_desc": "多协议节点的字段名：协议按顺序回退"
+  },
+  "tiers.form.choice_default": {
+    "m": "默认：{value}",
+    "_desc": "选择框没有选值时的占位文字：不选时按 value（这个参数的隐含默认值）处理，但不预填（P4 合同备忘：Shadowsocks 加密方式不预填）"
+  },
+  "tiers.form.choose": {
+    "m": "请选择…",
+    "_desc": "选择框没有选值时的占位文字"
+  },
+  "tiers.form.hide": {
+    "m": "隐藏",
+    "_desc": "密钥输入框里眼睛按钮的名称：隐藏内容"
+  },
+  "tiers.form.host.empty": {
+    "m": "地址不能为空",
+    "_desc": "「地址」字段的错误提示"
+  },
+  "tiers.form.host.invalid": {
+    "m": "地址格式不对：填域名（如 node.example.net）或 IP",
+    "_desc": "「地址」字段的错误提示"
+  },
+  "tiers.form.host.label": {
+    "m": "地址",
+    "_desc": "表单字段名：服务器地址"
+  },
+  "tiers.form.host.ph_multi": {
+    "m": "vps.example.net",
+    "_desc": "手动页（多协议）「地址」输入框的占位文字：一个示例域名"
+  },
+  "tiers.form.name.empty": {
+    "m": "名称不能为空",
+    "_desc": "「名称」字段的错误提示"
+  },
+  "tiers.form.name.label": {
+    "m": "名称",
+    "_desc": "表单字段名：节点或订阅的名称"
+  },
+  "tiers.form.name.too_long": {
+    "m": "{max, plural, other {名称最多 # 个字}}",
+    "_desc": "「名称」字段的错误提示：max 为最多字数"
+  },
+  "tiers.form.optional": {
+    "m": "可选",
+    "_desc": "字段名后的小标签：这一项可以不填；空间紧"
+  },
+  "tiers.form.port.hint": {
+    "m": "1–65535",
+    "_desc": "「端口」字段下的说明：端口的取值范围"
+  },
+  "tiers.form.port.invalid": {
+    "m": "端口需在 1–65535 之间",
+    "_desc": "「端口」字段的错误提示"
+  },
+  "tiers.form.port.label": {
+    "m": "端口",
+    "_desc": "表单字段名：端口"
+  },
+  "tiers.form.proto.label": {
+    "m": "协议",
+    "_desc": "手动导入表单的字段名：协议"
+  },
+  "tiers.form.proto.missing": {
+    "m": "先选择协议",
+    "_desc": "「协议」字段的错误提示：还没有选协议"
+  },
+  "tiers.form.proto.ph": {
+    "m": "选择协议…",
+    "_desc": "「协议」下拉框的占位文字"
+  },
+  "tiers.form.range": {
+    "m": "{has_max, select, yes {填 {min}–{max} 之间的整数} other {填不小于 {min} 的整数}}",
+    "_desc": "整数参数不在范围内；min、max 为规格给的范围"
+  },
+  "tiers.form.required": {
+    "m": "{name}不能为空",
+    "_desc": "必填的协议参数为空时的错误提示；name 为参数名（tiers.pf.*）"
+  },
+  "tiers.form.save": {
+    "m": "保存",
+    "_desc": "表单和抽屉的保存按钮"
+  },
+  "tiers.form.show": {
+    "m": "显示",
+    "_desc": "密钥输入框里眼睛按钮的名称：显示内容"
+  },
+  "tiers.form.url.empty": {
+    "m": "订阅地址不能为空",
+    "_desc": "「订阅地址」字段的错误提示"
+  },
+  "tiers.form.url.label": {
+    "m": "订阅地址",
+    "_desc": "表单字段名：订阅地址"
+  },
+  "tiers.form.url.scheme": {
+    "m": "订阅地址需以 https:// 或 http:// 开头",
+    "_desc": "「订阅地址」字段的错误提示"
+  },
+  "tiers.gateway.missing.body": {
+    "m": "配置的 <x>{name}</x> 不在候选里。",
+    "_desc": "Gateway 当前出口缺失的说明（G37）；<x> 包住已配置的出口名（数据）。怎么办由同一行的「选新出口」「停用 Gateway」两个按钮表达"
+  },
+  "tiers.gateway.missing.pick": {
+    "m": "选新出口",
+    "_desc": "Gateway 当前出口缺失时的按钮：把焦点移到候选列表（G37）；空间紧"
+  },
+  "tiers.gateway.missing.title": {
+    "m": "当前出口已缺失",
+    "_desc": "Gateway 当前出口缺失的标题（G37）"
+  },
+  "tiers.gateway.off_confirm.body": {
+    "m": "出口 IP 会变成当前层级节点自己的地址。",
+    "_desc": "确认框正文：停用 Gateway 的后果"
+  },
+  "tiers.gateway.off_confirm.title": {
+    "m": "停用 Gateway？",
+    "_desc": "确认框标题：停用固定出口；Gateway 为层级代号（不译）"
+  },
+  "tiers.gateway.off_link": {
+    "m": "停用 Gateway",
+    "_desc": "Gateway「当前出口」分组标签末尾的链接：停用固定出口（会先确认）；Gateway 为层级代号（不译）"
+  },
+  "tiers.gateway.unknown.title": {
+    "m": "当前出口暂不可知",
+    "_desc": "Gateway 状态未知的标题（gateway.current 还没有发布）"
+  },
+  "tiers.gateway.waiting.body": {
+    "m": "已选 <x>{name}</x>，等待核心应用。",
+    "_desc": "Gateway 已选择、尚未生效的说明；<x> 包住出口名（数据）"
+  },
+  "tiers.gateway.waiting.title": {
+    "m": "正在应用出口",
+    "_desc": "Gateway 已选择、尚未生效的标题"
+  },
+  "tiers.import.add_sub": {
+    "m": "添加订阅",
+    "_desc": "导入表单「订阅」页的主按钮"
+  },
+  "tiers.import.done_toast": {
+    "m": "{n, plural, other {已导入 # 项}}{outcome, select, unapplied {，但未能立即应用} next_start {，下次启动服务时生效} pending {，等待应用} other {}}。{first, select, yes {正在做第一次检测。} other {}}",
+    "_desc": "导入完成的提示。n 为导入的配置项数（不是节点数）；outcome：applied 已应用 / next_start 服务未运行 / pending 延后应用 / unapplied 已保存未应用；first=yes 时导入后立即检测（B-14），附一句正在检测，否则不附"
+  },
+  "tiers.import.go": {
+    "m": "导入",
+    "_desc": "手动导入表单的主按钮；空间紧"
+  },
+  "tiers.import.go_n": {
+    "m": "{n, plural, =0 {导入} other {导入 # 个节点}}",
+    "_desc": "导入表单的主按钮：n 为可以导入的节点数（0 时只说「导入」）"
+  },
+  "tiers.import.groups.count": {
+    "m": "{n, plural, other {# 个协议}}",
+    "_desc": "导入预览按物理节点分组（G38）时每组的协议数"
+  },
+  "tiers.import.groups.unnamed": {
+    "m": "第 {i} 组",
+    "_desc": "导入预览分组没有名字时的显示；i 从 1 开始"
+  },
+  "tiers.import.kind.multi": {
+    "m": "多协议",
+    "_desc": "手动页的节点类型：多协议；空间紧"
+  },
+  "tiers.import.kind.single": {
+    "m": "单协议",
+    "_desc": "手动页的节点类型：单协议；空间紧"
+  },
+  "tiers.import.kind_aria": {
+    "m": "节点类型",
+    "_desc": "手动页「单协议 / 多协议」切换的读屏名称"
+  },
+  "tiers.import.name_ph_multi": {
+    "m": "例如 东京 VPS",
+    "_desc": "手动页（多协议）「名称」输入框的占位文字：一个示例名称"
+  },
+  "tiers.import.paste.aria": {
+    "m": "粘贴分享链接",
+    "_desc": "粘贴框的无障碍名称"
+  },
+  "tiers.import.paste.ph": {
+    "m": "每行一个分享链接",
+    "_desc": "粘贴框的占位文字"
+  },
+  "tiers.import.recognizing": {
+    "m": "正在识别粘贴内容…",
+    "_desc": "粘贴后识别中的提示"
+  },
+  "tiers.import.replanned": {
+    "m": "预览已过期，已重新识别。",
+    "_desc": "导入时预览计划已过期或配置已变，页面自动重新预览一次之后的提示"
+  },
+  "tiers.import.replanning": {
+    "m": "预览已过期，正在重新识别…",
+    "_desc": "导入按钮失败时的文字：预览计划过期，正在自动重新预览；空间紧"
+  },
+  "tiers.import.row.to_sub": {
+    "m": "改为添加订阅",
+    "_desc": "识别结果一行里的链接：切到「订阅」页并填入这个地址"
+  },
+  "tiers.import.specs_failed": {
+    "m": "无法读取协议列表",
+    "_desc": "手动导入表单读取协议规格失败的标题"
+  },
+  "tiers.import.specs_loading": {
+    "m": "正在读取协议列表…",
+    "_desc": "手动导入表单读取协议规格时的文字"
+  },
+  "tiers.import.sub.added": {
+    "m": "已添加 · {n, plural, other {# 个节点}}",
+    "_desc": "「添加订阅」按钮完成后的文字：n 为订阅里的节点数；空间紧"
+  },
+  "tiers.import.sub.added_failed": {
+    "m": "订阅已添加，但第一次获取失败：{reason}",
+    "_desc": "添加订阅已保存、首次获取失败的提示；reason 为错误说明（已翻译的整句）"
+  },
+  "tiers.import.sub.name_hint": {
+    "m": "留空时按地址自动命名",
+    "_desc": "「订阅」页「名称」字段下的说明"
+  },
+  "tiers.import.sub.name_ph": {
+    "m": "例如 Orion 订阅",
+    "_desc": "「订阅」页「名称」输入框的占位文字：一个示例名称"
+  },
+  "tiers.import.sub.url_ph": {
+    "m": "https://sub.example.com/api/v1/client?token=…",
+    "_desc": "「订阅」页「订阅地址」输入框的占位文字：一个示例订阅地址"
+  },
+  "tiers.import.sum.bad": {
+    "m": "{n, plural, other {无法导入 #}}",
+    "_desc": "识别结果的小标签（可点，跳到第一条）：无法导入的条数；空间紧"
+  },
+  "tiers.import.sum.none": {
+    "m": "没有识别到节点",
+    "_desc": "粘贴识别结果：一个节点也没有识别到"
+  },
+  "tiers.import.sum.note_bad": {
+    "m": "有一条无法导入时整批都不会导入",
+    "_desc": "粘贴识别结果的说明：有无法导入的条目（B-37 不做时界面：整批接受或拒绝）"
+  },
+  "tiers.import.sum.ok": {
+    "m": "{n, plural, other {可导入 #}}",
+    "_desc": "识别结果的小标签：可以导入的条数；空间紧"
+  },
+  "tiers.import.tab.manual": {
+    "m": "手动",
+    "_desc": "导入表单的页签：手动填写；空间紧"
+  },
+  "tiers.import.tab.paste": {
+    "m": "粘贴",
+    "_desc": "导入表单的页签：粘贴链接或 YAML；空间紧"
+  },
+  "tiers.import.tab.sub": {
+    "m": "订阅",
+    "_desc": "导入表单的页签：添加订阅；空间紧"
+  },
+  "tiers.import.title": {
+    "m": "导入到 {tier}",
+    "_desc": "导入表单的标题；tier 为层级的完整称呼（tier.label，如「Vanguard 自建」）"
+  },
+  "tiers.import.why_count": {
+    "m": "{n, plural, other {共 # 条}}",
+    "_desc": "同一个无法导入的原因出现多次时的条数"
+  },
+  "tiers.import.why_title": {
+    "m": "无法导入的原因",
+    "_desc": "粘贴识别结果里「无法导入」原因列表的小标题"
+  },
+  "tiers.list.aria.pool": {
+    "m": "Garrison 的节点",
+    "_desc": "读屏用：打开 Garrison 后节点列表的名称；Garrison 为代号（不译）"
+  },
+  "tiers.list.aria.sub": {
+    "m": "{name}的节点",
+    "_desc": "读屏用：钻入某个订阅后节点列表的名称；name 为订阅名（数据，不译）"
+  },
+  "tiers.list.cap.health": {
+    "m": "健康",
+    "_desc": "订阅分组标签上的列名：健康（可用节点比例）；空间紧"
+  },
+  "tiers.list.cap.updated": {
+    "m": "更新",
+    "_desc": "订阅分组标签上的列名：上次更新时间；空间紧"
+  },
+  "tiers.list.label.candidates": {
+    "m": "候选",
+    "_desc": "列表分组标签（Gateway）：可以设为当前出口的节点"
+  },
+  "tiers.list.label.current": {
+    "m": "当前出口",
+    "_desc": "列表分组标签（Gateway）：当前的固定出口"
+  },
+  "tiers.list.label.draft": {
+    "m": "草稿",
+    "_desc": "列表分组标签：保留配置、不参与回退的节点"
+  },
+  "tiers.list.label.loose": {
+    "m": "单独添加的节点",
+    "_desc": "列表分组标签（Sentinel）：不属于任何订阅、单独添加的节点"
+  },
+  "tiers.list.label.mine": {
+    "m": "你添加的节点",
+    "_desc": "列表分组标签（Bastion）：用户自己添加的应急节点"
+  },
+  "tiers.list.label.my_sources": {
+    "m": "你添加的来源",
+    "_desc": "列表分组标签（Bastion）：用户自己添加的应急订阅来源"
+  },
+  "tiers.list.label.nodes": {
+    "m": "节点",
+    "_desc": "列表分组标签（备用订阅内）：订阅的全部节点"
+  },
+  "tiers.list.label.subs": {
+    "m": "订阅",
+    "_desc": "列表分组标签：订阅列表"
+  },
+  "tiers.list.loading": {
+    "m": "正在读取节点…",
+    "_desc": "列表还没有收到节点列表时的占位行"
+  },
+  "tiers.list.off.bastion.title": {
+    "m": "还没有",
+    "_desc": "Bastion 已启用但用户没有添加任何来源或节点时，列表空行的标题"
+  },
+  "tiers.list.off.gateway.title": {
+    "m": "未使用 Gateway",
+    "_desc": "Gateway 没有当前出口时，列表里占位行的标题；Gateway 不译"
+  },
+  "tiers.list.stale": {
+    "m": "数据未更新",
+    "_desc": "「数据未更新」：列表数据陈旧时（分页未齐、版本失配、换代）列表上方的细提示；也用于 Bastion 的数字（bastion.pool 暂时没有新数据时，格子第二行与 Garrison 面板的状态药丸）"
+  },
+  "tiers.manage.enabled": {
+    "m": "启用此订阅",
+    "_desc": "管理订阅抽屉的开关（G17）"
+  },
+  "tiers.manage.url_new": {
+    "m": "新的订阅地址",
+    "_desc": "管理订阅抽屉里替换订阅地址的输入框标签：不填就保持原样"
+  },
+  "tiers.menu.delete": {
+    "m": "删除",
+    "_desc": "节点行菜单（危险）：删除这个节点（会先确认）"
+  },
+  "tiers.menu.details": {
+    "m": "查看详情",
+    "_desc": "只读节点的行菜单项：打开详情"
+  },
+  "tiers.menu.diagnose": {
+    "m": "连通诊断",
+    "_desc": "节点行菜单：打开详情并做一次连通诊断"
+  },
+  "tiers.menu.edit": {
+    "m": "编辑",
+    "_desc": "节点行菜单：编辑这个节点"
+  },
+  "tiers.menu.toggle": {
+    "m": "{to, select, candidate {作为候选出口} fallback {参与回退} other {设为草稿}}",
+    "_desc": "节点行菜单：草稿与在用之间切换；to=candidate：Gateway 草稿改为候选出口；to=fallback：草稿改为参与回退；其余：把节点设为草稿"
+  },
+  "tiers.menu.view_nodes": {
+    "m": "查看节点",
+    "_desc": "订阅行菜单：钻入订阅、查看它的节点"
+  },
+  "tiers.outcome": {
+    "m": "{kind, select, applied {已应用} next_start {{what, select, short {下次启动生效} deleted {已删除，下次启动服务时生效} gateway {出口已保存，下次启动服务时生效} other {已保存，下次启动服务时生效}}} pending {{what, select, short {待应用} deleted {已删除，等待应用} gateway {出口已保存，等待应用} other {已保存，等待应用}}} unapplied {{what, select, short {未能应用} deleted {已删除，但未能立即应用} gateway {出口已保存，但未能立即应用} other {已保存，但未能立即应用}}} other {{what, select, short {结果未知} other {结果未知，请查看列表确认}}}}",
+    "_desc": "写入结果（Applied）的说法：kind 为 applied / next_start（服务未运行，下次启动生效）/ pending（延后应用）/ unapplied（已保存未应用）/ 其余未知；what：short 为按钮上的短文字，deleted 删除，gateway 选择出口，其余为保存"
+  },
+  "tiers.panel.aria": {
+    "m": "{name}",
+    "_desc": "节点 / 订阅侧面板的读屏名称：name 为节点名或订阅名（数据，不译）；需要时可以加上「详情」之类的词"
+  },
+  "tiers.panel.chain.title": {
+    "m": "协议回退",
+    "_desc": "节点详情的小节标题：多协议节点的回退顺序"
+  },
+  "tiers.panel.checked.never": {
+    "m": "尚未检测",
+    "_desc": "节点详情「最近检测」行：从未检测"
+  },
+  "tiers.panel.delete": {
+    "m": "删除",
+    "_desc": "节点详情底部的危险按钮：删除这个节点"
+  },
+  "tiers.panel.diag.cancel": {
+    "m": "取消",
+    "_desc": "诊断进行中的取消按钮"
+  },
+  "tiers.panel.diag.cancel_sent": {
+    "m": "已请求取消",
+    "_desc": "取消按钮完成后的文字（请求已送达，不等于已清理）；空间紧"
+  },
+  "tiers.panel.diag.cancelled": {
+    "m": "这次检测已取消。",
+    "_desc": "诊断结果区：检测已取消"
+  },
+  "tiers.panel.diag.cancelling": {
+    "m": "正在取消…",
+    "_desc": "取消按钮进行中的文字；空间紧"
+  },
+  "tiers.panel.diag.chain": {
+    "m": "链路",
+    "_desc": "连通诊断的方式：经由承载层级的节点连到这个出口；空间紧"
+  },
+  "tiers.panel.diag.cleanup": {
+    "m": "已取消",
+    "_desc": "取消按钮完成后的文字（检测还在收尾时也只说已取消）；空间紧"
+  },
+  "tiers.panel.diag.direct": {
+    "m": "直连",
+    "_desc": "连通诊断的方式：直接连接这个出口；空间紧"
+  },
+  "tiers.panel.diag.done": {
+    "m": "已完成",
+    "_desc": "诊断按钮完成、没有延迟数值时的文字；空间紧"
+  },
+  "tiers.panel.diag.fail_title": {
+    "m": "{word}{has_proto, select, yes { · {proto}} other {}}",
+    "_desc": "连通诊断失败的标题：word 为原因词（tiers.reason.*），has_proto=yes 时接所用协议名（数据，不译）"
+  },
+  "tiers.panel.diag.last_failed": {
+    "m": "上次检测{state, select, cancelled {已取消} superseded {被新的检测替代} other {失败}}{has_word, select, yes { · {word}} other {}}",
+    "_desc": "诊断结果区：上一次诊断（nodes.detail.last_diagnostic）没有成功；state 为诊断状态；has_word=yes 时 word 为原因词"
+  },
+  "tiers.panel.diag.last_ok": {
+    "m": "上次检测连通{has_ms, select, yes { · <b>{ms, number, integer} ms</b>} other {}}{chain, select, yes { · 链路} other {}}",
+    "_desc": "诊断结果区：上一次诊断成功（nodes.detail.last_diagnostic）"
+  },
+  "tiers.panel.diag.mode_aria": {
+    "m": "检测方式",
+    "_desc": "连通诊断的方式切换（直连 / 链路）的读屏名称"
+  },
+  "tiers.panel.diag.ok": {
+    "m": "代理连通{has_ms, select, yes { · <b>{ms, number, integer} ms</b>} other {}}{has_proto, select, yes { · <x>{proto}</x>} other {}}{chain, select, yes { · 链路} other {}}",
+    "_desc": "诊断成功的结果行；has_ms=yes 时带这次测得的延迟（从 nodes.detail 取，取不到时不写）；<x> 包住协议名（数据）；chain=yes 时是链路诊断"
+  },
+  "tiers.panel.diag.proto": {
+    "m": "协议",
+    "_desc": "连通诊断的选项名：用哪个协议检测（多协议节点）"
+  },
+  "tiers.panel.diag.rank": {
+    "m": "第 {n} 顺位",
+    "_desc": "诊断协议下拉选项的提示：这个协议在回退顺序里的位置"
+  },
+  "tiers.panel.diag.run": {
+    "m": "检测",
+    "_desc": "连通诊断的按钮：临时连接这个节点测一次；空间紧（按钮会显示结果）"
+  },
+  "tiers.panel.diag.start": {
+    "m": "启动服务",
+    "_desc": "上面提示里的按钮：启动服务"
+  },
+  "tiers.panel.diag.title": {
+    "m": "连通诊断",
+    "_desc": "节点详情的小节标题：连通诊断"
+  },
+  "tiers.panel.diag.via": {
+    "m": "经由 {tier} · <x>{name}</x> 到这个出口",
+    "_desc": "链路诊断的说明：tier 为承载层级的代号（不译），<x> 内的 name 为承载节点名（数据，不译）"
+  },
+  "tiers.panel.edit": {
+    "m": "编辑",
+    "_desc": "节点详情底部的按钮：编辑这个节点"
+  },
+  "tiers.panel.gone": {
+    "m": "节点列表已更新，详情已关闭。",
+    "_desc": "侧面板显示的节点或订阅已不在列表里（删除、换代）时的提示"
+  },
+  "tiers.panel.kv.address": {
+    "m": "地址",
+    "_desc": "节点 / 订阅详情信息行的名称：地址；空间紧"
+  },
+  "tiers.panel.kv.auto": {
+    "m": "自动更新",
+    "_desc": "订阅详情信息行的名称：自动更新的间隔；空间紧"
+  },
+  "tiers.panel.kv.checked": {
+    "m": "最近检测",
+    "_desc": "节点详情信息行的名称：最近一次检测的时间；空间紧"
+  },
+  "tiers.panel.kv.health": {
+    "m": "健康",
+    "_desc": "订阅详情的键：健康状况"
+  },
+  "tiers.panel.kv.lat": {
+    "m": "延迟",
+    "_desc": "节点详情信息行的名称：延迟；空间紧"
+  },
+  "tiers.panel.kv.nodes": {
+    "m": "节点",
+    "_desc": "订阅详情信息行的名称：节点数；空间紧"
+  },
+  "tiers.panel.kv.proto": {
+    "m": "协议",
+    "_desc": "节点详情信息行的名称：协议；空间紧"
+  },
+  "tiers.panel.kv.reason": {
+    "m": "原因",
+    "_desc": "节点详情信息行的名称：不可用的原因；空间紧"
+  },
+  "tiers.panel.kv.role": {
+    "m": "角色",
+    "_desc": "节点详情信息行的名称（Gateway）：候选出口还是草稿；空间紧"
+  },
+  "tiers.panel.kv.source": {
+    "m": "来源",
+    "_desc": "节点详情信息行的名称：所属订阅；空间紧"
+  },
+  "tiers.panel.kv.updated": {
+    "m": "更新于",
+    "_desc": "订阅详情信息行的名称：上次更新的时间；空间紧"
+  },
+  "tiers.panel.latnote": {
+    "m": "{kind, select, over {实时 · 超过上限 {max_ms, number, integer} ms} last {上次结果} last_ok {上次可用时} other {实时}}",
+    "_desc": "节点详情「延迟」行的小注：kind=over 实时值超过上限（max_ms 为上限）；last 显示的是上次结果；last_ok 显示的是上次可用时的值；live 实时"
+  },
+  "tiers.panel.params.field.uri": {
+    "m": "分享链接",
+    "_desc": "完整技术参数里的一行：节点的分享链接（v1 只有这一项，默认遮住）"
+  },
+  "tiers.panel.params.hide_value": {
+    "m": "隐藏",
+    "_desc": "遮住已显示的秘密值的按钮（无障碍名称和提示）"
+  },
+  "tiers.panel.params.show_value": {
+    "m": "显示",
+    "_desc": "显示秘密值的按钮（无障碍名称和提示）：点击时才向服务取值"
+  },
+  "tiers.panel.params.title": {
+    "m": "完整技术参数",
+    "_desc": "节点详情的折叠区标题：全部连接参数"
+  },
+  "tiers.panel.params.unset": {
+    "m": "未设置",
+    "_desc": "秘密值不存在时的显示"
+  },
+  "tiers.panel.reset": {
+    "m": "节点列表已更新，详情已关闭。",
+    "_desc": "后台服务重启（rt:reset）后侧面板关闭的提示（与 tiers.panel.gone 同一说法）"
+  },
+  "tiers.panel.role.candidate": {
+    "m": "候选出口",
+    "_desc": "节点详情「角色」行（Gateway 候选）"
+  },
+  "tiers.panel.role.draft": {
+    "m": "草稿",
+    "_desc": "节点详情「角色」行（Gateway 草稿）"
+  },
+  "tiers.panel.sub_health": {
+    "m": "{ok}/{total} 可用",
+    "_desc": "订阅详情头部状态标签：可用节点数/节点总数"
+  },
+  "tiers.panel.sub_pool": {
+    "m": "Bastion · Garrison",
+    "_desc": "Garrison 里节点的详情副标题；Bastion、Garrison 为代号（不译）"
+  },
+  "tiers.panel.sub_subscription": {
+    "m": "{tier} · 订阅",
+    "_desc": "订阅详情的副标题：tier 为层级代号（不译）"
+  },
+  "tiers.panel.toggle.candidate": {
+    "m": "作为候选出口",
+    "_desc": "节点详情的开关名称（Gateway）：作为候选出口（关闭即为草稿）"
+  },
+  "tiers.panel.toggle.fallback": {
+    "m": "参与回退",
+    "_desc": "节点详情的开关名称：节点参与回退（关闭即为草稿）"
+  },
+  "tiers.panel.toggle.k11": {
+    "m": "暂时无法重新启用这个草稿：找不到它的配置项。可以删除后重新导入。",
+    "_desc": "草稿节点的开关只能关不能开时的说明（K-11：找不到 ConfigItem 稳定 ID）；「删除」「导入」是按钮名"
+  },
+  "tiers.panel.trend.none": {
+    "m": "还没有检测记录。点下面的「检测」测一次。",
+    "_desc": "延迟走势小节的空状态（从未检测）；「检测」是下面的按钮名"
+  },
+  "tiers.panel.trend.title": {
+    "m": "延迟走势",
+    "_desc": "节点详情的小节标题：延迟走势图"
+  },
+  "tiers.pill.carrying": {
+    "m": "承载流量",
+    "_desc": "承载药丸：这个层级正在承载流量；空间紧"
+  },
+  "tiers.pill.degraded": {
+    "m": "延迟升高",
+    "_desc": "承载药丸：Vanguard 仍在承载，但延迟升高；警告色；空间紧"
+  },
+  "tiers.pill.fallback": {
+    "m": "已回退",
+    "_desc": "承载药丸：流量已回退到这个层级；警告色；空间紧"
+  },
+  "tiers.pill.restarting": {
+    "m": "正在重启",
+    "_desc": "跟随承载层级移动的小药丸：服务正在重启；空间紧"
+  },
+  "tiers.pool.aria": {
+    "m": "Bastion · Garrison",
+    "_desc": "Garrison 面板的读屏名称；Bastion、Garrison 为代号（不译）"
+  },
+  "tiers.pool.bar.meta": {
+    "m": "{phase, select, filling {正在补充} stale {数据未更新} other {待命}} · 可用 {ok}/{total} · 最少 {min, plural, other {# 个}}",
+    "_desc": "钻入 Garrison 后标题栏的说明：phase=filling 正在补充，stale 数据未更新（bastion.pool 暂时没有新数据，数字是上次的），否则待命；ok/total 为自动池的可用数/节点总数（目标节点数不显示）；min 为最少可用节点数"
+  },
+  "tiers.pool.bar.off": {
+    "m": "未启用",
+    "_desc": "钻入应急池后标题栏的说明：Bastion 未启用"
+  },
+  "tiers.pool.bar.stopped": {
+    "m": "服务未启动 · 最少 {min, plural, other {# 个}}",
+    "_desc": "钻入应急池后标题栏的说明：服务没有运行；min 为最少可用节点数"
+  },
+  "tiers.pool.bar.unknown": {
+    "m": "状态未知",
+    "_desc": "应急池钻入条的元信息：还没有收到应急池状态"
+  },
+  "tiers.pool.busy.filled": {
+    "m": "已补充",
+    "_desc": "「立即补充」按钮完成后的文字；空间紧"
+  },
+  "tiers.pool.busy.filling": {
+    "m": "补充中",
+    "_desc": "「立即补充」按钮进行中的文字；空间紧"
+  },
+  "tiers.pool.count_aria": {
+    "m": "{n, plural, other {# 个可用}}",
+    "_desc": "应急池面板大数字的读屏名称：n 为可用节点数"
+  },
+  "tiers.pool.detail.ready": {
+    "m": "{fastest, select, yes {最快 <x>{name}</x> {ms, number, integer} ms} other {还没有可用节点}}",
+    "_desc": "应急池面板的说明行（自动维护时）：最快的自动节点的名字（<x> 包住，数据）和延迟；没有可用节点时说明。地区 B-03 和更新时间不显示"
+  },
+  "tiers.pool.disable": {
+    "m": "停用 Bastion",
+    "_desc": "应急池面板的链接：停用 Bastion（会先确认）；Bastion 为层级代号（不译）"
+  },
+  "tiers.pool.fill": {
+    "m": "立即补充",
+    "_desc": "钻入应急池后的按钮：立即从公开来源补充节点"
+  },
+  "tiers.pool.min.invalid": {
+    "m": "{has_max, select, yes {填 1–{max} 之间的整数} other {填不小于 1 的整数}}",
+    "_desc": "「最少可用节点」输入不合法；has_max=yes 时 max 为自动节点池的容量（bastion.pool.capacity，D9）"
+  },
+  "tiers.pool.min.label": {
+    "m": "最少可用节点",
+    "_desc": "应急池「最少可用节点」输入框的标签和读屏名称"
+  },
+  "tiers.pool.min.unit": {
+    "m": "个",
+    "_desc": "「最少可用节点」输入框后的单位（量词）；空间紧，没有量词的语言写最短的说法（如 nodes）"
+  },
+  "tiers.pool.min.value": {
+    "m": "{n, plural, other {# 个}}",
+    "_desc": "「最少可用节点」只读显示的数值（K-7 写入口缺席时）"
+  },
+  "tiers.pool.of": {
+    "m": "可用",
+    "_desc": "Garrison 面板大数字（可用数/自动池节点总数）后的文字：可用。目标节点数不对用户显示"
+  },
+  "tiers.pool.state": {
+    "m": "{state, select, filling {正在补充} low {低于最少值} carrying {承载流量} ready {待命} unknown {状态未知} other {未运行}}",
+    "_desc": "Garrison 面板的状态药丸：filling 正在收集；low 低于最少可用节点；carrying 承载流量；ready 待命（与层卡的「待命」同词）；unknown 还没有收到状态；其余（idle）服务未运行"
+  },
+  "tiers.pool.title": {
+    "m": "Garrison",
+    "_desc": "Bastion 里自动收集、自动补充的公共节点的代号（面板标题、钻入后的标题、搜索结果里的来源）。Garrison 是代号，各语言原样保留，不译"
+  },
+  "tiers.pool.view_all": {
+    "m": "{n, plural, other {查看全部 # 个}}",
+    "_desc": "应急池面板的链接：钻入应急池查看全部节点；n 为应急池的节点数"
+  },
+  "tiers.reason.cancelled": {
+    "m": "已取消",
+    "_desc": "原因词（短）：检测被取消。显示在节点详情「原因」行和诊断结果里；空间紧"
+  },
+  "tiers.reason.cancelled.fix": {
+    "m": "这次检测已取消。可以点「检测」重新开始。",
+    "_desc": "原因 cancelled 的建议（一两句）；「检测」是诊断按钮名"
+  },
+  "tiers.reason.chain_requires_gateway": {
+    "m": "需要 Gateway",
+    "_desc": "原因词：链路诊断要经过 Gateway 出口，但 Gateway 没有可用的当前出口；Gateway 为层级代号（不译）"
+  },
+  "tiers.reason.chain_requires_gateway.fix": {
+    "m": "先在 Gateway 设好当前出口，再检测一次。",
+    "_desc": "原因 chain_requires_gateway 的建议；Gateway 为层级代号（不译）"
+  },
+  "tiers.reason.cleanup_failed": {
+    "m": "检测未正常结束",
+    "_desc": "原因词：检测没有正常结束"
+  },
+  "tiers.reason.cleanup_failed.fix": {
+    "m": "稍后再试；反复出现时重启服务。",
+    "_desc": "原因 cleanup_failed 的建议"
+  },
+  "tiers.reason.component_missing": {
+    "m": "缺少组件",
+    "_desc": "原因词：检测需要的组件缺失"
+  },
+  "tiers.reason.component_missing.fix": {
+    "m": "更新或重新安装 Tesseract 后再试。",
+    "_desc": "原因 component_missing 的建议；Tesseract 为产品名（不译）"
+  },
+  "tiers.reason.configuration_invalid": {
+    "m": "配置异常",
+    "_desc": "原因词：节点参数不完整或格式不对（原型的分类，目前只在设计态出现）"
+  },
+  "tiers.reason.configuration_invalid.fix": {
+    "m": "{source, select, subscription {订阅里这个节点的参数不完整。等订阅商修复后「更新订阅」即可。} other {节点参数不完整或格式不对。打开「编辑」检查地址、端口和密钥。}}",
+    "_desc": "原因 configuration_invalid 的建议；source：subscription 为订阅或应急池里的节点（不能单独编辑），其余为自己添加的节点；「更新订阅」「编辑」是按钮名"
+  },
+  "tiers.reason.connection_refused": {
+    "m": "连接被拒绝",
+    "_desc": "原因词：服务器拒绝了连接"
+  },
+  "tiers.reason.connection_refused.fix": {
+    "m": "确认端口和协议与服务端设置一致。",
+    "_desc": "原因 connection_refused 的建议"
+  },
+  "tiers.reason.connection_timeout": {
+    "m": "连接超时",
+    "_desc": "原因词：节点没有及时响应"
+  },
+  "tiers.reason.connection_timeout.fix": {
+    "m": "确认服务器在线，或换一个协议再试。",
+    "_desc": "原因 connection_timeout 的建议"
+  },
+  "tiers.reason.diagnostic_in_progress": {
+    "m": "正在检测",
+    "_desc": "原因词：这个节点已有一次检测在进行"
+  },
+  "tiers.reason.diagnostic_in_progress.fix": {
+    "m": "等这次检测结束后再试。",
+    "_desc": "原因 diagnostic_in_progress 的建议"
+  },
+  "tiers.reason.diagnostic_unavailable": {
+    "m": "暂时无法检测",
+    "_desc": "原因词：现在无法启动检测"
+  },
+  "tiers.reason.diagnostic_unavailable.fix": {
+    "m": "稍后再试。",
+    "_desc": "原因 diagnostic_unavailable 的建议"
+  },
+  "tiers.reason.disabled": {
+    "m": "已停用",
+    "_desc": "原因词：节点已停用"
+  },
+  "tiers.reason.disabled.fix": {
+    "m": "这个节点已停用，不参与回退。",
+    "_desc": "原因 disabled 的说明"
+  },
+  "tiers.reason.dns_resolution_failed": {
+    "m": "域名解析失败",
+    "_desc": "原因词：无法解析节点的域名"
+  },
+  "tiers.reason.dns_resolution_failed.fix": {
+    "m": "检查地址拼写，或稍后重试。",
+    "_desc": "原因 dns_resolution_failed 的建议"
+  },
+  "tiers.reason.invalid_request": {
+    "m": "请求无效",
+    "_desc": "原因词：检测请求不完整"
+  },
+  "tiers.reason.invalid_request.fix": {
+    "m": "关闭详情后重新打开，再检测一次。",
+    "_desc": "原因 invalid_request 的建议"
+  },
+  "tiers.reason.latency_limit_exceeded": {
+    "m": "延迟超过上限",
+    "_desc": "原因词：节点能连通，但延迟超过上限"
+  },
+  "tiers.reason.latency_limit_exceeded.fix": {
+    "m": "上限为 {max_ms, number, integer} ms，可在 配置 › 连接质量 调整。",
+    "_desc": "原因 latency_limit_exceeded 的说明：max_ms 为当前的延迟上限（毫秒）；「配置 › 连接质量」是配置页的位置"
+  },
+  "tiers.reason.node_changed": {
+    "m": "节点已变更",
+    "_desc": "原因词：检测期间节点的配置变了"
+  },
+  "tiers.reason.node_changed.fix": {
+    "m": "检测期间节点的配置变了，再检测一次即可。",
+    "_desc": "原因 node_changed 的建议"
+  },
+  "tiers.reason.node_index_unavailable": {
+    "m": "节点列表未就绪",
+    "_desc": "原因词：节点列表还没有准备好"
+  },
+  "tiers.reason.node_index_unavailable.fix": {
+    "m": "稍后再试。",
+    "_desc": "原因 node_index_unavailable 的建议"
+  },
+  "tiers.reason.node_not_found": {
+    "m": "找不到节点",
+    "_desc": "原因词：节点已不在列表里"
+  },
+  "tiers.reason.node_not_found.fix": {
+    "m": "可能刚被删除，或订阅刚更新过。",
+    "_desc": "原因 node_not_found 的说明"
+  },
+  "tiers.reason.node_unavailable": {
+    "m": "节点不可用",
+    "_desc": "原因词：笼统的不可用（没有更具体的原因时用）"
+  },
+  "tiers.reason.node_unavailable.fix": {
+    "m": "最近几次检测都没有连通。",
+    "_desc": "原因 node_unavailable 的说明"
+  },
+  "tiers.reason.probe_failed": {
+    "m": "检测失败",
+    "_desc": "原因词：这次检测没有得到结果"
+  },
+  "tiers.reason.probe_failed.fix": {
+    "m": "稍后再试。",
+    "_desc": "原因 probe_failed 的建议"
+  },
+  "tiers.reason.request_id_reused": {
+    "m": "请求重复",
+    "_desc": "原因词：同一次检测请求被重复提交"
+  },
+  "tiers.reason.request_id_reused.fix": {
+    "m": "再检测一次即可。",
+    "_desc": "原因 request_id_reused 的建议"
+  },
+  "tiers.reason.service_closed": {
+    "m": "服务已关闭",
+    "_desc": "原因词：服务关闭，检测没有完成"
+  },
+  "tiers.reason.service_closed.fix": {
+    "m": "服务启动后再试。",
+    "_desc": "原因 service_closed 的建议"
+  },
+  "tiers.reason.setup_failed": {
+    "m": "无法准备检测",
+    "_desc": "原因词：准备临时连接时出错"
+  },
+  "tiers.reason.setup_failed.fix": {
+    "m": "稍后再试。",
+    "_desc": "原因 setup_failed 的建议"
+  },
+  "tiers.reason.startup_failed": {
+    "m": "检测未能启动",
+    "_desc": "原因词：检测没有启动起来"
+  },
+  "tiers.reason.startup_failed.fix": {
+    "m": "稍后再试；反复出现时查看运行日志。",
+    "_desc": "原因 startup_failed 的建议；「运行日志」是页面名"
+  },
+  "tiers.reason.subscription_recheck_pending": {
+    "m": "等待复检",
+    "_desc": "原因词：订阅刚更新，节点在等待复检"
+  },
+  "tiers.reason.subscription_recheck_pending.fix": {
+    "m": "复检结果出来之前不会使用这个节点。",
+    "_desc": "原因 subscription_recheck_pending 的说明（原因词是「等待复检」）"
+  },
+  "tiers.reason.tier3_auto_pool_self_check": {
+    "m": "自动检测",
+    "_desc": "原因词：自动节点池的节点由 Tesseract 自己检测，不能单独诊断"
+  },
+  "tiers.reason.tier3_auto_pool_self_check.fix": {
+    "m": "Garrison 的节点不能单独诊断。",
+    "_desc": "原因 tier3_auto_pool_self_check 的说明：Garrison 的节点由运行时自己检测；Garrison 为代号（不译）"
+  },
+  "tiers.reason.timeout": {
+    "m": "检测超时",
+    "_desc": "原因词：检测没有在规定时间内完成"
+  },
+  "tiers.reason.timeout.fix": {
+    "m": "稍后再试。",
+    "_desc": "原因 timeout 的建议"
+  },
+  "tiers.reason.tls_failed": {
+    "m": "TLS 连接失败",
+    "_desc": "原因词：TLS 握手没有完成；TLS 为技术词"
+  },
+  "tiers.reason.tls_failed.fix": {
+    "m": "检查 SNI 和证书设置是否与服务端一致。",
+    "_desc": "原因 tls_failed 的建议；SNI 为技术词"
+  },
+  "tiers.reason.unsupported_protocol": {
+    "m": "协议不受支持",
+    "_desc": "原因词：当前核心不支持这个节点的协议"
+  },
+  "tiers.reason.unsupported_protocol.fix": {
+    "m": "换一个协议，或更新核心后再试。",
+    "_desc": "原因 unsupported_protocol 的建议"
+  },
+  "tiers.reason.upstream_missing": {
+    "m": "出口不可用",
+    "_desc": "原因词：链路诊断需要的 Gateway 出口不可用"
+  },
+  "tiers.reason.upstream_missing.fix": {
+    "m": "确认 Gateway 当前出口可用后再试。",
+    "_desc": "原因 upstream_missing 的建议；Gateway 为层级代号（不译）"
+  },
+  "tiers.refresh.result": {
+    "m": "{kind, select, applied {已更新并应用} next_start {已保存 · 下次启动时使用} stored_unapplied {已更新，未能应用} kept_previous {更新失败 · 仍使用上次的节点} busy_stopping {服务正在停止，稍后再更新} in_progress {这个订阅正在更新} recovery {正在恢复，稍后再更新} other {更新失败}}",
+    "_desc": "订阅更新的结果（G35 四种结果和拒绝）：applied 已更新并应用；next_start 服务未运行；stored_unapplied 已存储未应用；kept_previous 失败但保留上次的节点；failed 失败（新订阅没有旧缓存）；busy_stopping 服务正在停止；in_progress 同一订阅已在更新；recovery 正在恢复"
+  },
+  "tiers.refresh.short": {
+    "m": "{kind, select, applied {已更新} next_start {已保存} stored_unapplied {未能应用} kept_previous {更新失败} busy_stopping {服务正在停止} in_progress {正在更新} recovery {稍后再试} other {更新失败}}",
+    "_desc": "「更新订阅」按钮完成后的短文字；kind 同 tiers.refresh.result；空间紧"
+  },
+  "tiers.row.aria": {
+    "m": "{name}，{last, select, yes {上次} other {}}{state, select, ok {可用} slow {较慢} down {不可用} pending {待检查} recheck {待复检} draft {草稿} other {}}{cur, select, yes {，当前} other {}}",
+    "_desc": "节点行的读屏名称；name 为节点名（数据，不译）；last=yes 表示服务未运行、状态是上次的结果；state 为状态；cur=yes 表示正在使用"
+  },
+  "tiers.row.checking": {
+    "m": "检测中",
+    "_desc": "节点行延迟列的转圈图标的读屏名称：正在检测这个节点"
+  },
+  "tiers.row.current": {
+    "m": "当前",
+    "_desc": "节点行名称后的小标签：这个节点正在承载流量（或是 Gateway 的当前出口）；空间紧"
+  },
+  "tiers.row.diag": {
+    "m": "检测延迟",
+    "_desc": "节点行图标按钮的名称和提示：检测这个节点的延迟"
+  },
+  "tiers.row.more": {
+    "m": "更多操作",
+    "_desc": "行末「⋯」按钮的名称和提示：打开行菜单"
+  },
+  "tiers.row.use": {
+    "m": "设为当前",
+    "_desc": "Gateway 候选行的按钮：把这个节点设为当前固定出口；空间紧"
+  },
+  "tiers.row.use_aria": {
+    "m": "设为当前出口",
+    "_desc": "窄窗口下「设为当前」图标按钮的名称和提示"
+  },
+  "tiers.row.use_busy": {
+    "m": "应用中",
+    "_desc": "「设为当前」按钮进行中的文字；空间紧（与 tiers.row.use 同宽）"
+  },
+  "tiers.row.use_done": {
+    "m": "已切换",
+    "_desc": "「设为当前」按钮完成后的文字；空间紧（与 tiers.row.use 同宽）"
+  },
+  "tiers.search.empty.clear": {
+    "m": "清除搜索",
+    "_desc": "搜索空状态的按钮：清空搜索框"
+  },
+  "tiers.search.empty.title": {
+    "m": "没有匹配的节点",
+    "_desc": "搜索没有结果时的空状态标题"
+  },
+  "tiers.search.placeholder.bastion": {
+    "m": "搜索来源和节点",
+    "_desc": "Bastion 层搜索框的占位文字"
+  },
+  "tiers.search.placeholder.gateway": {
+    "m": "搜索名称、协议",
+    "_desc": "Gateway 列表搜索框的占位文字"
+  },
+  "tiers.search.placeholder.pool": {
+    "m": "搜索节点",
+    "_desc": "打开 Garrison 后搜索框的占位文字"
+  },
+  "tiers.search.placeholder.sentinel": {
+    "m": "搜索名称、协议、订阅",
+    "_desc": "Sentinel 列表搜索框的占位文字；订阅名也能搜到它的节点（G40）"
+  },
+  "tiers.search.placeholder.sub": {
+    "m": "搜索这个订阅的节点",
+    "_desc": "钻入某个订阅后搜索框的占位文字"
+  },
+  "tiers.search.placeholder.vanguard": {
+    "m": "搜索名称、协议",
+    "_desc": "Vanguard 列表搜索框的占位文字（地区 B-03、地址 K-1 不在搜索范围）"
+  },
+  "tiers.sub.aria": {
+    "m": "{name}，{total, plural, other {# 个节点}}，{good, plural, other {# 个可用}}{drill, select, yes {，按 Enter 查看节点} other {，按 Enter 查看详情}}",
+    "_desc": "订阅行的无障碍名称；name 为订阅名（数据）；drill=yes 时能钻入看成员（K-4 字段在），否则 Enter 打开详情"
+  },
+  "tiers.sub.auto.12h": {
+    "m": "每 12 小时",
+    "_desc": "订阅的自动更新间隔：每 12 小时"
+  },
+  "tiers.sub.auto.1d": {
+    "m": "每天",
+    "_desc": "订阅的自动更新间隔：每天一次"
+  },
+  "tiers.sub.auto.30m": {
+    "m": "每 30 分钟",
+    "_desc": "订阅的自动更新间隔：每 30 分钟"
+  },
+  "tiers.sub.auto.6h": {
+    "m": "每 6 小时",
+    "_desc": "订阅的自动更新间隔：每 6 小时"
+  },
+  "tiers.sub.auto.manual": {
+    "m": "仅手动",
+    "_desc": "订阅的自动更新间隔：不自动更新，只手动更新"
+  },
+  "tiers.sub.busy.failed": {
+    "m": "更新失败",
+    "_desc": "「更新订阅」按钮失败后的文字；空间紧"
+  },
+  "tiers.sub.busy.updated": {
+    "m": "已更新",
+    "_desc": "「更新订阅」按钮完成后的文字；空间紧"
+  },
+  "tiers.sub.busy.updating": {
+    "m": "更新中",
+    "_desc": "「更新订阅」按钮进行中的文字；空间紧"
+  },
+  "tiers.sub.count": {
+    "m": "{n, plural, other {# 个节点}}",
+    "_desc": "订阅行名称后的小标签：订阅里的节点数；空间紧"
+  },
+  "tiers.sub.degraded": {
+    "m": "订阅状态暂不可用",
+    "_desc": "订阅行第二行：读不到订阅状态，只显示配置里的名字（subscriptions.list 未发布时的降级）"
+  },
+  "tiers.sub.delete": {
+    "m": "删除订阅",
+    "_desc": "订阅行菜单（危险）：删除这个订阅（会先确认）"
+  },
+  "tiers.sub.disabled": {
+    "m": "已停用",
+    "_desc": "订阅行第二行：订阅已停用（G17）"
+  },
+  "tiers.sub.disabled_short": {
+    "m": "已停用",
+    "_desc": "订阅行健康列：订阅已停用（G17）；空间紧"
+  },
+  "tiers.sub.health": {
+    "m": "<b>{good}</b>/{total} 可用",
+    "_desc": "订阅行的健康列：可用节点数/节点总数；<b> 内的数字加粗"
+  },
+  "tiers.sub.job.updating": {
+    "m": "正在更新…",
+    "_desc": "订阅行第二行：订阅正在更新（笼统）"
+  },
+  "tiers.sub.manage": {
+    "m": "管理订阅",
+    "_desc": "订阅的菜单项和按钮：打开「管理订阅」抽屉（改名称、地址、自动更新）"
+  },
+  "tiers.sub.pending": {
+    "m": "待复检",
+    "_desc": "订阅行第二行：节点在等待复检（visibility=pending）"
+  },
+  "tiers.sub.previous": {
+    "m": "显示上次结果",
+    "_desc": "订阅行第二行：健康数是上一个运行代次的结果（visibility=previous）"
+  },
+  "tiers.sub.previous_short": {
+    "m": "上次",
+    "_desc": "订阅行健康列的附注：健康数是上次的结果；空间紧"
+  },
+  "tiers.sub.unknown": {
+    "m": "待检查",
+    "_desc": "订阅行第二行：还没有检测结果（visibility=unknown）"
+  },
+  "tiers.sub.update": {
+    "m": "更新订阅",
+    "_desc": "订阅行图标按钮的名称和提示：立即更新这个订阅"
+  },
+  "tiers.sub.update_all": {
+    "m": "全部更新",
+    "_desc": "Sentinel「订阅」分组标签末尾的按钮：依次更新全部订阅；空间紧"
+  },
+  "tiers.sub.updated": {
+    "m": "更新于 {ago}",
+    "_desc": "订阅行的更新列：上次更新的时间；ago 为相对时间（如「2 小时前」，T.fmt.ago）"
+  },
+  "tiers.sub_delete.body": {
+    "m": "{has_total, select, yes {{n, plural, other {这个订阅的 # 个节点会一起移除。}}} other {这个订阅的节点会一起移除。}}正在使用时，连接会切换到其他节点。删除后需要重新添加订阅地址才能恢复。",
+    "_desc": "删除订阅的确认框正文（G18：先警告再允许；在用数没有来源，一律警告）；has_total=yes 时 n 为订阅的节点数"
+  },
+  "tiers.switcher.aria": {
+    "m": "层级，按回退顺序排列",
+    "_desc": "顶部层级切换器（四个格子）的读屏名称"
+  },
+  "tiers.toolbar.import": {
+    "m": "导入",
+    "_desc": "工具条主按钮：打开导入表单"
+  },
+  "tiers.toolbar.search_aria": {
+    "m": "搜索节点",
+    "_desc": "工具条搜索框的读屏名称"
+  },
+  "tiers.toolbar.sort.lat": {
+    "m": "延迟",
+    "_desc": "排序切换：按延迟排序；空间紧"
+  },
+  "tiers.toolbar.sort.name": {
+    "m": "名称",
+    "_desc": "排序切换：按名称排序；空间紧"
+  },
+  "tiers.toolbar.sort_aria": {
+    "m": "排序方式",
+    "_desc": "工具条排序切换（延迟 / 名称）的读屏名称"
+  },
+  "tiers.toolbar.test": {
+    "m": "全部检测",
+    "_desc": "工具条按钮：依次检测当前列表里所有节点的延迟"
+  },
+  "tiers.write.rolled_back": {
+    "m": "保存没有生效，已恢复原来的配置。",
+    "_desc": "编辑、启停或删除失败且运行时已回滚（rolled_back）"
+  },
+  "tiers.write.stale": {
+    "m": "节点列表已更新，请重试。",
+    "_desc": "写入失败：节点 ID 已失效（换代，conflict）"
+  },
+  "tiers.write.unapplied": {
+    "m": "已保存，但未能立即应用：{reason}",
+    "_desc": "写入已保存、未能应用（saved=true、applied=false）；reason 为错误说明（已翻译的整句）"
+  }
+}

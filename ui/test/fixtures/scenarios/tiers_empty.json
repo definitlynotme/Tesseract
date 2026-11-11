@@ -1,0 +1,497 @@
+{
+ "name": "tiers_empty",
+ "desc": "T-P4-05b G34: running, every tier empty (no nodes, subscriptions or drafts), Bastion off, no Gateway selection: each tier says what to do and offers the import.",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "nodes.diagnose",
+      "nodes.cancelDiagnose",
+      "nodes.update",
+      "nodes.delete",
+      "nodes.reveal",
+      "subscriptions.refresh",
+      "import.preview",
+      "import.apply",
+      "gateway.select",
+      "settings.apply",
+      "config.snapshot",
+      "nodes.detail",
+      "import.specs"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "nodes.list",
+      "subscriptions.list",
+      "config.items",
+      "gateway.current",
+      "bastion.pool",
+      "core.info",
+      "jobs"
+     ],
+     "features": [
+      "B-01",
+      "B-03",
+      "B-04",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08",
+      "B-09",
+      "B-10",
+      "B-11",
+      "B-12",
+      "B-13",
+      "B-14",
+      "B-15",
+      "B-16",
+      "B-17",
+      "B-18",
+      "B-37"
+     ]
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": true,
+      "startup_phase": "running",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": true,
+      "pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": 120
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "route.published",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "publication_revision": 20,
+     "owner": {
+      "process_pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "selected_chain": [
+      "TIER1",
+      "hk03-vps"
+     ],
+     "leaf": "hk03-vps",
+     "managed_tier": "vanguard",
+     "observed_at_ms": 1790000000000,
+     "valid": true,
+     "invalid_reason": null,
+     "fail_closed_confirmed": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "vanguard",
+     "offline_reason": null,
+     "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+     ],
+     "degraded": false,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 0,
+       "usable": 0,
+       "check_interval_s": 30
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 0,
+       "usable": 0,
+       "check_interval_s": 60
+      },
+      "bastion": {
+       "enabled": false,
+       "total": 0,
+       "usable": 0,
+       "check_interval_s": 120
+      },
+      "gateway": {
+       "enabled": true,
+       "total": 0,
+       "usable": 0,
+       "check_interval_s": 60
+      }
+     },
+     "pool": {
+      "usable": 3,
+      "total": 5
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "config.items",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "selected": null,
+     "effective": null,
+     "missing": false,
+     "applied": false,
+     "pending": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "bastion.pool",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "runtime_alive": 0,
+     "user_alive": 0,
+     "capacity": 60,
+     "min_alive_nodes": 3,
+     "target_alive": 0,
+     "collecting": false,
+     "observed_at_ms": 1790000000000
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "core.info",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "running": true,
+     "pid": 7654,
+     "version": "1.19.27",
+     "generation": 8,
+     "cleanup_pending": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:language",
+    "language": "zh_CN",
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:visibility",
+    "visible": true,
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  }
+ ]
+}

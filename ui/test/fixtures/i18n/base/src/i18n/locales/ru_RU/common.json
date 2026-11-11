@@ -1,0 +1,8 @@
+{
+  "common.action.save": "RU save",
+  "common.items": "{n, plural, one {# node one} few {# node few} many {# node many} other {# node other}}",
+  "common.hint": "RU press <kbd>Ctrl K</kbd> to open {name}",
+  "common.mode": "{mode, select, tun {RU TUN} other {RU system proxy}}",
+  "common.tier": "Vanguard RU self-hosted",
+  "common.skipped.timeout": "RU timed out"
+}

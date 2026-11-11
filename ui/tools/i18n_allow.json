@@ -1,0 +1,551 @@
+{
+  "_doc": "Exceptions for ui/tools/i18n_check.mjs (glossary, truncation). Each entry: {check, reason, and any of id / lang / term_id / selector / page to narrow it}; an entry without a non-empty reason is ignored. zh_CN is never allowed here.",
+  "entries": [
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "en_US",
+      "term_id": "subscription",
+      "reason": "P5 en_US (10-20): source-type label in a 132px select (91px for the value) and the type chip; Subscription URL (106px) was clipped, so the label reads Subscription. F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term subscription URL is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "pt_BR",
+      "term_id": "subscription",
+      "reason": "P5 pt_BR (10-20): same as en_US. Source-type label in a 132px select (91px for the value) and the type chip; URL da assinatura (110px) was clipped by 19px (render run p5b-20261020, settings_i18n_page, both sizes), so the label reads Assinatura (still the glossary's role_sentinel word). F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term URL da assinatura is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "de_DE",
+      "term_id": "subscription",
+      "reason": "P5 de_DE (10-20): same as en_US. Source-type label in a 132px select (91px for the value) and the type chip; Abonnement-URL (110px) overflowed the value by 19px (render run p5b-20261020, settings_i18n_page, both sizes), so the label reads Abonnement (still the glossary's role_sentinel word). F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term Abonnement-URL is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "ja_JP",
+      "term_id": "subscription",
+      "reason": "P5 ja_JP (10-20): same as en_US. Source-type label in a 132px select (91px for the value) and the type chip; サブスクリプション URL (~113px) overflowed the value by 25px (render run p5b-20261020, settings_i18n_page, both sizes), so the label reads サブスク URL (~68px; サブスク is the glossary's own ja form of role_sentinel and the common abbreviation). F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term サブスクリプション URL is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "es_ES",
+      "term_id": "subscription",
+      "reason": "P5 es_ES (10-20): same as en_US. Source-type label in a 132px select (91px for the value) and the type chip; URL de suscripción (118px) overflowed the value by 27px (render run p5b-20261020, settings_i18n_page, both sizes), so the label reads Suscripción (~70px; still the glossary's role_sentinel word suscripci). F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term URL de suscripción is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "settings.bastion.src.sub.label",
+      "lang": "fr_FR",
+      "term_id": "subscription",
+      "reason": "P5 fr_FR (10-20): same as en_US. Source-type label in a 132px select (91px for the value) and the type chip; URL d’abonnement (117px) overflowed the value by 26px (render run p5b-20261020, settings_i18n_page, both sizes), so the label reads Abonnement (~81px; still the glossary's role_sentinel word abonnement; fits, render run p5b-fr-fix1-settings). F-01 (10-27) removed the hint below the field (settings.bastion.src.sub.hint), so the full term URL d’abonnement is no longer shown; the short label still names the source type."
+    },
+    {
+      "check": "glossary",
+      "id": "alerts.aux.title",
+      "lang": "en_US",
+      "term_id": "role_sentinel",
+      "reason": "P5 en_US (10-21, Claude D5 review): here 订阅 is the verb (subscribe to the ntfy / Pushover topic on a phone), not the Sentinel role noun; the glossary note anticipates this case. \"Subscribe on your phone (optional)\" says what the section does; the noun form \"Phone subscription\" read as a plan or contract."
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_paused",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「继续更新并跳到最新日志」的英文「Resume updates and jump to the latest」省掉了名词（提示挂在日志列表的跟随按钮上，latest 指最新一条）；不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），en_US 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），en_US 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），en_US 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），en_US 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），en_US 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.none.events_title",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-14 en_US: 事件视图的空状态标题「暂无事件日志」，en_US 说成「还没有事件」：所在视图叫 Key events（logs.view.events），空状态顺着视图名说。跨语言分歧：de / es / ja / ko 带「日志」，en / fr / pt / ru 不带，交各语言复核"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-14 de_DE: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），de_DE 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-14 de_DE: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），de_DE 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-14 de_DE: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），de_DE 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-14 de_DE: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），de_DE 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-14 de_DE: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），de_DE 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.clear.restored",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-14 es_ES: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），es_ES 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），fr_FR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），fr_FR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），fr_FR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），fr_FR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），fr_FR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.none.events_title",
+      "lang": "fr_FR",
+      "term_id": "log",
+      "reason": "T-P5-14 fr_FR: 事件视图的空状态标题「暂无事件日志」，fr_FR 说成「还没有事件」：所在视图叫 Événements clés（logs.view.events），空状态顺着视图名说。跨语言分歧：de / es / ja / ko 带「日志」，en / fr / pt / ru 不带，交各语言复核"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），pt_BR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），pt_BR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），pt_BR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），pt_BR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），pt_BR 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.none.events_title",
+      "lang": "pt_BR",
+      "term_id": "log",
+      "reason": "T-P5-14 pt_BR: 事件视图的空状态标题「暂无事件日志」，pt_BR 说成「还没有事件」：所在视图叫 Eventos principais（logs.view.events），空状态顺着视图名说。跨语言分歧：de / es / ja / ko 带「日志」，en / fr / pt / ru 不带，交各语言复核"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_live",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_paused",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.aria_paused",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.word",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.count",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_new",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.pill.aria_held",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.filtered.title",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.cleared.text",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.paused.text",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.none.events_title",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 事件视图的空状态标题「暂无事件日志」，ru_RU 说成「还没有事件」：所在视图叫 Ключевые события（logs.view.events），空状态顺着视图名说。跨语言分歧：de / es / ja / ko 带「日志」，en / fr / pt / ru 不带，交各语言复核"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.clear.restored",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 「条日志」是按条数说的单条日志记录（新日志计数胶囊、暂停时保留的条数、恢复的条数），ru_RU 目录对单条记录统一用「条目」词（en entry、de Eintrag、es / pt entrada、fr entrée、ru запись），「日志」整体仍用 tr 的词；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.load.relabel_failed",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-14 ru_RU: 句中指日志列表里的单条记录（新到的、暂停时保留的、清空视图时移走的、过滤后剩下的、标题被重新翻译的那些行），ru 目录对单条记录统一用 запись / записи，「日志」整体用 журнал；属合理的语境用词，不是用词不一致"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_live",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entry) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_live",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_live",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_paused",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.follow.tip_paused",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.cleared.text",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entry) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.cleared.text",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.cleared.text",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.paused.text",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entry) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.paused.text",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.paused.text",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.export.done",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (entry) like the new-entries pill, no longer the compound \"log entry\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.export.done",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (Eintrag) like the new-entries pill, no longer the compound \"Protokolleintrag\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.export.done",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (entrada) like the new-entries pill, no longer the compound \"entrada de registro\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.export.done",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-15 ru_RU: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (запись) like the new-entries pill, no longer the compound \"запись журнала\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.clear.restored",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (entry) like the new-entries pill, no longer the compound \"log entry\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.clear.restored",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (Eintrag) like the new-entries pill, no longer the compound \"Protokolleintrag\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (entry) like the new-entries pill, no longer the compound \"log entry\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (Eintrag) like the new-entries pill, no longer the compound \"Protokolleintrag\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (entrada) like the new-entries pill, no longer the compound \"entrada de registro\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-15 ru_RU: counts single log records (\"# 条日志\": exported, restored to the view, undelivered in a gap); the catalog counts them with the entry word (запись) like the new-entries pill, no longer the compound \"запись журнала\" (inconsistent with the pill, T-P5-14 §4); same rule as T-P5-14 class 1; \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap_unknown",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entry) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap_unknown",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap_unknown",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.list.gap_unknown",
+      "lang": "ru_RU",
+      "term_id": "log",
+      "reason": "T-P5-15 ru_RU: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (запись) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.filtered.title",
+      "lang": "en_US",
+      "term_id": "log",
+      "reason": "T-P5-15 en_US: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entry) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.filtered.title",
+      "lang": "de_DE",
+      "term_id": "log",
+      "reason": "T-P5-15 de_DE: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (Eintrag) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "logs.empty.filtered.title",
+      "lang": "es_ES",
+      "term_id": "log",
+      "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    }
+  ]
+}

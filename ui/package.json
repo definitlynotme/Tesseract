@@ -1,0 +1,26 @@
+{
+  "name": "tesseract-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tesseract desktop UI (web front end for the Tauri shell).",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node build.mjs --target app --clean && node build.mjs --target design --clean",
+    "build:app": "node build.mjs --target app --clean",
+    "build:design": "node build.mjs --target design --clean",
+    "check": "node tools/check.mjs",
+    "test": "node --test test/unit/",
+    "test:render": "node tools/run_if_exists.mjs test/render/run.mjs",
+    "test:e2e": "node tools/run_if_exists.mjs test/e2e/run.mjs",
+    "test:perf": "node tools/run_if_exists.mjs test/perf/run.mjs",
+    "test:a11y": "node tools/run_if_exists.mjs test/a11y/run.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/instrument-sans": "5.3.0",
+    "@fontsource/geist-mono": "5.3.0",
+    "acorn": "8.19.0",
+    "acorn-walk": "8.3.5",
+    "esbuild": "0.28.2",
+    "playwright-core": "1.63.0"
+  }
+}

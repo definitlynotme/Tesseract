@@ -1,0 +1,652 @@
+{
+ "answer": {
+  "admission": null,
+  "brokered": [
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   },
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   }
+  ],
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ],
+    [
+     "n2"
+    ]
+   ]
+  },
+  "delay_calls": [
+   {
+    "expected_status": "204",
+    "name": "n1",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   },
+   {
+    "expected_status": "204",
+    "name": "n2",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   }
+  ],
+  "leased": [
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n1",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   },
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n2",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   }
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:6a0ca4c9daf57f102fb42ed3\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0 observer=ob-9c48cf5f49495183 scope=sc-6c68f28cd4bd5866 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0 observer=ob-9c48cf5f49495183 scope=sc-6c68f28cd4bd5866 scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:6a0ca4c9daf57f102fb42ed3 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-08f9942328a9cd24 seq=<seq> loss_total=0)"
+   ]
+  },
+  "queue_wait_known": true,
+  "result": "http_answer",
+  "successor_result": "pass"
+ },
+ "error": {
+  "admission": null,
+  "brokered": [
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   },
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   }
+  ],
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ],
+    [
+     "n2"
+    ]
+   ]
+  },
+  "delay_calls": [
+   {
+    "expected_status": "204",
+    "name": "n1",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   },
+   {
+    "expected_status": "204",
+    "name": "n2",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   }
+  ],
+  "leased": [
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n1",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   },
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n2",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   }
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:f3c353e9fe76bb9b23c24355\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0 observer=ob-e0965a2978a1c56f scope=sc-6a3c7a8e94af18de scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0 observer=ob-e0965a2978a1c56f scope=sc-6a3c7a8e94af18de scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:f3c353e9fe76bb9b23c24355 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-afa2855f9e7000a3 seq=<seq> loss_total=0)"
+   ]
+  },
+  "queue_wait_known": true,
+  "result": "indeterminate",
+  "successor_result": "pass"
+ },
+ "ok": {
+  "admission": null,
+  "brokered": [
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   },
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   }
+  ],
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ],
+    [
+     "n2"
+    ]
+   ]
+  },
+  "delay_calls": [
+   {
+    "expected_status": "204",
+    "name": "n1",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   },
+   {
+    "expected_status": "204",
+    "name": "n2",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   }
+  ],
+  "leased": [
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n1",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   },
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n2",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   }
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:a6f2558703fedac4d0437c8c\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0 observer=ob-65e63f7ba5ab2aeb scope=sc-d81b20dd4cd61105 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0 observer=ob-65e63f7ba5ab2aeb scope=sc-d81b20dd4cd61105 scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:a6f2558703fedac4d0437c8c reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-4fec93370c60eb91 seq=<seq> loss_total=0)"
+   ]
+  },
+  "queue_wait_known": true,
+  "result": "pass",
+  "successor_result": "pass"
+ },
+ "timeout": {
+  "admission": null,
+  "brokered": [
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   },
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   }
+  ],
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ],
+    [
+     "n2"
+    ]
+   ]
+  },
+  "delay_calls": [
+   {
+    "expected_status": "204",
+    "name": "n1",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   },
+   {
+    "expected_status": "204",
+    "name": "n2",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   }
+  ],
+  "leased": [
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n1",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   },
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n2",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   }
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:4b24b5c25638aa782b68a7b9\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0 observer=ob-9d4da228c040ca79 scope=sc-1ff3cfba2b1a5682 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0 observer=ob-9d4da228c040ca79 scope=sc-1ff3cfba2b1a5682 scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:4b24b5c25638aa782b68a7b9 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d3eee085be291767 seq=<seq> loss_total=0)"
+   ]
+  },
+  "queue_wait_known": true,
+  "result": "timeout",
+  "successor_result": "pass"
+ },
+ "zombie": {
+  "admission": null,
+  "brokered": [
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   },
+   {
+    "deadline_minus_issue": 7.25,
+    "keys": [
+     "execution_deadline_monotonic",
+     "priority",
+     "queue_timeout_seconds",
+     "socket_start_timeout_seconds"
+    ],
+    "priority": "RUNTIME_MANUAL",
+    "queue_timeout_seconds": 1.5,
+    "socket_start_timeout_seconds": 0.5
+   }
+  ],
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ],
+    [
+     "n2"
+    ]
+   ]
+  },
+  "delay_calls": [
+   {
+    "expected_status": "204",
+    "name": "n1",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   },
+   {
+    "expected_status": "204",
+    "name": "n2",
+    "request_timeout": "4.5..5.65",
+    "thread": "runtime-probe-#-#",
+    "timeout_ms": 5000,
+    "url": "http://t0-tier3.test/generate_204",
+    "verify": true
+   }
+  ],
+  "leased": [
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n1",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   },
+   {
+    "expected_status": "204",
+    "has_ticket": true,
+    "keys": [
+     "execution_context",
+     "expected_status",
+     "recovery_deadline_monotonic",
+     "recovery_ticket",
+     "request_timeout_seconds",
+     "timeout_ms"
+    ],
+    "leaf": "n2",
+    "request_timeout_seconds": 5.75,
+    "timeout_ms": 5000,
+    "urls": [
+     "http://t0-tier3.test/generate_204"
+    ]
+   }
+  ],
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:5f2929326b1a2f57e519672e\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0 observer=ob-7d64a3f0599f20e1 scope=sc-ad8ec44918e83740 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0 observer=ob-7d64a3f0599f20e1 scope=sc-ad8ec44918e83740 scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:5f2929326b1a2f57e519672e reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-07eeda8c967f4c0a seq=<seq> loss_total=0)"
+   ]
+  },
+  "queue_wait_known": true,
+  "result": "transport_fail",
+  "successor_result": "pass"
+ }
+}

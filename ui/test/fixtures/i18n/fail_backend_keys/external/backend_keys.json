@@ -1,0 +1,33 @@
+{
+  "errors": {
+    "errors.timeout": [
+      "literal:bridge_x.py:1"
+    ],
+    "errors.io": [
+      "literal:bridge_y.py:2"
+    ]
+  },
+  "errors_by_domain": {
+    "(code)": 1
+  },
+  "catalog": {
+    "label": [
+      "catalog.ss"
+    ],
+    "choice": [],
+    "notice": []
+  },
+  "reasons": {
+    "common.skipped": [
+      "timeout"
+    ],
+    "tiers.reason": [
+      "timeout"
+    ],
+    "alerts.test_reason": [],
+    "overview.exit_reason": [],
+    "alerts.onboarding_reason": [],
+    "shell.host_reason": []
+  },
+  "unresolved": []
+}

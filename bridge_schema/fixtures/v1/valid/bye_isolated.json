@@ -1,0 +1,19 @@
+{
+  "epoch": "v1-fixture",
+  "exit_code": 0,
+  "network_recovery": {
+    "firewall": {
+      "error_code": "scope_isolated",
+      "remaining_count": 0,
+      "state": "not_needed"
+    },
+    "proxy": {
+      "error_code": "scope_isolated",
+      "remaining_count": 0,
+      "state": "not_needed"
+    }
+  },
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "t": "bye"
+}

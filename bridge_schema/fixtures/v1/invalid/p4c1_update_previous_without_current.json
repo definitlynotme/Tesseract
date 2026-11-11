@@ -1,0 +1,22 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "update.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "state": "idle",
+      "version": null,
+      "update_available": false,
+      "installable": false,
+      "error": null,
+      "current_version": null,
+      "previous_version": "0.1.0"
+    }
+  },
+  "expected": "invariant:update.state.previous_version"
+}

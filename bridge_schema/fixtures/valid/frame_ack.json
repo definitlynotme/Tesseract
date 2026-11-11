@@ -1,0 +1,10 @@
+{
+  "t": "ack",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "id": 17,
+  "req_id": "page-17",
+  "accepted": true,
+  "op": "job-42"
+}

@@ -1,0 +1,447 @@
+{
+ "proxies": {
+  "COMPATIBLE": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "0abbde70-dce9-4c3f-ad7e-7255ae0e6add",
+   "interface": "",
+   "mptcp": false,
+   "name": "COMPATIBLE",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Compatible",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "DIRECT": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "aeaa5aeb-86ca-4d55-9db1-42a6b983d495",
+   "interface": "",
+   "mptcp": false,
+   "name": "DIRECT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Direct",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "FINAL-EXIT": {
+   "alive": true,
+   "all": [
+    "PROXY-FALLBACK",
+    "REJECT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "FINAL-EXIT",
+   "now": "PROXY-FALLBACK",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "GENERAL": {
+   "alive": true,
+   "all": [
+    "FINAL-EXIT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "GENERAL",
+   "now": "FINAL-EXIT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "GLOBAL": {
+   "alive": true,
+   "all": [
+    "GENERAL",
+    "FINAL-EXIT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "GLOBAL",
+   "now": "GENERAL",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "PASS": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "00000000-0000-0000-0000-000000000000",
+   "interface": "",
+   "mptcp": false,
+   "name": "PASS",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Pass",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "PASS-RULE": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "00000000-0000-0000-0000-000000000000",
+   "interface": "",
+   "mptcp": false,
+   "name": "PASS-RULE",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "PassRule",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "PROXY-FALLBACK": {
+   "alive": true,
+   "all": [
+    "TIER3-AUTO"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "expectedStatus": "204",
+   "extra": {},
+   "fixed": "",
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "PROXY-FALLBACK",
+   "now": "TIER3-AUTO",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "http://127.0.0.1:51833/generate_204",
+   "tfo": false,
+   "type": "Fallback",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "REJECT": {
+   "alive": false,
+   "dialer-proxy": "",
+   "extra": {
+    "http://127.0.0.1:51833/generate_204": {
+     "alive": false,
+     "history": [
+      {
+       "delay": 0,
+       "time": "2026-10-30T05:37:33.0540312-04:00"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "delay": 0,
+     "time": "2026-10-30T05:37:33.0540312-04:00"
+    }
+   ],
+   "id": "4ad79982-8265-43a2-8be3-a70e7f0c4ff7",
+   "interface": "",
+   "mptcp": false,
+   "name": "REJECT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Reject",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "REJECT-DROP": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "c7b9edd8-1b2b-499e-88b5-1df7f1c6f1a5",
+   "interface": "",
+   "mptcp": false,
+   "name": "REJECT-DROP",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "RejectDrop",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "TIER3-AUTO": {
+   "alive": false,
+   "all": [
+    "n1",
+    "n2",
+    "n3",
+    "REJECT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "expectedStatus": "204",
+   "extra": {
+    "http://127.0.0.1:51833/generate_204": {
+     "alive": false,
+     "history": [
+      {
+       "delay": 0,
+       "time": "2026-10-30T05:37:33.0490899-04:00"
+      }
+     ]
+    }
+   },
+   "fixed": "",
+   "hidden": false,
+   "history": [
+    {
+     "delay": 0,
+     "time": "2026-10-30T05:37:33.0490899-04:00"
+    }
+   ],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "TIER3-AUTO",
+   "now": "n1",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "http://127.0.0.1:51833/generate_204",
+   "tfo": false,
+   "type": "Fallback",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "n1": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {
+    "http://127.0.0.1:51833/generate_204": {
+     "alive": true,
+     "history": [
+      {
+       "delay": 13,
+       "time": "2026-10-30T05:37:33.0678324-04:00"
+      },
+      {
+       "delay": 24,
+       "time": "2026-10-30T05:37:33.5895717-04:00"
+      },
+      {
+       "delay": 11,
+       "time": "2026-10-30T05:37:33.7174723-04:00"
+      },
+      {
+       "delay": 12,
+       "time": "2026-10-30T05:37:33.8029461-04:00"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "delay": 13,
+     "time": "2026-10-30T05:37:33.0678324-04:00"
+    },
+    {
+     "delay": 24,
+     "time": "2026-10-30T05:37:33.5895717-04:00"
+    },
+    {
+     "delay": 11,
+     "time": "2026-10-30T05:37:33.7174723-04:00"
+    },
+    {
+     "delay": 12,
+     "time": "2026-10-30T05:37:33.8029461-04:00"
+    }
+   ],
+   "id": "6af506c0-b0a6-4681-b2fe-1078f7030f2e",
+   "interface": "",
+   "mptcp": false,
+   "name": "n1",
+   "provider-name": "TIER3B-RUNTIME",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Http",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "n2": {
+   "alive": false,
+   "dialer-proxy": "",
+   "extra": {
+    "http://127.0.0.1:51833/generate_204": {
+     "alive": false,
+     "history": [
+      {
+       "delay": 25,
+       "time": "2026-10-30T05:37:33.0794626-04:00"
+      },
+      {
+       "delay": 22,
+       "time": "2026-10-30T05:37:33.6261933-04:00"
+      },
+      {
+       "delay": 22,
+       "time": "2026-10-30T05:37:33.7410557-04:00"
+      },
+      {
+       "delay": 0,
+       "time": "2026-10-30T05:37:33.8043591-04:00"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "delay": 25,
+     "time": "2026-10-30T05:37:33.0794626-04:00"
+    },
+    {
+     "delay": 22,
+     "time": "2026-10-30T05:37:33.6261933-04:00"
+    },
+    {
+     "delay": 22,
+     "time": "2026-10-30T05:37:33.7410557-04:00"
+    },
+    {
+     "delay": 0,
+     "time": "2026-10-30T05:37:33.8043591-04:00"
+    }
+   ],
+   "id": "5581bb8c-925b-4909-b804-826fa38fad2a",
+   "interface": "",
+   "mptcp": false,
+   "name": "n2",
+   "provider-name": "TIER3B-RUNTIME",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Http",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "n3": {
+   "alive": false,
+   "dialer-proxy": "",
+   "extra": {
+    "http://127.0.0.1:51833/generate_204": {
+     "alive": false,
+     "history": [
+      {
+       "delay": 13,
+       "time": "2026-10-30T05:37:33.0678324-04:00"
+      },
+      {
+       "delay": 11,
+       "time": "2026-10-30T05:37:33.6525963-04:00"
+      },
+      {
+       "delay": 0,
+       "time": "2026-10-30T05:37:33.7648191-04:00"
+      },
+      {
+       "delay": 0,
+       "time": "2026-10-30T05:37:33.8162036-04:00"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "delay": 13,
+     "time": "2026-10-30T05:37:33.0678324-04:00"
+    },
+    {
+     "delay": 11,
+     "time": "2026-10-30T05:37:33.6525963-04:00"
+    },
+    {
+     "delay": 0,
+     "time": "2026-10-30T05:37:33.7648191-04:00"
+    },
+    {
+     "delay": 0,
+     "time": "2026-10-30T05:37:33.8162036-04:00"
+    }
+   ],
+   "id": "773abfb4-18aa-4825-b234-07d4539ae25f",
+   "interface": "",
+   "mptcp": false,
+   "name": "n3",
+   "provider-name": "TIER3B-RUNTIME",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Http",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  }
+ }
+}

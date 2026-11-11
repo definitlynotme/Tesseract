@@ -1,0 +1,19 @@
+{
+  "_doc": "Exceptions for scan.mjs --rule inject (P4 architecture §7; a hard gate since T-P4-07). Entry: {file, check?, line_sha256, count?, reason}. file is relative to ui/ with forward slashes; check is the finding's check id (html-sink, helper-html, helper-string, raw, eval, on-attr); line_sha256 is the first 16 hex digits of sha256(trimmed source line) — see lineDigest() in scan.mjs. When the line changes the exception lapses automatically. One entry covers at most count distinct lines with that text (default 1); further identical lines in the same file stay findings. Every entry must state its reason. T-P4-07 keeps exactly two: the T.html implementation itself and the T.icon implementation.",
+  "entries": [
+    {
+      "file": "src/core/core.js",
+      "check": "html-sink",
+      "line_sha256": "d6ffcea04565001f",
+      "line": "t.innerHTML = out.trim();",
+      "reason": "The T.html implementation itself (architecture §7: the only dynamic innerHTML allowed). `out` is the template's literal parts joined with every interpolation passed through part(): strings escaped by T.esc, a Node replaced by a per-call nonce comment and swapped in after parsing, a Raw only from a literal or T.icon (inject rule 3). The template element parses inertly (no script runs, no image loads)."
+    },
+    {
+      "file": "src/core/icons.js",
+      "check": "raw",
+      "line_sha256": "31df1443e2fa476d",
+      "line": "return window.T && T.raw ? T.raw(s) : s;",
+      "reason": "The T.icon implementation (architecture §7: T.raw takes a literal or a T.icon() result; this is where that result is minted). `s` is an <svg> built from this file's static path table (an unknown name falls back to the dot), a size coerced to a positive number and extra class names escaped; no caller text reaches it."
+    }
+  ]
+}

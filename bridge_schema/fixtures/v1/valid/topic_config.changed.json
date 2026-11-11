@@ -1,0 +1,27 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "config.changed",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "rev": 1,
+    "files": [
+      "local"
+    ],
+    "sections": [
+      {
+        "section": "network",
+        "saved": true,
+        "applied": true,
+        "effect": "none",
+        "error": null
+      }
+    ],
+    "pending": null,
+    "external_detection": "bridge_writes_only"
+  },
+  "seq": 1
+}

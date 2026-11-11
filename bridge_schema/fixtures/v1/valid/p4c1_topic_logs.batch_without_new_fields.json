@@ -1,0 +1,30 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "logs.batch",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "from_seq": 1,
+    "records": [
+      {
+        "seq": 1,
+        "ts_ms": 1790812800001,
+        "rx_ms": 1790812800001,
+        "source": "MIHOMO",
+        "level": "info",
+        "category": "connection",
+        "key": "",
+        "title": "line",
+        "detail": "",
+        "raw": "line"
+      }
+    ],
+    "dropped": 0,
+    "dropped_total": 0,
+    "gap": false
+  },
+  "seq": 1
+}

@@ -1,0 +1,33 @@
+{
+  "errors": {
+    "errors.timeout": [
+      "literal:bridge_x.py:1"
+    ]
+  },
+  "errors_by_domain": {
+    "(code)": 1
+  },
+  "catalog": {
+    "label": [
+      "catalog.ss",
+      "catalog.vmess"
+    ],
+    "choice": [
+      "catalog.ss.method.choice.aes-128-gcm"
+    ],
+    "notice": []
+  },
+  "reasons": {
+    "common.skipped": [
+      "timeout"
+    ],
+    "tiers.reason": [
+      "timeout"
+    ],
+    "alerts.test_reason": [],
+    "overview.exit_reason": [],
+    "alerts.onboarding_reason": [],
+    "shell.host_reason": []
+  },
+  "unresolved": []
+}

@@ -1,0 +1,130 @@
+{
+  "_comment": "T-P4-C1 item 6 / T-P4-C3 item 9: first-run UI language (D4, U3). LANGID from GetUserDefaultUILanguage; primary language (LANGID & 0x3ff) decides; zh-TW/zh-HK/zh-SG/zh-MO map to zh_CN; unsupported languages map to en_US. 'lang' is the input tag, 'expected' the result. Shared by tests/test_bridge_p4_c1.py and shell/app/src/native_text.rs.",
+  "vectors": [
+    {
+      "langid": "0x0804",
+      "lang": "zh-CN",
+      "expected": "zh_CN"
+    },
+    {
+      "langid": "0x0404",
+      "lang": "zh-TW",
+      "expected": "zh_CN"
+    },
+    {
+      "langid": "0x0c04",
+      "lang": "zh-HK",
+      "expected": "zh_CN"
+    },
+    {
+      "langid": "0x1004",
+      "lang": "zh-SG",
+      "expected": "zh_CN"
+    },
+    {
+      "langid": "0x1404",
+      "lang": "zh-MO",
+      "expected": "zh_CN"
+    },
+    {
+      "langid": "0x0409",
+      "lang": "en-US",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0809",
+      "lang": "en-GB",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0411",
+      "lang": "ja-JP",
+      "expected": "ja_JP"
+    },
+    {
+      "langid": "0x0412",
+      "lang": "ko-KR",
+      "expected": "ko_KR"
+    },
+    {
+      "langid": "0x040c",
+      "lang": "fr-FR",
+      "expected": "fr_FR"
+    },
+    {
+      "langid": "0x0c0c",
+      "lang": "fr-CA",
+      "expected": "fr_FR"
+    },
+    {
+      "langid": "0x0407",
+      "lang": "de-DE",
+      "expected": "de_DE"
+    },
+    {
+      "langid": "0x0807",
+      "lang": "de-CH",
+      "expected": "de_DE"
+    },
+    {
+      "langid": "0x0c0a",
+      "lang": "es-ES",
+      "expected": "es_ES"
+    },
+    {
+      "langid": "0x080a",
+      "lang": "es-MX",
+      "expected": "es_ES"
+    },
+    {
+      "langid": "0x0416",
+      "lang": "pt-BR",
+      "expected": "pt_BR"
+    },
+    {
+      "langid": "0x0816",
+      "lang": "pt-PT",
+      "expected": "pt_BR"
+    },
+    {
+      "langid": "0x0419",
+      "lang": "ru-RU",
+      "expected": "ru_RU"
+    },
+    {
+      "langid": "0x0410",
+      "lang": "it-IT",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0413",
+      "lang": "nl-NL",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0415",
+      "lang": "pl-PL",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x041f",
+      "lang": "tr-TR",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0422",
+      "lang": "uk-UA",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x042a",
+      "lang": "vi-VN",
+      "expected": "en_US"
+    },
+    {
+      "langid": "0x0401",
+      "lang": "ar-SA",
+      "expected": "en_US"
+    }
+  ]
+}

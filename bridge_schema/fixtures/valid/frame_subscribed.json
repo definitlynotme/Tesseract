@@ -1,0 +1,8 @@
+{
+  "t": "subscribed",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000003,
+  "sent_at_ms": 1790000000004,
+  "id": 21,
+  "topics": ["service.state", "core.info"]
+}

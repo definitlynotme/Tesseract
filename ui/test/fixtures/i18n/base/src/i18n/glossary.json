@@ -1,0 +1,24 @@
+[
+  {
+    "term_id": "tier_vanguard",
+    "zh": "Vanguard",
+    "dnt": true,
+    "ns": [
+      "*"
+    ],
+    "tr": {},
+    "note": "tier code name"
+  },
+  {
+    "term_id": "node",
+    "zh": "节点",
+    "dnt": false,
+    "ns": [
+      "*"
+    ],
+    "tr": {
+      "en_US": "node"
+    },
+    "note": "one server"
+  }
+]

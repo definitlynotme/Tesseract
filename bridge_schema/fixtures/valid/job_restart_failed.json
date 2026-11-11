@@ -1,0 +1,27 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "jobs",
+  "rev": 3,
+  "kind": "edge",
+  "seq": 43,
+  "data": {
+    "op": "job-44",
+    "name": "service.restart",
+    "state": "failed",
+    "started_at_ms": 1789999999000,
+    "result": {
+      "applied": false,
+      "core_running": false,
+      "core_cleanup_pending": true,
+      "core_generation": 8
+    },
+    "error": {
+      "code": "io",
+      "message_key": "errors.bridge.io",
+      "params": {}
+    }
+  }
+}

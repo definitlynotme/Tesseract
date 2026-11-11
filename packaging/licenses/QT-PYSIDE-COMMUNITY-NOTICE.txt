@@ -1,0 +1,19 @@
+Qt for Python community distribution notice
+===========================================
+
+Tesseract uses the community edition of PySide6 and Shiboken6, and the Qt
+libraries shipped by those wheels. Tesseract selects the GPL-3.0-only option
+for this distribution. The complete GNU GPL version 3 text is distributed
+next to this notice as GPL-3.0.txt.
+
+Upstream licensing information:
+https://doc.qt.io/qtforpython-6/licenses.html
+
+Upstream source code:
+https://code.qt.io/cgit/pyside/pyside-setup.git/
+https://code.qt.io/cgit/qt/qtbase.git/
+https://code.qt.io/cgit/qt/qtsvg.git/
+
+Only Qt modules and plugins named in the release SBOM may be redistributed in
+the Tesseract binary package. The release build rejects unapproved Qt
+artifacts, including Qt PDF, Qt Quick/QML, and Qt Virtual Keyboard.

@@ -1,0 +1,30 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "logs.batch",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "from_seq": 41,
+    "records": [
+      {
+        "seq": 41,
+        "ts_ms": 1789999999995,
+        "rx_ms": 1789999999996,
+        "source": "TESSERACT",
+        "level": "info",
+        "category": "other",
+        "key": "source_boundary",
+        "title": "Core log source boundary",
+        "detail": "{\"from\":\"mihomo_api\",\"to\":\"stdout\",\"at_ms\":1789999999995,\"reason\":\"disconnected\",\"continuity\":\"unknown\"}",
+        "raw": "{\"from\":\"mihomo_api\",\"to\":\"stdout\",\"at_ms\":1789999999995,\"reason\":\"disconnected\",\"continuity\":\"unknown\"}"
+      }
+    ],
+    "dropped": 0,
+    "dropped_total": 0,
+    "gap": false
+  },
+  "seq": 41
+}

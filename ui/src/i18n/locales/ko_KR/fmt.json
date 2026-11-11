@@ -1,0 +1,19 @@
+{
+  "fmt.ago.days": "{n, plural, other {#일 전}}",
+  "fmt.ago.hours": "{n, plural, other {#시간 전}}",
+  "fmt.ago.minutes": "{n, plural, other {#분 전}}",
+  "fmt.ago.now": "방금",
+  "fmt.lat.down": "사용 불가",
+  "fmt.lat.ok": "정상",
+  "fmt.lat.slow": "느림",
+  "fmt.ms": "{n, number, integer} ms",
+  "fmt.qty": "{num} {unit}",
+  "fmt.unit.b": "B",
+  "fmt.unit.gb": "GB",
+  "fmt.unit.kb": "KB",
+  "fmt.unit.mb": "MB",
+  "fmt.unit.per_second": "{unit}/s",
+  "fmt.uptime.hours_minutes": "{h}시간 {m}분",
+  "fmt.uptime.minutes": "{m}분",
+  "fmt.uptime.under_minute": "1분 미만"
+}

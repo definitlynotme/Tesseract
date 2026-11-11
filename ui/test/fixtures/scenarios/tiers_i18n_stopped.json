@@ -1,0 +1,158 @@
+{
+  "name": "tiers_i18n_stopped",
+  "desc": "T-P4-04c: the tiers page with the service stopped (overview_i18n_stopped). ASCII data only; the tiers page itself still shows the design synthetic data under translate=\"no\" until T-P4-05b.",
+  "lang": "zh_CN",
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "service.start",
+            "service.stop",
+            "service.restart",
+            "app.quit"
+          ],
+          "topics": [
+            "service.state",
+            "route.published",
+            "tiers.summary",
+            "traffic.tick",
+            "traffic.history",
+            "logs.batch",
+            "core.info",
+            "jobs"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "restored",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.state",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": false,
+            "startup_phase": "stopped",
+            "shutdown_cleanup_pending": false,
+            "failure_code": null
+          },
+          "core": {
+            "running": false,
+            "pid": null,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": false
+          },
+          "readiness": {
+            "state": "ready",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": null
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "tiers.summary",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "carrier": "vanguard",
+          "offline_reason": null,
+          "order": [
+            "vanguard",
+            "sentinel",
+            "bastion",
+            "gateway"
+          ],
+          "degraded": false,
+          "fallback": false,
+          "tiers": {
+            "vanguard": {
+              "enabled": true,
+              "total": 3,
+              "usable": 2
+            },
+            "sentinel": {
+              "enabled": true,
+              "total": 2,
+              "usable": 1
+            },
+            "bastion": {
+              "enabled": true,
+              "total": 40,
+              "usable": 25
+            },
+            "gateway": {
+              "enabled": false,
+              "total": 0,
+              "usable": 0
+            }
+          },
+          "pool": {
+            "usable": 5,
+            "total": 7
+          }
+        }
+      }
+    }
+  ]
+}

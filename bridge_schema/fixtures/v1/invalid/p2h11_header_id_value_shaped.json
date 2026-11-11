@@ -1,0 +1,55 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "res",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "id": 1,
+    "req_id": "request-1",
+    "owner": "window-1",
+    "cmd": "config.snapshot",
+    "ok": true,
+    "data": {
+      "rev": 3,
+      "values": {
+        "alerts": {
+          "channels": [
+            {
+              "id": "hook",
+              "type": "generic_webhook",
+              "label": "Hook",
+              "enabled": false,
+              "alert_types": [],
+              "config": {
+                "enabled": false,
+                "body_format": "json"
+              }
+            },
+            {
+              "id": "plain",
+              "type": "slack",
+              "label": "Plain",
+              "enabled": false,
+              "alert_types": [],
+              "config": {
+                "enabled": false
+              }
+            }
+          ]
+        }
+      },
+      "secret_fields_set": [
+        "alerts.hook.headers",
+        "alerts.hook.headers.Bearer h11fixtureValue",
+        "alerts.hook.headers.X-Api-Key",
+        "alerts.hook.url",
+        "alerts.plain.headers",
+        "alerts.plain.url"
+      ],
+      "read_errors": [],
+      "pending": null
+    }
+  },
+  "expected": "sensitive:data.secret_fields_set[1]"
+}

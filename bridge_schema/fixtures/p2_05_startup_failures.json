@@ -1,0 +1,331 @@
+[
+  {
+    "diagnostic": {
+      "reason_code": "runtime_listener_conflict",
+      "params": {
+        "kind": "mixed",
+        "field": "mihomo_mixed_port",
+        "port": 7890,
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "runtime_listener_conflict",
+      "message_key": "errors.start.listener_conflict",
+      "params": {
+        "kind": "mixed",
+        "port": 7890
+      },
+      "reason_code": "runtime_listener_conflict"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "runtime_listener_unavailable",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "runtime_listener_unavailable",
+      "message_key": "errors.start.listener_unavailable",
+      "params": {},
+      "reason_code": "runtime_listener_unavailable"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "source_supply_no_egress",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "source_supply_no_egress",
+      "message_key": "errors.start.source_supply_no_egress",
+      "params": {},
+      "reason_code": "source_supply_no_egress"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "no_sources",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "no_sources",
+      "message_key": "errors.start.no_sources",
+      "params": {},
+      "reason_code": "no_sources"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "no_validated_nodes",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.no_validated_nodes",
+      "params": {},
+      "reason_code": "no_validated_nodes"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "insufficient_validated_nodes",
+      "params": {
+        "healthy": 2,
+        "required": 3,
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.insufficient_validated_nodes",
+      "params": {
+        "healthy": 2,
+        "required": 3
+      },
+      "reason_code": "insufficient_validated_nodes"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "core_missing",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "io",
+      "message_key": "errors.start.core_missing",
+      "params": {},
+      "reason_code": "core_missing"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "core_start_timeout",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "timeout",
+      "message_key": "errors.start.core_start_timeout",
+      "params": {},
+      "reason_code": "core_start_timeout"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "core_not_running",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "not_running",
+      "message_key": "errors.start.core_not_running",
+      "params": {},
+      "reason_code": "core_not_running"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "route_verification_failed",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.route_verification_failed",
+      "params": {},
+      "reason_code": "route_verification_failed"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "fallback_warmup_failed",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.fallback_warmup_failed",
+      "params": {},
+      "reason_code": "fallback_warmup_failed"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "geodata_missing",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "validation",
+      "message_key": "errors.start.geodata_missing",
+      "params": {},
+      "reason_code": "geodata_missing"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "geodata_needs_route",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.geodata_needs_route",
+      "params": {},
+      "reason_code": "geodata_needs_route"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "geodata_download_failed",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "io",
+      "message_key": "errors.start.geodata_download_failed",
+      "params": {},
+      "reason_code": "geodata_download_failed"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "admin_required",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "admin_required",
+      "message_key": "errors.start.admin_required",
+      "params": {},
+      "reason_code": "admin_required"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "cleanup_pending",
+      "params": {
+        "cleanup_pending": true,
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "lifecycle_busy",
+      "message_key": "errors.start.cleanup_pending",
+      "params": {
+        "cleanup_pending": true
+      },
+      "reason_code": "cleanup_pending"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "superseded",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "superseded",
+      "message_key": "errors.start.superseded",
+      "params": {},
+      "reason_code": "superseded"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "source_supply_terminal.rule_blocked",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "validation",
+      "message_key": "errors.start.source_supply_terminal",
+      "params": {},
+      "reason_code": "source_supply_terminal.rule_blocked"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "source_supply_terminal.no_proxy",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "needs_route",
+      "message_key": "errors.start.source_supply_terminal",
+      "params": {},
+      "reason_code": "source_supply_terminal.no_proxy"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "source_supply_terminal.transport_failed",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "io",
+      "message_key": "errors.start.source_supply_terminal",
+      "params": {},
+      "reason_code": "source_supply_terminal.transport_failed"
+    }
+  },
+  {
+    "diagnostic": {
+      "reason_code": "unexpected",
+      "params": {
+        "detail": "C:/private/token.yaml",
+        "traceback": "Traceback (most recent call last)"
+      }
+    },
+    "expected": {
+      "code": "internal",
+      "message_key": "errors.start.unexpected",
+      "params": {},
+      "reason_code": "unexpected"
+    }
+  }
+]

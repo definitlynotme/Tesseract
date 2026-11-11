@@ -1,0 +1,50 @@
+{
+  "schema_version": 4,
+  "fixture_role": "observed_async_reward_tail_characterization",
+  "performance": {
+    "time_to_pool_revision_3_ms": 4718,
+    "net_new_pool_growth_at_20s": 7,
+    "observation_duration_ms": 150000,
+    "final_pool_healthy": 16,
+    "target_alive": 25,
+    "observed_gap_windows_ms": [37000, 41000],
+    "timing_precision": "rounded_from_authoritative_report"
+  },
+  "candidate_pipeline": {
+    "unique_candidate_count": 7498,
+    "tcp_start_acked_count": 1761,
+    "tcp_responsive_count": 549,
+    "fast_completion_count": 545,
+    "fast_pass_count": 16,
+    "deep_completion_count": 63,
+    "deep_pass_count": 0,
+    "net_new_pass_count": 16
+  },
+  "exact_reward": {
+    "grant_count": 16,
+    "selected_count": 1,
+    "selected_fast_pass_count": 1,
+    "expired_unused_grant_count": 15,
+    "expired_unused_credit_count": 255,
+    "root_family_unrelated_handoff_aging_was_enabled": true
+  },
+  "service_reward": {
+    "bad_leaf_training_completed": 2,
+    "bad_leaf_training_passed": 2,
+    "bad_leaf_selected_before_feedback": 75,
+    "bad_leaf_resolved_count": 7,
+    "bad_leaf_fast_pass_count": 1,
+    "good_leaf_training_completed": 3,
+    "good_leaf_training_passed": 3,
+    "good_leaf_selected_count": 5,
+    "good_leaf_resolved_count": 1,
+    "good_leaf_fast_pass_count": 1
+  },
+  "event_truth": {
+    "candidate_identity": "runtime_hmac_only",
+    "raw_uri_available": false,
+    "credentials_available": false,
+    "individual_event_trace_available": false,
+    "aggregate_values_must_not_be_synthesized_into_events": true
+  }
+}

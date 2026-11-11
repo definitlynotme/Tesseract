@@ -1,0 +1,14 @@
+{
+  "cjk": "enforce",
+  "demo": "enforce",
+  "inject": "enforce",
+  "style": "enforce",
+  "features": "enforce",
+  "features_pages": [
+    "logs",
+    "overview",
+    "tiers",
+    "settings",
+    "shell"
+  ]
+}

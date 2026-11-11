@@ -1,0 +1,19 @@
+{
+  "t": "bye",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "exit_code": 0,
+  "network_recovery": {
+    "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+    },
+    "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+    }
+  }
+}

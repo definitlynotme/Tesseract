@@ -1,0 +1,32 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "nodes.list",
+    "rev": 2,
+    "kind": "patch",
+    "data": {
+      "changed": [
+        {
+          "id": "example",
+          "name": "example",
+          "tier": "vanguard",
+          "kind": "manual",
+          "enabled": true,
+          "status": "unknown",
+          "reason_code": null,
+          "protocol": "example",
+          "latency_ms": null
+        }
+      ],
+      "removed": [],
+      "extra": {}
+    },
+    "key": "vanguard",
+    "base_rev": 1
+  },
+  "expected": "unknown:data"
+}

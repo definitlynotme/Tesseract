@@ -1,0 +1,429 @@
+[CmdletBinding()]
+param(
+    # owner/name on GitHub. Default: APP_REPOSITORY_URL in app_info.py (the
+    # address the app's update check reads), so the two can never disagree.
+    [string] $Repository = "",
+    # Encrypted Ed25519 update-signing key (PKCS#8 PEM). Never inside the repository.
+    [string] $SigningKey = "",
+    # Private deny list for the anonymity/secret audit (see RELEASING.md).
+    [string] $DenyFile = "",
+    # Ed25519 SSH key used to sign the public commits and the release tag.
+    [string] $SshSigningKey = "",
+    # Pause the signing job until you approve it on github.com.
+    [switch] $RequireApproval,
+    # Check everything and prepare the public commit locally; change nothing on GitHub.
+    [switch] $DryRun,
+    # Do not wait for the release workflow and the live update check.
+    [switch] $NoWatch
+)
+
+# One-click public release (RELEASING.md):
+#   1. read-only checks: committed tree, GitHub login and scopes, SSH signing
+#      key, update-signing key, repository state, tag not yet used;
+#   2. one confirmation;
+#   3. set up what is missing (repository, `release` environment, secrets),
+#      then scripts\push_to_github.ps1 -Release (audit, signed commit, signed tag, push);
+#   4. watch the "Release Windows" workflow, then download the published
+#      release the way the app does and verify its signature.
+# Safe to re-run: every step checks before it writes, and nothing is force-pushed.
+
+$ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
+Set-Location $RepoRoot
+$PasswordEnv = "TESSERACT_RELEASE_SIGNING_PASSWORD"
+
+function Write-Step([string] $Text) { Write-Host ""; Write-Host "== $Text" -ForegroundColor Cyan }
+function Write-Ok([string] $Text) { Write-Host "   ok  $Text" -ForegroundColor Green }
+function Write-Todo([string] $Text) { Write-Host "   ->  $Text" -ForegroundColor Yellow }
+function Stop-Publish([string] $Text) { Write-Host ""; Write-Host "STOP: $Text" -ForegroundColor Red; exit 1 }
+
+function ConvertTo-ArgumentString([string[]] $Arguments) {
+    $quoted = foreach ($argument in $Arguments) {
+        if ($argument -eq "") { '""' }
+        elseif ($argument -notmatch '[\s"]') { $argument }
+        else { '"' + (($argument -replace '(\\*)"', '$1$1\"') -replace '(\\+)$', '$1$1') + '"' }
+    }
+    return ($quoted -join " ")
+}
+
+# Runs a tool with separate stdout/stderr and optional exact stdin bytes (no
+# trailing newline, so secrets are stored byte-for-byte).
+function Invoke-Tool([string] $Exe, [string[]] $Arguments, [object] $InputText = $null) {
+    $info = New-Object System.Diagnostics.ProcessStartInfo
+    $info.FileName = (Get-Command $Exe -ErrorAction Stop).Source
+    $info.Arguments = ConvertTo-ArgumentString $Arguments
+    $info.UseShellExecute = $false
+    $info.CreateNoWindow = $true
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    $info.RedirectStandardInput = ($null -ne $InputText)
+    $info.StandardOutputEncoding = [System.Text.UTF8Encoding]::new($false)
+    $info.StandardErrorEncoding = [System.Text.UTF8Encoding]::new($false)
+    $process = [System.Diagnostics.Process]::Start($info)
+    $stdout = $process.StandardOutput.ReadToEndAsync()
+    $stderr = $process.StandardError.ReadToEndAsync()
+    if ($null -ne $InputText) {
+        $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes([string] $InputText)
+        $process.StandardInput.BaseStream.Write($bytes, 0, $bytes.Length)
+        $process.StandardInput.Close()
+    }
+    $process.WaitForExit()
+    return [pscustomobject]@{ Code = $process.ExitCode; Out = $stdout.Result.Trim(); Err = $stderr.Result.Trim() }
+}
+
+function Confirm-Yes([string] $Question) {
+    $answer = Read-Host "$Question [y/N]"
+    return ($answer -match '^(y|yes)$')
+}
+
+function Read-Secret([string] $Prompt) {
+    $secure = Read-Host $Prompt -AsSecureString
+    $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+    try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer) }
+    finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
+}
+
+foreach ($tool in @("git", "gh")) {
+    if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { Stop-Publish "$tool is not installed or not on PATH." }
+}
+$python = Join-Path $RepoRoot ".venv\Scripts\python.exe"
+if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { $python = (Get-Command python -ErrorAction Stop).Source }
+if (-not $SigningKey) { $SigningKey = Join-Path $env:USERPROFILE ".tesseract-release\update-signing-key.pem" }
+if (-not $DenyFile) { $DenyFile = Join-Path $env:USERPROFILE ".tesseract-release\public-denylist.txt" }
+if (-not $SshSigningKey) { $SshSigningKey = Join-Path $env:USERPROFILE ".ssh\id_ed25519" }
+$PublicDir = Join-Path (Split-Path -Parent $RepoRoot) "Tessract-public"
+
+$appInfo = Invoke-Tool $python @("-B", "-c", "import app_info; print(app_info.DEFAULT_APP_VERSION); print(app_info.APP_REPOSITORY_URL)")
+if ($appInfo.Code -ne 0) { Stop-Publish "Cannot read app_info.py: $($appInfo.Err)" }
+$version, $repositoryUrl = $appInfo.Out -split "\r?\n"
+if (-not $Repository) { $Repository = ($repositoryUrl -replace '^https://github\.com/', '').TrimEnd('/') }
+if ($Repository -notmatch '^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$') { Stop-Publish "Repository '$Repository' is not owner/name." }
+$owner = $Repository.Split("/")[0]
+$tag = "v$version"
+$remoteUrl = "https://github.com/$Repository.git"
+$actions = New-Object System.Collections.Generic.List[string]
+
+Write-Host "Tesseract $version  ->  https://github.com/$Repository  (public)" -ForegroundColor White
+if ($DryRun) { Write-Host "Dry run: nothing on GitHub is changed and nothing is pushed." }
+
+# ---------------------------------------------------------------- 1. checks
+Write-Step "Source tree"
+$dirty = Invoke-Tool "git" @("status", "--porcelain", "--untracked-files=no")
+if ($dirty.Out) { Stop-Publish "Uncommitted changes in tracked files; commit them first:`n$($dirty.Out)" }
+$untracked = Invoke-Tool "git" @("ls-files", "-o", "--exclude-standard")
+if ($untracked.Out) {
+    Write-Todo "These untracked files are not ignored, so they would be published:"
+    $untracked.Out -split "\r?\n" | ForEach-Object { Write-Host "       $_" }
+    if (-not (Confirm-Yes "Publish them too?")) { Stop-Publish "Commit, delete or ignore them, then run again." }
+}
+$head = (Invoke-Tool "git" @("rev-parse", "--short", "HEAD")).Out
+Write-Ok "committed (HEAD $head, version $version)"
+if (-not (Test-Path -LiteralPath $DenyFile -PathType Leaf)) { Stop-Publish "Missing private deny list $DenyFile (RELEASING.md, one-time setup 3)." }
+Write-Ok "private deny list present"
+
+Write-Step "GitHub login"
+# gh can hold several accounts; only the active one's token is used. Ask the
+# API who that is instead of parsing `gh auth status` (which lists them all).
+function Get-GitHubUser {
+    $who = Invoke-Tool "gh" @("api", "user", "--jq", '.login + " " + (.id|tostring)')
+    if ($who.Code -eq 0 -and $who.Out) { return @($who.Out -split " ") }
+    return $null
+}
+$current = Get-GitHubUser
+if ($current -and $current[0] -ne $owner) {
+    # The owner's account may already be stored next to the other one.
+    $switched = Invoke-Tool "gh" @("auth", "switch", "-h", "github.com", "-u", $owner)
+    if ($switched.Code -eq 0) { $current = Get-GitHubUser }
+}
+if (-not $current -or $current[0] -ne $owner) {
+    if ($current) { Write-Todo "gh is logged in as $($current[0]), but the release goes to $owner." }
+    else { Write-Todo "gh is not logged in (or the token expired)." }
+    Write-Host "       The login page opens in your default browser, which must be signed in to GitHub as ${owner}."
+    Write-Host "       If it shows another account, sign out there first (or open the link in a private window)."
+    Read-Host "   Press Enter to log in as $owner" | Out-Null
+    & gh auth login -h github.com -p https -w -s "workflow,admin:ssh_signing_key"
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "gh auth login failed." }
+    $current = Get-GitHubUser
+    if (-not $current -or $current[0] -ne $owner) {
+        Stop-Publish "Still not logged in as $owner. Sign the browser in to $owner, then run again."
+    }
+}
+$login, $userId = $current
+# `workflow` is needed to push .github/workflows; the other to check/add the SSH signing key.
+$headers = Invoke-Tool "gh" @("api", "-i", "user")
+$scopeLine = ($headers.Out -split "\r?\n" | Where-Object { $_ -match '^X-Oauth-Scopes:' } | Select-Object -First 1)
+$granted = @(($scopeLine -replace '^X-Oauth-Scopes:\s*', '') -split ',\s*' | Where-Object { $_ })
+$missingScopes = @("workflow", "admin:ssh_signing_key") | Where-Object { $granted -notcontains $_ }
+if ($missingScopes) {
+    Write-Todo "Adding token scopes: $($missingScopes -join ', ')"
+    & gh auth refresh -h github.com -s ($missingScopes -join ",")
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "gh auth refresh failed." }
+}
+& gh auth setup-git | Out-Null
+Write-Ok "logged in as $login"
+
+Write-Step "SSH signing key (commits and tag must show Verified)"
+foreach ($path in @($SshSigningKey, "$SshSigningKey.pub")) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { Stop-Publish "Missing $path (RELEASING.md, one-time setup 2)." }
+}
+$sshPublic = ((Get-Content -LiteralPath "$SshSigningKey.pub" -Raw).Trim() -split '\s+')[0..1] -join " "
+if (-not $sshPublic.StartsWith("ssh-ed25519 ")) { Stop-Publish "$SshSigningKey is not an Ed25519 key." }
+$signingKeys = Invoke-Tool "gh" @("api", "user/ssh_signing_keys", "--paginate", "--jq", ".[].key")
+if ($signingKeys.Code -ne 0) { Stop-Publish "Cannot list SSH signing keys: $($signingKeys.Err)" }
+$addSshKey = -not (($signingKeys.Out -split "\r?\n") -contains $sshPublic)
+if ($addSshKey) { Write-Todo "register $SshSigningKey.pub on GitHub as a signing key"; $actions.Add("Register the SSH public key as a GitHub signing key") }
+else { Write-Ok "registered on GitHub" }
+
+Write-Step "Repository"
+$repoName = $Repository.Split("/")[1]
+$repoState = Invoke-Tool "gh" @("api", "repos/$Repository", "--jq", '.full_name + " " + (.private|tostring)')
+$createRepo = $false; $makePublic = $false; $archiveRepo = $null; $repoExists = $false
+if ($repoState.Code -ne 0) {
+    if ($repoState.Err -notmatch "404|Not Found") { Stop-Publish "Cannot read $Repository`: $($repoState.Err)" }
+}
+else {
+    $fullName, $isPrivate = $repoState.Out -split " "
+    # After a rename GitHub redirects the old name to the renamed repository
+    # until a new repository takes the name, so a redirect means the name is free.
+    $repoExists = ($fullName -eq $Repository)
+    if (-not $repoExists) { Write-Ok "the name is free ($Repository only redirects to $fullName)" }
+}
+if (-not $repoExists) {
+    $createRepo = $true
+    Write-Todo "create public repository $Repository"
+    $actions.Add("Create the public repository $Repository")
+}
+else {
+    $remoteHeads = Invoke-Tool "git" @("ls-remote", "--heads", "--tags", $remoteUrl)
+    $isEmpty = ($remoteHeads.Code -eq 0 -and -not $remoteHeads.Out)
+    if ($isPrivate -eq "true" -and -not $isEmpty) {
+        # Never made public: older private history may carry personal identities.
+        # Keep it as a private archive under a new name and start a fresh public one.
+        $archiveRepo = "$repoName-private-$(Get-Date -Format yyyyMMdd)"
+        $archiveState = Invoke-Tool "gh" @("api", "repos/$owner/$archiveRepo", "--jq", ".full_name")
+        if ($archiveState.Code -eq 0 -and $archiveState.Out -eq "$owner/$archiveRepo") {
+            Stop-Publish "$Repository is private with content and $owner/$archiveRepo exists too; rename one of them on github.com, then run again."
+        }
+        Write-Todo "$Repository is private and already has content, so it is never made public"
+        Write-Host "       It is renamed to $owner/$archiveRepo (stays private, nothing is deleted),"
+        Write-Host "       and a new public $Repository is created in its place."
+        $createRepo = $true
+        $actions.Add("Rename the private $Repository to $owner/$archiveRepo (kept private, nothing deleted)")
+        $actions.Add("Create the public repository $Repository")
+    }
+    elseif ($isPrivate -eq "true") {
+        $makePublic = $true
+        Write-Todo "make the empty private repository public"
+        $actions.Add("Make the empty repository $Repository public")
+    }
+    else { Write-Ok "public" }
+    if (-not $archiveRepo) {
+        if (-not $isEmpty -and -not (Test-Path -LiteralPath (Join-Path $PublicDir ".git"))) {
+            Stop-Publish ("$Repository already has history, but the local public clone $PublicDir is missing. " +
+                "Clone it there first (git clone $remoteUrl `"$PublicDir`"), then run again.")
+        }
+        if ($remoteHeads.Out -match [regex]::Escape("refs/tags/$tag")) {
+            Stop-Publish "Tag $tag is already on GitHub. Bump APP_RELEASE_BASE_VERSION in app_info.py and commit."
+        }
+    }
+}
+# A remote of this private checkout that names the public repository would
+# publish the private history with one `git push`; point it elsewhere.
+$publicRemotePattern = '(?i)github\.com[/:]' + [regex]::Escape($Repository) + '(\.git)?/?$'
+$hazardRemotes = @()
+foreach ($remoteName in @((Invoke-Tool "git" @("remote")).Out -split "\r?\n" | Where-Object { $_ })) {
+    $remoteTarget = (Invoke-Tool "git" @("remote", "get-url", $remoteName)).Out
+    if ($remoteTarget -match $publicRemotePattern) { $hazardRemotes += $remoteName }
+}
+if ($hazardRemotes) {
+    if ($archiveRepo) {
+        Write-Todo "remote $($hazardRemotes -join ', ') of this checkout will follow the archive"
+        $actions.Add("Point remote $($hazardRemotes -join ', ') of this private checkout at $owner/$archiveRepo")
+    }
+    else {
+        Write-Todo "remote $($hazardRemotes -join ', ') of this checkout points at the public repository"
+        $actions.Add("Remove remote $($hazardRemotes -join ', ') from this private checkout (it names the public repository)")
+    }
+}
+if (Test-Path -LiteralPath (Join-Path $PublicDir ".git")) {
+    & git -C $PublicDir rev-parse -q --verify "refs/tags/$tag" 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) { Stop-Publish "Tag $tag already exists in $PublicDir. Bump the version, or delete that local tag if it was never pushed." }
+}
+Write-Ok "tag $tag is unused"
+
+Write-Step "Update-signing key (the app installs only releases signed with it)"
+$latestRelease = Invoke-Tool "gh" @("api", "repos/$Repository/releases/latest", "--jq", ".tag_name")
+$hasPublishedRelease = ($latestRelease.Code -eq 0 -and $latestRelease.Out)
+# Releases of a repository that is only a redirect or about to be archived
+# leave with it; installed copies read the public repository only.
+if (-not $repoExists -or $archiveRepo) { $hasPublishedRelease = $false }
+$generateKey = $false
+if (Test-Path -LiteralPath $SigningKey -PathType Leaf) {
+    $password = Read-Secret "Password of $SigningKey"
+    [Environment]::SetEnvironmentVariable($PasswordEnv, $password, "Process")
+    $check = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "check-key", $SigningKey)
+    if ($check.Code -ne 0) { Stop-Publish "$($check.Out) $($check.Err)" }
+    Write-Ok $check.Out
+}
+else {
+    if ($hasPublishedRelease) {
+        Stop-Publish ("No update-signing key at $SigningKey, and $($latestRelease.Out) is already published. Installed copies " +
+            "trust only the old key: restore that key file (or pass -SigningKey) instead of making a new one.")
+    }
+    Write-Todo "no update-signing key at $SigningKey"
+    Write-Host "       Nothing is published yet, so a new key can replace the one in app_info.py safely."
+    $generateKey = $true
+    $actions.Add("Generate a new update-signing key, put its public key into app_info.py and commit that")
+}
+
+$actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and its 3 secrets")
+$actions.Add("Audit, commit and sign the public tree in $PublicDir, tag $tag, push main and $tag")
+
+# ---------------------------------------------------------------- 2. confirm
+Write-Step "Plan"
+$actions | ForEach-Object { Write-Host "   - $_" }
+if ($DryRun) {
+    Write-Host ""
+    Write-Host "Dry run: preparing and auditing the public commit locally (no tag, no push)..."
+    if ($generateKey) { Write-Todo "the real run makes the signing key first; this preview still uses the old app_info.py" }
+    & (Join-Path $PSScriptRoot "push_to_github.ps1") -NoPush -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `
+        -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir
+    Write-Host ""
+    Write-Host "Dry run finished: checks passed and the public tree passed the audit. Run again without -DryRun to publish." -ForegroundColor Green
+    exit 0
+}
+Write-Host ""
+if (-not (Confirm-Yes "Publish Tesseract $version publicly at https://github.com/$Repository ?")) { Stop-Publish "Cancelled; nothing was changed." }
+
+# ---------------------------------------------------------------- 3. set up and push
+if ($generateKey) {
+    Write-Step "New update-signing key"
+    Write-Host "   Choose a strong password. Keep the key file and the password backed up:"
+    Write-Host "   without them no future release can update installed copies."
+    $first = Read-Secret "New key password"
+    $second = Read-Secret "Repeat the password"
+    if (-not $first -or $first -ne $second) { Stop-Publish "The passwords are empty or differ." }
+    $password = $first
+    [Environment]::SetEnvironmentVariable($PasswordEnv, $password, "Process")
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $SigningKey) | Out-Null
+    $publicKeyFile = "$SigningKey.public.txt"
+    $made = Invoke-Tool $python @("-B", "scripts\generate_release_signing_key.py", "--private-key", $SigningKey, "--public-key", $publicKeyFile, "--password-env", $PasswordEnv)
+    if ($made.Code -ne 0) { Stop-Publish "Key generation failed: $($made.Out) $($made.Err)" }
+    $installed = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "install-public-key", $publicKeyFile)
+    if ($installed.Code -ne 0) { Stop-Publish $installed.Out }
+    $check = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "check-key", $SigningKey)
+    if ($check.Code -ne 0) { Stop-Publish "$($check.Out) $($check.Err)" }
+    & git add -- app_info.py
+    & git commit --quiet -m "Trust the update-signing key of the first public release" -- app_info.py
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "Committing app_info.py failed." }
+    Write-Ok "$($check.Out) Key file: $SigningKey"
+}
+
+if ($addSshKey) {
+    Write-Step "Register SSH signing key"
+    & gh ssh-key add "$SshSigningKey.pub" --type signing --title "Tesseract release signing"
+    if ($LASTEXITCODE -ne 0) {
+        Stop-Publish ("gh ssh-key add failed. If GitHub says the key is already in use, remove it from the other " +
+            "account (Settings -> SSH and GPG keys) or pass -SshSigningKey with another Ed25519 key, then run again.")
+    }
+}
+
+if ($archiveRepo) {
+    Write-Step "Archive the old private repository"
+    & gh repo rename $archiveRepo --repo $Repository --yes
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "Renaming $Repository to $archiveRepo failed; nothing else was changed on GitHub." }
+    Write-Ok "$Repository is now $owner/$archiveRepo (private)"
+}
+foreach ($remoteName in $hazardRemotes) {
+    if ($archiveRepo) {
+        & git remote set-url $remoteName "https://github.com/$owner/$archiveRepo.git"
+        if ($LASTEXITCODE -ne 0) { Stop-Publish "Could not repoint remote $remoteName; fix it before publishing." }
+        Write-Ok "remote $remoteName -> $owner/$archiveRepo"
+    }
+    else {
+        & git remote remove $remoteName
+        if ($LASTEXITCODE -ne 0) { Stop-Publish "Could not remove remote $remoteName; remove it before publishing." }
+        Write-Ok "removed remote $remoteName"
+    }
+}
+
+if ($createRepo) {
+    Write-Step "Create repository"
+    & gh repo create $Repository --public --description "Tesseract - a Windows proxy client"
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "gh repo create failed." }
+}
+if ($makePublic) {
+    & gh repo edit $Repository --visibility public --accept-visibility-change-consequences
+    if ($LASTEXITCODE -ne 0) { Stop-Publish "gh repo edit --visibility public failed." }
+}
+
+Write-Step "Release environment and secrets"
+$environment = @{
+    deployment_branch_policy = @{ protected_branches = $false; custom_branch_policies = $true }
+}
+if ($RequireApproval) {
+    $environment.reviewers = @(@{ type = "User"; id = [long] $userId })
+    $environment.prevent_self_review = $false
+}
+$put = Invoke-Tool "gh" @("api", "-X", "PUT", "repos/$Repository/environments/release", "--input", "-") ($environment | ConvertTo-Json -Depth 5 -Compress)
+if ($put.Code -ne 0) { Stop-Publish "Creating the release environment failed: $($put.Err)" }
+$policies = Invoke-Tool "gh" @("api", "repos/$Repository/environments/release/deployment-branch-policies", "--jq", '.branch_policies[] | .type + ":" + .name')
+if (-not (($policies.Out -split "\r?\n") -contains "tag:v*")) {
+    $policy = Invoke-Tool "gh" @("api", "-X", "POST", "repos/$Repository/environments/release/deployment-branch-policies", "--input", "-") '{"name":"v*","type":"tag"}'
+    if ($policy.Code -ne 0) { Stop-Publish "Restricting the release environment to v* tags failed: $($policy.Err)" }
+}
+Write-Ok "environment 'release' (tags v* only$(if ($RequireApproval) { ', needs your approval' }))"
+$secrets = [ordered]@{
+    TESSERACT_UPDATE_PRIVATE_KEY_B64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($SigningKey))
+    TESSERACT_UPDATE_KEY_PASSWORD    = $password
+    PUBLIC_RELEASE_PRIVATE_DENYLIST  = [IO.File]::ReadAllText($DenyFile)
+}
+foreach ($name in $secrets.Keys) {
+    $set = Invoke-Tool "gh" @("secret", "set", $name, "--env", "release", "--repo", $Repository) $secrets[$name]
+    if ($set.Code -ne 0) { Stop-Publish "Setting secret $name failed: $($set.Err)" }
+    Write-Ok "secret $name"
+}
+$secrets = $null
+
+Write-Step "Publish source and tag"
+& (Join-Path $PSScriptRoot "push_to_github.ps1") -Release -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `
+    -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir
+
+# ---------------------------------------------------------------- 4. watch and verify
+[Environment]::SetEnvironmentVariable($PasswordEnv, $null, "Process")
+$password = $null
+if ($NoWatch) {
+    Write-Host "Pushed. Follow the build at https://github.com/$Repository/actions" -ForegroundColor Green
+    exit 0
+}
+Write-Step "Release workflow"
+$runId = $null
+for ($attempt = 0; $attempt -lt 24 -and -not $runId; $attempt++) {
+    Start-Sleep -Seconds 5
+    $runs = Invoke-Tool "gh" @("run", "list", "--repo", $Repository, "--workflow", "release-windows.yml", "--limit", "10",
+        "--json", "databaseId,headBranch", "--jq", ".[] | select(.headBranch == `"$tag`") | .databaseId")
+    if ($runs.Code -eq 0 -and $runs.Out) { $runId = ($runs.Out -split "\r?\n")[0] }
+}
+if (-not $runId) { Stop-Publish "The tag was pushed but no workflow run appeared; see https://github.com/$Repository/actions" }
+Write-Host "   https://github.com/$Repository/actions/runs/$runId  (about 40-60 minutes)"
+if ($RequireApproval) { Write-Todo "approve the 'release' deployment on that page when the build finishes" }
+& gh run watch $runId --repo $Repository --exit-status --interval 60
+for ($rerun = 1; $LASTEXITCODE -ne 0 -and $rerun -le 2; $rerun++) {
+    # A few tests drive a real Mihomo and can miss a timing window on a busy
+    # runner; re-running only the failed jobs is the normal remedy. Nothing is
+    # published until the last job succeeds.
+    Write-Todo "the release workflow failed: https://github.com/$Repository/actions/runs/$runId"
+    if (-not (Confirm-Yes "Re-run the failed jobs (attempt $rerun of 2)?")) { break }
+    & gh run rerun $runId --repo $Repository --failed
+    if ($LASTEXITCODE -ne 0) { break }
+    Start-Sleep -Seconds 15
+    & gh run watch $runId --repo $Repository --exit-status --interval 60
+}
+if ($LASTEXITCODE -ne 0) { Stop-Publish "The release workflow failed; open the run above. Nothing broken is published (the release is created only at the end)." }
+
+Write-Step "In-app update check against the live release"
+& $python -B scripts\publish_release_helper.py verify-live
+if ($LASTEXITCODE -ne 0) { Stop-Publish "The release exists but the app could not verify it (see above)." }
+Write-Host ""
+Write-Host "Published: https://github.com/$Repository/releases/tag/$tag" -ForegroundColor Green

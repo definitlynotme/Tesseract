@@ -1,0 +1,75 @@
+{
+  "t": "batch",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "tick_seq": 7,
+  "items": [
+    {
+      "t": "evt",
+      "epoch": "sidecar-4381-1790000000000",
+      "produced_at_ms": 1790000000000,
+      "sent_at_ms": 1790000000002,
+      "topic": "service.state",
+      "rev": 51,
+      "kind": "snapshot",
+      "data": {
+        "intent": {
+          "desired_running": true,
+          "stop_requested": false,
+          "lifecycle_revision": 12,
+          "runtime_generation": 4
+        },
+        "runtime": {
+          "runtime_running": true,
+          "startup_phase": "running",
+          "shutdown_cleanup_pending": false,
+          "failure_code": null
+        },
+        "core": {
+          "running": true,
+          "pid": 7654,
+          "process_generation": 4,
+          "core_generation": 8,
+          "cleanup_pending": false
+        },
+        "readiness": {
+          "state": "ready",
+          "validation_active": false,
+          "reason": "",
+          "remaining_ms": null,
+          "publication_revision": 36,
+          "lifecycle_revision": 12,
+          "route_epoch": 7,
+          "network_context_epoch": 2
+        },
+        "freshness": {
+          "sampled_at_ms": 1790000000000,
+          "snapshot_revision": 51,
+          "stale": false,
+          "uptime_s": 120
+        }
+      }
+    },
+    {
+      "t": "evt",
+      "epoch": "sidecar-4381-1790000000000",
+      "produced_at_ms": 1790000000000,
+      "sent_at_ms": 1790000000002,
+      "topic": "traffic.tick",
+      "rev": 9,
+      "kind": "snapshot",
+      "data": {
+        "t_ms": 1790000000000,
+        "up_bps": 2048,
+        "down_bps": 8192,
+        "session": {
+          "up_bytes": 512000,
+          "down_bytes": 1024000
+        },
+        "running": true,
+        "error_code": null
+      }
+    }
+  ]
+}

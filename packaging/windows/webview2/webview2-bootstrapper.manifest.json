@@ -1,0 +1,16 @@
+{
+  "description": "Microsoft Edge WebView2 Runtime Evergreen Bootstrapper. Embedded in the Shell-flavor installer with dontcopy, extracted to {tmp} and run only when WebView2 is missing; never installed into {app}. Not committed: fetch_webview2_bootstrapper.ps1 downloads it into cache/ and verifies sha256 and the Authenticode signer.",
+  "file_name": "MicrosoftEdgeWebview2Setup.exe",
+  "source_url": "https://go.microsoft.com/fwlink/p/?LinkId=2124703",
+  "sha256": "ca4c9016c70e2184c5e231662e0e98abf4826647180ef3faab32fcb1ca2ec15e",
+  "size_bytes": 1888472,
+  "file_version": "1.3.303.7",
+  "signer_subject": "CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+  "signer_thumbprint": "4028cad637509d4744b17ec5b42aed8d7a31e6af",
+  "signer_issuer": "CN=Microsoft Code Signing PCA 2024, O=Microsoft Corporation, C=US",
+  "signer_root_subject": "CN=Microsoft Root Certificate Authority 2011, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+  "authenticode_status": "Valid",
+  "downloaded_utc": "2026-10-26T16:48:46Z",
+  "silent_install_args": "/silent /install",
+  "repin": "Microsoft republishes the bootstrapper behind the same fwlink. On a hash mismatch run fetch_webview2_bootstrapper.ps1 -Repin, review the printed signer (it is listed side by side with signer_thumbprint, signer_issuer and signer_root_subject here), then update sha256 and the signer fields here and WebView2BootstrapperSha256 in Tesseract-shell.iss together (ISCC refuses to compile when the two sha256 pins differ). -Repin keeps its staging copy for review: delete cache/repin-* by hand once reviewed."
+}

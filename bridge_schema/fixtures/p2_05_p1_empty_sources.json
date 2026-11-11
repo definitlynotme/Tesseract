@@ -1,0 +1,18 @@
+{
+  "evidence": ".build/p1-16-smoke/20260930-180903-744/frames.jsonl",
+  "failure_detail": "primary=no primary layers are configured; collection sources=0, fetched=0, failed=0, parsed_nodes=0; startup_error=no primary layers are configured; Bastion Layer is disabled",
+  "runtime_text": "Fallback has no validated proxy nodes; startup remains fail-closed (primary=no primary layers are configured; collection sources=0, fetched=0, failed=0, parsed_nodes=0; startup_error=no primary layers are configured; Bastion Layer is disabled)",
+  "diagnostic": {
+    "code": "needs_route",
+    "message_key": "errors.start.no_validated_nodes",
+    "params": {},
+    "reason_code": "no_validated_nodes",
+    "exception_type": "RuntimeError"
+  },
+  "expected": {
+    "code": "needs_route",
+    "message_key": "errors.start.no_validated_nodes",
+    "params": {},
+    "reason_code": "no_validated_nodes"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "bastion.pool",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "runtime_alive": 1,
+    "user_alive": 1,
+    "capacity": 1,
+    "min_alive_nodes": 1,
+    "target_alive": 1,
+    "collecting": true,
+    "observed_at_ms": 1
+  }
+}

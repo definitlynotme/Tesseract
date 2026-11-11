@@ -1,0 +1,166 @@
+{
+ "_doc": "T-P4-03 T.fmt 允许差异表（批评 E1）。zh_CN：与原型 core.js:181-218 的逐值比对，test/unit/i18n_fmt.test.mjs 断言每个差异都属于这里的某一类、每一类都真的出现、示例都成立。其他语言：原型只有 zh_CN，没有可比的旧值；P5 后 8 种语言的目录 fmt.* 都已写全（各 17 条，缺译 0），输出是该语言的目录译文（fmt.*）加 Intl 的数字写法，规则见 other_languages（只作说明，不参与断言）。逐值快照 fmt_snapshot.json 记录 en_US、de_DE、ru_RU、ja_JP；es_ES、fr_FR、ko_KR、pt_BR 不在快照里，下面的例子取自各自的目录与 Intl。",
+ "engine": {
+  "icu": "78.2",
+  "cldr": "48.0"
+ },
+ "zh_CN": {
+  "bytesParts": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      1000
+     ],
+     "before": [
+      "1000",
+      "B"
+     ],
+     "after": [
+      "1,000",
+      "B"
+     ]
+    }
+   },
+   {
+    "category": "rounding",
+    "why": "舍入：原型 toFixed 按二进制值舍入（1.005 → 1.00），Intl 按十进制半数进位（1.005 → 1.01），末位最多差 1",
+    "example": {
+     "args": [
+      1029.12
+     ],
+     "before": [
+      "1.00",
+      "KB"
+     ],
+     "after": [
+      "1.01",
+      "KB"
+     ]
+    }
+   }
+  ],
+  "bytes": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      1023
+     ],
+     "before": "1023 B",
+     "after": "1,023 B"
+    }
+   },
+   {
+    "category": "rounding",
+    "why": "舍入：原型 toFixed 按二进制值舍入（1.005 → 1.00），Intl 按十进制半数进位（1.005 → 1.01），末位最多差 1",
+    "example": {
+     "args": [
+      1630535.68
+     ],
+     "before": "1.55 MB",
+     "after": "1.56 MB"
+    }
+   }
+  ],
+  "rateParts": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      1000
+     ],
+     "before": [
+      "1000",
+      "B/s"
+     ],
+     "after": [
+      "1,000",
+      "B/s"
+     ]
+    }
+   },
+   {
+    "category": "rounding",
+    "why": "舍入：原型 toFixed 按二进制值舍入（1.005 → 1.00），Intl 按十进制半数进位（1.005 → 1.01），末位最多差 1",
+    "example": {
+     "args": [
+      1053818.88
+     ],
+     "before": [
+      "1.00",
+      "MB/s"
+     ],
+     "after": [
+      "1.01",
+      "MB/s"
+     ]
+    }
+   }
+  ],
+  "rate": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      1023994.88
+     ],
+     "before": "1000.00 KB/s",
+     "after": "1,000.00 KB/s"
+    }
+   },
+   {
+    "category": "rounding",
+    "why": "舍入：原型 toFixed 按二进制值舍入（1.005 → 1.00），Intl 按十进制半数进位（1.005 → 1.01），末位最多差 1",
+    "example": {
+     "args": [
+      1029.12
+     ],
+     "before": "1.00 KB/s",
+     "after": "1.01 KB/s"
+    }
+   }
+  ],
+  "ms": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      1234
+     ],
+     "before": "1234 ms",
+     "after": "1,234 ms"
+    }
+   }
+  ],
+  "pct": [
+   {
+    "category": "grouping",
+    "why": "千分位：Intl.NumberFormat 对 ≥ 1000 的数字加分组符（zh_CN 为 ,）；原型直接 toFixed / String",
+    "example": {
+     "args": [
+      12.5,
+      0
+     ],
+     "before": "1250%",
+     "after": "1,250%"
+    }
+   }
+  ]
+ },
+ "other_languages": {
+  "numbers": "数字按语言分组与小数点（Intl.NumberFormat）：de_DE、es_ES、pt_BR 为 1.234.567,891（de_DE 7,29 GB）；ru_RU 用不换行空格（U+00A0）、fr_FR 用窄不换行空格（U+202F）分组，小数点为逗号；en_US、ja_JP、ko_KR 与 zh_CN 相同，为 1,234,567.891",
+  "units": "单位名与「数字 单位」连接：用目录 fmt.qty / fmt.unit.* / fmt.ms 的该语言译文，P5 后 8 种语言都有。ru_RU 为 Б / КБ / МБ / ГБ、МБ/с、42 мс；fr_FR 为 o / Ko / Mo / Go（octet）、42 ms；其余 6 种为 B / KB / MB / GB、42 ms。目录缺该条时（P5 后的目录不会出现）回退 B/KB/MB/GB 与空格（与 zh_CN 相同），fmt.ms 回退 Intl 的 millisecond 短单位",
+  "percent": "百分号按语言（Intl）：de_DE、es_ES、fr_FR、ru_RU 为 46 %（不换行空格）；en_US、ja_JP、ko_KR、pt_BR 与 zh_CN 相同，为 46%",
+  "relative_time": "ago：用目录 fmt.ago.* 的该语言译文，复数按该语言的类别。en_US just now / 5 minutes ago，de_DE gerade eben / vor 5 Minuten，es_ES ahora mismo / hace 5 minutos，fr_FR à l’instant / il y a 5 minutes，ja_JP たった今 / 5 分前，ko_KR 방금 / 5분 전，pt_BR agora mesmo / há 5 minutos，ru_RU только что / 5 минут назад。译文是句中形式（小写开头）；送达状态旁的 T.fmt.ago 按附注保持小写（T-P5-07 第 6 条）。目录缺该条时回退 Intl.RelativeTimeFormat（如 now / jetzt / сейчас / 今）",
+  "uptime": "uptime：用目录 fmt.uptime.* 的该语言短单位。en_US less than 1 min / 5 min / 1 h 2 min，de_DE unter 1 Min. / 1 Std. 2 Min.，es_ES 与 pt_BR menos de 1 min / 1 h 2 min，fr_FR moins d’une minute / 1 h 2 min，ja_JP 1 分未満 / 1 時間 2 分，ko_KR 1분 미만 / 1시간 2분，ru_RU меньше 1 мин / 1 ч 2 мин。目录缺该条时用 Intl 单位（en_US 1 hr 2 min，不足 1 分钟为 < 1 minute）",
+  "clock_time": "time/hm 一律 24 小时制两位数（hourCycle h23）；clock 仍是 HH:MM:SS 数字",
+  "latency_words": "latWord 没有 Intl 写法，用目录 fmt.lat.* 的该语言译文。en_US Normal / Slow / Unavailable，de_DE Normal / Langsam / Nicht verfügbar，es_ES Normal / Lento / No disponible，fr_FR Normal / Lent / Indisponible，ja_JP 正常 / 低速 / 利用不可，ko_KR 정상 / 느림 / 사용 불가，pt_BR Normal / Lento / Indisponível，ru_RU Нормально / Медленно / Недоступно。目录缺该条时按回退链 en_US → zh_CN",
+  "new_functions": "新增 region（Intl.DisplayNames 地区名）、list（Intl.ListFormat）、compare/collator（Intl.Collator），原型没有对应函数，不构成回归差异"
+ }
+}

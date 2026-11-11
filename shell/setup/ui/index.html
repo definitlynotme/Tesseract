@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tesseract Setup</title>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="setup.css">
+</head>
+<body>
+<div class="win" id="win">
+  <div class="band">
+    <div class="wc">
+      <button class="wc-b" type="button" tabindex="-1" data-wc="min" id="wcMin"><span class="wc-in"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6H10"/></svg></span></button>
+      <button class="wc-b wc-close" type="button" tabindex="-1" data-wc="close" id="wcClose"><span class="wc-in"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.25 2.25L9.75 9.75M9.75 2.25L2.25 9.75"/></svg></span></button>
+    </div>
+  </div>
+
+  <header class="lockup">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M42.5 90V47A17 17 0 0 0 25.5 30H6" pathLength="1"/>
+      <path d="M57.5 90V47A17 17 0 0 1 74.5 30H94" pathLength="1"/>
+      <circle class="dot" id="dot" cx="80" cy="11" r="5.8"/>
+    </svg>
+    <div class="lockup-t">
+      <div class="word" id="wordmark" translate="no">Tesseract</div>
+      <div class="ver" id="ver"></div>
+    </div>
+  </header>
+
+  <main class="body" id="body" aria-live="polite"></main>
+
+  <footer class="foot">
+    <div class="foot-l" id="footL"></div>
+    <div class="foot-r" id="footR"></div>
+  </footer>
+
+  <div class="scrim" id="scrim"></div>
+  <section class="sheet" id="sheet" aria-hidden="true" role="dialog" aria-labelledby="sheetT">
+    <div class="sheet-h"><b id="sheetT"></b><span class="mono">GPL-3.0</span>
+      <button class="sheet-x" id="sheetX" type="button"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.25 2.25L9.75 9.75M9.75 2.25L2.25 9.75"/></svg></button></div>
+    <div class="sheet-b" id="sheetBody"></div>
+  </section>
+</div>
+<script src="strings.js"></script>
+<script src="setup.js"></script>
+</body>
+</html>

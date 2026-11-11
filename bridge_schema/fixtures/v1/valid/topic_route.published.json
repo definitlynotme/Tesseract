@@ -1,0 +1,20 @@
+{
+  "data": {
+    "fail_closed_confirmed": false,
+    "invalid_reason": "no_published_route",
+    "leaf": null,
+    "managed_tier": null,
+    "observed_at_ms": 0,
+    "owner": null,
+    "publication_revision": 1,
+    "selected_chain": [],
+    "valid": false
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "route.published"
+}

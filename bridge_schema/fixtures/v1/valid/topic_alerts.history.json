@@ -1,0 +1,23 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "alerts.history",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "items": [
+      {
+        "id": "example",
+        "seq": 1,
+        "severity": "info",
+        "event_id": "example",
+        "title": "Example text",
+        "detail": "Example text",
+        "ts_ms": 1
+      }
+    ],
+    "last_seq": 1
+  }
+}

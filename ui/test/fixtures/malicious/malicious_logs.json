@@ -1,0 +1,860 @@
+{
+  "name": "malicious_logs",
+  "desc": "T-P4-07 恶意文本（运行日志）：logs_malicious_text 的记录（title / detail / raw 带标签、脚本、超长行、双向控制字符）再加两条：带 ICU 敏感字符、javascript:、属性逃逸的关键事件和原始行",
+  "lang": "zh_CN",
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "service.start",
+            "service.stop",
+            "service.restart",
+            "app.quit",
+            "app.info",
+            "logs.tail",
+            "logs.query",
+            "logs.setMihomoLevel",
+            "logs.exportBundle",
+            "logs.exportFiltered"
+          ],
+          "topics": [
+            "service.state",
+            "route.published",
+            "tiers.summary",
+            "traffic.tick",
+            "traffic.history",
+            "logs.batch",
+            "logs.feed",
+            "core.info",
+            "jobs"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "restored",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790654400000,
+        "sent_at_ms": 1790654400001,
+        "topic": "service.state",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": true,
+            "startup_phase": "running",
+            "shutdown_cleanup_pending": false,
+            "failure_code": null
+          },
+          "core": {
+            "running": true,
+            "pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": false
+          },
+          "readiness": {
+            "state": "ready",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": 600
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "route.published",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "publication_revision": 20,
+          "owner": {
+            "process_pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "selected_chain": [
+            "TIER1",
+            "node-a"
+          ],
+          "leaf": "node-a",
+          "managed_tier": "vanguard",
+          "observed_at_ms": 1790000000000,
+          "valid": true,
+          "invalid_reason": null,
+          "fail_closed_confirmed": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "tiers.summary",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "carrier": "vanguard",
+          "offline_reason": null,
+          "order": [
+            "vanguard",
+            "sentinel",
+            "bastion",
+            "gateway"
+          ],
+          "degraded": false,
+          "fallback": false,
+          "tiers": {
+            "vanguard": {
+              "enabled": true,
+              "total": 3,
+              "usable": 2
+            },
+            "sentinel": {
+              "enabled": true,
+              "total": 2,
+              "usable": 1
+            },
+            "bastion": {
+              "enabled": true,
+              "total": 40,
+              "usable": 25
+            },
+            "gateway": {
+              "enabled": false,
+              "total": 0,
+              "usable": 0
+            }
+          },
+          "pool": {
+            "usable": 5,
+            "total": 7
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "traffic.tick",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "t_ms": 1790000000000,
+          "up_bps": 2048,
+          "down_bps": 8192,
+          "session": {
+            "up_bytes": 512000,
+            "down_bytes": 1024000
+          },
+          "running": true,
+          "error_code": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "traffic.history",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "sampled_at_ms": 1790000000000,
+          "source": "temporary_snapshot",
+          "h24": [
+            {
+              "t_ms": 1789996400000,
+              "down_bps": 4096,
+              "up_bps": 1535,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789996700000,
+              "down_bps": 5078,
+              "up_bps": 1490,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997000000,
+              "down_bps": 5819,
+              "up_bps": 1330,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997300000,
+              "down_bps": 6139,
+              "up_bps": 1096,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997600000,
+              "down_bps": 5958,
+              "up_bps": 844,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789997900000,
+              "down_bps": 5322,
+              "up_bps": 637,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998200000,
+              "down_bps": 4385,
+              "up_bps": 524,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998500000,
+              "down_bps": 3378,
+              "up_bps": 533,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789998800000,
+              "down_bps": 2546,
+              "up_bps": 663,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999100000,
+              "down_bps": 2094,
+              "up_bps": 881,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999400000,
+              "down_bps": 2132,
+              "up_bps": 1134,
+              "sample_count": 300
+            },
+            {
+              "t_ms": 1789999700000,
+              "down_bps": 2651,
+              "up_bps": 1360,
+              "sample_count": 300
+            }
+          ],
+          "live": [
+            {
+              "t_ms": 1789999970000,
+              "down_bps": 8192,
+              "up_bps": 2661
+            },
+            {
+              "t_ms": 1789999971000,
+              "down_bps": 10156,
+              "up_bps": 2193
+            },
+            {
+              "t_ms": 1789999972000,
+              "down_bps": 11639,
+              "up_bps": 1689
+            },
+            {
+              "t_ms": 1789999973000,
+              "down_bps": 12278,
+              "up_bps": 1273
+            },
+            {
+              "t_ms": 1789999974000,
+              "down_bps": 11916,
+              "up_bps": 1047
+            },
+            {
+              "t_ms": 1789999975000,
+              "down_bps": 10643,
+              "up_bps": 1066
+            },
+            {
+              "t_ms": 1789999976000,
+              "down_bps": 8770,
+              "up_bps": 1326
+            },
+            {
+              "t_ms": 1789999977000,
+              "down_bps": 6755,
+              "up_bps": 1762
+            },
+            {
+              "t_ms": 1789999978000,
+              "down_bps": 5092,
+              "up_bps": 2268
+            },
+            {
+              "t_ms": 1789999979000,
+              "down_bps": 4188,
+              "up_bps": 2721
+            },
+            {
+              "t_ms": 1789999980000,
+              "down_bps": 4264,
+              "up_bps": 3009
+            },
+            {
+              "t_ms": 1789999981000,
+              "down_bps": 5302,
+              "up_bps": 3061
+            },
+            {
+              "t_ms": 1789999982000,
+              "down_bps": 7048,
+              "up_bps": 2866
+            },
+            {
+              "t_ms": 1789999983000,
+              "down_bps": 9073,
+              "up_bps": 2470
+            },
+            {
+              "t_ms": 1789999984000,
+              "down_bps": 10883,
+              "up_bps": 1971
+            },
+            {
+              "t_ms": 1789999985000,
+              "down_bps": 12034,
+              "up_bps": 1491
+            },
+            {
+              "t_ms": 1789999986000,
+              "down_bps": 12244,
+              "up_bps": 1147
+            },
+            {
+              "t_ms": 1789999987000,
+              "down_bps": 11463,
+              "up_bps": 1024
+            },
+            {
+              "t_ms": 1789999988000,
+              "down_bps": 9880,
+              "up_bps": 1152
+            },
+            {
+              "t_ms": 1789999989000,
+              "down_bps": 7884,
+              "up_bps": 1499
+            },
+            {
+              "t_ms": 1789999990000,
+              "down_bps": 5964,
+              "up_bps": 1980
+            },
+            {
+              "t_ms": 1789999991000,
+              "down_bps": 4589,
+              "up_bps": 2478
+            },
+            {
+              "t_ms": 1789999992000,
+              "down_bps": 4096,
+              "up_bps": 2871
+            },
+            {
+              "t_ms": 1789999993000,
+              "down_bps": 4606,
+              "up_bps": 3062
+            },
+            {
+              "t_ms": 1789999994000,
+              "down_bps": 5994,
+              "up_bps": 3005
+            },
+            {
+              "t_ms": 1789999995000,
+              "down_bps": 7920,
+              "up_bps": 2714
+            },
+            {
+              "t_ms": 1789999996000,
+              "down_bps": 9913,
+              "up_bps": 2259
+            },
+            {
+              "t_ms": 1789999997000,
+              "down_bps": 11484,
+              "up_bps": 1753
+            },
+            {
+              "t_ms": 1789999998000,
+              "down_bps": 12250,
+              "up_bps": 1319
+            },
+            {
+              "t_ms": 1789999999000,
+              "down_bps": 12021,
+              "up_bps": 1064
+            }
+          ]
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "core.info",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "running": true,
+          "pid": 7654,
+          "version": "1.19.27",
+          "generation": 8,
+          "cleanup_pending": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790654400000,
+        "sent_at_ms": 1790654400001,
+        "topic": "logs.feed",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "state": "connected",
+          "level": "info",
+          "updated_at_ms": 1790654370000,
+          "dropped": {
+            "debug": 0,
+            "info": 0,
+            "warn": 0,
+            "error": 0,
+            "critical": 0,
+            "total": 0
+          },
+          "run_id": "run-42"
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:language",
+        "language": "zh_CN",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:visibility",
+        "visible": true,
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "on_invoke": {
+        "cmd": "logs.tail"
+      },
+      "reply": [
+        {
+          "t": "res",
+          "epoch": "rt-fixture-e1",
+          "produced_at_ms": 1790654400000,
+          "sent_at_ms": 1790654400001,
+          "id": 1,
+          "req_id": "$req_id",
+          "owner": "$owner",
+          "cmd": "logs.tail",
+          "ok": true,
+          "data": {
+            "records": [
+              {
+                "seq": 1,
+                "ts_ms": 1790653800000,
+                "rx_ms": 1790653800009,
+                "source": "TESSERACT",
+                "level": "info",
+                "category": "runtime",
+                "key": "runtime.start_requested",
+                "title": "Starting service",
+                "detail": "Collecting node sources and preparing the core.",
+                "raw": "Desktop runtime start requested (generation=42)",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 2,
+                "ts_ms": 1790653820000,
+                "rx_ms": 1790653820009,
+                "source": "MIHOMO",
+                "level": "info",
+                "category": "runtime",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "Start initial configuration in progress",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 3,
+                "ts_ms": 1790653840000,
+                "rx_ms": 1790653840009,
+                "source": "MIHOMO",
+                "level": "info",
+                "category": "connection",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "[TCP] 127.0.0.1:50110 --> www.example.com:443 match RuleSet(proxy) using Vanguard",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 4,
+                "ts_ms": 1790653860000,
+                "rx_ms": 1790653860009,
+                "source": "TESSERACT",
+                "level": "info",
+                "category": "routing",
+                "key": "tier.vanguard_active",
+                "title": "Traffic on Vanguard",
+                "detail": "Vanguard has 2 usable nodes.",
+                "raw": "carrier=vanguard usable=2",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 5,
+                "ts_ms": 1790653880000,
+                "rx_ms": 1790653880009,
+                "source": "MIHOMO",
+                "level": "warn",
+                "category": "connection",
+                "key": "mihomo.connection_timeout",
+                "title": "Connection timed out",
+                "detail": "203.0.113.9:443",
+                "raw": "dial tcp 203.0.113.9:443: i/o timeout",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 6,
+                "ts_ms": 1790653900000,
+                "rx_ms": 1790653900009,
+                "source": "MIHOMO",
+                "level": "warn",
+                "category": "connection",
+                "key": "mihomo.connection_timeout",
+                "title": "Connection timed out",
+                "detail": "203.0.113.9:443",
+                "raw": "dial tcp 203.0.113.9:443: i/o timeout",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 7,
+                "ts_ms": 1790653920000,
+                "rx_ms": 1790653920009,
+                "source": "MIHOMO",
+                "level": "warn",
+                "category": "connection",
+                "key": "mihomo.connection_timeout",
+                "title": "Connection timed out",
+                "detail": "203.0.113.10:443",
+                "raw": "dial tcp 203.0.113.10:443: i/o timeout",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 8,
+                "ts_ms": 1790653940000,
+                "rx_ms": 1790653940009,
+                "source": "TESSERACT",
+                "level": "error",
+                "category": "update",
+                "key": "update.sources_failed",
+                "title": "Source refresh failed",
+                "detail": "All 5 sources failed; the pool keeps 4 usable nodes.",
+                "raw": "",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 9,
+                "ts_ms": 1790653960000,
+                "rx_ms": 1790653960009,
+                "source": "ALERT",
+                "level": "info",
+                "category": "runtime",
+                "key": "alert.delivered",
+                "title": "Alert delivered",
+                "detail": "1 channel delivered.",
+                "raw": "alert delivered channel=ntfy",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 10,
+                "ts_ms": 1790653980000,
+                "rx_ms": 1790653980009,
+                "source": "TESSERACT",
+                "level": "warn",
+                "category": "routing",
+                "key": "tier.bastion_active",
+                "title": "Traffic on Bastion",
+                "detail": "Bastion has 6 usable nodes, switched from Sentinel.",
+                "raw": "carrier=bastion usable=6",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 11,
+                "ts_ms": 1790654000000,
+                "rx_ms": 1790654000009,
+                "source": "MIHOMO",
+                "level": "debug",
+                "category": "connection",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "[DNS] example.org --> 93.184.216.34",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 12,
+                "ts_ms": 1790654020000,
+                "rx_ms": 1790654020009,
+                "source": "TESSERACT",
+                "level": "info",
+                "category": "configuration",
+                "key": "proxy.system_set",
+                "title": "System proxy set",
+                "detail": "127.0.0.1:7890 written to the Windows proxy settings.",
+                "raw": "system proxy set 127.0.0.1:7890",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 13,
+                "ts_ms": 1790654040000,
+                "rx_ms": 1790654040009,
+                "source": "MIHOMO",
+                "level": "info",
+                "category": "other",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "panic recovered\n  goroutine 12 [running]\n  main.serve()",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 14,
+                "ts_ms": 1790654060000,
+                "rx_ms": 1790654060009,
+                "source": "TESSERACT",
+                "level": "info",
+                "category": "runtime",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "Monitor heartbeat ok",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 15,
+                "ts_ms": 1790654391000,
+                "rx_ms": 1790654391009,
+                "source": "TESSERACT",
+                "level": "error",
+                "category": "runtime",
+                "key": "runtime.desktop_failed",
+                "title": "<img src=\"x\" onerror=\"window.__pwned=1\">",
+                "detail": "<script>window.__pwned=1</script><b>bold?</b>",
+                "raw": "<iframe src=\"javascript:window.__pwned=1\"></iframe>",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 16,
+                "ts_ms": 1790654392000,
+                "rx_ms": 1790654392009,
+                "source": "MIHOMO",
+                "level": "warn",
+                "category": "connection",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "<script>window.__pwned=1</script> & \"quoted\" <img src=x onerror=window.__pwned=1>",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 17,
+                "ts_ms": 1790654393000,
+                "rx_ms": 1790654393009,
+                "source": "MIHOMO",
+                "level": "info",
+                "category": "connection",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "Loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong",
+                "is_key_event": false,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 18,
+                "ts_ms": 1790654394000,
+                "rx_ms": 1790654394009,
+                "source": "TESSERACT",
+                "level": "warn",
+                "category": "routing",
+                "key": "tier.sentinel_active",
+                "title": "Traffic on ‮Sentinel‬ ⁦mixed⁩",
+                "detail": "bidi ‏‫ controls ‬ end",
+                "raw": "carrier=sentinel ‮",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 19,
+                "ts_ms": 1790654395000,
+                "rx_ms": 1790654395009,
+                "source": "TESSERACT",
+                "level": "warn",
+                "category": "runtime",
+                "key": "runtime.desktop_failed",
+                "title": "\"><svg onload=\"window.__pwned=3\"> ICU {n, plural, one {#} other {x}} 'q' #",
+                "detail": "javascript:window.__pwned=4 ‮evil‬⁦x⁩",
+                "raw": "<img src=\"x\" onerror=\"window.__pwned=1\"> {n, plural, one {#} other {x}} 'q' #",
+                "is_key_event": true,
+                "run_id": "run-42"
+              },
+              {
+                "seq": 20,
+                "ts_ms": 1790654396000,
+                "rx_ms": 1790654396009,
+                "source": "MIHOMO",
+                "level": "info",
+                "category": "connection",
+                "key": "log.raw",
+                "title": "",
+                "detail": "",
+                "raw": "<script>window.__pwned=2</script> {n, plural, one {#} other {x}} 'q' # ‮evil‬⁦x⁩",
+                "is_key_event": false,
+                "run_id": "run-42"
+              }
+            ],
+            "watermark": 18,
+            "next_cursor": null,
+            "gap": false,
+            "dropped": 0
+          }
+        }
+      ]
+    },
+    {
+      "on_invoke": {
+        "cmd": "app.info"
+      },
+      "reply": [
+        {
+          "t": "res",
+          "epoch": "rt-fixture-e1",
+          "produced_at_ms": 1790654400000,
+          "sent_at_ms": 1790654400001,
+          "id": 1,
+          "req_id": "$req_id",
+          "owner": "$owner",
+          "cmd": "app.info",
+          "ok": true,
+          "data": {
+            "version": "1.0.0",
+            "language": "zh_CN",
+            "caps": [],
+            "listeners": [
+              {
+                "kind": "mixed",
+                "host": "127.0.0.1",
+                "port": 7890,
+                "available": true
+              },
+              {
+                "kind": "controller",
+                "host": "127.0.0.1",
+                "port": 9090,
+                "available": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

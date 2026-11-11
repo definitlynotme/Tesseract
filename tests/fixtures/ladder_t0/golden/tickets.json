@@ -1,0 +1,89 @@
+{
+ "lines": {
+  "log:Runtime recovery phase completed": [
+   "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:cefea97506cb486b20693c43\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+   "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:42336959416b9e30c890011f\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+   "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:92eba105873251d52eb0e839\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+   "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:cefea97506cb486b20693c43\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+   "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:c08754fa67396a25f99965ed\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}"
+  ],
+  "log:Runtime route view": [
+   "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+  ],
+  "observer:arm_diagnostics_state": [
+   "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> state=started loss_total=0)"
+  ],
+  "observer:arm_state": [
+   "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)",
+   "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)"
+  ],
+  "observer:observer_policy": [
+   "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0 observer=ob-0c720a5bf06b0c20 scope=sc-afe7ab911f0c9bd2 scope_seq=2)"
+  ],
+  "observer:observer_started": [
+   "INFO Post-dial observer observer_started (mode=act)"
+  ],
+  "observer:observer_started_context": [
+   "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0 observer=ob-0c720a5bf06b0c20 scope=sc-afe7ab911f0c9bd2 scope_seq=1)"
+  ],
+  "observer:recovery_phase": [
+   "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:cefea97506cb486b20693c43 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)",
+   "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:42336959416b9e30c890011f reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)",
+   "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:92eba105873251d52eb0e839 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)",
+   "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:cefea97506cb486b20693c43 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)",
+   "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:c08754fa67396a25f99965ed reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)"
+  ],
+  "observer:route_epoch": [
+   "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2756101f6d45d3ee seq=<seq> loss_total=0)"
+  ]
+ },
+ "t3": {
+  "ensure_empty": null,
+  "ensure_existing": true,
+  "ensure_new": {
+   "facility_epoch": 0,
+   "from": "n1",
+   "incident": "post-dial-<I4>",
+   "route_epoch": 1,
+   "selector_intent_revision": 0,
+   "window_s": 6.0
+  },
+  "force_rebind": {
+   "generation_delta": 3,
+   "same": false,
+   "view": {
+    "facility_epoch": 0,
+    "from": "n1",
+    "incident": "post-dial-<I1>",
+    "route_epoch": 1,
+    "selector_intent_revision": 0,
+    "window_s": 6.0
+   }
+  },
+  "register_again_same": true,
+  "register_default": {
+   "facility_epoch": 0,
+   "from": "n1",
+   "incident": "post-dial-<I1>",
+   "route_epoch": 1,
+   "selector_intent_revision": 0,
+   "window_s": 6.0
+  },
+  "register_long_deadline": {
+   "facility_epoch": 0,
+   "from": "n1",
+   "incident": "post-dial-<I3>",
+   "route_epoch": 1,
+   "selector_intent_revision": 0,
+   "window_s": 6.0
+  },
+  "register_short_deadline": {
+   "facility_epoch": 0,
+   "from": "n1",
+   "incident": "post-dial-<I2>",
+   "route_epoch": 1,
+   "selector_intent_revision": 0,
+   "window_s": 2.0
+  }
+ }
+}

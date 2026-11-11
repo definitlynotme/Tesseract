@@ -1,0 +1,38 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "nodes.list",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "items": [
+      {
+        "id": "node-sub-1",
+        "name": "Tokyo 01",
+        "tier": "sentinel",
+        "kind": "subscription",
+        "enabled": true,
+        "status": "healthy",
+        "reason_code": null,
+        "protocol": "vless",
+        "latency_ms": 120,
+        "subscription_id": "sub-1"
+      },
+      {
+        "id": "node-manual-1",
+        "name": "Manual",
+        "tier": "sentinel",
+        "kind": "manual",
+        "enabled": true,
+        "status": "unknown",
+        "reason_code": null,
+        "protocol": "trojan",
+        "latency_ms": null,
+        "subscription_id": null
+      }
+    ]
+  },
+  "key": "sentinel"
+}

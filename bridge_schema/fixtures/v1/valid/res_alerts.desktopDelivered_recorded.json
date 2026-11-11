@@ -1,0 +1,15 @@
+{
+  "cmd": "alerts.desktopDelivered",
+  "data": {
+    "duplicate": false,
+    "recorded": true
+  },
+  "epoch": "v1-fixture",
+  "id": 1056,
+  "ok": true,
+  "owner": "shell",
+  "produced_at_ms": 1790812800000,
+  "req_id": "req-1056",
+  "sent_at_ms": 1790812800001,
+  "t": "res"
+}

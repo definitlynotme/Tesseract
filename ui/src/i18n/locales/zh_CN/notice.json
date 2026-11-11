@@ -1,0 +1,150 @@
+{
+  "notice.action.view": {
+    "m": "查看",
+    "_desc": "提醒卡片和应用内提醒上的按钮：打开主窗口并跳到相关页面。2 个字"
+  },
+  "notice.capture.detail": {
+    "m": "流量不再经过 Tesseract。重启服务可以重新接管。",
+    "_desc": "提醒卡片正文（系统代理被其他程序改写）：后果与修法。最多两行"
+  },
+  "notice.capture.resolved.detail": {
+    "m": "流量重新经过 Tesseract。",
+    "_desc": "提醒卡片正文（系统代理恢复为 Tesseract 后，同一张卡原地变成的恢复状态）"
+  },
+  "notice.capture.resolved.title": {
+    "m": "系统代理已恢复",
+    "_desc": "提醒卡片标题：之前被其他程序改写的系统代理已经重新指向 Tesseract"
+  },
+  "notice.capture.title": {
+    "m": "系统代理被其他程序改写",
+    "_desc": "提醒卡片标题：Windows 系统代理不再指向 Tesseract（被其他程序改写或关闭）"
+  },
+  "notice.close": {
+    "m": "关闭",
+    "_desc": "提醒卡片右上角 × 按钮的无障碍名称"
+  },
+  "notice.fallback.detail.bastion": {
+    "m": "Bastion 使用公共节点，请勿登录任何账号。",
+    "_desc": "提醒卡片正文（回退到 Bastion）：有实际后果的安全提示。Bastion 是层级代号，不翻译"
+  },
+  "notice.fallback.detail.other": {
+    "m": "{from} 暂时不可用。",
+    "_desc": "提醒卡片正文（回退到 Sentinel 等）：from 是原来所在的层级代号（Vanguard 等，不翻译）"
+  },
+  "notice.fallback.resolved.title": {
+    "m": "已回到 {tier}",
+    "_desc": "提醒卡片标题：之前回退的连接回到了原来的层级。tier 是层级代号（Vanguard / Sentinel，不翻译）"
+  },
+  "notice.fallback.title": {
+    "m": "已回退到 {tier}",
+    "_desc": "提醒卡片标题：运行中流量改经下一个层级。tier 是层级代号（Sentinel / Bastion，不翻译）"
+  },
+  "notice.level.error": {
+    "m": "错误",
+    "_desc": "提醒卡片顶行的级别词（八边形图标旁），标记，12 px"
+  },
+  "notice.level.warn": {
+    "m": "警告",
+    "_desc": "提醒卡片顶行的级别词（三角形图标旁），标记，12 px"
+  },
+  "notice.more": {
+    "m": "还有 {count, plural, other {# 条}}",
+    "_desc": "卡片堆叠超过 3 张时，最上方的合并行：count 是被收起的提醒数"
+  },
+  "notice.outage.detail": {
+    "m": "所有层级都不可用。",
+    "_desc": "提醒卡片正文（连接中断，熔断没有开启）；标题已说连接已中断"
+  },
+  "notice.outage.detail_blocked": {
+    "m": "所有层级都不可用。熔断已开启，出站已阻断。",
+    "_desc": "提醒卡片正文（连接中断，熔断已开启并阻断出站）"
+  },
+  "notice.outage.detail_core": {
+    "m": "代理核心没有在运行，自动重启没有成功。",
+    "_desc": "提醒卡片正文（连接中断的原因是代理核心退出且重启失败）"
+  },
+  "notice.outage.fix.source_supply": {
+    "m": "检查 DNS 设置或导入节点",
+    "_desc": "提醒卡片原因行的修法，接在引用的原因（notice.outage.reason.source_supply）之后，用 · 分隔"
+  },
+  "notice.outage.reason.source_supply": {
+    "m": "节点来源无法访问",
+    "_desc": "提醒卡片原因行里引用的原因（花体）：Bastion 的节点来源在当前网络下解析或连接不上"
+  },
+  "notice.outage.resolved.detail": {
+    "m": "当前经 {tier}。",
+    "_desc": "提醒卡片正文（连接恢复）：tier 是现在承载流量的层级代号（不翻译）"
+  },
+  "notice.outage.resolved.title": {
+    "m": "{minutes, plural, =0 {连接已恢复} other {连接已恢复 · 中断 # 分钟}}",
+    "_desc": "提醒卡片标题（同一张卡由「连接已中断」原地变来）：minutes 是中断时长，不足 1 分钟为 0"
+  },
+  "notice.outage.title": {
+    "m": "连接已中断",
+    "_desc": "提醒卡片标题：服务运行中，所有层级都不可用"
+  },
+  "notice.preview.detail": {
+    "m": "这是一条预览提醒。",
+    "_desc": "设置页「预览提醒」发出的卡片正文"
+  },
+  "notice.preview.title": {
+    "m": "提醒已开启",
+    "_desc": "设置页「预览提醒」发出的卡片标题"
+  },
+  "notice.service_stopped.detail": {
+    "m": "网络已恢复，服务处于停止状态。",
+    "_desc": "提醒卡片正文（后台服务崩溃后，壳已恢复网络并以停止状态重启服务）"
+  },
+  "notice.service_stopped.title": {
+    "m": "服务意外停止",
+    "_desc": "提醒卡片标题：后台服务意外退出（窗口不在前台时由壳发出）"
+  },
+  "notice.start_failed.detail": {
+    "m": "打开 Tesseract 查看原因。",
+    "_desc": "提醒卡片正文（启动失败且没有具体原因时的兜底）；有原因时改用 errors.start.* 的文字"
+  },
+  "notice.start_failed.resolved.title": {
+    "m": "服务已启动",
+    "_desc": "提醒卡片标题：之前启动失败，随后一次启动成功（同一张卡原地变成的恢复状态）"
+  },
+  "notice.start_failed.title": {
+    "m": "服务未能启动",
+    "_desc": "提醒卡片标题：启动失败（窗口不在前台时，比如开机自启）"
+  },
+  "notice.summary.detail": {
+    "m": "{resolved, plural, =0 {仍未恢复。} other {其中 # 条已恢复。}}",
+    "_desc": "全屏或勿扰结束后的汇总卡正文：resolved 是期间已经恢复的提醒数"
+  },
+  "notice.summary.title": {
+    "m": "期间有 {count, plural, other {# 条提醒}}",
+    "_desc": "全屏、演示或勿扰结束后的汇总卡标题：count 是期间暂存的提醒数"
+  },
+  "notice.time.now": {
+    "m": "刚刚",
+    "_desc": "提醒卡片顶行右侧的时间：一分钟内"
+  },
+  "notice.time.minutes": {
+    "m": "{n, plural, other {# 分钟前}}",
+    "_desc": "提醒卡片顶行右侧的时间：n 分钟前（卡片停留期间每分钟更新）"
+  },
+  "notice.unstable.detail.connection": {
+    "m": "{minutes, plural, other {# 分钟内}}中断了 {count, plural, other {# 次}}。",
+    "_desc": "提醒卡片正文（连接不稳定，由连接中断合并而来）：minutes 是统计窗口，count 是次数"
+  },
+  "notice.unstable.detail.tier": {
+    "m": "{minutes, plural, other {# 分钟内}}切换了 {count, plural, other {# 次}}层级。",
+    "_desc": "提醒卡片正文（连接不稳定，由层级回退合并而来）：minutes 是统计窗口，count 是次数"
+  },
+  "notice.unstable.title": {
+    "m": "连接不稳定",
+    "_desc": "提醒卡片标题：短时间内反复中断或反复切换层级，合并成这一张"
+  },
+  "notice.update.detail": {
+    "m": "当前 {current}。",
+    "_desc": "提醒卡片正文（发现新版本）：current 是正在使用的版本号"
+  },
+  "notice.update.title": {
+    "m": "发现新版本 {latest}",
+    "_desc": "提醒卡片标题：latest 是新版本号，每个版本只提醒一次"
+  }
+}

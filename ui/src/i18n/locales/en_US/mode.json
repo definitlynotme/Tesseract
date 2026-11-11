@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN and the system proxy together",
+  "mode.mixed.label": "System proxy + TUN",
+  "mode.mixed.short": "Both",
+  "mode.switch.confirm.body": "{mode, select, tun {The proxy service will restart and traffic will pause briefly. TUN mode takes over all traffic on this computer.} mixed {The proxy service will restart and traffic will pause briefly. TUN mode takes over all traffic on this computer.} other {The proxy service will restart and traffic will pause briefly.}}",
+  "mode.switch.confirm.ok": "Switch",
+  "mode.switch.confirm.title": "Switch to {label}?",
+  "mode.system.desc": "Only covers apps that use the system proxy",
+  "mode.system.label": "System proxy",
+  "mode.system.short": "System",
+  "mode.tun.desc": "Takes over all traffic through a virtual adapter (TUN)",
+  "mode.tun.label": "TUN mode",
+  "mode.tun.short": "TUN"
+}

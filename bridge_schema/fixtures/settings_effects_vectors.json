@@ -1,0 +1,839 @@
+[
+  {
+    "name": "network_ipv6",
+    "before": {
+      "network": {
+        "ipv6": false
+      }
+    },
+    "after": {
+      "network": {
+        "ipv6": true
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "restart",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32008"
+  },
+  {
+    "name": "network_port",
+    "before": {
+      "network": {
+        "mihomo_mixed_port": 7890
+      }
+    },
+    "after": {
+      "network": {
+        "mihomo_mixed_port": 7891
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "restart",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "network_config_view.py:235"
+  },
+  {
+    "name": "network_egress",
+    "before": {
+      "network": {
+        "egress_recovery": {
+          "enabled": true
+        }
+      }
+    },
+    "after": {
+      "network": {
+        "egress_recovery": {
+          "enabled": false
+        }
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:31984"
+  },
+  {
+    "name": "network_bypass",
+    "before": {
+      "network": {
+        "system_proxy": {
+          "bypass": [
+            "localhost"
+          ]
+        }
+      }
+    },
+    "after": {
+      "network": {
+        "system_proxy": {
+          "bypass": [
+            "localhost",
+            "10.*"
+          ]
+        }
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "system_proxy_override"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32121"
+  },
+  {
+    "name": "dns_mode",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "reload",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": "dns_lifecycle",
+      "mode": "incremental_export",
+      "fallback_effect": "restart"
+    },
+    "qt": "desktop_app.py:32000"
+  },
+  {
+    "name": "dns_rules",
+    "before": {
+      "dns": {
+        "mode": "auto",
+        "respect_rules": false
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "auto",
+        "respect_rules": true
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "reload",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": "dns_lifecycle",
+      "mode": "incremental_export",
+      "fallback_effect": "restart"
+    },
+    "qt": "desktop_app.py:31997"
+  },
+  {
+    "name": "routing_direct",
+    "before": {
+      "routing": {
+        "rules": {
+          "direct": []
+        }
+      }
+    },
+    "after": {
+      "routing": {
+        "rules": {
+          "direct": [
+            "example.test"
+          ]
+        }
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "reload",
+      "actions": [],
+      "reason": "user_graph_config",
+      "mode": "strict",
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:34259;task_result_view.py:50;desktop_app.py:33545"
+  },
+  {
+    "name": "routing_reject",
+    "before": {
+      "routing": {
+        "rules": {
+          "reject": []
+        }
+      }
+    },
+    "after": {
+      "routing": {
+        "rules": {
+          "reject": [
+            "bad.test"
+          ]
+        }
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "reload",
+      "actions": [],
+      "reason": "user_graph_config",
+      "mode": "strict",
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:34259;task_result_view.py:50;desktop_app.py:33545"
+  },
+  {
+    "name": "latency_500",
+    "before": {
+      "latency": {
+        "primary_gateway_max_latency_ms": 800
+      }
+    },
+    "after": {
+      "latency": {
+        "primary_gateway_max_latency_ms": 500
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "recheck",
+      "actions": [
+        "latency_recheck"
+      ],
+      "reason": "user_graph_config",
+      "mode": "incremental_export",
+      "fallback_effect": null
+    },
+    "qt": "desktop_runtime.py:43951;desktop_runtime.py:43993"
+  },
+  {
+    "name": "latency_1200",
+    "before": {
+      "latency": {
+        "primary_gateway_max_latency_ms": 800
+      }
+    },
+    "after": {
+      "latency": {
+        "primary_gateway_max_latency_ms": 1200
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "recheck",
+      "actions": [
+        "latency_recheck"
+      ],
+      "reason": "user_graph_config",
+      "mode": "incremental_export",
+      "fallback_effect": null
+    },
+    "qt": "desktop_runtime.py:43951;desktop_runtime.py:43993"
+  },
+  {
+    "name": "sources_enabled",
+    "before": {
+      "sources": [
+        {
+          "id": "source-a",
+          "kind": "subscription_urls",
+          "enabled": true,
+          "value": "https://example.test/old"
+        }
+      ]
+    },
+    "after": {
+      "sources": [
+        {
+          "id": "source-a",
+          "kind": "subscription_urls",
+          "enabled": false,
+          "value": "https://example.test/old"
+        }
+      ]
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:28203;desktop_runtime.py:44748;desktop_runtime.py:44760"
+  },
+  {
+    "name": "sources_value",
+    "before": {
+      "sources": [
+        {
+          "id": "source-a",
+          "kind": "subscription_urls",
+          "enabled": true,
+          "value": "https://example.test/old"
+        }
+      ]
+    },
+    "after": {
+      "sources": [
+        {
+          "id": "source-a",
+          "kind": "subscription_urls",
+          "enabled": true,
+          "value": "https://example.test/new"
+        }
+      ]
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:28203;desktop_runtime.py:44748;desktop_runtime.py:44760"
+  },
+  {
+    "name": "alerts_edit",
+    "before": {
+      "alerts": {
+        "channels": [
+          {
+            "id": "a",
+            "type": "desktop",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    "after": {
+      "alerts": {
+        "channels": [
+          {
+            "id": "a",
+            "type": "desktop",
+            "enabled": false
+          }
+        ]
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32558"
+  },
+  {
+    "name": "alerts_remove",
+    "before": {
+      "alerts": {
+        "channels": [
+          {
+            "id": "a",
+            "type": "desktop"
+          }
+        ]
+      }
+    },
+    "after": {
+      "alerts": {
+        "channels": []
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "delete_delivery_records"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32636;desktop_app.py:32651"
+  },
+  {
+    "name": "ui_language",
+    "before": {
+      "ui": {
+        "language": "en_US"
+      }
+    },
+    "after": {
+      "ui": {
+        "language": "zh_CN"
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "ui_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:31802;desktop_runtime.py:44017"
+  },
+  {
+    "name": "ui_overview_auto_exit_lookup",
+    "before": {
+      "ui": {
+        "overview_auto_exit_lookup": true
+      }
+    },
+    "after": {
+      "ui": {
+        "overview_auto_exit_lookup": false
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "ui_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:31802;desktop_runtime.py:44017"
+  },
+  {
+    "name": "autostart_True",
+    "before": {
+      "autostart": {
+        "enabled": false
+      }
+    },
+    "after": {
+      "autostart": {
+        "enabled": true
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "autostart"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:33521;desktop_runtime.py:45994"
+  },
+  {
+    "name": "autostart_False",
+    "before": {
+      "autostart": {
+        "enabled": true
+      }
+    },
+    "after": {
+      "autostart": {
+        "enabled": false
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "autostart"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:33521;desktop_runtime.py:45994"
+  },
+  {
+    "name": "traffic_enabled",
+    "before": {
+      "traffic": {
+        "enabled": true
+      }
+    },
+    "after": {
+      "traffic": {
+        "enabled": false
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "traffic_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_runtime.py:36661 (monitor reconfiguration; no Qt preference editor)"
+  },
+  {
+    "name": "traffic_history_seconds",
+    "before": {
+      "traffic": {
+        "history_seconds": 86400
+      }
+    },
+    "after": {
+      "traffic": {
+        "history_seconds": 3600
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "traffic_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_runtime.py:36661 (monitor reconfiguration; no Qt preference editor)"
+  },
+  {
+    "name": "killswitch_enabled",
+    "before": {
+      "killswitch": {
+        "enabled": true
+      }
+    },
+    "after": {
+      "killswitch": {
+        "enabled": false
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "killswitch_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32174;desktop_runtime.py:36687"
+  },
+  {
+    "name": "killswitch_allow_lan",
+    "before": {
+      "killswitch": {
+        "allow_lan": true
+      }
+    },
+    "after": {
+      "killswitch": {
+        "allow_lan": false
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "killswitch_preferences"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:32174;desktop_runtime.py:36687"
+  },
+  {
+    "name": "lifecycle_stopped",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": false,
+    "phase": "stopped",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15 (lifecycle extension)"
+  },
+  {
+    "name": "lifecycle_collecting",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": false,
+    "phase": "collecting",
+    "expected": {
+      "effect": "deferred",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": "dns_lifecycle",
+      "mode": "incremental_export",
+      "fallback_effect": "restart"
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15 (lifecycle extension)"
+  },
+  {
+    "name": "lifecycle_core_standby",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": true,
+    "phase": "core_standby",
+    "expected": {
+      "effect": "deferred",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": "dns_lifecycle",
+      "mode": "incremental_export",
+      "fallback_effect": "restart"
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15 (lifecycle extension)"
+  },
+  {
+    "name": "lifecycle_stopping",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": true,
+    "phase": "stopping",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15 (lifecycle extension)"
+  },
+  {
+    "name": "lifecycle_cleanup_pending",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      }
+    },
+    "running": true,
+    "phase": "cleanup_pending",
+    "expected": {
+      "effect": "none",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15 (lifecycle extension)"
+  },
+  {
+    "name": "combined_restart",
+    "before": {
+      "network": {
+        "ipv6": false
+      },
+      "ui": {
+        "language": "en_US"
+      },
+      "autostart": {
+        "enabled": false
+      },
+      "latency": {
+        "primary_gateway_max_latency_ms": 800
+      },
+      "alerts": {
+        "channels": [
+          {
+            "id": "a"
+          }
+        ]
+      }
+    },
+    "after": {
+      "network": {
+        "ipv6": true
+      },
+      "ui": {
+        "language": "zh_CN"
+      },
+      "autostart": {
+        "enabled": true
+      },
+      "latency": {
+        "primary_gateway_max_latency_ms": 500
+      },
+      "alerts": {
+        "channels": []
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "restart",
+      "actions": [
+        "latency_recheck",
+        "ui_preferences",
+        "autostart",
+        "delete_delivery_records"
+      ],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "bridge_schema/PROTOCOL.md:15"
+  },
+  {
+    "name": "combined_dns_graph",
+    "before": {
+      "dns": {
+        "mode": "auto"
+      },
+      "routing": {
+        "rules": {}
+      }
+    },
+    "after": {
+      "dns": {
+        "mode": "system"
+      },
+      "routing": {
+        "rules": {
+          "direct": [
+            "a.test"
+          ]
+        }
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "reload",
+      "actions": [
+        "refresh_dns_policy"
+      ],
+      "reason": "user_graph_config",
+      "mode": "strict",
+      "fallback_effect": null
+    },
+    "qt": "desktop_app.py:33545"
+  },
+  {
+    "name": "unchanged",
+    "before": {
+      "ui": {
+        "language": "en_US"
+      }
+    },
+    "after": {
+      "ui": {
+        "language": "en_US"
+      }
+    },
+    "running": true,
+    "phase": "running",
+    "expected": {
+      "effect": "none",
+      "actions": [],
+      "reason": null,
+      "mode": null,
+      "fallback_effect": null
+    },
+    "qt": "unchanged values"
+  }
+]

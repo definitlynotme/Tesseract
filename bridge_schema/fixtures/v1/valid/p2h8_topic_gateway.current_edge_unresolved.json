@@ -1,0 +1,17 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "gateway.current",
+  "rev": 1,
+  "kind": "edge",
+  "seq": 2,
+  "data": {
+    "selected": "Paris-2",
+    "effective": null,
+    "missing": true,
+    "applied": false,
+    "pending": null
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "langs": [
+    "zh_CN",
+    "en_US",
+    "de_DE",
+    "es_ES",
+    "fr_FR",
+    "ja_JP",
+    "ko_KR",
+    "pt_BR",
+    "ru_RU"
+  ],
+  "items": [],
+  "coverage": {
+    "complete": true,
+    "source_digest": "fixture-digest",
+    "_doc": "materialize() passes sourceDigest: fixture-digest (T-P4-12 fix 1)"
+  }
+}

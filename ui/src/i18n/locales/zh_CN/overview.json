@@ -1,0 +1,742 @@
+{
+  "overview.hero.eyebrow": {
+    "m": "当前层级",
+    "_desc": "英雄区最上方的小标题，下面是正在承载流量的层级名（Vanguard 等，不译）"
+  },
+  "overview.hero.state": {
+    "m": "{state, select, starting {启动中} cancelling {取消中} stopping {停止中} failed {启动失败} blocked {出站已阻断} unconfirmed {路由未确认} connecting {正在连接} other {未启动}}",
+    "_desc": "英雄区的大字：没有可显示的承载层时代替层级名的状态词。state：starting 启动中、cancelling 正在取消启动、stopping 正在停止、failed 启动失败、blocked 所有层级都不可用而出站已被阻断、unconfirmed 运行中但流量经过哪个层级暂时无法确认、connecting 正在连接后台服务（界面刚打开或后台重启）、other 服务未启动（停止后）。字号大，宜短"
+  },
+  "overview.hero.hint.restarting": {
+    "m": "正在重启代理核心",
+    "_desc": "英雄区提示行：手动重启代理核心期间"
+  },
+  "overview.hero.hint.stop_failed": {
+    "m": "<x>停止没有完成</x>",
+    "_desc": "英雄区提示行：上一次停止服务失败（仍在停止、网络设置没清理完或核心退出异常），悬停可看具体原因；运行按钮上另有「重试」。<x> 显示为错误色"
+  },
+  "overview.hero.hint.blocked": {
+    "m": "<x>所有层级都不可用</x>",
+    "_desc": "英雄区提示行：熔断保护已触发或运行时进入阻断状态，所有出站流量都被拦下（大字已是「出站已阻断」）。<x> 显示为错误色"
+  },
+  "overview.hero.hint.data_plane_failed": {
+    "m": "<x>出口暂不可用</x> · 请切换节点后重试",
+    "_desc": "英雄区提示行：数据通道检测失败，流量暂时出不去；后半句是处理办法。<x> 显示为错误色"
+  },
+  "overview.hero.hint.hold": {
+    "m": "暂时无法确认连接状态",
+    "_desc": "英雄区提示行：运行时暂停了就绪判断（等待控制器、设施或激活），状态暂时无法确认"
+  },
+  "overview.hero.hint.validating": {
+    "m": "正在验证最终出口…",
+    "_desc": "英雄区提示行：运行中，正在验证流量最终从哪里出去"
+  },
+  "overview.hero.hint.stale": {
+    "m": "状态未更新",
+    "_desc": "英雄区提示行：几秒没有收到服务状态，页面保留上次的显示，状态点变灰"
+  },
+  "overview.hero.hint.fallback": {
+    "m": "<x>已回退</x> · {tier} 暂不可用{ks, select, off { · <x>熔断保护已关闭</x>} blocked { · <x>熔断保护未生效</x>} error { · <x>熔断保护出错</x>} other {}}",
+    "_desc": "英雄区提示行：流量已回退到后备层级。<x> 包住的词显示为琥珀色警示；tier 是暂不可用的层级代号（Vanguard 等，不译）。ks：off 熔断保护被关闭、blocked 缺管理员权限而未生效、error 熔断保护的防火墙操作出错时，句尾追加一段警示；other 不追加"
+  },
+  "overview.hero.hint.degraded": {
+    "m": "<x>延迟升高</x> · 正在评估 {tier}{ks, select, off { · <x>熔断保护已关闭</x>} blocked { · <x>熔断保护未生效</x>} error { · <x>熔断保护出错</x>} other {}}",
+    "_desc": "英雄区提示行（后端尚未提供，功能开关 B-01 打开时才出现）：承载层当前节点变慢、还没切换。tier 是承载层代号（不译）。ks：off 熔断保护被关闭、blocked 缺管理员权限而未生效、error 熔断保护的防火墙操作出错时，句尾追加一段警示；other 不追加"
+  },
+  "overview.hero.hint.nodes_unknown": {
+    "m": "{ks, select, off {<x>熔断保护已关闭</x>} blocked {<x>熔断保护未生效</x>} error {<x>熔断保护出错</x>} other {}}",
+    "_desc": "英雄区提示行：正常运行，但后台还没有给出承载层的节点数（不写「全部节点可用」，也不解释为什么没有数）。只在熔断保护失效时提醒：ks=off 熔断保护被关闭、blocked 缺管理员权限而未生效、error 熔断保护的防火墙操作出错；other 时整行为空。<x> 包住的词显示为警示色"
+  },
+  "overview.hero.hint.nodes": {
+    "m": "{count, select, partial {{total, plural, other {{ok, number}/# 个节点可用}}} all {{total, plural, other {全部 # 个节点可用}}} other {全部节点可用}}{ks, select, off { · <x>熔断保护已关闭</x>} blocked { · <x>熔断保护未生效</x>} error { · <x>熔断保护出错</x>} other {}}",
+    "_desc": "英雄区提示行：正常运行时承载层的节点可用情况。count：partial 部分节点不可用（显示 ok/total），all 全部可用（total 个），other 层里没有节点计数。ks：off 熔断保护被关闭、blocked 缺管理员权限而未生效、error 熔断保护的防火墙操作出错时，句尾追加一段警示；other 不追加"
+  },
+  "overview.run.aria": {
+    "m": "服务控制",
+    "_desc": "运行药丸（启动 / 停止服务的组合按钮）的读屏名称"
+  },
+  "overview.run.start": {
+    "m": "启动服务",
+    "_desc": "运行药丸的主按钮，服务停止时显示；也是该按钮的读屏名称。按钮空间紧"
+  },
+  "overview.run.act_aria": {
+    "m": "{state, select, starting {取消启动} retry {重试启动} stop_retry {再次停止服务} other {停止服务}}",
+    "_desc": "运行药丸右侧分段按钮的读屏名称：starting 启动中是取消启动；retry 启动失败后重新启动；stop_retry 上次停止没有完成、再停止一次；other 运行中是停止服务"
+  },
+  "overview.run.cancel": {
+    "m": "取消",
+    "_desc": "运行药丸启动中右侧的分段按钮：取消正在进行的启动。空间很紧，一个词"
+  },
+  "overview.run.ready": {
+    "m": "已就绪",
+    "_desc": "运行药丸在启动完成瞬间的短暂提示（约 1 秒）。空间紧"
+  },
+  "overview.run.running": {
+    "m": "运行中",
+    "_desc": "运行药丸的状态读数，后面紧跟运行时长 HH:MM:SS。空间紧"
+  },
+  "overview.run.stop": {
+    "m": "停止",
+    "_desc": "运行药丸运行中右侧的分段按钮：停止服务。空间很紧，一个词"
+  },
+  "overview.run.stopping": {
+    "m": "{cancelling, select, yes {取消中} other {停止中}}",
+    "_desc": "运行药丸在服务停止过程中的读数（cancelling=yes 表示正在取消启动）。空间紧"
+  },
+  "overview.run.connecting": {
+    "m": "正在连接",
+    "_desc": "运行药丸：界面还没连上后台服务时的读数（按钮都不可用）。空间紧"
+  },
+  "overview.run.failed": {
+    "m": "启动失败",
+    "_desc": "运行药丸左侧的读数：启动失败（右侧分段是「重试」或「停止」）。空间紧"
+  },
+  "overview.run.retry": {
+    "m": "重试",
+    "_desc": "运行药丸：启动失败后重新启动、或停止失败后再停止一次的按钮文字。空间紧（与「停止」同宽）"
+  },
+  "overview.run.retry_link": {
+    "m": "重试",
+    "_desc": "运行药丸：启动失败、而代理核心还在运行时，左侧读数里的「重试」（点读数区域重新启动，右侧仍是「停止」）。空间紧"
+  },
+  "overview.run.stop_failed": {
+    "m": "停止失败",
+    "_desc": "运行药丸左侧的读数：上一次停止没有完成（右侧分段是「重试」）。空间紧"
+  },
+  "overview.run.main_aria_retry": {
+    "m": "重试启动服务",
+    "_desc": "运行药丸主按钮在启动失败后的读屏名称（点按重新启动服务）"
+  },
+  "overview.phase.collect.label": {
+    "m": "收集节点",
+    "_desc": "启动第 1 阶段的名称，显示在运行药丸里，后接「1/3」。空间紧"
+  },
+  "overview.phase.verify.label": {
+    "m": "验证出口",
+    "_desc": "启动第 2 阶段的名称，显示在运行药丸里，后接「2/3」。空间紧"
+  },
+  "overview.phase.ready.label": {
+    "m": "就绪",
+    "_desc": "启动第 3 阶段的名称，显示在运行药丸里，后接「3/3」。空间紧"
+  },
+  "overview.restart.label": {
+    "m": "重启服务",
+    "_desc": "英雄区右上的按钮：重启代理核心（只在服务运行时出现）。按钮空间紧"
+  },
+  "overview.restart.tip": {
+    "m": "流量会短暂中断",
+    "_desc": "「重启服务」按钮的悬停提示：重启的后果（按钮缩成图标时前面会加上按钮名）"
+  },
+  "overview.restart.busy": {
+    "m": "重启中…",
+    "_desc": "「重启服务」按钮在重启进行中的文字。与按钮原文同宽为宜"
+  },
+  "overview.restart.done": {
+    "m": "已重启",
+    "_desc": "「重启服务」按钮在重启完成后短暂显示的文字"
+  },
+  "overview.restart.failed": {
+    "m": "重启没有完成",
+    "_desc": "「重启服务」按钮在重启失败（作业失败、未应用或被拒绝）后短暂显示的文字；原因写在英雄区的提示里"
+  },
+  "overview.exit.title": {
+    "m": "当前出口",
+    "_desc": "当前出口卡的标题，也是该区域的读屏名称：显示流量最终离开时的公网 IP"
+  },
+  "overview.exit.refresh.label": {
+    "m": "刷新",
+    "_desc": "出口卡标题右侧的按钮：经当前出口重新完整验证一次出口 IP（只在服务运行时出现）。按钮很窄"
+  },
+  "overview.exit.refresh.busy": {
+    "m": "验证中",
+    "_desc": "出口卡「刷新」按钮在验证进行中的文字。按钮很窄"
+  },
+  "overview.exit.refresh.done": {
+    "m": "已验证",
+    "_desc": "出口卡「刷新」按钮在验证完成后短暂显示的文字。按钮很窄"
+  },
+  "overview.exit.copy.aria": {
+    "m": "复制 {family} 地址",
+    "_desc": "复制出口地址的图标按钮的读屏名称；family 是 IPv4 或 IPv6（不译）"
+  },
+  "overview.exit.copy.tip": {
+    "m": "复制 {family}",
+    "_desc": "复制出口地址的图标按钮的悬停提示；family 是 IPv4 或 IPv6（不译）"
+  },
+  "overview.exit.last": {
+    "m": "上次结果",
+    "_desc": "出口地址旁的小标签：正在重新查询时，显示的是上一次的结果。空间紧"
+  },
+  "overview.exit.net_type": {
+    "m": "{type, select, backbone {骨干网络} business {企业网络} hosting {托管网络} mobile {移动网络} residential {家庭宽带} isp {运营商网络} other {其他网络}}",
+    "_desc": "出口卡网络行末尾的小标签：检测来源报告的出口网络类型。空间紧"
+  },
+  "overview.exit.single_source": {
+    "m": "单一来源",
+    "_desc": "出口卡位置行末尾的小标签：只有一个检测来源确认了这个地址。空间紧"
+  },
+  "overview.exit.single_source_tip": {
+    "m": "只有一个检测来源确认了这个地址",
+    "_desc": "「单一来源」小标签的悬停提示"
+  },
+  "overview.exit.same_location": {
+    "m": "位置同上",
+    "_desc": "IPv6 地址后的说明：IPv6 出口的位置与上面的 IPv4 相同"
+  },
+  "overview.exit.prov.idle": {
+    "m": "{state, select, starting {等待就绪} wait {等待查询} other {未查询}}",
+    "_desc": "出口卡标题旁的来源徽标：还没有出口结果。state：starting 服务启动中、等就绪后再查；wait 服务运行中、还没有结果（自动查询进行时后台不发布进度，所以不写正在查询）；other 尚未查询出口"
+  },
+  "overview.exit.prov.pending": {
+    "m": "{phase, select, deferred {就绪后查询} upgrading {结束后再验证} retrying {正在重试} rate_limited {正在重试} waiting_connection {正在等待连接} other {{how, select, manual {正在验证出口…} other {正在获取…}}}}",
+    "_desc": "出口卡标题旁的来源徽标：查询进行中。phase：deferred 服务还在启动，就绪后才查询（最多等 2 分钟）；upgrading 有一次自动查询正在进行，结束后再完整验证一次；retrying、rate_limited 正在重试；waiting_connection 在等待连接建立；other 正在查询。how=manual 是用户点刷新发起的完整验证，other 是自动查询"
+  },
+  "overview.exit.prov.ok": {
+    "m": "{how, select, manual {已验证} other {已确认}} · {ago}",
+    "_desc": "出口卡标题旁的来源徽标：出口已查到。how=manual 是用户点刷新验证的结果，other 是启动时的自动查询；ago 是相对时间（如「3 分钟前」「刚刚」）"
+  },
+  "overview.exit.prov.expired": {
+    "m": "已过期",
+    "_desc": "出口卡标题旁的来源徽标：显示的出口结果已经过期（路由或网络变了），地址保留；旁边就是「刷新」按钮"
+  },
+  "overview.exit.prov.stale": {
+    "m": "数据未更新",
+    "_desc": "出口卡标题旁的来源徽标：出口数据暂时没有更新，页面保留上次的显示"
+  },
+  "overview.exit.leg.none": {
+    "m": "{status, select, unknown {未查询} running {查询中…} other {没有结果}}",
+    "_desc": "出口卡某一地址族（IPv4 或 IPv6）没有地址时，地址位置的说明（没有更具体的原因时）。status：unknown 还没查、running 正在查、other 查过但没有结果"
+  },
+  "overview.exit.route.running": {
+    "m": "经由 <tier>{via}</tier> <x>→</x> <tier>{exit}</tier>",
+    "_desc": "出口卡底部的路由行：流量经由哪个节点、从哪个 Gateway 节点离开。<tier> 包住的是节点名，渲染为「层级图标 + 节点名」（节点名是数据，原样显示，不译）；<x> 渲染为箭头图标，里面的「→」不显示。两段 <tier> 的先后可以按语序调换"
+  },
+  "overview.exit.route.direct": {
+    "m": "经由 <tier>{via}</tier> 直接出口",
+    "_desc": "出口卡底部的路由行（运行中、没有使用 Gateway）：经由哪个节点直接出去。via 是节点名（数据，不译），<tier> 渲染为图标 + 名称"
+  },
+  "overview.exit.route.gateway": {
+    "m": "经由未知节点 <x>→</x> <tier>{exit}</tier>",
+    "_desc": "出口卡底部的路由行（运行中、使用 Gateway 固定出口）：流量先经某个节点（后台不报告是哪一个），再从 Gateway 节点 exit 离开。exit 是节点名（数据，原样显示，不译），<tier> 渲染为 Gateway 图标 + 节点名；<x> 渲染为箭头图标，里面的「→」不显示。不能写成「直接出口」"
+  },
+  "overview.exit.route.unconfirmed": {
+    "m": "路由未确认",
+    "_desc": "出口卡底部的路由行：服务在运行，但已发布的路由失效或还没有，暂时无法确认流量经过哪里"
+  },
+  "overview.deck.title": {
+    "m": "回退顺序",
+    "_desc": "层卡叠的标题，也是该区域的读屏名称：三张层卡按回退顺序叠放"
+  },
+  "overview.deck.meta.fallback": {
+    "m": "已回退",
+    "_desc": "回退顺序标题旁的状态：运行中已回退到后备层级"
+  },
+  "overview.deck.more": {
+    "m": "查看层级",
+    "_desc": "最前面那张层卡右上角的链接文字，点卡片进入层级页。空间紧"
+  },
+  "overview.deck.card_aria": {
+    "m": "{name}，查看层级",
+    "_desc": "层卡和层卡下方 Gateway 行（按钮）的读屏名称：name 是层级代号（不译）"
+  },
+  "overview.deck.pill": {
+    "m": "{state, select, slow {延迟升高} fallback {已回退} down {不可用} carrying {承载流量} standby {待命} starting {启动中} cancelling {取消中} stopping {停止中} unknown {正在连接} other {未连接}}",
+    "_desc": "最前面那张层卡左上的状态药丸。state：slow 延迟升高（功能开关 B-01）、fallback 已回退到这一层、down 全部节点不可用、carrying 正在承载流量、standby 待命、starting 启动中、cancelling 正在取消启动、stopping 正在停止、unknown 正在连接后台服务、other 服务未启动。空间紧"
+  },
+  "overview.deck.pill_unconfirmed": {
+    "m": "承载未确认",
+    "_desc": "最前面那张层卡左上的状态药丸：使用 Gateway 固定出口时，后台不报告流量经过哪个回退层，所以这一层是否正在承载流量暂时无法确认（不写「待命」也不写「承载流量」）。空间紧"
+  },
+  "overview.deck.node.lat": {
+    "m": "<b>{lat}</b> ms",
+    "_desc": "层卡上当前节点的延迟读数，lat 是毫秒数（加粗显示）。ms 是单位"
+  },
+  "overview.deck.node.over_limit": {
+    "m": "超过上限",
+    "_desc": "层卡当前节点行末尾：延迟超过了配置的延迟上限"
+  },
+  "overview.deck.node.down": {
+    "m": "全部节点不可用",
+    "_desc": "层卡当前节点行：这一层全部节点都不可用，各节点的原因不一致（原因一致时用 overview.deck.node.down_reason）"
+  },
+  "overview.deck.node.down_reason": {
+    "m": "全部节点不可用 · {reason}",
+    "_desc": "层卡当前节点行：这一层全部节点都不可用，多数节点的原因相同。reason 是该原因的短语（如「连接超时」）"
+  },
+  "overview.deck.node.unconfirmed": {
+    "m": "当前节点未知 · 由 Gateway 出口",
+    "_desc": "层卡当前节点行（使用 Gateway 固定出口时）：流量按回退顺序经过某一层后从 Gateway 节点离开，后台不报告经过的节点，所以不显示节点名。Gateway 不译"
+  },
+  "overview.deck.node.untested": {
+    "m": "未测",
+    "_desc": "层卡当前节点行末尾：这个节点还没有延迟检测结果。空间紧"
+  },
+  "overview.deck.stat.bastion_off": {
+    "m": "未启用",
+    "_desc": "Bastion 层卡的状态行：Bastion 没有启用"
+  },
+  "overview.deck.stat.bastion_capacity": {
+    "m": "{capacity, plural, other {最多 # 个节点}}",
+    "_desc": "Bastion 层卡的状态行（服务未启动）：最多容纳 capacity 个节点"
+  },
+  "overview.deck.stat.collecting": {
+    "m": "收集中…",
+    "_desc": "层卡状态行：启动中，这一层还在收集节点"
+  },
+  "overview.deck.stat.bastion_filling": {
+    "m": "正在补充 · {n, number} 可用",
+    "_desc": "Bastion 层卡状态行：正在收集补充公共节点。n 是现有可用节点数（不写成对容量的分数）；capacity 参数不再使用"
+  },
+  "overview.deck.stat.bastion_low": {
+    "m": "{n, number} 可用 · {min, plural, other {少于最少 # 个}}",
+    "_desc": "Bastion 层卡状态行（琥珀色）：可用节点 n 少于设定的最少可用数 min；capacity 参数不再使用"
+  },
+  "overview.deck.stat.bastion_standby": {
+    "m": "{n, number} 可用 · 待命",
+    "_desc": "Bastion 层卡状态行：Garrison 待命。n 是现有可用节点数；capacity 参数不再使用"
+  },
+  "overview.deck.stat.bastion_count": {
+    "m": "{n, number} 可用",
+    "_desc": "Bastion 层卡状态行，bastion.pool 暂时没有新数据时：上次的可用节点数 n（外面再套 overview.common.stale_after「· 数据未更新」；状态词不写，因为状态不确定）"
+  },
+  "overview.deck.stat.nodes": {
+    "m": "{total, plural, other {# 个节点}}",
+    "_desc": "层卡状态行（服务未启动）：这一层有多少个节点"
+  },
+  "overview.deck.stat.down": {
+    "m": "0/{total, number} · 不可用",
+    "_desc": "层卡状态行（红色）：这一层全部节点不可用，total 是节点总数"
+  },
+  "overview.deck.stat.usable": {
+    "m": "{ok, number}/{total, number} 可用",
+    "_desc": "层卡状态行：承载流量的层级里 ok 个节点可用，共 total 个"
+  },
+  "overview.deck.stat.standby": {
+    "m": "{ok, number}/{total, number} · 待命",
+    "_desc": "层卡状态行：待命的层级里 ok 个节点可用，共 total 个"
+  },
+  "overview.deck.stat.unconfirmed": {
+    "m": "{ok, number}/{total, number} · 承载未确认",
+    "_desc": "层卡状态行（使用 Gateway 固定出口时的最前一张卡）：这一层 ok 个节点可用，共 total 个；后台不报告它是否正在承载流量（不写「待命」）"
+  },
+  "overview.deck.stat.unconfigured": {
+    "m": "未配置",
+    "_desc": "层卡状态行：这一层已启用但还没有节点，点卡片去层级页添加。空间紧"
+  },
+  "overview.deck.stat.off": {
+    "m": "未启用",
+    "_desc": "层卡状态行：这一层在设置里没有启用。空间紧"
+  },
+  "overview.deck.stat.unknown": {
+    "m": "—",
+    "_desc": "「—」：没有数据时的占位（层卡状态行在连接后台服务时；Bastion 应急池还没有数字时；协议分布合计在启动中、代理核心还没加载配置时）"
+  },
+  "overview.gate.stat.waiting": {
+    "m": "等待验证",
+    "_desc": "Gateway 行的状态：启动中，Gateway 还没开始验证"
+  },
+  "overview.gate.stat.verifying": {
+    "m": "验证中…",
+    "_desc": "Gateway 行的状态：启动中，正在验证 Gateway 出口"
+  },
+  "overview.gate.stat.current": {
+    "m": "<x>当前 </x><tier>{name}</tier> · {ok, number}/{total, number}",
+    "_desc": "层卡下方 Gateway 行的状态：当前使用的 Gateway 节点和可用节点数（ok 个可用，共 total 个）。<x> 包住的部分在窄窗口里隐藏，隐藏后剩下的部分也要通顺；<tier> 包住节点名（数据，原样显示，不译）"
+  },
+  "overview.gate.stat.selected": {
+    "m": "<x>已选择，</x>未生效 · <tier>{name}</tier> · {ok, number}/{total, number}",
+    "_desc": "层卡下方 Gateway 行的状态：服务在运行，用户选了这个 Gateway 节点，但流量此刻没有经过它（路由暂时无效，或刚切换、链路还没走到它），所以不说「当前」。ok/total 为 Gateway 层可用节点数/总数。<x> 包住的部分在窄窗口里隐藏，隐藏后剩下的部分也要通顺，并且仍须与「当前」那条（overview.gate.stat.current）区分开：「未生效」这个标记放在 <x> 之外，窄窗口里也保留；<tier> 包住节点名（数据，原样显示，不译）"
+  },
+  "overview.gate.stat.off": {
+    "m": "未使用 Gateway",
+    "_desc": "Gateway 行的状态：没有选择 Gateway 出口，或 Gateway 层没有启用（Gateway 不译）"
+  },
+  "overview.gate.stat.missing": {
+    "m": "<x>当前出口已缺失</x> · <tier>{name}</tier>",
+    "_desc": "Gateway 行的状态（琥珀色）：选定的 Gateway 节点已不在列表里。name 是节点名（数据，不译）。<x> 在窄窗口里保留"
+  },
+  "overview.gate.stat.pending": {
+    "m": "<x>已保存，待应用 · </x><tier>{name}</tier>",
+    "_desc": "Gateway 行的状态：新的 Gateway 选择已保存，还没有生效。name 是节点名（数据，不译）。<x> 包住的部分在窄窗口里隐藏"
+  },
+  "overview.gate.stat.counts": {
+    "m": "{ok, number}/{total, number}",
+    "_desc": "Gateway 行的状态：还不知道当前出口的名字时，只显示可用数/总数"
+  },
+  "overview.traffic.title": {
+    "m": "流量",
+    "_desc": "流量卡的标题，也是该区域的读屏名称"
+  },
+  "overview.traffic.scope": {
+    "m": "{scope, select, last {上次会话} other {本次会话}}",
+    "_desc": "流量卡标题旁的范围说明：累计数字属于哪一次会话（服务停止后是上次会话）"
+  },
+  "overview.traffic.cumulative": {
+    "m": "累计",
+    "_desc": "流量标题旁的范围词：下载、上传是累计值（从上次应用配置时开始计，不是从本次启动开始，所以不写「本次会话」）"
+  },
+  "overview.traffic.error": {
+    "m": "流量数据暂不可用",
+    "_desc": "流量标题旁：流量采样出错，数字可能不准"
+  },
+  "overview.traffic.unknown_aria": {
+    "m": "暂无数据",
+    "_desc": "流量卡下载、上传累计数字在还没收到流量数据时（显示为「—」）给读屏软件读的文字"
+  },
+  "overview.traffic.range.aria": {
+    "m": "曲线时间范围",
+    "_desc": "流量曲线时间范围切换（24 小时 / 5 分钟）的读屏名称"
+  },
+  "overview.traffic.range.h24": {
+    "m": "24 小时",
+    "_desc": "流量曲线时间范围切换的选项：过去 24 小时。分段按钮，空间紧"
+  },
+  "overview.traffic.range.m5": {
+    "m": "5 分钟",
+    "_desc": "流量曲线时间范围切换的选项：最近 5 分钟。分段按钮，空间紧"
+  },
+  "overview.traffic.down": {
+    "m": "下载",
+    "_desc": "流量卡的下载累计标签，也用于曲线悬停读数"
+  },
+  "overview.traffic.up": {
+    "m": "上传",
+    "_desc": "流量卡的上传累计标签，也用于曲线悬停读数"
+  },
+  "overview.traffic.live": {
+    "m": "实时 <x>{rate}</x>",
+    "_desc": "下载 / 上传标签后的实时速率，rate 是速率（如 1.54 MB/s）。<x> 包住速率数字，每秒更新"
+  },
+  "overview.chart.aria": {
+    "m": "{range, select, m5 {最近 5 分钟的下载与上传速率曲线} other {过去 24 小时的下载与上传速率曲线}}",
+    "_desc": "流量曲线图的读屏名称，随时间范围变化"
+  },
+  "overview.chart.x.minutes_ago": {
+    "m": "{n, plural, other {# 分钟前}}",
+    "_desc": "5 分钟曲线横轴刻度：n 分钟前。刻度空间紧"
+  },
+  "overview.chart.x.now": {
+    "m": "现在",
+    "_desc": "曲线横轴最右端的刻度：现在。刻度空间紧"
+  },
+  "overview.chart.tip.average": {
+    "m": "{time} · 5 分钟均值",
+    "_desc": "24 小时曲线悬停读数的标题：time 是时刻，数值是这 5 分钟的平均速率"
+  },
+  "overview.strip.aria": {
+    "m": "接管方式、熔断保护与节点",
+    "_desc": "右侧状态格组的读屏名称"
+  },
+  "overview.mode.label": {
+    "m": "接管方式",
+    "_desc": "接管方式格的标签"
+  },
+  "overview.mode.aria": {
+    "m": "接管方式",
+    "_desc": "接管方式格里两个开关按钮（系统代理 / 虚拟网卡，可以同时开）的读屏名称"
+  },
+  "overview.mode.gated_tip": {
+    "m": "需要管理员权限",
+    "_desc": "被锁住的网络模式选项（全局、混合）的悬停提示：没有管理员权限时不能选"
+  },
+  "overview.mode.hint.switching": {
+    "m": "正在切换到{mode, select, tun {虚拟网卡模式} mixed {系统代理 + 虚拟网卡} other {系统代理}}",
+    "_desc": "接管方式格的提示行：正在切换。mode：tun 只用虚拟网卡、mixed 两者都开、other 系统代理。三个名称与共享词 mode.tun.label / mode.mixed.label / mode.system.label 的译法保持一致"
+  },
+  "overview.mode.hint.gate_note": {
+    "m": "<x>{mode, select, tun {虚拟网卡模式} mixed {虚拟网卡模式} other {系统代理}}需要管理员权限</x>",
+    "_desc": "接管方式格的提示行：用户的操作要开启虚拟网卡、但没有管理员权限时的说明（约 3 秒）。<x> 包住的部分显示为琥珀色警示。mode：tun / mixed 都是因为虚拟网卡模式，other 系统代理（实际不会出现）"
+  },
+  "overview.mode.hint.gated": {
+    "m": "<x>需要管理员权限</x>",
+    "_desc": "网络模式格的提示行：当前选中的模式需要管理员权限而现在没有。<x> 包住的部分显示为琥珀色警示"
+  },
+  "overview.mode.hint.system": {
+    "m": "已接管 · <mono>{port}</mono>",
+    "_desc": "网络模式格的提示行：服务运行中、系统代理已被接管（系统代理或混合模式）。port 是系统代理指向的本机监听地址（如 127.0.0.1:7890），等宽显示，不译。服务没在运行或还没接管时这一行不显示"
+  },
+  "overview.mode.hint.system_noport": {
+    "m": "已接管",
+    "_desc": "网络模式格的提示行：服务运行中、所选模式已接管（全局模式，或还不知道监听地址时的系统代理 / 混合模式）"
+  },
+  "overview.mode.hint.drift": {
+    "m": "<x>系统代理被其他程序改写</x> · 浏览器流量未走 Tesseract",
+    "_desc": "网络模式格提示行：系统代理设置被别的程序改掉了，浏览器流量没有经过 Tesseract。<x> 显示为琥珀色；行尾另有一个「重启服务」按钮（overview.restart.label）用来重新接管，窄时这句话先省略（Tesseract 不译）"
+  },
+  "overview.mode.hint.proxy_unknown": {
+    "m": "<x>无法读取系统代理设置</x>",
+    "_desc": "网络模式格提示行：读不到系统代理设置，无法确认是否已接管"
+  },
+  "overview.mode.note.next_start": {
+    "m": "已保存 · 下次启动生效",
+    "_desc": "网络模式格提示行（切换后短暂显示）：服务没有运行，新模式已保存，下次启动时生效"
+  },
+  "overview.mode.note.cleanup_pending": {
+    "m": "<x>正在清理上一次的网络设置</x> · 稍后再切换",
+    "_desc": "网络模式格提示行（切换后短暂显示）：上一次的 TUN 或系统代理设置还在清理，这次切换没有生效"
+  },
+  "overview.mode.note.not_applied": {
+    "m": "<x>已保存，重启服务后生效</x>",
+    "_desc": "网络模式格提示行（切换后短暂显示）：新模式已保存但没能生效，悬停可看原因"
+  },
+  "overview.mode.note.conflict": {
+    "m": "<x>另一项设置正在应用</x> · 稍后再切换",
+    "_desc": "网络模式格提示行（切换后短暂显示）：有别的设置正在应用，这次切换没有执行"
+  },
+  "overview.mode.note.failed": {
+    "m": "<x>切换没有完成</x>",
+    "_desc": "网络模式格提示行（切换后短暂显示）：切换失败，悬停可看原因"
+  },
+  "overview.mode.confirm.aria": {
+    "m": "切换接管方式",
+    "_desc": "运行中切换接管方式时弹出的内联确认的读屏名称"
+  },
+  "overview.mode.confirm.title": {
+    "m": "{mode, select, tun {切换到虚拟网卡模式？} mixed {同时开启系统代理和虚拟网卡？} other {切换到系统代理？}}",
+    "_desc": "运行中切换接管方式的内联确认标题（加粗）。mode 是按下开关后的结果：tun 只用虚拟网卡、mixed 两者都开（打开第二个开关时）、other 只用系统代理。正文和确认按钮用共用的 mode.switch.confirm.body / mode.switch.confirm.ok"
+  },
+  "overview.ks.aria": {
+    "m": "熔断保护，前往配置",
+    "_desc": "熔断保护格（按钮）的读屏名称：点击前往配置页的熔断保护项"
+  },
+  "overview.ks.label": {
+    "m": "熔断保护",
+    "_desc": "熔断保护格的标签。熔断保护：所有层级都不可用时阻断出站，防止流量直接从本机发出"
+  },
+  "overview.ks.state": {
+    "m": "{state, select, off {已关闭} blocked {未生效} triggered {已触发} armed {已布防} error {出错} unknown {—} other {未生效}}",
+    "_desc": "熔断保护格的状态值。state：off 设置里关闭了、blocked 缺管理员权限而未生效、triggered 已触发（出站已阻断）、armed 已布防、error 防火墙操作出错、unknown 还没有读到熔断状态（显示破折号）、other 服务未运行所以未生效。空间紧"
+  },
+  "overview.ks.hint": {
+    "m": "{state, select, blocked {需要管理员权限} error {防火墙规则可能没有生效} other {}}",
+    "_desc": "熔断保护格的提示行，只在需要用户处理时出现：blocked 缺管理员权限而未生效、error 防火墙规则可能没有生效（悬停给出具体错误，点格子进入配置）。other 不显示（页面不会用到）"
+  },
+  "overview.pool.aria": {
+    "m": "节点，前往层级",
+    "_desc": "节点格（按钮）的读屏名称：点击前往层级页"
+  },
+  "overview.pool.label": {
+    "m": "节点",
+    "_desc": "节点格的标签：自建与订阅层级的节点（Bastion 另有小计量条）"
+  },
+  "overview.pool.unit": {
+    "m": "可用",
+    "_desc": "节点池格的数值（如 9/10）后面的单位词。空间紧"
+  },
+  "overview.pool.value": {
+    "m": "{state, select, starting {检测中} other {—}}",
+    "_desc": "节点池格的数值位在服务没有运行时的显示：starting 启动中正在检测；other 显示破折号"
+  },
+  "overview.pool.online": {
+    "m": "在线率 {rate, number, percent}{pending, plural, =0 {} other { · # 个待复检}}",
+    "_desc": "节点池格的提示行（运行中）：可用节点占全部节点的比例；pending 是后台报告的待复检节点数（没有时为 0，不显示这一段）"
+  },
+  "overview.pool.empty": {
+    "m": "还没有节点",
+    "_desc": "节点池格的提示行（运行中）：自有和订阅层级都还没有节点"
+  },
+  "overview.pool.bastion_off": {
+    "m": "Bastion 未启用",
+    "_desc": "节点池格里 Bastion 小计量条的悬停提示：Bastion 没有启用。Bastion 是层级代号，不译"
+  },
+  "overview.pool.bastion_tip": {
+    "m": "Bastion · {n, number} 可用",
+    "_desc": "节点格里 Bastion 小计量条的悬停提示：Bastion 现有 n 个可用节点（计量条按容量画）；capacity 参数不再使用；Bastion 不译"
+  },
+  "overview.proto.title": {
+    "m": "协议分布",
+    "_desc": "协议分布区的标题，也是该区域的读屏名称：节点池里各协议的节点数"
+  },
+  "overview.proto.tip": {
+    "m": "{name} · {count, plural, other {# 个节点}} · {share, number, percent}",
+    "_desc": "协议分布条形图每一段的悬停提示：name 是协议名（不译），count 是节点数，share 是占比"
+  },
+  "overview.proto.other": {
+    "m": "其他",
+    "_desc": "协议分布图例：协议种类太多时，尾部几种合并成的一项"
+  },
+  "overview.proto.other_tip": {
+    "m": "{n, plural, other {其他 # 种协议}} · {count, plural, other {# 个节点}} · {share, number, percent}",
+    "_desc": "协议分布中「其他」一段的悬停提示：合并了 n 种协议，共 count 个节点，占比 share"
+  },
+  "overview.proto.empty": {
+    "m": "还没有节点",
+    "_desc": "协议分布：还没有任何节点时的显示（链接按钮，点按去层级页）"
+  },
+  "overview.common.stale": {
+    "m": "数据未更新",
+    "_desc": "总览各区的标注：这一块的数据暂时没有更新，页面保留上次的值"
+  },
+  "overview.common.stale_after": {
+    "m": "{text} · 数据未更新",
+    "_desc": "总览各区：保留上次的值，并在后面标注这一块的数据暂时没有更新。text 是上次显示的内容（已经是译好的整句或数字）"
+  },
+  "overview.exit_reason.auto_not_ready": {
+    "m": "服务未就绪",
+    "_desc": "出口卡的原因短语（reason_code auto_not_ready）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。自动查询因服务还没就绪而跳过"
+  },
+  "overview.exit_reason.auto_ready_lost": {
+    "m": "服务不再就绪",
+    "_desc": "出口卡的原因短语（reason_code auto_ready_lost）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。自动查询途中服务不再就绪"
+  },
+  "overview.exit_reason.connection_not_ready": {
+    "m": "连接还没准备好",
+    "_desc": "出口卡的原因短语（reason_code connection_not_ready）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。连接还没准备好，暂时无法验证"
+  },
+  "overview.exit_reason.core_generation_changed": {
+    "m": "代理核心已重启",
+    "_desc": "出口卡的原因短语（reason_code core_generation_changed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间代理核心重启，结果作废"
+  },
+  "overview.exit_reason.core_not_running": {
+    "m": "代理核心未运行",
+    "_desc": "出口卡的原因短语（reason_code core_not_running）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。代理核心没有运行"
+  },
+  "overview.exit_reason.data_plane_unavailable": {
+    "m": "代理通道暂不可用",
+    "_desc": "出口卡的原因短语（reason_code data_plane_unavailable）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。数据通道暂不可用"
+  },
+  "overview.exit_reason.deferred": {
+    "m": "就绪后查询",
+    "_desc": "出口卡的原因短语（reason_code deferred）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。进度：服务还在启动，就绪后才查询（最多等 2 分钟）"
+  },
+  "overview.exit_reason.exit_unreachable": {
+    "m": "连不上检测服务",
+    "_desc": "出口卡的原因短语（reason_code exit_unreachable）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。连不上出口检测服务"
+  },
+  "overview.exit_reason.identity_conflict": {
+    "m": "出口地址不一致",
+    "_desc": "出口卡的原因短语（reason_code identity_conflict）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。两次检测得到的出口地址不一致，地址暂不显示"
+  },
+  "overview.exit_reason.identity_rate_limited": {
+    "m": "查询太频繁",
+    "_desc": "出口卡的原因短语（reason_code identity_rate_limited）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口检测服务限制了查询次数"
+  },
+  "overview.exit_reason.identity_rotating": {
+    "m": "出口地址在变化",
+    "_desc": "出口卡的原因短语（reason_code identity_rotating）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口地址正在变化（节点可能在轮换出口），地址暂不显示"
+  },
+  "overview.exit_reason.identity_stale": {
+    "m": "结果已过期",
+    "_desc": "出口卡的原因短语（reason_code identity_stale）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口结果已经过期"
+  },
+  "overview.exit_reason.identity_timeout": {
+    "m": "查询超时",
+    "_desc": "出口卡的原因短语（reason_code identity_timeout）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口查询超时"
+  },
+  "overview.exit_reason.identity_unavailable": {
+    "m": "无法查询",
+    "_desc": "出口卡的原因短语（reason_code identity_unavailable）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。无法查询这一地址族的出口地址（例如本机没有 IPv6 出口）"
+  },
+  "overview.exit_reason.in_progress": {
+    "m": "验证进行中",
+    "_desc": "出口卡的原因短语（reason_code in_progress）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。已有一次出口验证在进行"
+  },
+  "overview.exit_reason.lifecycle_changed": {
+    "m": "服务状态已变",
+    "_desc": "出口卡的原因短语（reason_code lifecycle_changed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间服务状态变了，结果作废"
+  },
+  "overview.exit_reason.lookup_unavailable": {
+    "m": "查询暂不可用",
+    "_desc": "出口卡的原因短语（reason_code lookup_unavailable）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口查询暂不可用"
+  },
+  "overview.exit_reason.manual_execution_binding_stale": {
+    "m": "节点已变化，未采用",
+    "_desc": "出口卡的原因短语（reason_code manual_execution_binding_stale）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间所用节点已变化，结果没有采用"
+  },
+  "overview.exit_reason.manual_validation_execution_changed": {
+    "m": "路由已变",
+    "_desc": "出口卡的原因短语（reason_code manual_validation_execution_changed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间路由变了，结果作废"
+  },
+  "overview.exit_reason.native_fallback_unverified_budget": {
+    "m": "核心已切换，未核实",
+    "_desc": "出口卡的原因短语（reason_code native_fallback_unverified_budget）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。代理核心自行切换了节点，但没来得及核实"
+  },
+  "overview.exit_reason.native_fallback_verified": {
+    "m": "核心已切换并核实",
+    "_desc": "出口卡的原因短语（reason_code native_fallback_verified）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。代理核心自行切换到另一个节点，新节点已核实可用（不是 Tesseract 写的选择）"
+  },
+  "overview.exit_reason.native_fallback_verified_commit_rejected": {
+    "m": "已核实，未采纳",
+    "_desc": "出口卡的原因短语（reason_code native_fallback_verified_commit_rejected）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。代理核心切换到的节点已核实，但没有被采纳为当前选择"
+  },
+  "overview.exit_reason.network_changed": {
+    "m": "网络已变化",
+    "_desc": "出口卡的原因短语（reason_code network_changed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间网络环境变了，结果作废"
+  },
+  "overview.exit_reason.owner_revoked": {
+    "m": "验证已取消",
+    "_desc": "出口卡的原因短语（reason_code owner_revoked）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。发起验证的窗口或页面已关闭"
+  },
+  "overview.exit_reason.partial_validation": {
+    "m": "只验证了一部分",
+    "_desc": "出口卡的原因短语（reason_code partial_validation）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口只验证了一部分，地址保留"
+  },
+  "overview.exit_reason.probe_busy": {
+    "m": "检测繁忙",
+    "_desc": "出口卡的原因短语（reason_code probe_busy）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。后台检测繁忙"
+  },
+  "overview.exit_reason.probe_target_error": {
+    "m": "检测服务出错",
+    "_desc": "出口卡的原因短语（reason_code probe_target_error）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口检测服务返回了错误"
+  },
+  "overview.exit_reason.probe_unavailable": {
+    "m": "检测暂不可用",
+    "_desc": "出口卡的原因短语（reason_code probe_unavailable）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口检测暂不可用"
+  },
+  "overview.exit_reason.querying": {
+    "m": "正在查询",
+    "_desc": "出口卡的原因短语（reason_code querying）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。进度：正在查询"
+  },
+  "overview.exit_reason.rate_limited": {
+    "m": "正在重试",
+    "_desc": "出口卡的原因短语（reason_code rate_limited）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。进度：被限流，稍后自动重试"
+  },
+  "overview.exit_reason.route_changed": {
+    "m": "当前节点已变",
+    "_desc": "出口卡的原因短语（reason_code route_changed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。验证期间当前节点变了，结果作废"
+  },
+  "overview.exit_reason.route_contract_failed": {
+    "m": "层级连通检查未通过",
+    "_desc": "出口卡的原因短语（reason_code route_contract_failed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。当前层级的节点没有通过 Google 连通检查，也没有可用的备用节点"
+  },
+  "overview.exit_reason.route_unconfirmed": {
+    "m": "路由未确认",
+    "_desc": "出口卡的原因短语（reason_code route_unconfirmed）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。还不能确认流量经过哪个节点"
+  },
+  "overview.exit_reason.runtime_stop_requested": {
+    "m": "服务正在停止",
+    "_desc": "出口卡的原因短语（reason_code runtime_stop_requested）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。服务正在停止，验证已中止"
+  },
+  "overview.exit_reason.service_stopped": {
+    "m": "服务已停止",
+    "_desc": "出口卡的原因短语（reason_code service_stopped）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。服务已停止"
+  },
+  "overview.exit_reason.system_proxy_capture_inactive": {
+    "m": "系统代理未生效",
+    "_desc": "出口卡的原因短语（reason_code system_proxy_capture_inactive）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。系统代理没有生效（可能被其他代理软件改掉），浏览器流量可能没有经过 Tesseract；地址保留"
+  },
+  "overview.exit_reason.system_proxy_host_path_unverified": {
+    "m": "本机路径未确认",
+    "_desc": "出口卡的原因短语（reason_code system_proxy_host_path_unverified）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。无法确认本机经系统代理的流量路径；地址保留"
+  },
+  "overview.exit_reason.timeout": {
+    "m": "验证超时",
+    "_desc": "出口卡的原因短语（reason_code timeout）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口验证超时"
+  },
+  "overview.exit_reason.upgrading": {
+    "m": "结束后再验证",
+    "_desc": "出口卡的原因短语（reason_code upgrading）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。进度：一次自动查询正在进行，结束后再完整验证一次"
+  },
+  "overview.exit_reason.validation_cancelled": {
+    "m": "验证已取消",
+    "_desc": "出口卡的原因短语（reason_code validation_cancelled）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口验证已取消"
+  },
+  "overview.exit_reason.validation_timeout": {
+    "m": "验证超时",
+    "_desc": "出口卡的原因短语（reason_code validation_timeout）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。出口验证超时（经当前节点）"
+  },
+  "overview.exit_reason.waiting_connection": {
+    "m": "正在等待连接",
+    "_desc": "出口卡的原因短语（reason_code waiting_connection）：用在来源徽标、地址位置或说明行，空间紧；完整说明在悬停提示里。正在等待连接建立"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "service.state",
+  "rev": 52,
+  "kind": "gap",
+  "seq": 43,
+  "data": {
+    "from_seq": 10,
+    "to_seq": 1,
+    "dropped": 10
+  }
+}

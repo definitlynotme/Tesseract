@@ -1,0 +1,218 @@
+{
+  "core.busy.done": {
+    "m": "已完成",
+    "_desc": "按钮操作成功后的默认文字（调用方没有给时）；空间紧"
+  },
+  "core.busy.failed": {
+    "m": "{code, select, runtime_gone {后台服务已重启} cancelled {已取消} superseded {已被之后的操作取代} other {操作失败}}",
+    "_desc": "按钮操作失败后的默认文字（调用方没有给、错误也没有说明时）。code：runtime_gone 后台服务在操作途中重启了；cancelled 操作被取消；superseded 被之后的同类操作取代；other 一般失败。空间紧"
+  },
+  "core.busy.working": {
+    "m": "处理中…",
+    "_desc": "按钮执行操作时的默认文字（调用方没有给时）；空间紧：按钮会预留各状态中最宽的宽度"
+  },
+  "core.confirm.title": {
+    "m": "确认操作",
+    "_desc": "确认对话框的调用方没有给标题时的默认标题"
+  },
+  "core.lat.down": {
+    "m": "不可用",
+    "_desc": "延迟列：节点没有响应时代替毫秒数显示；空间紧"
+  },
+  "core.lat.last": {
+    "m": "上次延迟",
+    "_desc": "延迟列里划掉的旧数值的悬停提示：这是节点上次能连通时测到的延迟"
+  },
+  "core.number.decrease": {
+    "m": "减少",
+    "_desc": "数字输入框左侧 − 按钮的无障碍名称"
+  },
+  "core.number.increase": {
+    "m": "增加",
+    "_desc": "数字输入框右侧 + 按钮的无障碍名称"
+  },
+  "core.savebar.aria": {
+    "m": "未保存的更改",
+    "_desc": "保存条区域的无障碍名称"
+  },
+  "core.savebar.busy.apply": {
+    "m": "正在应用…",
+    "_desc": "保存条：保存进行中的说明（立即生效类设置）"
+  },
+  "core.savebar.busy.restart": {
+    "m": "正在重启代理服务…",
+    "_desc": "保存条：保存进行中的说明（需要重启代理服务的设置）"
+  },
+  "core.savebar.busy.wait": {
+    "m": "请稍候…",
+    "_desc": "保存条：保存进行中的默认说明（调用方自定义生效方式且没给说明时）"
+  },
+  "core.savebar.count": {
+    "m": "{count, plural, other {# 项更改未保存}}",
+    "_desc": "保存条左侧的主文字：有几项更改还没保存"
+  },
+  "core.savebar.done.instant": {
+    "m": "已生效",
+    "_desc": "保存条：保存完成后的说明（立即生效类设置；也是默认说明）"
+  },
+  "core.savebar.done.reload": {
+    "m": "已生效，连接未中断",
+    "_desc": "保存条：保存完成后的说明（原地重新加载）"
+  },
+  "core.savebar.done.restart": {
+    "m": "代理服务已重启，连接已恢复",
+    "_desc": "保存条：保存完成后的说明（重启了代理服务）"
+  },
+  "core.savebar.effect.deferred": {
+    "m": "保存后，等服务就绪时生效",
+    "_desc": "保存条的生效说明（预留，T-P4-05d 使用）：服务正在启动，保存的内容在启动完成后应用"
+  },
+  "core.savebar.effect.instant": {
+    "m": "保存后立即生效",
+    "_desc": "保存条的生效说明：这些更改保存后马上生效"
+  },
+  "core.savebar.effect.next_start": {
+    "m": "保存后，下次启动服务时生效",
+    "_desc": "保存条的生效说明（预留，T-P4-05d 使用）：服务没在运行，保存的内容在下次启动时使用"
+  },
+  "core.savebar.effect.recheck": {
+    "m": "保存后立即生效，并重新检测节点延迟",
+    "_desc": "保存条的生效说明（预留，T-P4-05d 使用）：连接质量类设置，保存后按新标准重新检测节点"
+  },
+  "core.savebar.effect.reload": {
+    "m": "保存后立即生效，连接不中断",
+    "_desc": "保存条的生效说明：代理核心原地重新加载，已有连接不受影响"
+  },
+  "core.savebar.effect.restart": {
+    "m": "保存后会重启代理服务，流量中断约 1–2 秒",
+    "_desc": "保存条的生效说明（警告色）：保存会重启代理服务"
+  },
+  "core.savebar.failed": {
+    "m": "保存失败",
+    "_desc": "保存条：保存失败时的主文字；按钮变成「重试」"
+  },
+  "core.savebar.failed_reason": {
+    "m": "更改没有生效。",
+    "_desc": "保存条「保存失败」时的默认说明（错误没有说明时）"
+  },
+  "core.savebar.held": {
+    "m": "还不能保存",
+    "_desc": "保存条：有设置需要先改好（校验没通过，或服务正在启动）时的主文字；什么都没有写入"
+  },
+  "core.savebar.held_reason": {
+    "m": "有一项设置需要修改",
+    "_desc": "保存条「还不能保存」时的默认说明（调用方没给原因时）"
+  },
+  "core.savebar.leave.confirm.body": {
+    "m": "离开后这些更改不会生效。",
+    "_desc": "离开确认对话框的正文；确认按钮是「放弃更改」（common.action.discard）"
+  },
+  "core.savebar.leave.confirm.stay": {
+    "m": "留下",
+    "_desc": "离开确认对话框的取消按钮：留在本页继续编辑；空间紧"
+  },
+  "core.savebar.leave.confirm.title": {
+    "m": "{count, plural, other {有 # 项更改未保存}}",
+    "_desc": "离开配置页时、还有未保存更改的确认对话框标题"
+  },
+  "core.savebar.saved": {
+    "m": "已保存",
+    "_desc": "保存条：保存成功后的主文字（随后保存条自动收起）"
+  },
+  "core.savebar.saving": {
+    "m": "{count, plural, other {正在保存 # 项更改}}",
+    "_desc": "保存条：正在保存时的主文字"
+  },
+  "core.savebar.undo": {
+    "m": "撤销",
+    "_desc": "保存条的按钮：放弃所有未保存的更改；空间紧"
+  },
+  "core.search.clear": {
+    "m": "清除搜索",
+    "_desc": "搜索框里 × 按钮的无障碍名称"
+  },
+  "core.search.count": {
+    "m": "<b>{n, number}</b> / {total, number}",
+    "_desc": "搜索框右侧的计数：n 为匹配的条数（加粗），total 为总条数；空间紧"
+  },
+  "core.select.placeholder": {
+    "m": "请选择",
+    "_desc": "下拉选择框还没有选值时的占位文字"
+  },
+  "core.status.current": {
+    "m": "当前",
+    "_desc": "状态词：正在使用的节点；空间紧"
+  },
+  "core.status.down": {
+    "m": "不可用",
+    "_desc": "状态词：连不上；空间紧"
+  },
+  "core.status.draft": {
+    "m": "草稿",
+    "_desc": "状态词：编辑中、尚未保存的节点；空间紧"
+  },
+  "core.status.error": {
+    "m": "出错",
+    "_desc": "状态词：检测本身出错，结果不可信；空间紧"
+  },
+  "core.status.last.down": {
+    "m": "上次不可用",
+    "_desc": "服务停止时显示的上次结果：上次检测不可用；空间紧"
+  },
+  "core.status.last.ok": {
+    "m": "上次可用",
+    "_desc": "服务停止时显示的上次结果（变淡）：上次检测可用；空间紧"
+  },
+  "core.status.last.slow": {
+    "m": "上次较慢",
+    "_desc": "服务停止时显示的上次结果：上次检测较慢；空间紧"
+  },
+  "core.status.off": {
+    "m": "未启用",
+    "_desc": "状态词：已停用；空间紧"
+  },
+  "core.status.ok": {
+    "m": "可用",
+    "_desc": "节点或订阅的状态词：可以使用；空间紧（状态小标签）"
+  },
+  "core.status.pending": {
+    "m": "待检查",
+    "_desc": "状态词：还没有检测过；空间紧"
+  },
+  "core.status.recheck": {
+    "m": "待复检",
+    "_desc": "状态词：配置变了，等待重新检测；空间紧"
+  },
+  "core.status.slow": {
+    "m": "较慢",
+    "_desc": "状态词：能用，但延迟偏高；空间紧"
+  },
+  "core.status.stale": {
+    "m": "未更新",
+    "_desc": "状态词：数据已经过期，等待刷新；空间紧"
+  },
+  "core.status.unknown": {
+    "m": "未知",
+    "_desc": "状态词：暂时不知道状态（例如还没连上后台服务）；空间紧"
+  },
+  "core.tier_tag.aria": {
+    "m": "{name}，查看层级",
+    "_desc": "可点击的层级标签的无障碍名称：name 为层级代号（不译）；点击打开层级页"
+  },
+  "core.savebar.saved_pending": {
+    "m": "已保存，待应用",
+    "_desc": "保存条：保存成功但要等服务就绪后才生效时的主文字（随后自动收起）"
+  },
+  "core.savebar.not_applied": {
+    "m": "已保存，但没有生效",
+    "_desc": "保存条的第三种结果：已写入但没有生效（全部或部分）；按钮变成「重试应用」和「关闭」"
+  },
+  "core.savebar.conflict": {
+    "m": "配置已在别处修改",
+    "_desc": "保存条：保存时配置已被别处修改（默认主文字；页面通常给自己的说法）"
+  },
+  "core.savebar.conflict_reason": {
+    "m": "请检查后再保存一次。",
+    "_desc": "保存条「配置已在别处修改」时的默认说明"
+  }
+}

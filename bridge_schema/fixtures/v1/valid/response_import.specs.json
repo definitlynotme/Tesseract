@@ -1,0 +1,31 @@
+{
+  "t": "res",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "id": 1,
+  "req_id": "request-1",
+  "owner": "window-1",
+  "cmd": "import.specs",
+  "ok": true,
+  "data": {
+    "protocols": [
+      {
+        "id": "ss",
+        "label_id": "protocol.ss",
+        "fields": [
+          {
+            "id": "method",
+            "label_id": "fields.method",
+            "type": "choice",
+            "required": true,
+            "choices": [
+              "aes-128-gcm"
+            ],
+            "conditions": {}
+          }
+        ]
+      }
+    ]
+  }
+}

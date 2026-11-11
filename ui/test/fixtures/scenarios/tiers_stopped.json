@@ -1,0 +1,1009 @@
+{
+ "name": "tiers_stopped",
+ "desc": "T-P4-05b: service stopped; the lists show the last results (last-known status shapes), gateway.current carries the saved choice only (effective null), no bastion.pool baseline.",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "nodes.diagnose",
+      "nodes.cancelDiagnose",
+      "nodes.update",
+      "nodes.delete",
+      "nodes.reveal",
+      "subscriptions.refresh",
+      "import.preview",
+      "import.apply",
+      "gateway.select",
+      "settings.apply",
+      "config.snapshot",
+      "nodes.detail",
+      "import.specs"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "nodes.list",
+      "subscriptions.list",
+      "config.items",
+      "gateway.current",
+      "bastion.pool",
+      "core.info",
+      "jobs"
+     ],
+     "features": [
+      "B-01",
+      "B-03",
+      "B-04",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08",
+      "B-09",
+      "B-10",
+      "B-11",
+      "B-12",
+      "B-13",
+      "B-14",
+      "B-15",
+      "B-16",
+      "B-17",
+      "B-18",
+      "B-37"
+     ]
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": false,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": false,
+      "startup_phase": "stopped",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": false,
+      "pid": null,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": null
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "vanguard",
+     "offline_reason": null,
+     "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+     ],
+     "degraded": false,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 4,
+       "usable": 2,
+       "check_interval_s": 30
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 6,
+       "usable": 3,
+       "check_interval_s": 60
+      },
+      "bastion": {
+       "enabled": true,
+       "total": 5,
+       "usable": 3,
+       "check_interval_s": 120
+      },
+      "gateway": {
+       "enabled": true,
+       "total": 3,
+       "usable": 2,
+       "check_interval_s": 60
+      }
+     },
+     "pool": {
+      "usable": 3,
+      "total": 5
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "hysteria2",
+       "latency_ms": 42,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654383000
+      },
+      {
+       "id": "v-tyo01",
+       "name": "tyo01-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless_reality",
+       "latency_ms": 388,
+       "subscription_id": null,
+       "slow": true,
+       "last_checked_at_ms": 1790654375000
+      },
+      {
+       "id": "v-sg02",
+       "name": "sg02-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "tls_failed",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654391000
+      },
+      {
+       "id": "v-new01",
+       "name": "new01-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "pending",
+       "reason_code": null,
+       "protocol": "naive",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": null
+      },
+      {
+       "id": "v-old",
+       "name": "old-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": false,
+       "status": "disabled",
+       "reason_code": "disabled",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": null
+      }
+     ]
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "s-fra04",
+       "name": "fra04-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vmess",
+       "latency_ms": 120,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-sel01",
+       "name": "sel01-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 96,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-osa03",
+       "name": "osa03-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "connection_timeout",
+       "protocol": "shadowsocks",
+       "latency_ms": null,
+       "subscription_id": "sub-nebula",
+       "slow": false,
+       "last_checked_at_ms": 1790654370000
+      },
+      {
+       "id": "s-lax02",
+       "name": "lax02-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "pending",
+       "reason_code": "subscription_recheck_pending",
+       "protocol": "vmess",
+       "latency_ms": null,
+       "subscription_id": "sub-aurora",
+       "slow": false,
+       "last_checked_at_ms": null
+      },
+      {
+       "id": "s-sin01",
+       "name": "sin01-sub",
+       "tier": "sentinel",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 210,
+       "subscription_id": "sub-aurora",
+       "slow": false,
+       "last_checked_at_ms": 1790654350000
+      },
+      {
+       "id": "s-solo",
+       "name": "solo-node",
+       "tier": "sentinel",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "anytls",
+       "latency_ms": 160,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654360000
+      }
+     ]
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "b-p1",
+       "name": "pool-a1",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "shadowsocks",
+       "latency_ms": 140,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-p2",
+       "name": "pool-a2",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vmess",
+       "latency_ms": 310,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-p3",
+       "name": "pool-a3",
+       "tier": "bastion",
+       "kind": "automatic",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "connection_refused",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-u1",
+       "name": "my-emergency",
+       "tier": "bastion",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 220,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      },
+      {
+       "id": "b-s1",
+       "name": "src-node-1",
+       "tier": "bastion",
+       "kind": "subscription",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "shadowsocks",
+       "latency_ms": 260,
+       "subscription_id": "sub-mysrc",
+       "slow": false,
+       "last_checked_at_ms": 1790654340000
+      }
+     ]
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless_reality",
+       "latency_ms": 64,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      },
+      {
+       "id": "g-tyo01",
+       "name": "tyo01-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "trojan",
+       "latency_ms": 81,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      },
+      {
+       "id": "g-sel03",
+       "name": "sel03-exit",
+       "tier": "gateway",
+       "kind": "manual",
+       "enabled": true,
+       "status": "failed",
+       "reason_code": "dns_resolution_failed",
+       "protocol": "trojan",
+       "latency_ms": null,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654380000
+      }
+     ]
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-nebula",
+       "name": "nebula",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "nebula.example.com",
+       "total": 3,
+       "healthy": 2,
+       "visibility": "current",
+       "refreshing": false,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-aurora",
+       "name": "aurora",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "aurora.example.com",
+       "total": 2,
+       "healthy": 1,
+       "visibility": "pending",
+       "refreshing": false,
+       "recheck": {
+        "done": 1,
+        "total": 2
+       },
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-orion",
+       "name": "orion",
+       "tier": "sentinel",
+       "enabled": false,
+       "display": "orion.example.com",
+       "total": 4,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-vega",
+       "name": "vega",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "vega.example.com",
+       "total": 5,
+       "healthy": 4,
+       "visibility": "previous",
+       "refreshing": true,
+       "last_refresh_at_ms": 1790653800000
+      },
+      {
+       "id": "sub-lyra",
+       "name": "lyra",
+       "tier": "sentinel",
+       "enabled": true,
+       "display": "lyra.example.com",
+       "total": 0,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": null
+      }
+     ]
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-mysrc",
+       "name": "my-source",
+       "tier": "bastion",
+       "enabled": true,
+       "display": "my-source.example.com",
+       "total": 1,
+       "healthy": 1,
+       "visibility": "current",
+       "refreshing": false
+      }
+     ]
+    },
+    "key": "bastion"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "subscriptions.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sub-exits",
+       "name": "exit-feed",
+       "tier": "gateway",
+       "enabled": true,
+       "display": "exit-feed.example.com",
+       "total": 0,
+       "healthy": 0,
+       "visibility": "unknown",
+       "refreshing": false,
+       "last_refresh_at_ms": null
+      }
+     ]
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "config.items",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-tyo01",
+       "name": "tyo01-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-sg02",
+       "name": "sg02-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "v-new01",
+       "name": "new01-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-old",
+       "name": "old-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-draft2",
+       "name": "draft-two",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "s-solo",
+       "name": "solo-node",
+       "kind": "node",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "b-u1",
+       "name": "my-emergency",
+       "kind": "node",
+       "section": "bastion",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-osa02",
+       "name": "osa02-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-tyo01",
+       "name": "tyo01-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "g-sel03",
+       "name": "sel03-exit",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "cfg-gdraft",
+       "name": "exit-draft",
+       "kind": "node",
+       "section": "gateway",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "sub-nebula",
+       "name": "nebula",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-aurora",
+       "name": "aurora",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-orion",
+       "name": "orion",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": false,
+       "secret_set": true
+      },
+      {
+       "id": "sub-vega",
+       "name": "vega",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-lyra",
+       "name": "lyra",
+       "kind": "subscription",
+       "section": "sentinel",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-mysrc",
+       "name": "my-source",
+       "kind": "subscription",
+       "section": "bastion",
+       "enabled": true,
+       "secret_set": true
+      },
+      {
+       "id": "sub-exits",
+       "name": "exit-feed",
+       "kind": "subscription",
+       "section": "gateway",
+       "enabled": true,
+       "secret_set": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "selected": "osa02-exit",
+     "effective": null,
+     "missing": false,
+     "applied": false,
+     "pending": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "core.info",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "running": false,
+     "pid": null,
+     "version": "1.19.27",
+     "generation": 8,
+     "cleanup_pending": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:language",
+    "language": "zh_CN",
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:visibility",
+    "visible": true,
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 5,
+      "values": {
+       "latency": {
+        "primary_gateway_max_latency_ms": 600
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 3
+       }
+      },
+      "secret_fields_set": [],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "nodes.detail",
+    "args": {
+     "node_id": "v-hk03"
+    }
+   },
+   "reply": [
+    {
+     "t": "res",
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "nodes.detail",
+     "ok": true,
+     "data": {
+      "node": {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "hysteria2",
+       "latency_ms": 42,
+       "subscription_id": null,
+       "slow": false,
+       "last_checked_at_ms": 1790654383000
+      },
+      "config_item": {
+       "id": "v-hk03",
+       "name": "hk03-vps",
+       "kind": "node",
+       "section": "vanguard",
+       "enabled": true,
+       "secret_set": true
+      },
+      "last_diagnostic": null,
+      "check_interval_s": 30,
+      "endpoint": {
+       "host_masked": "h•••.net",
+       "port": 443
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

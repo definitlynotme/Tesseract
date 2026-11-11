@@ -1,0 +1,599 @@
+paths:
+  sources_file: sources.yaml
+  tier3_nodes_file: data/nodes.json
+  tier2_cache_file: data/tier2_cache.json
+  exit_cache_file: data/exit_cache.json
+  tier_observation_cache_file: data/tier_observation_cache.json
+tiers:
+  tier1:
+    name: Vanguard Layer
+    security_level: full
+    check_interval: 30
+    # Optional scoped DNS resolver additions for advanced config/API use.
+    # The Settings UI currently edits client.dns only.
+    # dns:
+    #   proxy_server_nameserver:
+    #   - 9.9.9.9
+    # Individual tier1 nodes may also set dns with the same shape.
+    nodes: []
+  tier2:
+    name: Sentinel Layer
+    security_level: moderate
+    check_interval: 60
+    # Optional scoped DNS resolver additions for this layer.
+    # dns:
+    #   nameserver:
+    #   - https://dns.example/dns-query
+    nodes: []
+    subscription_urls: []
+    cache_file: data/tier2_cache.json
+  tier3:
+    name: Bastion Layer
+    security_level: anonymous_only
+    enabled: false
+    check_interval: 120
+    auto_collect_interval: 900
+    min_collect_interval: 120
+    max_collect_interval: 3600
+    max_pool_size: 100
+    # User safety floor and empty-start Core gate. At or near this value the
+    # same background expansion pipeline runs at critical PI pressure.
+    # The effective pool target is derived from this floor by the hidden
+    # reserve policy; pi_controller.target_alive is only an advanced lower
+    # bound that can raise it.
+    min_alive_nodes: 3
+    validation_candidate_limit: 24
+    validation_empty_retry_limit: 96
+    validation_batch_size: 12
+    # Background refresh validates and commits in small verified batches.
+    incremental_validation_batch_size: 4
+    # PI-driven expansion budgets interpolate inside these bounds.  They count
+    # helper processes; with the batch backend below every process hosts
+    # validation_slots_per_process identities (8 x 8 = 64 by default).
+    validation_concurrency_min: 3
+    validation_concurrency_max: 8
+    validation_worker_min: 1
+    validation_worker_max: 8
+    full_validation_process_max: 8
+    # Batch validation backend (shipped default 8).  Each helper process's
+    # single Mihomo hosts this many worker identities (one listener per
+    # candidate), so that many candidates validate at once per process; every
+    # per-process limit above and the TCP prefilter in-flight bounds are
+    # multiplied by it.  Cold-start expansion is bounded by validation
+    # throughput, and process creation is the expensive part on Windows, so
+    # 8 identities in each of 8 processes (64; the single-slot path had 16)
+    # raise concurrency without more processes.
+    validation_slots_per_process: 8
+    # TCP prefilter breadth per validator identity (1.0..4.0).  Only about a
+    # quarter of candidates answer TCP, and a TCP probe (~1.3 s) is shorter
+    # than a FAST lease (~3 s), so at 1.0 TCP keeps only ~55-65% of the
+    # identities busy.  B > 1 multiplies the TCP executor capacity, its layout
+    # ceiling and the PI TCP in-flight bounds by B (never above 256 in
+    # flight), widens the validation supply gate by the TCP prefetch needed to
+    # keep the FAST slots busy, and refills TCP as soon as one wave fits
+    # (never later than the 50% rule used at 1.0).  Verdicts and validation
+    # limits are unchanged.  2.0 allows up to 128 TCP probes in flight for the
+    # 64 identities.
+    tcp_breadth_per_identity: 2.0
+    # Resolver threads for TCP prefilter host names.  auto follows the session
+    # TCP cap (half of it, within 16..64); unset keeps 16; an integer is
+    # clamped to 16..64.
+    tcp_dns_capacity: auto
+    # Opt out (single-slot path, one candidate per helper process) by setting
+    # all of these in config.local.yaml:
+    #   validation_slots_per_process: 1
+    #   tcp_breadth_per_identity: 1.0
+    #   validation_worker_max: 24
+    #   full_validation_process_max: 24
+    #   validation_concurrency_max: 16
+    # There capacity may reach 24 processes, but the managed baseline stays
+    # locked at 16 until risk_control.baseline_capacity_canary_enabled is
+    # promoted, and tcp_dns_capacity: auto stays at 16 threads.
+    full_validation_process_batch_size: 16
+    full_validation_concurrency_max: 96
+    full_validation_timeout_floor: 5.0
+    source_stream_window_min: 8
+    source_stream_window_max: null
+    # Once sources and fresh FAST work are exhausted, defer a zero-growth
+    # DEEP-only tail to the next normal collection cycle instead of keeping
+    # the current refresh open indefinitely.
+    source_stream_no_growth_tail_seconds: 120
+    validation_budget_multiplier: 4
+    negative_cache_cooldown_hours: 6
+    pool_eviction_failure_threshold: 3
+    startup_export_candidate_limit: 36
+    startup_core_probe_limit: 36
+    empty_refresh_replace_after_failures: 3
+    # Verified Bastion provider writes (default on): a provider write keeps
+    # the serving node first, every node is tested explicitly afterwards,
+    # and Bastion proxies are named by their definition (name plus a short
+    # digest).  false restores the previous provider lane and positional
+    # names.  Read when the runtime starts, from the configuration last
+    # loaded: a hand edit applies after an app restart, or at the next
+    # Start after any settings save (which reloads the configuration); a
+    # Core reload or restart in between keeps the value the runtime started
+    # with.
+    # verified_provider_writes: true
+    # Optional scoped DNS resolver additions for Bastion-generated nodes.
+    # dns:
+    #   proxy_server_nameserver:
+    #   - 9.9.9.9
+    nodes: []
+    subscription_urls: []
+    cache_revival_days: 7
+    # Full-validation replay horizon for source-authorized historical PASSes.
+    # This never admits a cached node directly into the automatic pool.
+    validated_replay_days: 30
+    pi_controller:
+      enabled: true
+      # Advanced/internal lower bound only. The effective target also follows
+      # the hidden reserve policy derived from min_alive_nodes and is capped by
+      # max_pool_size.
+      target_alive: 25
+      kp: 0.85
+      ki: 0.15
+      integral_decay: 0.85
+      min_intensity: 0.12
+      max_intensity: 1.0
+      source_budget_min: 1
+      source_budget_max: 12
+    risk_control:
+      enabled: true
+      # Deterministic PI/DRR remains authoritative while the validation
+      # baseline is under release audit.
+      rollout_mode: shadow
+      fast_allocation_interval_ms: 250
+      envelope_interval_ms: 2000
+      model_refresh_interval_seconds: 15
+      max_learning_correction: 0.20
+      initial_safe_worker_cap: 16
+      hard_worker_max: 24
+      canary_step: 2
+      canary_cooldown_seconds: 60
+      baseline_capacity_canary_enabled: false
+      min_candidate_observations: 500
+      min_candidate_passes: 20
+      mature_candidate_observations: 2000
+      mature_candidate_passes: 50
+      min_cvar_sessions: 200
+    observation_cache:
+      history_limit: 5000
+      dead_evict_threshold: 3
+      revive_cooldown_hours: 24
+  exit:
+    name: Gateway Layer
+    security_level: final_exit
+    check_interval: 60
+    # Optional scoped DNS resolver additions for Gateway nodes.
+    # dns:
+    #   proxy_server_nameserver:
+    #   - 9.9.9.9
+    subscription_urls: []
+    nodes: []
+    cache_file: data/exit_cache.json
+testing:
+  tcp_timeout: 5
+  concurrency: 50
+  # Tier1, Tier2, and Gateway become unavailable when a successful automatic
+  # or manual probe exceeds this latency. Tier3 keeps its fallback policy.
+  primary_gateway_max_latency_ms: 800
+  # Legacy Tier3 slow threshold; strict tiers derive SLOW at half of the
+  # primary/Gateway maximum above.
+  slow_threshold_ms: 2000
+  request_timeout: 15
+  max_source_bytes: 8388608
+  retries: 2
+  validation_mode: optional
+  user_agents:
+  - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36
+  - Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/123.0 Safari/537.36
+  xray_helper:
+    enabled: false
+    binary_path: xray
+    probe_url: https://www.google.com/generate_204
+    probe_timeout: 8
+    startup_delay: 1.5
+  mihomo_helper:
+    # Used by the desktop runtime to pre-warm Tier3-only health checks before
+    # user traffic is exposed to cached/free nodes.
+    enabled: true
+    probe_urls:
+    - https://cp.cloudflare.com
+    - https://www.gstatic.com/generate_204
+    - http://connectivitycheck.gstatic.com/generate_204
+    - http://www.gstatic.com/generate_204
+    probe_url: https://cp.cloudflare.com
+    # Bastion admission gate.  Some free nodes answer the probe_urls above
+    # (204) yet cannot load any real HTTPS site.  A candidate that passed the
+    # probes is admitted only after it also loads every URL here over HTTPS
+    # through the node.  [] disables the gate.
+    confirm_urls:
+    - https://www.google.com/generate_204
+    # Health-check URL of the automatic Bastion route group (TIER3-AUTO), so
+    # the active Bastion route is re-judged against a real HTTPS site rather
+    # than probe_url.  Must be an absolute https:// URL that answers 204;
+    # anything else (including '') falls back to
+    # https://www.google.com/generate_204.  It cannot be turned off.
+    route_health_check_url: https://www.google.com/generate_204
+    probe_timeout: 5
+    startup_timeout: 5
+    concurrency: 3
+    port_attempts: 1
+egress_proxy:
+  enabled: false
+  scheme: http
+  server: ''
+  port: 0
+  username: ''
+  password: ''
+  use_for:
+    collection: true
+alerts:
+  log_file: data/monitor.log
+  level: INFO
+  history_limit: 200
+  # Desktop notices (the new UI's alert switches). Notices are local only: the
+  # channel blocks below are no longer sent to and are removed from
+  # config.local.yaml the first time the alert settings are saved.
+  notify:
+    enabled: true
+    events:
+      - connection
+      - tier_fallback
+      - update
+    sound: true
+  desktop:
+    enabled: false
+    timeout: 8
+  telegram:
+    enabled: false
+    bot_token: ''
+    chat_id: ''
+    parse_mode: HTML
+    silent: false
+    protect_content: false
+    disable_link_preview: true
+  whatsapp:
+    enabled: false
+    mode: text
+    access_token: ''
+    phone_number_id: ''
+    to: ''
+    api_url: ''
+    graph_api_version: v25.0
+    template:
+      name: ''
+      language: en_US
+      body_params:
+        - '{severity}'
+        - '{title}'
+        - '{message}'
+        - '{timestamp}'
+  sound:
+    enabled: false
+    frequency: 1000
+    duration_ms: 450
+  # Unified notification channels. Legacy desktop/telegram/whatsapp/sound
+  # sections above are still supported; new providers should use this list.
+  # Supported types:
+  # - chat: slack, discord, teams, google_chat
+  # - push: ntfy, pushover, gotify
+  # - email: email_smtp, email_sendgrid
+  # - sms: sms_twilio
+  # - generic: generic_webhook
+  channels:
+    - id: ops-webhook
+      type: generic_webhook
+      label: Ops Webhook
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        url: ''
+        body_format: json
+        headers: {}
+        payload:
+          app: '{app}'
+          severity: '{severity}'
+          title: '{title}'
+          message: '{message}'
+          timestamp: '{timestamp}'
+    - id: ops-slack
+      type: slack
+      label: Slack Alerts
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        url: ''
+    - id: phone-ntfy
+      type: ntfy
+      label: Phone Push
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        server: https://ntfy.sh
+        topic: ''
+        token: ''
+        priority: ''
+        tags: []
+    - id: smtp-email
+      type: email_smtp
+      label: SMTP Email
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        host: ''
+        port: 587
+        starttls: true
+        ssl: false
+        username: ''
+        password: ''
+        from_addr: ''
+        to_addrs: []
+    - id: twilio-critical-sms
+      type: sms_twilio
+      label: Critical SMS
+      enabled: false
+      # SMS can create provider costs; keep the default to severe alerts only.
+      alert_types:
+        - CRITICAL
+        - EMERGENCY
+        - KILL_SWITCH_ON
+      config:
+        enabled: false
+        account_sid: ''
+        auth_token: ''
+        from_number: ''
+        messaging_service_sid: ''
+        to_numbers: []
+ui:
+  language: en_US
+  theme: daylight
+  # D8: when launched by Windows autostart, open to the tray instead of a window.
+  start_in_tray_on_autostart: false
+subscription_server:
+  host: 127.0.0.1
+  port: 25500
+  tier3_limit: 20
+  # Required when host is not loopback. Keep empty for local-only use.
+  token: ''
+  # CORS is denied by default. Add exact origins only when a trusted local UI needs them.
+  cors_allowed_origins: []
+routing:
+  rules:
+    # routing.rules.direct is the ONLY authorization source for public DIRECT
+    # traffic, and it is exactly what Settings > Proxy routing rules shows: no
+    # rule is ever appended behind this list.
+    # The two entries below are a REGIONAL DEFAULT, not a hidden built-in. They
+    # keep mainland-China destinations on the local connection, which is what
+    # users there want and what keeps ordinary browsing working while the proxy
+    # pool is still filling. Delete them in Settings if you are elsewhere, or
+    # add your own (geosite:, geoip:, a domain, an IP).
+    # Rules are evaluated list by list in routing.rule_order (default: direct,
+    # proxy, reject; each list top to bottom), then raw/rule_sets.
+    # System exit-detection and static-data refresh always use FINAL-EXIT and
+    # cannot be overridden by these lists.
+    # Unmatched traffic uses MATCH,GENERAL and is rejected when no proxy is
+    # available. Local/LAN bypass remains separate under
+    # client.system_proxy.bypass.
+    # raw and rule_sets must not target DIRECT or COMPATIBLE. The retired
+    # AI-FIXED-IP policy is ignored.
+    # Plain domains and bare IP addresses are accepted. Prefixes are also accepted:
+    # domain:, suffix:, keyword:, geosite:, geoip:, ip-cidr:, ip-cidr6:, process:.
+    direct:
+    - geosite:CN
+    - geoip:CN
+    proxy: []
+    reject: []
+    raw: []
+    rule_sets: []
+  # Which of the three lists above matches first. Any order of direct, proxy
+  # and reject, e.g. [reject, proxy, direct] lets a block or proxy rule win over
+  # a broad direct rule. Leave it out for the default order.
+  # rule_order: [direct, proxy, reject]
+  # HTTP rule-provider updates default to FINAL-EXIT; DIRECT/COMPATIBLE are not accepted,
+  # and references to the retired AI-FIXED-IP policy fall back to FINAL-EXIT.
+  rule_providers: {}
+geo_update:
+  # Background refresh of geoip.dat / geosite.dat / optional mmdb. Silent when
+  # healthy; failures are logged only. Manual trigger is available from the UI.
+  enabled: true
+  interval_hours: 24
+  request_timeout: 30
+  allow_insecure_http: false
+  # Mihomo can consume these from the generated config via `geox-url`. Override
+  # to point at a mirror close to your region.
+  geox_url:
+    geoip: https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat
+    geosite: https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat
+    # mmdb and asn are optional; leave empty to skip downloading them.
+    mmdb: ''
+    asn: ''
+killswitch:
+  # Off by default: the firewall rules need Administrator rights, so the user
+  # turns it on from Settings once Tesseract runs elevated.
+  enabled: false
+  allow_lan: true
+  additional_whitelist: []
+  # DNS is blocked while the kill switch is active unless you explicitly
+  # allow known resolver IPs here. This avoids UDP/53 leak tunnels.
+  allow_dns: false
+  dns_whitelist: []
+  dynamic_whitelist_refresh_interval: 300
+  # Windows firewall profiles the rules apply to. Valid: domain, private, public, any.
+  # Default [private, public] matches Clash Verge behaviour; set ["any"] for "all profiles".
+  profiles: [private, public]
+client:
+  mode: clash
+  clash_config_path: ''
+  mihomo_binary_path: bin/mihomo.exe
+  mihomo_work_dir: data/mihomo
+  mihomo_runtime_config: data/mihomo-runtime.yaml
+  # allow-lan exposes the local Mihomo mixed-port to the LAN.
+  # Default false for private-by-default. Flip to true if you want other
+  # devices on the same network to use this node as a proxy.
+  allow_lan: false
+  # Mihomo mixed-port. This is also the Windows system proxy target port.
+  # Keep it in sync with client.system_proxy.port unless you have a custom setup.
+  mihomo_mixed_port: 7890
+  # network_mode controls how traffic is captured:
+  #   system_proxy: HKCU registry proxy only (current default). No admin required.
+  #   tun:          WinTun virtual adapter captures all traffic including UDP.
+  #                 Requires Administrator. System proxy is NOT set.
+  #   mixed:        TUN + system proxy together (double insurance).
+  #                 Requires Administrator.
+  network_mode: system_proxy
+  mihomo_controller:
+    enabled: true
+    host: 127.0.0.1
+    port: 9090
+    secret: ''
+    timeout: 3
+  runtime_state_path: data/runtime-state.json
+  ipv6: false
+  egress_recovery:
+    # Rotate only after every identity endpoint fails with a transport error.
+    enabled: true
+    max_rotations: 2
+    exclusion_ttl_seconds: 120
+    retry_source_refresh: true
+    # Runtime node judgement. The values below are the defaults; add the block
+    # only to change one. enabled: false turns every item off (the previous
+    # behaviour). Leaf names are hashed in logs; no destination is logged.
+    # node_judgement:
+    #   enabled: true
+    #   # One hashed TIER3-AUTO route-view log line whenever it changes.
+    #   evidence_log: true
+    #   # off | shadow | act. shadow only logs what the judge would do.
+    #   post_dial_judge: act
+    #   # In act mode, true also records a durable judgement of a convicted
+    #   # node (suspicious mark plus a targeted recheck). false only follows
+    #   # Mihomo's own switch to the next node and records nothing about it.
+    #   durable_conviction: false
+    #   # Act mode only (shadow never refreshes). When the judge is blocked
+    #   # only because Mihomo switched nodes since recovery was armed, refresh
+    #   # the route (at most 3 times per node and route, 1 s apart) so it can
+    #   # re-arm.
+    #   rearm_on_stale_route: true
+    #   # Judge the node that carries traffic at any tier (Tier1, Tier2 or
+    #   # Tier3), not only Tier3. After a failed check of that node Mihomo
+    #   # itself moves traffic to the next node in order; a group higher up
+    #   # is tested only when every node below failed and another member of
+    #   # that group answered first. Never writes a selection or pin; judges
+    #   # in act mode only. While true, automatic recovery also stops
+    #   # switching the Tier1 select groups (in every mode).
+    #   tier_ladder_judge: true
+    #   # Needs tier_ladder_judge. When Mihomo itself drops PROXY-FALLBACK
+    #   # below a member whose own node still looks healthy, re-test that
+    #   # member once so Mihomo can return to it (no write).
+    #   overshoot_repair: true
+    #   # Trigger rules act mode may use: fast, aged (fast_spread, slow,
+    #   # waiting, aged_single stay shadow-only until promoted).
+    #   act_rules: [fast, aged]
+    #   # When above 0, fast/aged act only while most of the node's recent
+    #   # connections fail: failed / (failed + answered) among its
+    #   # connections of the last 10 s must reach this share (0-1 or a
+    #   # percentage such as "50%"). 0, the default, is off: the rules
+    #   # alone. The shares (and what 0.5 would do) are logged either way.
+    #   trigger_min_failed_share: 0
+    #   # In act mode, close only connections provably stuck on a node Mihomo
+    #   # has just demoted.
+    #   close_stuck_connections: true
+    #   # Keep watching a fast stream this long after it last moved (0: off).
+    #   stream_watch_seconds: 60
+    #   # Startup/post-capture group checks use the group's own URL, expected
+    #   # status and full timeout (never shortened; deferred until ready).
+    #   group_round_native_timeout: false
+    #   # Release a TIER3-AUTO pin that names a node no longer in the group.
+    #   release_stale_fallback_pins: false
+    #   # The overview Check judges the current node by its group's health URL.
+    #   manual_check_uses_route_contract: true
+    #   # Act mode only. When every node of the Tier3 group has failed (or the
+    #   # group is frozen), hand Mihomo the current node pool again.
+    #   exhausted_pool_reexport: true
+    #   # Act mode only. While the Tier3 group is exhausted, wait instead of
+    #   # judging one node after another.
+    #   exhausted_hold: true
+    #   # Act mode only. During a back-off, a node whose recent connections
+    #   # clearly fail (at least 80% of at least 4) is still checked once.
+    #   not_reproduced_override: true
+    #   # Act mode only. When the check of the current node gives no answer
+    #   # in time, move traffic for now to a next node already known to work
+    #   # (held like any automatic fix, see route_lease).
+    #   post_dial_provisional_move: true
+    #   # A next node whose recent Mihomo health result is good counts as
+    #   # known to work for that move.
+    #   post_dial_successor_from_history: true
+    #   # Wait 1 s instead of 2 s before checking the next node.
+    #   post_dial_fast_successor: false
+    #   # Also close streams that stopped moving on a node Mihomo has left.
+    #   post_dial_close_frozen_streams: true
+    # route_lease:
+    #   # A node the app fixes automatically during recovery is held only for
+    #   # a limited time; a node you select yourself is never released.
+    #   enabled: true
+    #   # Release the fixed node after this long (60-3600).
+    #   ttl_seconds: 600
+    #   # true releases earlier once a node ahead of it passes Mihomo's own
+    #   # health check and has had no failed check for stable_seconds (0
+    #   # releases on the first such pass). false, the default, does not.
+    #   early_release: false
+    #   stable_seconds: 110
+    #   # How often the held node is checked while a hold exists (5-30).
+    #   watch_interval_seconds: 10
+    #   # Fixing the same node again within this long after it failed keeps
+    #   # the original time limit (0-300).
+    #   death_carry_seconds: 60
+  tun:
+    device: Tesseract
+    stack: mixed
+    auto_route: true
+    auto_detect_interface: true
+    mtu: 9000
+    strict_route: false
+    dns_hijack:
+    - any:53
+  dns:
+    # Resolver policy. auto: qualify a neutral pool of IP-literal encrypted
+    # resolvers (DoH/DoT) on every start and use the fastest reachable ones;
+    # degrade to the link's own resolver only when the network proves
+    # encrypted DNS unreachable (shown in the UI). encrypted_only: never
+    # degrade. system: always use the network's resolvers. custom: use the
+    # lists below verbatim. No resolver is hardcoded for any region.
+    mode: auto
+    enable: true
+    # Advanced users can enable respect_rules to route ordinary DNS upstream
+    # traffic through the rule engine once a node is up.
+    respect_rules: false
+    ipv6: false
+    listen: 127.0.0.1:1053
+    enhanced_mode: fake-ip
+    fake_ip_range: 198.18.0.1/16
+    fake_ip_filter:
+    - '*.lan'
+    - '*.local'
+    - '+.home.arpa'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+    # custom mode example (IP literals keep startup independent of any other
+    # resolver; default_nameserver accepts IP literals or system):
+    # nameserver:
+    # - tls://9.9.9.9
+    # - https://1.1.1.1/dns-query
+    # default_nameserver:
+    # - system
+    # proxy_server_nameserver:
+    # - tls://9.9.9.9
+  system_proxy:
+    enabled: true
+    host: 127.0.0.1
+    port: 7890
+    startup_timeout: 30
+    health_failures_before_restore: 3
+    bypass:
+    - localhost
+    - 127.*
+    - <local>

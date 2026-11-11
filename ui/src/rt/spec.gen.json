@@ -1,0 +1,570 @@
+{
+ "commands": {
+  "alerts.desktopDelivered": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "shell"
+  },
+  "alerts.test": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "app.quit": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "job",
+   "source": "shell"
+  },
+  "app.sessionEnd": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "shell"
+  },
+  "app.update.check": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "app.update.install": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "exit.verify": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "gateway.select": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "geo.update": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "host.openFolder": {
+   "cancel": "none",
+   "domain": "shell",
+   "reply": "res",
+   "source": "page"
+  },
+  "host.openUrl": {
+   "cancel": "none",
+   "domain": "shell",
+   "reply": "res",
+   "source": "page"
+  },
+  "host.reveal": {
+   "cancel": "none",
+   "domain": "shell",
+   "reply": "res",
+   "source": "page"
+  },
+  "host.saveFile": {
+   "cancel": "dialog",
+   "domain": "shell",
+   "reply": "res",
+   "source": "page"
+  },
+  "import.apply": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "import.preview": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "logs.exportBundle": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "logs.exportFiltered": {
+   "cancel": "queued",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "logs.setMihomoLevel": {
+   "cancel": "none",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "mode.set": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "nodes.cancelDiagnose": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "page"
+  },
+  "nodes.delete": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "nodes.diagnose": {
+   "cancel": "diagnostic",
+   "domain": "normal",
+   "reply": "job",
+   "source": "page"
+  },
+  "nodes.reveal": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "private",
+   "source": "page"
+  },
+  "nodes.update": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "service.restart": {
+   "cancel": "supersede",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "service.start": {
+   "cancel": "supersede",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "service.stop": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "job",
+   "source": "page"
+  },
+  "settings.apply": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "settings.validate": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "shell.saveGrant": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "shell"
+  },
+  "subscriptions.refresh": {
+   "cancel": "queued",
+   "domain": "mutation",
+   "reply": "job",
+   "source": "page"
+  },
+  "ui.presence": {
+   "cancel": "none",
+   "domain": "sampling",
+   "reply": "res",
+   "source": "shell"
+  },
+  "update.exitResponse": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "shell"
+  },
+  "update.installResult": {
+   "cancel": "none",
+   "domain": "control",
+   "reply": "res",
+   "source": "shell"
+  }
+ },
+ "generated_by": "ui/tools/gen_rt_spec.py",
+ "page_commands": [
+  "alerts.test",
+  "app.update.check",
+  "app.update.install",
+  "exit.verify",
+  "gateway.select",
+  "geo.update",
+  "host.openFolder",
+  "host.openUrl",
+  "host.reveal",
+  "host.saveFile",
+  "import.apply",
+  "import.preview",
+  "logs.exportBundle",
+  "logs.exportFiltered",
+  "logs.setMihomoLevel",
+  "mode.set",
+  "nodes.cancelDiagnose",
+  "nodes.delete",
+  "nodes.diagnose",
+  "nodes.reveal",
+  "nodes.update",
+  "service.restart",
+  "service.start",
+  "service.stop",
+  "settings.apply",
+  "settings.validate",
+  "subscriptions.refresh"
+ ],
+ "proto": 1,
+ "queries": {
+  "app.info": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "autostart.state": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "config.snapshot": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "geo.status": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "import.specs": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "logs.query": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "logs.tail": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  },
+  "nodes.detail": {
+   "cancel": "owner",
+   "domain": "normal",
+   "reply": "res",
+   "source": "page"
+  }
+ },
+ "topics": {
+  "alerts.desktop": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap"
+   ],
+   "patchable": false,
+   "shell_only": true
+  },
+  "alerts.history": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "bastion.pool": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "bastion.sources": {
+   "keyed": false,
+   "kinds": [
+    "gap",
+    "patch",
+    "snapshot"
+   ],
+   "patchable": true,
+   "shell_only": false
+  },
+  "config.changed": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "config.items": {
+   "keyed": false,
+   "kinds": [
+    "gap",
+    "patch",
+    "snapshot"
+   ],
+   "patchable": true,
+   "shell_only": false
+  },
+  "core.info": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "exit.identity": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "gateway.current": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "geo.status": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "jobs": {
+   "keyed": false,
+   "kinds": [
+    "edge"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "killswitch.state": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "logs.batch": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "logs.feed": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "network.mode": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "nodes.list": {
+   "keyed": true,
+   "kinds": [
+    "gap",
+    "patch",
+    "snapshot"
+   ],
+   "patchable": true,
+   "shell_only": false
+  },
+  "protocols.mix": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "route.published": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "service.collect": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "service.state": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "shutdown": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": true
+  },
+  "subscriptions.list": {
+   "keyed": true,
+   "kinds": [
+    "gap",
+    "patch",
+    "snapshot"
+   ],
+   "patchable": true,
+   "shell_only": false
+  },
+  "tier.transition": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "tiers.summary": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "traffic.history": {
+   "keyed": false,
+   "kinds": [
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "traffic.tick": {
+   "keyed": false,
+   "kinds": [
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "ui.language": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  },
+  "update.prepareExit": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap"
+   ],
+   "patchable": false,
+   "shell_only": true
+  },
+  "update.state": {
+   "keyed": false,
+   "kinds": [
+    "edge",
+    "gap",
+    "snapshot"
+   ],
+   "patchable": false,
+   "shell_only": false
+  }
+ }
+}

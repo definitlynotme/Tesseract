@@ -1,0 +1,51 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "service.collect",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "generation": 1,
+    "tiers": [
+      {
+        "tier": "bastion",
+        "generation": 1,
+        "first_check": "unknown",
+        "source_count": null,
+        "healthy": null,
+        "required": null,
+        "observed_at_ms": null
+      },
+      {
+        "tier": "gateway",
+        "generation": 1,
+        "first_check": "unknown",
+        "source_count": null,
+        "healthy": null,
+        "required": null,
+        "observed_at_ms": null
+      },
+      {
+        "tier": "sentinel",
+        "generation": 1,
+        "first_check": "unknown",
+        "source_count": null,
+        "healthy": null,
+        "required": null,
+        "observed_at_ms": null
+      },
+      {
+        "tier": "vanguard",
+        "generation": 1,
+        "first_check": "unknown",
+        "source_count": null,
+        "healthy": null,
+        "required": null,
+        "observed_at_ms": null
+      }
+    ],
+    "observed_at_ms": 1
+  }
+}

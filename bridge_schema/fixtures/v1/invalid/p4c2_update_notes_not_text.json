@@ -1,0 +1,27 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "update.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "state": "available",
+      "version": "0.3.0",
+      "update_available": true,
+      "installable": true,
+      "error": null,
+      "current_version": "0.2.0",
+      "previous_version": null,
+      "notes": [
+        "line"
+      ],
+      "enabled": true,
+      "last_check_at_ms": 1790812740000
+    }
+  },
+  "expected": "type:update.state.notes"
+}

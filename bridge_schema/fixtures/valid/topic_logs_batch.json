@@ -1,0 +1,30 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "logs.batch",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "from_seq": 41,
+    "records": [
+      {
+        "seq": 41,
+        "ts_ms": 1789999999995,
+        "rx_ms": 1789999999996,
+        "source": "TESSERACT",
+        "level": "info",
+        "category": "runtime",
+        "key": "service.started",
+        "title": "Core started",
+        "detail": "",
+        "raw": "Core started"
+      }
+    ],
+    "dropped": 0,
+    "dropped_total": 0,
+    "gap": false
+  },
+  "seq": 41
+}

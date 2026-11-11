@@ -1,0 +1,3946 @@
+{
+ "name": "alerts_a04_lock",
+ "desc": "A-04 测试进行中锁定表单（作业不结束）",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "t": "rt:reset",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "hello",
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "alerts.catalog",
+      "alerts.deliveries",
+      "alerts.onboarding.cancel",
+      "alerts.onboarding.complete",
+      "alerts.onboarding.poll",
+      "alerts.onboarding.start",
+      "alerts.test",
+      "app.info",
+      "app.update.check",
+      "app.update.install",
+      "autostart.state",
+      "config.snapshot",
+      "geo.status",
+      "geo.update",
+      "mode.set",
+      "service.restart",
+      "service.start",
+      "service.stop",
+      "settings.apply"
+     ],
+     "topics": [
+      "alerts.delivery",
+      "alerts.history",
+      "alerts.onboarding",
+      "bastion.pool",
+      "bastion.sources",
+      "config.changed",
+      "core.info",
+      "geo.status",
+      "jobs",
+      "killswitch.state",
+      "network.mode",
+      "nodes.list",
+      "route.published",
+      "service.state",
+      "tiers.summary",
+      "update.state"
+     ],
+     "features": []
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": true,
+      "startup_phase": "running",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": true,
+      "pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": 120
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "vanguard",
+     "offline_reason": null,
+     "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+     ],
+     "degraded": false,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 3,
+       "usable": 2
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 2,
+       "usable": 1
+      },
+      "bastion": {
+       "enabled": true,
+       "total": 40,
+       "usable": 25
+      },
+      "gateway": {
+       "enabled": false,
+       "total": 0,
+       "usable": 0
+      }
+     },
+     "pool": {
+      "usable": 5,
+      "total": 7
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "network.mode",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "mode": "system",
+     "admin": true,
+     "switching": false,
+     "proxy_state": "owned",
+     "drift": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "killswitch.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "enabled": true,
+     "active": false,
+     "admin": true,
+     "error": null,
+     "triggered": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "core.info",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "running": true,
+     "pid": 7654,
+     "version": "1.19.27",
+     "generation": 8,
+     "cleanup_pending": false
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "update.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "state": "idle",
+     "version": null,
+     "update_available": false,
+     "installable": false,
+     "error": null,
+     "current_version": "1.0.0",
+     "previous_version": null
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "geo.status",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "running": false,
+     "updated_at_ms": 1789996400000,
+     "errors": []
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "bastion.pool",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "runtime_alive": 18,
+     "user_alive": 2,
+     "capacity": 100,
+     "min_alive_nodes": 5,
+     "target_alive": 30,
+     "collecting": true,
+     "observed_at_ms": 1790000000000
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "bastion.sources",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "src-gh-1",
+       "kind": "github_repos",
+       "display": "GitHub",
+       "enabled": true,
+       "hint": "e•••/f•••"
+      },
+      {
+       "id": "src-sub-1",
+       "kind": "subscription_urls",
+       "display": "Subscription",
+       "enabled": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "vanguard-0",
+       "name": "vanguard-node-0",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless",
+       "latency_ms": 120
+      },
+      {
+       "id": "vanguard-1",
+       "name": "vanguard-node-1",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless",
+       "latency_ms": 480
+      },
+      {
+       "id": "vanguard-2",
+       "name": "vanguard-node-2",
+       "tier": "vanguard",
+       "kind": "manual",
+       "enabled": true,
+       "status": "unknown",
+       "reason_code": null,
+       "protocol": "vless",
+       "latency_ms": null
+      }
+     ]
+    },
+    "key": "vanguard"
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "sentinel-0",
+       "name": "sentinel-node-0",
+       "tier": "sentinel",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless",
+       "latency_ms": 260
+      },
+      {
+       "id": "sentinel-1",
+       "name": "sentinel-node-1",
+       "tier": "sentinel",
+       "kind": "manual",
+       "enabled": true,
+       "status": "healthy",
+       "reason_code": null,
+       "protocol": "vless",
+       "latency_ms": 900
+      }
+     ]
+    },
+    "key": "sentinel"
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "nodes.list",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": []
+    },
+    "key": "gateway"
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "alerts.history",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "alert-1",
+       "seq": 1,
+       "severity": "warn",
+       "event_id": "mode.tier2_active",
+       "title": "Fallback to Sentinel",
+       "detail": "Vanguard is unavailable; traffic moved to Sentinel.",
+       "ts_ms": 1789996400000
+      },
+      {
+       "id": "alert-2",
+       "seq": 2,
+       "severity": "critical",
+       "event_id": "kill_switch.activated",
+       "title": "Kill switch triggered",
+       "detail": "Every tier is unavailable; outbound traffic is blocked.",
+       "ts_ms": 1789998200000
+      },
+      {
+       "id": "alert-3",
+       "seq": 3,
+       "severity": "info",
+       "event_id": "mode.recovery.vanguard",
+       "title": "Vanguard recovered",
+       "detail": "Traffic moved back to Vanguard.",
+       "ts_ms": 1789999400000
+      }
+     ],
+     "last_seq": 3
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "alerts.delivery",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "items": [
+      {
+       "id": "delivery-telegram-main",
+       "channel_id": "telegram-main",
+       "state": "healthy",
+       "last_attempt_ms": 1789999410000,
+       "last_success_ms": 1789999410000,
+       "error": null
+      },
+      {
+       "id": "delivery-desktop",
+       "channel_id": "desktop",
+       "state": "healthy",
+       "last_attempt_ms": 1789999400000,
+       "last_success_ms": 1789999400000,
+       "error": null
+      },
+      {
+       "id": "delivery-ntfy-1",
+       "channel_id": "ntfy-1",
+       "state": "failed",
+       "last_attempt_ms": 1789998300000,
+       "last_success_ms": null,
+       "error": {
+        "code": "io",
+        "message_key": "errors.alerts.delivery_failed",
+        "params": {}
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "t": "evt",
+    "topic": "alerts.onboarding",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "sessions": []
+    }
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "t": "host:language",
+    "language": "zh_CN"
+   }
+  },
+  {
+   "deliver": {
+    "epoch": "rt-fixture-e1",
+    "t": "host:visibility",
+    "visible": true
+   }
+  },
+  {
+   "on_invoke": {
+    "cmd": "config.snapshot"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "config.snapshot",
+     "ok": true,
+     "data": {
+      "rev": 7,
+      "values": {
+       "network": {
+        "allow_lan": false,
+        "ipv6": true,
+        "mihomo_mixed_port": 7890,
+        "mode": "system",
+        "system_proxy": {
+         "bypass": [
+          "localhost",
+          "127.*",
+          "192.168.*"
+         ]
+        },
+        "subscription": {
+         "port": 25500
+        },
+        "egress_recovery": {
+         "enabled": true,
+         "retry_source_refresh": false
+        }
+       },
+       "dns": {
+        "mode": "custom",
+        "respect_rules": true,
+        "nameserver": [
+         "https://dns.example.net/dns-query"
+        ],
+        "proxy_server_nameserver": [
+         "tls://dot.example.net"
+        ],
+        "default_nameserver": [
+         "192.0.2.53"
+        ]
+       },
+       "routing": {
+        "rules": {
+         "direct": [
+          "suffix:example.cn",
+          "geoip:CN"
+         ],
+         "proxy": [
+          "suffix:example.io"
+         ],
+         "reject": [
+          "keyword:ads"
+         ],
+         "compatibility_defaults": [
+          {
+           "rule_type": "direct",
+           "value": "suffix:example.com"
+          }
+         ]
+        }
+       },
+       "latency": {
+        "primary_gateway_max_latency_ms": 800
+       },
+       "sources": [
+        {
+         "id": "src-gh-1",
+         "kind": "github_repos",
+         "display": "GitHub",
+         "enabled": true,
+         "hint": "e•••/f•••"
+        },
+        {
+         "id": "src-sub-1",
+         "kind": "subscription_urls",
+         "display": "Subscription",
+         "enabled": true
+        }
+       ],
+       "alerts": {
+        "channels": [
+         {
+          "id": "telegram-main",
+          "type": "telegram",
+          "label": "Phone",
+          "enabled": true,
+          "alert_types": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "config": {
+           "enabled": true,
+           "timeout": 10,
+           "parse_mode": "HTML",
+           "chat_id": "-1001234567890"
+          }
+         },
+         {
+          "id": "telegram-ops",
+          "type": "telegram",
+          "label": "Ops",
+          "enabled": true,
+          "alert_types": [
+           "CRITICAL",
+           "BACKUP_REMINDER"
+          ],
+          "config": {
+           "chat_id": "-1009876543210"
+          }
+         },
+         {
+          "id": "ntfy-1",
+          "type": "ntfy",
+          "label": "",
+          "enabled": true,
+          "alert_types": [],
+          "config": {
+           "priority": 4,
+           "tags": [
+            "warning"
+           ]
+          }
+         },
+         {
+          "id": "mail-1",
+          "type": "email_smtp",
+          "label": "Mail",
+          "enabled": false,
+          "alert_types": [],
+          "config": {
+           "host": "smtp.example.com",
+           "port": 587,
+           "from_addr": "alerts@example.com",
+           "starttls": true
+          }
+         },
+         {
+          "id": "desktop",
+          "type": "desktop",
+          "label": "",
+          "enabled": true,
+          "alert_types": [],
+          "config": {
+           "enabled": true,
+           "timeout": 5
+          }
+         }
+        ]
+       },
+       "ui": {
+        "language": "zh_CN",
+        "overview_auto_exit_lookup": true,
+        "start_in_tray_on_autostart": false
+       },
+       "autostart": {
+        "enabled": true
+       },
+       "killswitch": {
+        "enabled": true,
+        "allow_lan": true,
+        "allow_dns": true,
+        "dns_whitelist": [
+         "192.0.2.53"
+        ],
+        "additional_whitelist": [
+         "LocalSubnet",
+         "203.0.113.5"
+        ]
+       },
+       "bastion": {
+        "enabled": true,
+        "min_alive_nodes": 5
+       }
+      },
+      "secret_fields_set": [
+       "alerts.mail-1.password",
+       "alerts.mail-1.to_addrs",
+       "alerts.mail-1.username",
+       "alerts.ntfy-1.server",
+       "alerts.ntfy-1.topic",
+       "alerts.telegram-main.bot_token",
+       "alerts.telegram-ops.bot_token"
+      ],
+      "read_errors": [],
+      "pending": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "autostart.state"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "autostart.state",
+     "ok": true,
+     "data": {
+      "supported": true,
+      "enabled": true,
+      "target": "shell",
+      "mismatch": false,
+      "error": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "app.info"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "app.info",
+     "ok": true,
+     "data": {
+      "version": "1.0.0",
+      "language": "zh_CN",
+      "caps": [],
+      "listeners": [
+       {
+        "kind": "mixed",
+        "host": "127.0.0.1",
+        "port": 7890,
+        "available": true
+       },
+       {
+        "kind": "subscription",
+        "host": "127.0.0.1",
+        "port": 25500,
+        "available": true
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "geo.status"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "geo.status",
+     "ok": true,
+     "data": {
+      "running": false,
+      "updated_at_ms": 1789996400000,
+      "errors": []
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.catalog"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.catalog",
+     "ok": true,
+     "data": {
+      "channels": [
+       {
+        "id": "desktop",
+        "label_id": "catalog.alerts.desktop",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.desktop.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "built_in",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.desktop.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.desktop.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.desktop.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.desktop.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.desktop.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         }
+        ]
+       },
+       {
+        "id": "sound",
+        "label_id": "catalog.alerts.sound",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.sound.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "built_in",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.sound.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.sound.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.sound.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.sound.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.sound.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "frequency",
+          "label_id": "catalog.alerts.sound.frequency",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "min": 37,
+           "max": 32767,
+           "presets": {
+            "soft": 750,
+            "standard": 1000,
+            "prominent": 1400
+           }
+          }
+         },
+         {
+          "id": "duration_ms",
+          "label_id": "catalog.alerts.sound.duration_ms",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "min": 20,
+           "max": 10000,
+           "presets": {
+            "soft": 250,
+            "standard": 450,
+            "prominent": 800
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "telegram",
+        "label_id": "catalog.alerts.telegram",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.telegram.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.telegram.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.telegram.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.telegram.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.telegram.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.telegram.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "bot_token",
+          "label_id": "catalog.alerts.telegram.bot_token",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "chat_id",
+          "label_id": "catalog.alerts.telegram.chat_id",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "parse_mode",
+          "label_id": "catalog.alerts.telegram.parse_mode",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "implicit_default": "HTML"
+          }
+         },
+         {
+          "id": "message_thread_id",
+          "label_id": "catalog.alerts.telegram.message_thread_id",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "silent",
+          "label_id": "catalog.alerts.telegram.silent",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "protect_content",
+          "label_id": "catalog.alerts.telegram.protect_content",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "disable_link_preview",
+          "label_id": "catalog.alerts.telegram.disable_link_preview",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "implicit_default": "true"
+          }
+         }
+        ]
+       },
+       {
+        "id": "whatsapp",
+        "label_id": "catalog.alerts.whatsapp",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.whatsapp.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": true
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.whatsapp.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.whatsapp.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           },
+           "implicit_default": [
+            "CRITICAL",
+            "EMERGENCY",
+            "KILL_SWITCH_ON"
+           ]
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.whatsapp.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.whatsapp.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.whatsapp.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "access_token",
+          "label_id": "catalog.alerts.whatsapp.access_token",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "to",
+          "label_id": "catalog.alerts.whatsapp.to",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "phone_number_id",
+          "label_id": "catalog.alerts.whatsapp.phone_number_id",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_when": [
+            {
+             "field": "api_url",
+             "present": false
+            }
+           ]
+          }
+         },
+         {
+          "id": "mode",
+          "label_id": "catalog.alerts.whatsapp.mode",
+          "type": "choice",
+          "required": false,
+          "choices": [
+           "text",
+           "template"
+          ],
+          "conditions": {
+           "advanced": false,
+           "implicit_default": "text"
+          }
+         },
+         {
+          "id": "template_name",
+          "label_id": "catalog.alerts.whatsapp.template_name",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "visible_when": [
+            {
+             "field": "mode",
+             "values": [
+              "template"
+             ]
+            }
+           ],
+           "required_when": [
+            {
+             "field": "mode",
+             "values": [
+              "template"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "template_language",
+          "label_id": "catalog.alerts.whatsapp.template_language",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "visible_when": [
+            {
+             "field": "mode",
+             "values": [
+              "template"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "template_body_params",
+          "label_id": "catalog.alerts.whatsapp.template_body_params",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "list",
+           "visible_when": [
+            {
+             "field": "mode",
+             "values": [
+              "template"
+             ]
+            }
+           ]
+          }
+         },
+         {
+          "id": "graph_api_version",
+          "label_id": "catalog.alerts.whatsapp.graph_api_version",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "api_url",
+          "label_id": "catalog.alerts.whatsapp.api_url",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "preview_url",
+          "label_id": "catalog.alerts.whatsapp.preview_url",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "slack",
+        "label_id": "catalog.alerts.slack",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.slack.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.slack.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.slack.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.slack.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.slack.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.slack.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "url",
+          "label_id": "catalog.alerts.slack.url",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.slack.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "headers",
+          "label_id": "catalog.alerts.slack.headers",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "headers"
+          }
+         },
+         {
+          "id": "payload",
+          "label_id": "catalog.alerts.slack.payload",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "json"
+          }
+         }
+        ]
+       },
+       {
+        "id": "discord",
+        "label_id": "catalog.alerts.discord",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.discord.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.discord.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.discord.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.discord.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.discord.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.discord.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "url",
+          "label_id": "catalog.alerts.discord.url",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.discord.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "headers",
+          "label_id": "catalog.alerts.discord.headers",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "headers"
+          }
+         },
+         {
+          "id": "payload",
+          "label_id": "catalog.alerts.discord.payload",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "json"
+          }
+         }
+        ]
+       },
+       {
+        "id": "teams",
+        "label_id": "catalog.alerts.teams",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.teams.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.teams.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.teams.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.teams.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.teams.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.teams.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "url",
+          "label_id": "catalog.alerts.teams.url",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.teams.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "headers",
+          "label_id": "catalog.alerts.teams.headers",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "headers"
+          }
+         },
+         {
+          "id": "payload",
+          "label_id": "catalog.alerts.teams.payload",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "json"
+          }
+         }
+        ]
+       },
+       {
+        "id": "google_chat",
+        "label_id": "catalog.alerts.google_chat",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.google_chat.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "chat",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.google_chat.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.google_chat.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.google_chat.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.google_chat.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.google_chat.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "url",
+          "label_id": "catalog.alerts.google_chat.url",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.google_chat.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "headers",
+          "label_id": "catalog.alerts.google_chat.headers",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "headers"
+          }
+         },
+         {
+          "id": "payload",
+          "label_id": "catalog.alerts.google_chat.payload",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "json"
+          }
+         }
+        ]
+       },
+       {
+        "id": "ntfy",
+        "label_id": "catalog.alerts.ntfy",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.ntfy.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "push",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.ntfy.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.ntfy.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.ntfy.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.ntfy.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.ntfy.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.alerts.ntfy.server",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "topic",
+          "label_id": "catalog.alerts.ntfy.topic",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "pattern": "^[-_A-Za-z0-9]{1,64}$",
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "token",
+          "label_id": "catalog.alerts.ntfy.token",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "priority",
+          "label_id": "catalog.alerts.ntfy.priority",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 1,
+           "max": 5
+          }
+         },
+         {
+          "id": "tags",
+          "label_id": "catalog.alerts.ntfy.tags",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "list"
+          }
+         },
+         {
+          "id": "title_template",
+          "label_id": "catalog.alerts.ntfy.title_template",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.ntfy.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "pushover",
+        "label_id": "catalog.alerts.pushover",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.pushover.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "push",
+           "cost": true
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.pushover.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.pushover.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           },
+           "implicit_default": [
+            "CRITICAL",
+            "EMERGENCY",
+            "KILL_SWITCH_ON"
+           ]
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.pushover.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.pushover.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.pushover.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "app_token",
+          "label_id": "catalog.alerts.pushover.app_token",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "user_key",
+          "label_id": "catalog.alerts.pushover.user_key",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "device",
+          "label_id": "catalog.alerts.pushover.device",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "priority",
+          "label_id": "catalog.alerts.pushover.priority",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": -2,
+           "max": 1
+          }
+         },
+         {
+          "id": "sound",
+          "label_id": "catalog.alerts.pushover.sound",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "title_template",
+          "label_id": "catalog.alerts.pushover.title_template",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.pushover.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "gotify",
+        "label_id": "catalog.alerts.gotify",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.gotify.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "push",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.gotify.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.gotify.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.gotify.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.gotify.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.gotify.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "server",
+          "label_id": "catalog.alerts.gotify.server",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "app_token",
+          "label_id": "catalog.alerts.gotify.app_token",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "priority",
+          "label_id": "catalog.alerts.gotify.priority",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "title_template",
+          "label_id": "catalog.alerts.gotify.title_template",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.gotify.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "email_smtp",
+        "label_id": "catalog.alerts.email_smtp",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.email_smtp.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "email",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.email_smtp.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.email_smtp.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.email_smtp.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.email_smtp.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.email_smtp.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "host",
+          "label_id": "catalog.alerts.email_smtp.host",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "port",
+          "label_id": "catalog.alerts.email_smtp.port",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "min": 1,
+           "max": 65535
+          }
+         },
+         {
+          "id": "username",
+          "label_id": "catalog.alerts.email_smtp.username",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "password",
+          "label_id": "catalog.alerts.email_smtp.password",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "from_addr",
+          "label_id": "catalog.alerts.email_smtp.from_addr",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "to_addrs",
+          "label_id": "catalog.alerts.email_smtp.to_addrs",
+          "type": "textarea",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "format": "list",
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "starttls",
+          "label_id": "catalog.alerts.email_smtp.starttls",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "ssl",
+          "label_id": "catalog.alerts.email_smtp.ssl",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "subject_template",
+          "label_id": "catalog.alerts.email_smtp.subject_template",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "body_template",
+          "label_id": "catalog.alerts.email_smtp.body_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "email_sendgrid",
+        "label_id": "catalog.alerts.email_sendgrid",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.email_sendgrid.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "email",
+           "cost": true
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.email_sendgrid.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.email_sendgrid.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           },
+           "implicit_default": [
+            "CRITICAL",
+            "EMERGENCY",
+            "KILL_SWITCH_ON"
+           ]
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.email_sendgrid.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.email_sendgrid.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.email_sendgrid.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "api_key",
+          "label_id": "catalog.alerts.email_sendgrid.api_key",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "from_addr",
+          "label_id": "catalog.alerts.email_sendgrid.from_addr",
+          "type": "string",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "to_addrs",
+          "label_id": "catalog.alerts.email_sendgrid.to_addrs",
+          "type": "textarea",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "format": "list",
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "api_url",
+          "label_id": "catalog.alerts.email_sendgrid.api_url",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "subject_template",
+          "label_id": "catalog.alerts.email_sendgrid.subject_template",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "body_template",
+          "label_id": "catalog.alerts.email_sendgrid.body_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "sms_twilio",
+        "label_id": "catalog.alerts.sms_twilio",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.sms_twilio.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "sms",
+           "cost": true
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.sms_twilio.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.sms_twilio.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           },
+           "implicit_default": [
+            "CRITICAL",
+            "EMERGENCY",
+            "KILL_SWITCH_ON"
+           ]
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.sms_twilio.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.sms_twilio.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.sms_twilio.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "account_sid",
+          "label_id": "catalog.alerts.sms_twilio.account_sid",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "auth_token",
+          "label_id": "catalog.alerts.sms_twilio.auth_token",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "to_numbers",
+          "label_id": "catalog.alerts.sms_twilio.to_numbers",
+          "type": "textarea",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "format": "list",
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "from_number",
+          "label_id": "catalog.alerts.sms_twilio.from_number",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_when": [
+            {
+             "field": "messaging_service_sid",
+             "present": false
+            }
+           ]
+          }
+         },
+         {
+          "id": "messaging_service_sid",
+          "label_id": "catalog.alerts.sms_twilio.messaging_service_sid",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": false
+          }
+         },
+         {
+          "id": "api_url",
+          "label_id": "catalog.alerts.sms_twilio.api_url",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "body_template",
+          "label_id": "catalog.alerts.sms_twilio.body_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       },
+       {
+        "id": "generic_webhook",
+        "label_id": "catalog.alerts.generic_webhook",
+        "fields": [
+         {
+          "id": "enabled",
+          "label_id": "catalog.alerts.generic_webhook.enabled",
+          "type": "boolean",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "scope": "channel",
+           "group": "generic",
+           "cost": false
+          }
+         },
+         {
+          "id": "label",
+          "label_id": "catalog.alerts.generic_webhook.label",
+          "type": "string",
+          "required": false,
+          "choices": [],
+          "conditions": {}
+         },
+         {
+          "id": "alert_types",
+          "label_id": "catalog.alerts.generic_webhook.alert_types",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "WARNING",
+           "CRITICAL",
+           "EMERGENCY",
+           "RECOVERY",
+           "POOL_UPDATE",
+           "BACKUP_REMINDER",
+           "KILL_SWITCH_ON",
+           "KILL_SWITCH_OFF",
+           "KILL_SWITCH_DISABLED",
+           "KILL_SWITCH_OVERRIDE"
+          ],
+          "conditions": {
+           "presets": {
+            "urgent": [
+             "CRITICAL",
+             "EMERGENCY",
+             "KILL_SWITCH_ON"
+            ],
+            "abnormal_recovery": [
+             "WARNING",
+             "CRITICAL",
+             "EMERGENCY",
+             "RECOVERY",
+             "KILL_SWITCH_ON",
+             "KILL_SWITCH_OFF",
+             "KILL_SWITCH_DISABLED",
+             "KILL_SWITCH_OVERRIDE"
+            ],
+            "all": []
+           }
+          }
+         },
+         {
+          "id": "event_groups",
+          "label_id": "catalog.alerts.generic_webhook.event_groups",
+          "type": "multichoice",
+          "required": false,
+          "choices": [
+           "vanguard_nodes",
+           "route_health",
+           "emergency_fallback",
+           "protection",
+           "backup"
+          ],
+          "conditions": {
+           "templates": {
+            "all": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection",
+             "backup"
+            ],
+            "key_events": [
+             "vanguard_nodes",
+             "route_health",
+             "emergency_fallback",
+             "protection"
+            ]
+           },
+           "missing_means": "all",
+           "empty_list_means": "none"
+          }
+         },
+         {
+          "id": "timeout",
+          "label_id": "catalog.alerts.generic_webhook.timeout",
+          "type": "number",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min_exclusive": 0,
+           "max": 300
+          }
+         },
+         {
+          "id": "retries",
+          "label_id": "catalog.alerts.generic_webhook.retries",
+          "type": "integer",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "min": 0,
+           "max": 10
+          }
+         },
+         {
+          "id": "url",
+          "label_id": "catalog.alerts.generic_webhook.url",
+          "type": "secret",
+          "required": true,
+          "choices": [],
+          "conditions": {
+           "advanced": false,
+           "required_for": "enabled"
+          }
+         },
+         {
+          "id": "body_format",
+          "label_id": "catalog.alerts.generic_webhook.body_format",
+          "type": "choice",
+          "required": false,
+          "choices": [
+           "json",
+           "raw",
+           "text"
+          ],
+          "conditions": {
+           "advanced": false,
+           "implicit_default": "json"
+          }
+         },
+         {
+          "id": "headers",
+          "label_id": "catalog.alerts.generic_webhook.headers",
+          "type": "secret",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "headers"
+          }
+         },
+         {
+          "id": "payload",
+          "label_id": "catalog.alerts.generic_webhook.payload",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true,
+           "format": "json"
+          }
+         },
+         {
+          "id": "body_template",
+          "label_id": "catalog.alerts.generic_webhook.body_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         },
+         {
+          "id": "message_template",
+          "label_id": "catalog.alerts.generic_webhook.message_template",
+          "type": "textarea",
+          "required": false,
+          "choices": [],
+          "conditions": {
+           "advanced": true
+          }
+         }
+        ]
+       }
+      ],
+      "event_groups": [
+       "vanguard_nodes",
+       "route_health",
+       "emergency_fallback",
+       "protection",
+       "backup"
+      ],
+      "scopes": [
+       "all",
+       "key_events"
+      ],
+      "acl": {
+       "plaintext_storage": true,
+       "access_state": "no_known_failures",
+       "unconfirmed_count": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.deliveries"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "res",
+     "id": 1,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "cmd": "alerts.deliveries",
+     "ok": true,
+     "data": {
+      "items": [
+       {
+        "id": "delivery-r1",
+        "channel_id": "telegram-main",
+        "state": "healthy",
+        "last_attempt_ms": 1789999410000,
+        "last_success_ms": 1789999410000,
+        "error": null
+       },
+       {
+        "id": "delivery-r2",
+        "channel_id": "telegram-main",
+        "state": "failed",
+        "last_attempt_ms": 1789998210000,
+        "last_success_ms": null,
+        "error": {
+         "code": "io",
+         "message_key": "errors.alerts.delivery_failed",
+         "params": {}
+        }
+       }
+      ],
+      "next_cursor": null
+     }
+    }
+   ]
+  },
+  {
+   "on_invoke": {
+    "cmd": "alerts.test"
+   },
+   "reply": [
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "ack",
+     "id": 2,
+     "req_id": "$req_id",
+     "owner": "$owner",
+     "accepted": true,
+     "op": "op-test-1"
+    },
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "evt",
+     "topic": "jobs",
+     "rev": 1,
+     "kind": "edge",
+     "seq": 1,
+     "data": {
+      "op": "op-test-1",
+      "req_id": "$req_id",
+      "owner": "$owner",
+      "name": "alerts.test",
+      "state": "queued",
+      "started_at_ms": null,
+      "progress": null,
+      "result": null,
+      "error": null
+     }
+    },
+    {
+     "epoch": "rt-fixture-e1",
+     "produced_at_ms": 1790000000000,
+     "sent_at_ms": 1790000000001,
+     "t": "evt",
+     "topic": "jobs",
+     "rev": 2,
+     "kind": "edge",
+     "seq": 2,
+     "data": {
+      "op": "op-test-1",
+      "req_id": "$req_id",
+      "owner": "$owner",
+      "name": "alerts.test",
+      "state": "running",
+      "started_at_ms": 1790000000000,
+      "progress": null,
+      "result": null,
+      "error": null
+     }
+    }
+   ]
+  }
+ ]
+}

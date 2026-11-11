@@ -1,0 +1,4 @@
+{
+  "//": "T-P4-02a: the rt modules are ES modules; this lets node:test load them without the MODULE_TYPELESS_PACKAGE_JSON warning. esbuild bundles them either way.",
+  "type": "module"
+}

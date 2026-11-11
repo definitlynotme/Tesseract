@@ -1,0 +1,267 @@
+/* ==========================================================================
+   Tesseract · design tokens (the ONLY place raw values live)
+   One light theme. No dark mode, no theme switch, no prefers-color-scheme.
+   Every page stylesheet uses these variables; never hard-code a hex there.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  /* ---- surfaces ---------------------------------------------------------- */
+  --c-bg:        #FFFFFF;   /* main plane                                      */
+  --c-mist:      #F7F7F8;   /* sidebar ground                                  */
+  --c-well:      #F2F3F5;   /* inset wells: segmented track, chips, tags       */
+  --c-well-2:    #E7E9EC;   /* switch track off, empty meter                   */
+  --c-tint-1:    #FBFBFC;   /* deck: first card behind                         */
+  --c-tint-2:    #F6F7F8;   /* deck: second card behind                        */
+  --c-scrim:     rgba(21, 23, 26, .10);
+
+  /* near-white surface roles: never mix another near-white by hand */
+  --c-surface:       #FFFFFF;   /* = --c-bg: controls, menus, cards, the toast   */
+  --c-surface-hover: #FAFAFB;   /* hover on a white surface that is a button     */
+  --c-surface-press: #F5F6F7;   /* pressed white surface                         */
+  --c-btn-hover:     #F9F9FA;   /* secondary .btn hover                          */
+  --c-ghost-1:       #FCFCFD;   /* ghosts: stopped deck bands, gated option, fold row */
+  --c-ghost-2:       #FAFAFB;
+  --c-ghost-3:       #F8F8F9;
+  --c-on-accent:     #FFFFFF;   /* text / glyph on the accent fill               */
+  --c-on-accent-2:   rgba(255, 255, 255, .84);   /* secondary text on the accent fill (5.7:1) */
+
+  /* hairlines, by role (never boxes in boxes) */
+  --c-line:      rgba(21, 23, 26, .085);
+  --c-line-2:    rgba(21, 23, 26, .13);
+  --c-line-3:    rgba(21, 23, 26, .20);   /* field edges at rest (input, search, select), hover edge of other controls */
+  --c-line-4:    rgba(21, 23, 26, .30);   /* field edges on hover */
+  --c-wash:     rgba(21, 23, 26, .045);  /* hover wash   */
+  --c-wash-2:    rgba(21, 23, 26, .075);  /* pressed wash */
+
+  /* ---- text (all meaningful text >= 4.5:1 on white AND on mist) ----------- */
+  --c-ink:       #15171A;   /* 17.9:1 */
+  --c-ink-2:     #4F5560;   /*  7.4:1 */
+  --c-ink-3:     #646B78;   /*  5.4:1 on white, 5.0:1 on mist */
+  --c-ink-4:     #A3A8B2;   /* decorative / disabled only, never meaning */
+
+  /* ---- the one accent: dark blue, 暗蓝 (11.2:1 on white, 10.5:1 on mist) ----
+     F-02 (user 10-28): black, white, dark blue and grey carry the UI; the low-saturation
+     companions below keep it from becoming a black-and-white snapshot.
+     Was the muted slate-indigo #44507E (F-01) and the crisper #3B50A4 before it.
+     Used ONLY for: brand dot, primary action, progress fill, active nav glyph,
+     download series, focus ring, the 当前 / 承载流量 marks. Never a status colour. */
+  --c-accent:        #2B3A60;
+  --c-accent-hover:  #263355;
+  --c-accent-press:  #202B48;
+  --c-accent-ink:    #2B3A60;   /* text on the accent tint (10.1:1) */
+  --c-accent-tint:   #EEF0F4;
+  --c-accent-tint-2: #DEE1E9;
+  --c-accent-line:   #C7CCD8;   /* hover edge of a control on the accent tint */
+  --c-accent-wash:   rgba(43, 58, 96, .10);   /* hover wash on the accent tint */
+  --c-accent-off:    #A9AFBE;   /* disabled primary / checked-disabled mark */
+  --c-selection:     rgba(43, 58, 96, .16);   /* ::selection */
+
+  /* ---- semantics (separate from the accent; always paired with shape and word) ----
+     F-01 (option B 灰阶) took the saturated green / amber / red out. F-02 (user 10-28):
+     emphasis is typographic (weight, the voice), and colour stays as low-saturation
+     companions of the dark blue — never green, never a saturated red:
+     - healthy: the word in ink, a slate-blue dot (the accent's family);
+     - warning (较慢, 已回退): a sand mark, the word in umber;
+     - failure and error (不可用, 失败, 已触发, invalid input, destructive acts): a clay
+       mark, the word in clay, bold where it needs a look.
+     Hues sit on marks and short state words; running text and titles stay ink. */
+  --c-ok:        #2F343B;   /* 12.6:1 — a healthy word is ink */
+  --c-ok-dot:    #5A6B8C;   /* slate blue */
+  --c-ok-tint:   #EFF1F5;
+  --c-warn:      #7A6342;   /* 5.7:1 — umber */
+  --c-warn-dot:  #B39B6E;   /* sand */
+  --c-warn-tint: #F5F1E8;
+  --c-fail:      #8C4E46;   /* 6.4:1 — clay: a routine failure (a node, a probe, a source) */
+  --c-fail-dot:  #B27A71;
+  --c-err:       #8C4E46;   /* = fail: errors, invalid input, destructive actions */
+  --c-err-dot:   #B27A71;
+  --c-err-tint:  #F6EDEB;
+
+  /* mid tints: band tracks, meters, slider bands (fills, never text) */
+  --c-ok-2:      #C3CBDA;
+  --c-warn-2:    #DDD1B6;
+  --c-err-2:     #E3C8C3;
+
+  /* washes + edges for severity surfaces (callouts, banners): barely tinted */
+  --c-ok-wash:   #FAFAFC;   --c-ok-line:   rgba(21, 23, 26, .13);
+  --c-warn-wash: #FCFAF6;   --c-warn-line: rgba(122, 99, 66, .22);
+  --c-err-wash:  #FCF8F7;   --c-err-line:  rgba(140, 78, 70, .22);
+  /* the quiet destructive button (删除 / 停用): a clay edge and word, a faint clay hover */
+  --c-danger-line:   rgba(140, 78, 70, .32);
+  --c-err-wash-2: #FAF3F2;  --c-err-line-2: rgba(140, 78, 70, .5);
+  --c-err-hover: #7A433C;   --c-err-press: #6B3A34;   --c-err-off: #D2B3AE;
+
+  /* neutral marks (shapes, not text) */
+  --c-dot-off:   #A7ACB5;   /* the stopped brand dot, unknown dots, a missing tier dash */
+  --c-ring-off:  #9AA0AA;   /* hollow grey status rings (未启用, filter chip off) */
+  --c-ring-mute: #8F96A1;   /* dashed / diamond marks (待检查, 草稿) */
+  --c-dot-dim:   #B9BEC6;
+  --c-switch-off:   #D9DCE1;   /* switch track, off (the knob's .38 ring reads at 3.2:1 on white, the track's .22 ring bounds it) */
+  --c-switch-hover: #CDD1D7;
+
+  /* ---- selection & state (lists, tables, menus) --------------------------- */
+  --c-hover:     rgba(21, 23, 26, .035);  /* row hover                         */
+  --c-sel:       #EEF0F4;                 /* selected / open row (= accent tint: focus role) */
+  --c-sel-hover: #E6E9EF;
+  --c-hl:        var(--c-well);           /* gliding keyboard highlight in menus */
+  --c-skel:      #EEF0F2;                 /* skeleton blocks                     */
+  --c-changed:   var(--c-ink-2);          /* unsaved-change marker (neutral, not a status) */
+
+  /* ---- data ---------------------------------------------------------------- */
+  --c-series-down: var(--c-accent);
+  --c-series-up:   #8D9AB5;  /* mist blue: upload line (not text) */
+  --c-series-up-area: rgba(141, 154, 181, .12);
+  --c-grid:      rgba(21, 23, 26, .07);   /* chart grid lines */
+  --c-grid-base: rgba(21, 23, 26, .14);   /* chart baseline */
+  --c-ramp-1: #3A4868;       /* single-hue ramp for categorical bars: the accent's blue, F-02 */
+  --c-ramp-2: #5A6B8C;
+  --c-ramp-3: #8D9AB5;
+  --c-ramp-4: #C3CBDA;
+  --c-ramp-5: #DCE1EA;       /* the lightest step (a fourth category when the ramp starts at 2) */
+
+  /* ---- type ------------------------------------------------------------------ */
+  /* Per-language stacks (architecture §8): this block is the Western default
+     (en, de, es, fr, pt and any page without a lang); zh / ja / ko / ru
+     override it below on :root:lang(). Instrument Sans and Geist Mono are
+     self-hosted (fonts.css, latin + latin-ext only); CJK falls through to the
+     system font of that language. The wordmark is Latin only, so the brand
+     stack names no CJK font. */
+  /* YaHei last: Chinese data text (node names) on a western page keeps one CJK face (T-P4-08a §9-3). */
+  --font-sans:  "Instrument Sans", "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  --font-mono:  "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, "Microsoft YaHei UI", monospace;
+  --font-brand: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", "Instrument Sans", sans-serif;
+
+  --fs-12: 12px;   /* hints, labels, chips, axis        */
+  --fs-13: 13px;   /* body, rows, buttons               */
+  --fs-14: 14px;   /* emphasised UI, nav, panel titles  */
+  --fs-15: 15px;   /* page title in the top bar         */
+  --fs-18: 18px;   /* small figures                      */
+  --fs-24: 24px;   /* IPv4 (mono)                        */
+  --fs-26: 26px;   /* session totals                     */
+  --fs-34: 34px;   /* current tier name                  */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semi: 600;
+  --track-tight: -.022em;   /* 22 px and larger */
+
+  /* ---- emphasis (F-02, user 10-28): what stands out does so by type first ----------
+     strong: --fw-semi. mark: 12 px, --fw-semi, --track-mark (承载流量, 当前, 未保存),
+     no fill. voice (the 花体): a second face for the few words that are a provisional
+     state or a quoted reason (待检查 · 草稿 · 待生效 · TLS 连接失败). (F-03: the tier role
+     words that first carried it are gone from the interface.)
+     The voice is per language, because italics are a Latin and Cyrillic idea:
+     Latin + Cyrillic: Sitka Text italic (Georgia italic where Sitka is missing). zh: the
+     bundled handwritten kai (below). ja / ko: the UI face itself, upright (no fake oblique
+     on kana or hangul, and no Japanese / Korean serif is assumed: Yu Mincho draws too
+     thin at 12-13 px). */
+  --font-voice:   "Sitka Text", Georgia, serif;
+  --voice-style:  italic;
+  --voice-weight: 400;
+  --voice-scale:  1;
+  --voice-track:  0;
+  --c-voice:      var(--c-ink-2);   /* a quoted reason, 待生效 */
+  --c-voice-3:    var(--c-ink-3);   /* a provisional state (待检查, 草稿) */
+  --track-mark:   .02em;
+  /* the letter's hand (11-05, letter.css): its heading, page numbers and signature are Latin in
+     every language, so one italic serves all nine; Sitka's display optical size at 26 px and up */
+  --font-letter:  "Sitka Heading", "Sitka Text", Georgia, serif;
+
+  /* ---- space (4 px grid) ----------------------------------------------------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 28px; --sp-8: 32px;
+
+  /* ---- radii ------------------------------------------------------------------ */
+  --r-xs:    4px;    /* checkbox, keycaps, 20–24 px chips and buttons */
+  --r-ctl:   6px;    /* controls and rows */
+  --r-md:    8px;    /* nav items, palette rows, segmented track, the command button, chart tip */
+  --r-panel: 10px;   /* panels, cards, menus, popovers */
+  --r-float: 12px;   /* palette, dialogs, sheets, save bar */
+  --r-pill:  999px;
+
+  /* ---- row heights (dense UI) ------------------------------------------------ */
+  --row-h:       36px;   /* list rows              */
+  --row-h-dense: 30px;   /* log rows, table rows   */
+  --ctl-h:       32px;   /* default control height */
+  --ctl-h-sm:    28px;
+
+  /* ---- shadows: ONLY for things that float or stack -------------------------- */
+  --sh-raise: 0 0 0 1px rgba(21,23,26,.06), 0 1px 2px rgba(21,23,26,.07);          /* nav indicator, seg thumb */
+  --sh-card:  0 0 0 1px rgba(21,23,26,.05), 0 1px 2px rgba(21,23,26,.05), 0 6px 16px -8px rgba(21,23,26,.14);   /* deck front */
+  --sh-card-back: 0 0 0 1px rgba(21,23,26,.055), 0 1px 2px rgba(21,23,26,.04);      /* deck behind */
+  --sh-card-lift: 0 0 0 1px rgba(21,23,26,.05), 0 2px 4px rgba(21,23,26,.05), 0 12px 26px -10px rgba(21,23,26,.2);
+  --sh-float: 0 0 0 1px rgba(21,23,26,.07), 0 6px 16px -6px rgba(21,23,26,.10), 0 22px 48px -18px rgba(21,23,26,.22);
+  --sh-pop:   0 0 0 1px rgba(21,23,26,.08), 0 4px 10px -4px rgba(21,23,26,.10), 0 14px 32px -12px rgba(21,23,26,.20);   /* menus, popovers, slider bubble */
+  --sh-drag:  0 0 0 1px rgba(21,23,26,.06), 0 3px 6px rgba(21,23,26,.06), 0 14px 28px -10px rgba(21,23,26,.24);    /* a row being dragged */
+
+  /* ---- stacking ---------------------------------------------------------------- */
+  --z-savebar: 20;  --z-ghost: 65;  --z-ovl: 70;  --z-notice: 72;  --z-cmdk: 80;  --z-menu: 88;  --z-tip: 90;
+  --z-frame: 110;   /* the window buttons (#wc): above the launch cover (100) and every overlay, as a system caption */
+
+  /* ---- motion ----------------------------------------------------------------
+     --spring / --spring-dur are replaced at boot by a CSS linear() curve
+     generated from a damped spring (k 560, c 46: no overshoot).             */
+  --ease-out:   cubic-bezier(.2, .8, .2, 1);
+  --ease-in:    cubic-bezier(.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(.45, 0, .2, 1);
+  --ease-quart: cubic-bezier(.25, 1, .5, 1);
+  --spring:      cubic-bezier(.2, .9, .25, 1);
+  --spring-dur:  300ms;
+  --spring-soft: cubic-bezier(.2, .9, .25, 1);
+  --spring-soft-dur: 380ms;
+  --dur-press: 0ms;    /* the press lands on the next frame (no transition, so no compositor hand-shake); the release springs back */
+  --dur-micro: 160ms;
+  --dur-panel: 240ms;
+
+  /* ---- layout ------------------------------------------------------------------ */
+  --side-w: 232px;
+  --top-h: 52px;
+  --gut: 28px;
+  --page-max: 1240px;
+}
+
+/* ---- per-language font stacks (architecture §8; html[lang] is the page language) ---- */
+:root:lang(zh) {
+  /* 思源黑体 (Noto Sans SC, part of Windows 11 24H2) before YaHei: real 500 / 600 weights, so a
+     bold title no longer jumps to YaHei's heavy 700; older Windows falls back to YaHei (F-02). */
+  --font-sans: "Instrument Sans", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, "Noto Sans SC", "Microsoft YaHei UI", monospace;
+  /* the voice: a handwritten kai (user 10-28: too upright a face reads badly in Simplified
+     Chinese; 思源宋体 and the system 楷体 were tried and looked odd). "Tesseract Kai" is the
+     bundled subset of 霞鹜文楷 GB 屏幕阅读版 (LXGW WenKai GB Screen, OFL; css/fonts.css), cut
+     to the characters the interface uses; anything outside it falls back to the system 楷体.
+     Latin inside it (TLS) stays in the UI face. */
+  --font-voice:   "Instrument Sans", "Tesseract Kai", KaiTi, STKaiti, "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+  --voice-style:  normal;
+  --voice-scale:  1.04;   /* a hair larger than the sans beside it; its own spacing is right */
+  --c-voice:      var(--c-ink);
+  --c-voice-3:    var(--c-ink-2);
+  --track-mark:   .06em;
+}
+/* Japanese: Yu Gothic UI / Meiryo UI first, so kanji keep their Japanese forms; YaHei only
+   after them, for simplified-only hanzi in data text (Chinese node names), which the
+   Japanese fonts lack and Chrome would otherwise draw in SimSun. Korean likewise. */
+:root:lang(ja) {
+  --font-sans: "Instrument Sans", "Yu Gothic UI", "Meiryo UI", "Microsoft YaHei UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, "Yu Gothic UI", "Meiryo UI", "Microsoft YaHei UI", monospace;
+  --font-voice:  var(--font-sans);
+  --voice-style: normal;
+  --track-mark:  .04em;
+}
+:root:lang(ko) {
+  --font-sans: "Instrument Sans", "Malgun Gothic", "Microsoft YaHei UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, "Malgun Gothic", "Microsoft YaHei UI", monospace;
+  --font-voice:  var(--font-sans);
+  --voice-style: normal;
+}
+/* Russian: system fonts throughout, so a sentence never mixes the Latin web font with a
+   Cyrillic fallback (the shipped subsets have no Cyrillic; V11, T-P4-08a report). */
+:root:lang(ru) {
+  --font-sans:  "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  --font-mono:  "Cascadia Mono", Consolas, "Microsoft YaHei UI", monospace;
+  --font-brand: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+}
+
+@media (max-width: 1180px) {
+  :root { --side-w: 208px; --gut: 24px; }
+}

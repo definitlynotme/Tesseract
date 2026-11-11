@@ -1,0 +1,28 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "logs.feed",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "state": "stdout",
+      "level": "info",
+      "updated_at_ms": 1790812800000,
+      "dropped": {
+        "debug": 0,
+        "info": 0,
+        "warn": 0,
+        "error": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "run_id": "run-1",
+      "reason": "network_down"
+    }
+  },
+  "expected": "type:logs.feed.reason"
+}

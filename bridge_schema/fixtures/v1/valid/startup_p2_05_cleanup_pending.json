@@ -1,0 +1,54 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "service.state",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+    },
+    "runtime": {
+      "runtime_running": false,
+      "startup_phase": "failed",
+      "shutdown_cleanup_pending": true,
+      "failure_code": "lifecycle_busy",
+      "failure": {
+        "code": "lifecycle_busy",
+        "message_key": "errors.start.cleanup_pending",
+        "params": {
+          "cleanup_pending": true
+        },
+        "reason_code": "cleanup_pending"
+      }
+    },
+    "core": {
+      "running": false,
+      "pid": null,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+    },
+    "readiness": {
+      "state": "fail_closed",
+      "validation_active": false,
+      "reason": "cleanup_pending",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+    },
+    "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": null
+    }
+  }
+}

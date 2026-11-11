@@ -1,0 +1,70 @@
+{
+  "fmt.ago.days": {
+    "m": "{n, plural, other {# 天前}}",
+    "_desc": "相对时间：n 天前；T.fmt.ago"
+  },
+  "fmt.ago.hours": {
+    "m": "{n, plural, other {# 小时前}}",
+    "_desc": "相对时间：n 小时前（1–23）；T.fmt.ago"
+  },
+  "fmt.ago.minutes": {
+    "m": "{n, plural, other {# 分钟前}}",
+    "_desc": "相对时间：n 分钟前（1–59）；T.fmt.ago"
+  },
+  "fmt.ago.now": {
+    "m": "刚刚",
+    "_desc": "相对时间：45 秒以内；T.fmt.ago（如「已验证 · 刚刚」）"
+  },
+  "fmt.lat.down": {
+    "m": "不可用",
+    "_desc": "延迟档位词：超过上限或没有结果；T.fmt.latWord"
+  },
+  "fmt.lat.ok": {
+    "m": "正常",
+    "_desc": "延迟档位词：不超过上限的一半；T.fmt.latWord；DESIGN §8 延迟词"
+  },
+  "fmt.lat.slow": {
+    "m": "较慢",
+    "_desc": "延迟档位词：超过上限一半、不超过上限；T.fmt.latWord"
+  },
+  "fmt.ms": {
+    "m": "{n, number, integer} ms",
+    "_desc": "毫秒延迟，如 42 ms；T.fmt.ms"
+  },
+  "fmt.qty": {
+    "m": "{num} {unit}",
+    "_desc": "数字与单位的连接方式（DESIGN §8：数字和单位之间有空格，如 7.29 GB）；num 已按语言格式化，unit 来自 fmt.unit.*；不需要空格的语言在这里去掉"
+  },
+  "fmt.unit.b": {
+    "m": "B",
+    "_desc": "字节单位（小于 1 KB 时）；T.fmt.bytes"
+  },
+  "fmt.unit.gb": {
+    "m": "GB",
+    "_desc": "吉字节单位（1024 进制）；T.fmt.bytes"
+  },
+  "fmt.unit.kb": {
+    "m": "KB",
+    "_desc": "千字节单位（1024 进制）；T.fmt.bytes"
+  },
+  "fmt.unit.mb": {
+    "m": "MB",
+    "_desc": "兆字节单位（1024 进制）；T.fmt.bytes"
+  },
+  "fmt.unit.per_second": {
+    "m": "{unit}/s",
+    "_desc": "速率单位，unit 为 fmt.unit.* 之一，如 MB/s；T.fmt.rate"
+  },
+  "fmt.uptime.hours_minutes": {
+    "m": "{h} 小时 {m} 分",
+    "_desc": "已运行时长：h 小时 m 分；T.fmt.uptime；空间紧，用短单位"
+  },
+  "fmt.uptime.minutes": {
+    "m": "{m} 分钟",
+    "_desc": "已运行时长：m 分钟（不足 1 小时）；T.fmt.uptime"
+  },
+  "fmt.uptime.under_minute": {
+    "m": "不到 1 分钟",
+    "_desc": "已运行时长不足 1 分钟；T.fmt.uptime（如「已运行 不到 1 分钟」）"
+  }
+}

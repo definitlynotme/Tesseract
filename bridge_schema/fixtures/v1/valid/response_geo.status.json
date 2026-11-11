@@ -1,0 +1,22 @@
+{
+  "t": "res",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "id": 1,
+  "req_id": "request-1",
+  "owner": "window-1",
+  "cmd": "geo.status",
+  "ok": true,
+  "data": {
+    "running": true,
+    "updated_at_ms": null,
+    "errors": [
+      {
+        "code": "validation",
+        "message_key": "errors.validation.field",
+        "params": {}
+      }
+    ]
+  }
+}

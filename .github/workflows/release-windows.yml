@@ -1,0 +1,1354 @@
+name: Release Windows
+
+on:
+  push:
+    tags:
+      - "v*"
+
+# Every job declares the smallest token scope it needs.  In particular, the
+# private update-signing key is available only to the protected `release`
+# environment job and is never exposed to the build job.
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: "3.12.7"
+  NODE_VERSION: "24.14.1"
+  RUST_VERSION: "1.96.0"
+  CARGO_ABOUT_VERSION: "0.9.3"
+  CARGO_DENY_VERSION: "0.20.2"
+  INNO_SETUP_VERSION: "6.7.1"
+  INNO_SETUP_URL: https://github.com/jrsoftware/issrc/releases/download/is-6_7_1/innosetup-6.7.1.exe
+  INNO_SETUP_SIZE: "10619024"
+  INNO_SETUP_SHA256: 4d11e8050b6185e0d49bd9e8cc661a7a59f44959a621d31d11033124c4e8a7b0
+  BUILD_ARTIFACT_NAME: tesseract-windows-unsigned
+  SIGNED_ARTIFACT_NAME: tesseract-windows-signed-manifest
+  FINAL_ARTIFACT_NAME: tesseract-windows-release
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    timeout-minutes: 240
+    permissions:
+      contents: read
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
+      release_windows_version: ${{ steps.release.outputs.release_windows_version }}
+      release_commit: ${{ steps.release.outputs.release_commit }}
+      tag_object_sha: ${{ steps.release.outputs.tag_object_sha }}
+      is_prerelease: ${{ steps.release.outputs.is_prerelease }}
+
+    steps:
+      - name: Check out the tagged source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up exact release Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-windows.lock.txt
+            requirements-release-signing.lock.txt
+
+      - name: Validate signed tag, main ancestry, and source version
+        id: release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if ($env:GITHUB_EVENT_NAME -ne "push" -or $env:GITHUB_REF_TYPE -ne "tag") {
+            throw "Official releases must be triggered by a pushed tag."
+          }
+          if ($env:RELEASE_TAG -notmatch '^v(?<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-rc\.(?:0|[1-9]\d*))?)$') {
+            throw "Release tag must be canonical vX.Y.Z or vX.Y.Z-rc.N: $env:RELEASE_TAG"
+          }
+          $version = $Matches.version
+          $isPrerelease = $version.Contains("-")
+
+          $headers = @{
+            Accept = "application/vnd.github+json"
+            Authorization = "Bearer $env:GH_TOKEN"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+          $escapedTag = [Uri]::EscapeDataString($env:RELEASE_TAG)
+          $refUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/ref/tags/$escapedTag"
+          $ref = Invoke-RestMethod -Method Get -Uri $refUri -Headers $headers
+          if ($ref.object.type -ne "tag") {
+            throw "Lightweight tags are not releasable; an annotated signed tag is required."
+          }
+          $tagObjectShaText = [string] $ref.object.sha
+          if ($tagObjectShaText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "GitHub tag reference returned an invalid tag-object SHA."
+          }
+          $tagObjectSha = $tagObjectShaText.ToLowerInvariant()
+
+          $tagObjectUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/tags/$tagObjectSha"
+          $tagObject = Invoke-RestMethod -Method Get -Uri $tagObjectUri -Headers $headers
+          if ($tagObject.tag -ne $env:RELEASE_TAG) {
+            throw "GitHub tag object name does not match the pushed ref."
+          }
+          if ($tagObject.object.type -ne "commit") {
+            throw "Nested or non-commit release tags are not allowed."
+          }
+          if ($tagObject.verification.verified -ne $true -or $tagObject.verification.reason -ne "valid") {
+            throw "GitHub did not verify the annotated tag signature: $($tagObject.verification.reason)"
+          }
+          $releaseCommitText = [string] $tagObject.object.sha
+          if ($releaseCommitText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "Verified release tag returned an invalid commit SHA."
+          }
+          $releaseCommit = $releaseCommitText.ToLowerInvariant()
+
+          # checkout intentionally does not persist the workflow token.  Resolve
+          # the current protected branch and its ancestry through authenticated
+          # GitHub APIs instead of teaching later build steps Git credentials.
+          $mainRefUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/ref/heads/main"
+          $mainRef = Invoke-RestMethod -Method Get -Uri $mainRefUri -Headers $headers
+          if ([string] $mainRef.ref -cne "refs/heads/main") {
+            throw "GitHub main reference name is not exact."
+          }
+          if ([string] $mainRef.object.type -cne "commit") {
+            throw "GitHub main reference does not target a commit."
+          }
+          $mainCommitText = [string] $mainRef.object.sha
+          if ($mainCommitText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "GitHub main reference returned an invalid commit SHA."
+          }
+          $mainCommit = $mainCommitText.ToLowerInvariant()
+
+          $compareUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/compare/${releaseCommit}...${mainCommit}"
+          $comparison = Invoke-RestMethod -Method Get -Uri $compareUri -Headers $headers
+          foreach ($requiredComparisonProperty in @(
+            "url",
+            "base_commit",
+            "merge_base_commit",
+            "status",
+            "ahead_by",
+            "behind_by",
+            "total_commits",
+            "commits"
+          )) {
+            if ($comparison.PSObject.Properties.Name -notcontains $requiredComparisonProperty) {
+              throw "GitHub comparison omitted '$requiredComparisonProperty'."
+            }
+          }
+          if ([string] $comparison.url -cne $compareUri) {
+            throw "GitHub comparison did not echo the exact release and main commits."
+          }
+
+          foreach ($countProperty in @("ahead_by", "behind_by", "total_commits")) {
+            $countValue = $comparison.$countProperty
+            if (
+              $null -eq $countValue -or
+              ($countValue -isnot [int] -and $countValue -isnot [long]) -or
+              [long] $countValue -lt 0
+            ) {
+              throw "GitHub comparison returned an invalid nonnegative integer for '$countProperty'."
+            }
+          }
+          if ($null -eq $comparison.commits) {
+            throw "GitHub comparison returned a null commits list."
+          }
+          $aheadBy = [long] $comparison.ahead_by
+          $behindBy = [long] $comparison.behind_by
+          $totalCommits = [long] $comparison.total_commits
+
+          $comparisonBaseText = [string] $comparison.base_commit.sha
+          $comparisonMergeBaseText = [string] $comparison.merge_base_commit.sha
+          if (
+            $comparisonBaseText -notmatch '^[0-9a-fA-F]{40}$' -or
+            $comparisonMergeBaseText -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "GitHub comparison returned an invalid base or merge-base SHA."
+          }
+          $comparisonBase = $comparisonBaseText.ToLowerInvariant()
+          $comparisonMergeBase = $comparisonMergeBaseText.ToLowerInvariant()
+          if (
+            $comparisonBase -cne $releaseCommit -or
+            $comparisonMergeBase -cne $releaseCommit
+          ) {
+            throw "Release tag target is not contained in the current protected main branch."
+          }
+
+          $compareCommits = @($comparison.commits)
+          $comparisonStatus = [string] $comparison.status
+          switch -CaseSensitive ($comparisonStatus) {
+            "identical" {
+              if (
+                $mainCommit -cne $releaseCommit -or
+                $aheadBy -ne 0 -or
+                $behindBy -ne 0 -or
+                $totalCommits -ne 0 -or
+                $compareCommits.Count -ne 0
+              ) {
+                throw "GitHub identical comparison is internally inconsistent."
+              }
+            }
+            "ahead" {
+              # With no pagination parameters GitHub returns at most 250
+              # commits, but documents that the last item is still the newest
+              # commit in the complete comparison.
+              $expectedReturnedCommitCount = [Math]::Min($totalCommits, [long] 250)
+              if (
+                $mainCommit -ceq $releaseCommit -or
+                $aheadBy -lt 1 -or
+                $behindBy -ne 0 -or
+                $totalCommits -lt 1 -or
+                $aheadBy -ne $totalCommits -or
+                $compareCommits.Count -ne $expectedReturnedCommitCount
+              ) {
+                throw "GitHub ahead comparison is internally inconsistent."
+              }
+              $compareHeadText = [string] $compareCommits[-1].sha
+              if ($compareHeadText -notmatch '^[0-9a-fA-F]{40}$') {
+                throw "GitHub comparison returned an invalid final commit SHA."
+              }
+              if ($compareHeadText.ToLowerInvariant() -cne $mainCommit) {
+                throw "GitHub comparison head does not match the protected main reference."
+              }
+            }
+            default {
+              throw "GitHub comparison status '$comparisonStatus' does not prove release ancestry."
+            }
+          }
+          $localTagRef = "refs/tags/$env:RELEASE_TAG"
+
+          # Windows PowerShell 5 promotes native stderr to an ErrorRecord when
+          # ErrorActionPreference is Stop.  Capture each Git command under a
+          # temporary Continue policy, preserve its exit code immediately, and
+          # restore the fail-closed policy before validating the result.
+          function Invoke-ReleaseGitCapture {
+            param(
+              [Parameter(Mandatory = $true)]
+              [string[]] $Arguments
+            )
+
+            $capturedExit = -1
+            $capturedLines = @()
+            $savedErrorActionPreference = $ErrorActionPreference
+            try {
+              $ErrorActionPreference = "Continue"
+              $capturedLines = @(& git @Arguments 2>$null)
+              $capturedExit = $LASTEXITCODE
+            }
+            finally {
+              $ErrorActionPreference = $savedErrorActionPreference
+            }
+            return [PSCustomObject] @{
+              ExitCode = [int] $capturedExit
+              Lines = [object[]] @($capturedLines)
+            }
+          }
+
+          $localTagObjectResult = Invoke-ReleaseGitCapture -Arguments @(
+            "rev-parse",
+            "--verify",
+            $localTagRef
+          )
+          $localTagObjectOutput = @($localTagObjectResult.Lines)
+          if (
+            $localTagObjectResult.ExitCode -ne 0 -or
+            $localTagObjectOutput.Count -ne 1 -or
+            [string] $localTagObjectOutput[0] -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "Could not resolve the exact local release tag object."
+          }
+          $localTagObject = ([string] $localTagObjectOutput[0]).ToLowerInvariant()
+          if ($localTagObject -cne $tagObjectSha) {
+            throw "Local tag object does not match the GitHub tag object."
+          }
+
+          $localTagTypeResult = Invoke-ReleaseGitCapture -Arguments @(
+            "cat-file",
+            "-t",
+            $localTagObject
+          )
+          $localTagTypeOutput = @($localTagTypeResult.Lines)
+          if (
+            $localTagTypeResult.ExitCode -ne 0 -or
+            $localTagTypeOutput.Count -ne 1 -or
+            [string] $localTagTypeOutput[0] -cne "tag"
+          ) {
+            throw "The local release ref is not an annotated tag object."
+          }
+
+          $localTagPayloadResult = Invoke-ReleaseGitCapture -Arguments @(
+            "cat-file",
+            "-p",
+            $localTagObject
+          )
+          $localTagPayload = @($localTagPayloadResult.Lines)
+          if (
+            $localTagPayloadResult.ExitCode -ne 0 -or
+            $localTagPayload.Count -lt 4
+          ) {
+            throw "Could not read the local annotated tag payload."
+          }
+          if ([string] $localTagPayload[1] -cne "type commit") {
+            throw "Local annotated tag does not directly target a commit."
+          }
+          if ([string] $localTagPayload[0] -cne "object $releaseCommit") {
+            throw "Local annotated tag target does not match the verified GitHub tag."
+          }
+          if ([string] $localTagPayload[2] -cne "tag $env:RELEASE_TAG") {
+            throw "Local annotated tag name does not match the pushed ref."
+          }
+          $localCommit = ([string] $localTagPayload[0]).Substring(7).ToLowerInvariant()
+
+          $localHeadResult = Invoke-ReleaseGitCapture -Arguments @(
+            "rev-parse",
+            "--verify",
+            "HEAD^{commit}"
+          )
+          $localHeadOutput = @($localHeadResult.Lines)
+          if (
+            $localHeadResult.ExitCode -ne 0 -or
+            $localHeadOutput.Count -ne 1 -or
+            [string] $localHeadOutput[0] -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "Could not resolve the checked-out release commit."
+          }
+          $localHead = ([string] $localHeadOutput[0]).ToLowerInvariant()
+          if ($localHead -cne $releaseCommit) {
+            throw "Checked-out HEAD does not match the verified GitHub tag commit."
+          }
+
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $tagObjectSha `
+            -ExpectedCommit $releaseCommit
+
+          $sourceContractJson = (python -c "import json; from app_info import DEFAULT_RELEASE_VERSION_CONTRACT; print(json.dumps(DEFAULT_RELEASE_VERSION_CONTRACT, separators=(',', ':')))").Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $sourceContractJson) {
+            throw "Could not resolve the source release-version contract."
+          }
+          $sourceContract = $sourceContractJson | ConvertFrom-Json
+          $sourceVersion = [string] $sourceContract.version
+          $sourceWindowsVersion = [string] $sourceContract.windows_version_numeric
+          if (
+            $sourceVersion -cne $version -or
+            -not $sourceWindowsVersion
+          ) {
+            throw "Tag version '$version' does not match source version '$sourceVersion'."
+          }
+          python -c "import sys; expected=(3,12,7); assert sys.version_info[:3] == expected, sys.version"
+          if ($LASTEXITCODE -ne 0) {
+            throw "The exact release Python version is unavailable."
+          }
+
+          # A previous release makes the run non-repeatable.  A 404 is the only
+          # acceptable API failure; authentication and network errors fail closed.
+          $existingRelease = $null
+          try {
+            $releaseUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/releases/tags/$escapedTag"
+            $existingRelease = Invoke-RestMethod -Method Get -Uri $releaseUri -Headers $headers
+          }
+          catch {
+            $statusCode = if ($_.Exception.Response) {
+              [int] $_.Exception.Response.StatusCode
+            }
+            else {
+              0
+            }
+            if ($statusCode -ne 404) {
+              throw
+            }
+          }
+          if ($existingRelease) {
+            throw "A GitHub Release already exists for $env:RELEASE_TAG; refusing to replace it."
+          }
+
+          "release_version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_windows_version=$sourceWindowsVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_commit=$releaseCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "tag_object_sha=$tagObjectSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "is_prerelease=$($isPrerelease.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Install pinned Inno Setup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $installerPath = Join-Path $env:RUNNER_TEMP "innosetup-$env:INNO_SETUP_VERSION-$env:GITHUB_RUN_ATTEMPT.exe"
+          try {
+            Invoke-WebRequest `
+              -Uri $env:INNO_SETUP_URL `
+              -OutFile $installerPath `
+              -Headers @{ "User-Agent" = "Tesseract-release" }
+            $installer = Get-Item -LiteralPath $installerPath
+            if ($installer.Length -ne [int64] $env:INNO_SETUP_SIZE) {
+              throw "Inno Setup installer size mismatch."
+            }
+            $installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($installerHash -cne $env:INNO_SETUP_SHA256) {
+              throw "Inno Setup installer SHA-256 mismatch."
+            }
+            $installProcess = Start-Process `
+              -FilePath $installerPath `
+              -ArgumentList @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-") `
+              -WindowStyle Hidden `
+              -Wait `
+              -PassThru
+            if ($installProcess.ExitCode -notin @(0, 1641, 3010)) {
+              throw "Pinned Inno Setup installation failed with exit code $($installProcess.ExitCode)."
+            }
+          }
+          finally {
+            Remove-Item -LiteralPath $installerPath -Force -ErrorAction SilentlyContinue
+          }
+          # Official Inno Setup 6.7.1 binaries report a placeholder PE
+          # ProductVersion (0.0.0.0).  Bind the already hash-pinned installer
+          # to its machine-wide uninstall registration instead.
+          $innoUninstallKey = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1"
+          $innoRegistration = Get-ItemProperty -LiteralPath $innoUninstallKey -ErrorAction Stop
+          if ([string] $innoRegistration.DisplayVersion -cne $env:INNO_SETUP_VERSION) {
+            throw "Expected registered Inno Setup $env:INNO_SETUP_VERSION, got $($innoRegistration.DisplayVersion)."
+          }
+          $expectedInnoRoot = "${env:ProgramFiles(x86)}\Inno Setup 6"
+          $registeredInnoRoot = ([string] $innoRegistration.InstallLocation).TrimEnd('\')
+          if ($registeredInnoRoot -cne $expectedInnoRoot) {
+            throw "Pinned Inno Setup registered an unexpected install location: $registeredInnoRoot"
+          }
+          $iscc = Join-Path $registeredInnoRoot "ISCC.exe"
+          if (-not (Test-Path -LiteralPath $iscc -PathType Leaf)) {
+            throw "Pinned Inno Setup compiler was not installed."
+          }
+          "ISCC_PATH=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      # Shell flavor toolchain: Node.js for the web UI (ui/), Rust for the
+      # Tauri shell (shell/), and the two pinned license tools the release
+      # license/SBOM gate runs (scripts/shell_release_licenses.py cargo-inputs).
+      - name: Set up exact release Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install exact release Rust toolchain and license tools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          rustup toolchain install $env:RUST_VERSION --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { throw "rustup toolchain install failed." }
+          rustup default $env:RUST_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "rustup default failed." }
+          $rustc = (rustc --version | Out-String).Trim()
+          if ($rustc -notmatch "^rustc $([regex]::Escape($env:RUST_VERSION)) ") {
+            throw "Expected rustc $env:RUST_VERSION, got: $rustc"
+          }
+          $toolRoot = Join-Path $env:RUNNER_TEMP "cargo-license-tools"
+          cargo install --locked --root $toolRoot "cargo-deny@$env:CARGO_DENY_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw "cargo-deny install failed." }
+          cargo install --locked --root $toolRoot --features cli "cargo-about@$env:CARGO_ABOUT_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw "cargo-about install failed." }
+          (Join-Path $toolRoot "bin") | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build unsigned-by-policy release artifacts
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.release_version }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          .\scripts\build_windows.ps1 `
+            -Version $env:RELEASE_VERSION `
+            -ExpectedGitCommit $env:RELEASE_COMMIT `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -WorkflowRunId $env:GITHUB_RUN_ID
+
+      - name: Verify build metadata and unsigned manifest
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.release_version }}
+          RELEASE_WINDOWS_VERSION: ${{ steps.release.outputs.release_windows_version }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $releaseRoot = (Resolve-Path -LiteralPath "release").Path
+
+          function Resolve-One([string] $Pattern, [string] $Label) {
+            $matches = @(Get-ChildItem -LiteralPath $releaseRoot -File -Filter $Pattern)
+            if ($matches.Count -ne 1) {
+              throw "Expected exactly one $Label matching '$Pattern', found $($matches.Count)."
+            }
+            return $matches[0]
+          }
+
+          $installer = Resolve-One "Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe" "installer"
+          $portable = Resolve-One "Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip" "portable archive"
+          $sources = Resolve-One "Tesseract-$env:RELEASE_VERSION-third-party-sources.zip" "third-party source archive"
+          $sbom = Get-Item -LiteralPath (Join-Path $releaseRoot "sbom.cdx.json")
+          $metadataFile = Get-Item -LiteralPath (Join-Path $releaseRoot "release-metadata.json")
+          $manifest = Get-Item -LiteralPath (Join-Path $releaseRoot "SHA256SUMS.txt")
+          $payload = @($installer, $portable, $sbom, $metadataFile, $sources)
+
+          $packagedExe = Get-Item -LiteralPath "dist/Tesseract/Tesseract.exe"
+          foreach ($unsignedArtifact in @($packagedExe, $installer)) {
+            $authenticode = Get-AuthenticodeSignature -LiteralPath $unsignedArtifact.FullName
+            if ($authenticode.Status -ne [System.Management.Automation.SignatureStatus]::NotSigned) {
+              throw "Anonymous release artifact is not Authenticode-unsigned: $($unsignedArtifact.Name) ($($authenticode.Status))."
+            }
+          }
+          if ($packagedExe.VersionInfo.ProductVersion.Trim() -ne $env:RELEASE_VERSION) {
+            throw "Packaged EXE ProductVersion does not match the release tag version."
+          }
+          if ($packagedExe.VersionInfo.FileVersion.Trim() -ne $env:RELEASE_VERSION) {
+            throw "Packaged EXE FileVersion does not match the release tag version."
+          }
+          if ($installer.VersionInfo.ProductVersion.Trim() -ne $env:RELEASE_VERSION) {
+            throw "Installer ProductVersion does not match the release tag version."
+          }
+
+          $numericVersions = [ordered]@{
+            "packaged EXE FileVersion" = @(
+              $packagedExe.VersionInfo.FileMajorPart,
+              $packagedExe.VersionInfo.FileMinorPart,
+              $packagedExe.VersionInfo.FileBuildPart,
+              $packagedExe.VersionInfo.FilePrivatePart
+            ) -join "."
+            "packaged EXE ProductVersion" = @(
+              $packagedExe.VersionInfo.ProductMajorPart,
+              $packagedExe.VersionInfo.ProductMinorPart,
+              $packagedExe.VersionInfo.ProductBuildPart,
+              $packagedExe.VersionInfo.ProductPrivatePart
+            ) -join "."
+            "installer FileVersion" = @(
+              $installer.VersionInfo.FileMajorPart,
+              $installer.VersionInfo.FileMinorPart,
+              $installer.VersionInfo.FileBuildPart,
+              $installer.VersionInfo.FilePrivatePart
+            ) -join "."
+            "installer ProductVersion" = @(
+              $installer.VersionInfo.ProductMajorPart,
+              $installer.VersionInfo.ProductMinorPart,
+              $installer.VersionInfo.ProductBuildPart,
+              $installer.VersionInfo.ProductPrivatePart
+            ) -join "."
+          }
+          foreach ($numericVersion in $numericVersions.GetEnumerator()) {
+            if ($numericVersion.Value -cne $env:RELEASE_WINDOWS_VERSION) {
+              throw "$($numericVersion.Key) numeric value '$($numericVersion.Value)' does not match '$env:RELEASE_WINDOWS_VERSION'."
+            }
+          }
+
+          $metadata = Get-Content -Raw -LiteralPath $metadataFile.FullName | ConvertFrom-Json
+          if ($metadata.schema_version -ne 2) { throw "release-metadata.json must use schema 2." }
+          if ($metadata.version -ne $env:RELEASE_VERSION) { throw "Release metadata version mismatch." }
+          if ($metadata.tag -ne $env:RELEASE_TAG) { throw "Release metadata tag mismatch." }
+          if ($metadata.repository -ne $env:EXPECTED_REPOSITORY) { throw "Release metadata repository mismatch." }
+          if ($metadata.git_commit.ToLowerInvariant() -ne $env:RELEASE_COMMIT.ToLowerInvariant()) {
+            throw "Release metadata commit mismatch."
+          }
+          if ($metadata.dirty -ne $false) { throw "Official release metadata must record dirty=false." }
+          if ([string] $metadata.workflow_run_id -ne [string] $env:GITHUB_RUN_ID) {
+            throw "Release metadata workflow run mismatch."
+          }
+          if ($metadata.toolchain.windows_version_numeric -cne $env:RELEASE_WINDOWS_VERSION) {
+            throw "Release metadata Windows numeric version mismatch."
+          }
+          if ($metadata.artifact_mode -ne "portable-and-installer") {
+            throw "Official workflow must produce portable-and-installer artifacts."
+          }
+          if ($metadata.packaged_smoke -ne "passed") {
+            throw "Official workflow requires the packaged smoke to pass."
+          }
+          foreach ($testName in @(
+            "source_smoke",
+            "pytest",
+            "mihomo_config",
+            "packaged_smoke",
+            "helper_smoke",
+            "candidate_shell_smoke",
+            "candidate_directory",
+            "portable_zip",
+            "installed_smoke",
+            "installed_shell_scope",
+            "installer_tree"
+          )) {
+            if ($metadata.tests.$testName -ne "passed") {
+              throw "Official workflow requires metadata.tests.$testName=passed."
+            }
+          }
+          if ($metadata.tests.public_release_audit -ne "pending") {
+            throw "Unsigned staging must await the protected public-release audit."
+          }
+          $trustedUpdateKeyIds = @($metadata.trusted_update_key_ids | ForEach-Object { [string] $_ })
+          if ($trustedUpdateKeyIds.Count -lt 1) {
+            throw "Official metadata must contain at least one trusted update key ID."
+          }
+          if (@($trustedUpdateKeyIds | Where-Object { $_ -notmatch '^sha256:[0-9a-f]{64}$' }).Count) {
+            throw "Official metadata contains a malformed trusted update key ID."
+          }
+          $canonicalTrustedUpdateKeyIds = @($trustedUpdateKeyIds | Sort-Object -Unique)
+          if (($canonicalTrustedUpdateKeyIds -join "`n") -ne ($trustedUpdateKeyIds -join "`n")) {
+            throw "trusted_update_key_ids must be sorted and unique."
+          }
+          if ($metadata.release_signature -ne "pending" -or $null -ne $metadata.key_id) {
+            throw "Unsigned staging metadata must await the protected manifest-signing job."
+          }
+          if ($metadata.authenticode -ne "unsigned-by-policy") {
+            throw "Anonymous release metadata must record authenticode=unsigned-by-policy."
+          }
+
+          $bytes = [IO.File]::ReadAllBytes($manifest.FullName)
+          if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xef -and $bytes[1] -eq 0xbb -and $bytes[2] -eq 0xbf) {
+            throw "SHA256SUMS.txt must not contain a UTF-8 BOM."
+          }
+          $utf8 = [Text.UTF8Encoding]::new($false, $true)
+          $text = $utf8.GetString($bytes)
+          if ($text.Contains("`r") -or -not $text.EndsWith("`n")) {
+            throw "SHA256SUMS.txt must use LF endings and end with one newline."
+          }
+          $lines = @($text.Split("`n", [StringSplitOptions]::RemoveEmptyEntries))
+          $manifestNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+          foreach ($line in $lines) {
+            if ($line -notmatch '^([0-9a-f]{64})  ([^\\/]+)$') {
+              throw "Malformed SHA256SUMS.txt line: $line"
+            }
+            $expectedHash = $Matches[1]
+            $name = $Matches[2]
+            if (-not $manifestNames.Add($name)) { throw "Duplicate manifest entry: $name" }
+            $artifactPath = Join-Path $releaseRoot $name
+            if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+              throw "Manifest entry is missing: $name"
+            }
+            $actualHash = (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actualHash -ne $expectedHash) { throw "SHA256 mismatch for $name" }
+          }
+          $expectedNames = @($payload.Name | Sort-Object)
+          $actualNames = @($manifestNames | Sort-Object)
+          if (Compare-Object -ReferenceObject $expectedNames -DifferenceObject $actualNames) {
+            throw "SHA256SUMS.txt must cover exactly the five fixed payload files."
+          }
+          $allowedFiles = @($expectedNames + "SHA256SUMS.txt" | Sort-Object)
+          $releaseFiles = @(Get-ChildItem -LiteralPath $releaseRoot -File | ForEach-Object Name | Sort-Object)
+          if (Compare-Object -ReferenceObject $allowedFiles -DifferenceObject $releaseFiles) {
+            throw "Unexpected file found in unsigned release staging."
+          }
+
+      - name: Upload unsigned build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  sign-release-manifest:
+    needs: build-windows
+    runs-on: windows-2022
+    timeout-minutes: 30
+    environment:
+      name: release
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out the exact tagged source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          # The private-denylist audit below must see every reachable object in
+          # the public repository, not merely the tagged commit's shallow tip.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Revalidate build-bound signed tag before protected signing
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_TAG_OBJECT: ${{ needs.build-windows.outputs.tag_object_sha }}
+          EXPECTED_RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+            -ExpectedCommit $env:EXPECTED_RELEASE_COMMIT
+
+      - name: Set up exact signing Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-release-signing.lock.txt
+
+      - name: Install hash-locked signing dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check --no-deps --require-hashes -r requirements-release-signing.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw "Signing dependency installation failed." }
+
+      - name: Download verified unsigned build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.BUILD_ARTIFACT_NAME }}
+          path: release
+
+      - name: Audit public history and release assets with private denylist
+        shell: pwsh
+        env:
+          PRIVATE_DENYLIST: ${{ secrets.PUBLIC_RELEASE_PRIVATE_DENYLIST }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $denylistPath = Join-Path $env:RUNNER_TEMP "tesseract-public-release-denylist-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT.txt"
+          $metadataTempPath = "release/release-metadata.json.audit"
+          try {
+            if ([string]::IsNullOrWhiteSpace($env:PRIVATE_DENYLIST)) {
+              throw "The protected PUBLIC_RELEASE_PRIVATE_DENYLIST secret is required."
+            }
+            [IO.File]::WriteAllText(
+              $denylistPath,
+              $env:PRIVATE_DENYLIST,
+              [Text.UTF8Encoding]::new($false)
+            )
+            python scripts/audit_public_release.py `
+              --repo-root . `
+              --deny-file $denylistPath `
+              --artifact release
+            if ($LASTEXITCODE -ne 0) {
+              throw "Public release anonymity/secret audit failed."
+            }
+
+            $metadataPath = "release/release-metadata.json"
+            $metadata = Get-Content -Raw -LiteralPath $metadataPath | ConvertFrom-Json
+            if ($metadata.schema_version -ne 2 -or $metadata.tests.public_release_audit -ne "pending") {
+              throw "Release metadata does not expose the expected pending public audit gate."
+            }
+            $metadata.tests.public_release_audit = "passed"
+            [IO.File]::WriteAllText(
+              $metadataTempPath,
+              ($metadata | ConvertTo-Json -Depth 10) + "`n",
+              [Text.UTF8Encoding]::new($false)
+            )
+            Move-Item -LiteralPath $metadataTempPath -Destination $metadataPath -Force
+          }
+          finally {
+            Remove-Item -LiteralPath $metadataTempPath -Force -ErrorAction SilentlyContinue
+            Remove-Item -LiteralPath $denylistPath -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Materialize encrypted update-signing key
+        shell: pwsh
+        env:
+          PRIVATE_KEY_B64: ${{ secrets.TESSERACT_UPDATE_PRIVATE_KEY_B64 }}
+          TESSERACT_UPDATE_KEY_PASSWORD: ${{ secrets.TESSERACT_UPDATE_KEY_PASSWORD }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not $env:PRIVATE_KEY_B64 -or -not $env:TESSERACT_UPDATE_KEY_PASSWORD) {
+            throw "Both protected update-signing secrets are required."
+          }
+          $keyPath = Join-Path $env:RUNNER_TEMP "tesseract-update-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT.pem"
+          try {
+            $keyBytes = [Convert]::FromBase64String($env:PRIVATE_KEY_B64)
+          }
+          catch {
+            throw "TESSERACT_UPDATE_PRIVATE_KEY_B64 is not valid Base64."
+          }
+          if ($keyBytes.Length -eq 0) { throw "Decoded update-signing key is empty." }
+          [IO.File]::WriteAllBytes($keyPath, $keyBytes)
+
+      - name: Sign release metadata and SHA256 manifest
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_TAG_OBJECT: ${{ needs.build-windows.outputs.tag_object_sha }}
+          EXPECTED_RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+          TESSERACT_UPDATE_KEY_PASSWORD: ${{ secrets.TESSERACT_UPDATE_KEY_PASSWORD }}
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+            -ExpectedCommit $env:EXPECTED_RELEASE_COMMIT
+
+          $privateKeyPath = Join-Path $env:RUNNER_TEMP "tesseract-update-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT.pem"
+          python scripts/sign_release_manifest.py `
+            --manifest release/SHA256SUMS.txt `
+            --metadata release/release-metadata.json `
+            --payload "release/Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe" `
+            --payload "release/Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip" `
+            --payload release/sbom.cdx.json `
+            --payload release/release-metadata.json `
+            --payload "release/Tesseract-$env:RELEASE_VERSION-third-party-sources.zip" `
+            --private-key $privateKeyPath `
+            --password-env TESSERACT_UPDATE_KEY_PASSWORD `
+            --output release/SHA256SUMS.txt.sig
+          if ($LASTEXITCODE -ne 0) { throw "Release manifest signing failed." }
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+            -ExpectedCommit $env:EXPECTED_RELEASE_COMMIT
+
+      - name: Remove private signing material
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          $privateKeyPath = Join-Path $env:RUNNER_TEMP "tesseract-update-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT.pem"
+          if (Test-Path -LiteralPath $privateKeyPath -PathType Leaf) {
+            Remove-Item -LiteralPath $privateKeyPath -Force
+          }
+
+      - name: Verify signed manifest with embedded public key
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+        run: |
+          $publicKeyPath = Join-Path $env:RUNNER_TEMP "tesseract-update-public-$env:GITHUB_RUN_ID.txt"
+          $env:TESSERACT_PUBLIC_KEY_PATH = $publicKeyPath
+          try {
+            python -c "import json, os; from pathlib import Path; import app_info; from app_update_signing import decode_public_key, public_key_id; signature=json.loads(Path('release/SHA256SUMS.txt.sig').read_text(encoding='utf-8')); keys=(getattr(app_info, 'APP_UPDATE_SIGNING_PUBLIC_KEY', ''), *tuple(getattr(app_info, 'APP_UPDATE_SIGNING_PUBLIC_KEYS', ()))); key_by_id={public_key_id(decode_public_key(key)): key for key in keys if key}; key=key_by_id.get(str(signature.get('key_id') or '')); assert key, 'signature key_id is not in the embedded update-signing key ring'; Path(os.environ['TESSERACT_PUBLIC_KEY_PATH']).write_text(key + '\n', encoding='ascii', newline='\n')"
+            if ($LASTEXITCODE -ne 0) { throw "Could not materialize the matching embedded public key." }
+            python scripts/verify_release_manifest.py `
+              --manifest release/SHA256SUMS.txt `
+              --signature release/SHA256SUMS.txt.sig `
+              --public-key $publicKeyPath
+            if ($LASTEXITCODE -ne 0) { throw "Signed release manifest verification failed." }
+          }
+          finally {
+            Remove-Item -LiteralPath $publicKeyPath -Force -ErrorAction SilentlyContinue
+          }
+
+          $metadata = Get-Content -Raw -LiteralPath release/release-metadata.json | ConvertFrom-Json
+          $signature = Get-Content -Raw -LiteralPath release/SHA256SUMS.txt.sig | ConvertFrom-Json
+          if ($metadata.release_signature -ne "ed25519-valid") {
+            throw "Signed metadata must record release_signature=ed25519-valid."
+          }
+          if (-not $metadata.key_id -or $metadata.key_id -ne $signature.key_id) {
+            throw "Signed metadata key_id does not match the detached signature."
+          }
+          if (@($metadata.trusted_update_key_ids) -notcontains $signature.key_id) {
+            throw "Signed metadata key_id is not in trusted_update_key_ids."
+          }
+          if ($metadata.authenticode -ne "unsigned-by-policy") {
+            throw "Manifest signing must not claim Authenticode signing."
+          }
+          if ($metadata.tests.public_release_audit -ne "passed") {
+            throw "Signed metadata must record the protected public-release audit as passed."
+          }
+
+          $expectedPayloadNames = @(
+            "Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe",
+            "Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip",
+            "Tesseract-$env:RELEASE_VERSION-third-party-sources.zip",
+            "sbom.cdx.json",
+            "release-metadata.json"
+          ) | Sort-Object
+          $actualPayloadNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+          foreach ($line in @(Get-Content -LiteralPath release/SHA256SUMS.txt)) {
+            if ($line -notmatch '^([0-9a-f]{64})  ([^\\/]+)$') {
+              throw "Malformed signed manifest line: $line"
+            }
+            $expectedHash = $Matches[1]
+            $name = $Matches[2]
+            if (-not $actualPayloadNames.Add($name)) { throw "Duplicate signed manifest entry: $name" }
+            $path = Join-Path release $name
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Signed payload is missing: $name" }
+            $actualHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actualHash -ne $expectedHash) { throw "Signed payload SHA256 mismatch: $name" }
+          }
+          if (Compare-Object -ReferenceObject $expectedPayloadNames -DifferenceObject @($actualPayloadNames | Sort-Object)) {
+            throw "Signed manifest does not cover exactly the five fixed payload files."
+          }
+
+      - name: Revalidate build-bound signed tag before signed artifact upload
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_TAG_OBJECT: ${{ needs.build-windows.outputs.tag_object_sha }}
+          EXPECTED_RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+            -ExpectedCommit $env:EXPECTED_RELEASE_COMMIT
+
+      - name: Upload signed release staging
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.SIGNED_ARTIFACT_NAME }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  attest-release:
+    needs:
+      - build-windows
+      - sign-release-manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Download signed release staging
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.SIGNED_ARTIFACT_NAME }}
+          path: release
+
+      - name: Confirm signed staging file set
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+        run: |
+          $expected = @(
+            "Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe",
+            "Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip",
+            "Tesseract-$env:RELEASE_VERSION-third-party-sources.zip",
+            "sbom.cdx.json",
+            "release-metadata.json",
+            "SHA256SUMS.txt",
+            "SHA256SUMS.txt.sig"
+          ) | Sort-Object
+          $actual = @(Get-ChildItem -LiteralPath release -File | ForEach-Object Name | Sort-Object)
+          if (Compare-Object -ReferenceObject $expected -DifferenceObject $actual) {
+            throw "Signed release staging contains a missing or unexpected file."
+          }
+
+      - name: Attest every signed release staging file
+        id: attest
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: release/*
+          show-summary: true
+
+      - name: Preserve attestation bundle as a fixed release asset
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+          GENERATED_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          if (-not $env:GENERATED_BUNDLE -or -not (Test-Path -LiteralPath $env:GENERATED_BUNDLE -PathType Leaf)) {
+            throw "GitHub attestation action did not produce a bundle."
+          }
+          $destination = "release/Tesseract-$env:RELEASE_VERSION-attestation.sigstore.json"
+          Copy-Item -LiteralPath $env:GENERATED_BUNDLE -Destination $destination
+          if ((Get-Item -LiteralPath $destination).Length -le 0) {
+            throw "Attestation bundle is empty."
+          }
+
+      - name: Upload final immutable release staging
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.FINAL_ARTIFACT_NAME }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
+  publish-release:
+    needs:
+      - build-windows
+      - attest-release
+    # The hash-locked verification requirements intentionally contain Windows
+    # CPython 3.12 x64 wheel hashes, so the final independent verification also
+    # runs on the fixed Windows image.
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out verifier from the exact tagged source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up exact verification Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-release-signing.lock.txt
+
+      - name: Install hash-locked verification dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check --no-deps --require-hashes -r requirements-release-signing.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw "Verification dependency installation failed." }
+
+      - name: Download final immutable release staging
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ env.FINAL_ARTIFACT_NAME }}
+          path: release
+
+      - name: Final signature, provenance, and publication preflight
+        id: publish-preflight
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+          RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $publicKeyPath = Join-Path $env:RUNNER_TEMP "tesseract-update-public-$env:GITHUB_RUN_ID.txt"
+          $env:TESSERACT_PUBLIC_KEY_PATH = $publicKeyPath
+          try {
+            python -c "import json, os; from pathlib import Path; import app_info; from app_update_signing import decode_public_key, public_key_id; signature=json.loads(Path('release/SHA256SUMS.txt.sig').read_text(encoding='utf-8')); keys=(getattr(app_info, 'APP_UPDATE_SIGNING_PUBLIC_KEY', ''), *tuple(getattr(app_info, 'APP_UPDATE_SIGNING_PUBLIC_KEYS', ()))); key_by_id={public_key_id(decode_public_key(key)): key for key in keys if key}; key=key_by_id.get(str(signature.get('key_id') or '')); assert key, 'signature key_id is not in the embedded update-signing key ring'; Path(os.environ['TESSERACT_PUBLIC_KEY_PATH']).write_text(key + '\n', encoding='ascii', newline='\n')"
+            if ($LASTEXITCODE -ne 0) { throw "Could not materialize the matching embedded public key." }
+            python scripts/verify_release_manifest.py `
+              --manifest release/SHA256SUMS.txt `
+              --signature release/SHA256SUMS.txt.sig `
+              --public-key $publicKeyPath
+            if ($LASTEXITCODE -ne 0) { throw "Final detached signature verification failed." }
+          }
+          finally {
+            Remove-Item -LiteralPath $publicKeyPath -Force -ErrorAction SilentlyContinue
+          }
+
+          $expectedNames = @(
+            "Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe",
+            "Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip",
+            "Tesseract-$env:RELEASE_VERSION-third-party-sources.zip",
+            "sbom.cdx.json",
+            "release-metadata.json",
+            "SHA256SUMS.txt",
+            "SHA256SUMS.txt.sig",
+            "Tesseract-$env:RELEASE_VERSION-attestation.sigstore.json"
+          )
+          $duplicateNames = @($expectedNames | Group-Object | Where-Object Count -gt 1)
+          if ($duplicateNames) { throw "Duplicate publication asset names are not allowed." }
+          $actualNames = @(Get-ChildItem -LiteralPath release -File | ForEach-Object Name | Sort-Object)
+          if (Compare-Object -ReferenceObject ($expectedNames | Sort-Object) -DifferenceObject $actualNames) {
+            throw "Final release staging contains a missing or unexpected asset."
+          }
+          foreach ($name in $expectedNames) {
+            $path = Join-Path "release" $name
+            if ((Get-Item -LiteralPath $path).Length -le 0) { throw "Release asset is empty: $name" }
+          }
+
+          $bundleName = "Tesseract-$env:RELEASE_VERSION-attestation.sigstore.json"
+          $bundlePath = Join-Path "release" $bundleName
+          foreach ($name in @($expectedNames | Where-Object { $_ -ne $bundleName })) {
+            $path = Join-Path "release" $name
+            & gh attestation verify $path `
+              --repo $env:EXPECTED_REPOSITORY `
+              --signer-repo $env:EXPECTED_REPOSITORY `
+              --signer-workflow "$env:EXPECTED_REPOSITORY/.github/workflows/release-windows.yml" `
+              --source-ref "refs/tags/$env:RELEASE_TAG" `
+              --bundle $bundlePath
+            if ($LASTEXITCODE -ne 0) {
+              throw "GitHub/Sigstore attestation verification failed for $name."
+            }
+          }
+
+          $metadata = Get-Content -Raw -LiteralPath release/release-metadata.json | ConvertFrom-Json
+          $signature = Get-Content -Raw -LiteralPath release/SHA256SUMS.txt.sig | ConvertFrom-Json
+          if ($metadata.version -ne $env:RELEASE_VERSION) { throw "Final metadata version mismatch." }
+          if ($metadata.repository -ne $env:EXPECTED_REPOSITORY) { throw "Final metadata repository mismatch." }
+          if ($metadata.git_commit.ToLowerInvariant() -ne $env:RELEASE_COMMIT.ToLowerInvariant()) {
+            throw "Final metadata commit mismatch."
+          }
+          if ($metadata.release_signature -ne "ed25519-valid") {
+            throw "Final metadata does not record a verified Ed25519 release signature."
+          }
+          if (-not $metadata.key_id -or $metadata.key_id -ne $signature.key_id) {
+            throw "Final metadata key_id does not match the detached signature."
+          }
+          if (@($metadata.trusted_update_key_ids) -notcontains $signature.key_id) {
+            throw "Final signature key_id is not in trusted_update_key_ids."
+          }
+          if ($metadata.authenticode -ne "unsigned-by-policy") {
+            throw "Final metadata must preserve the anonymous Authenticode policy."
+          }
+          if ($metadata.tests.public_release_audit -ne "passed") {
+            throw "Final metadata must preserve the passed public-release audit gate."
+          }
+
+          $expectedPayloadNames = @(
+            "Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe",
+            "Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip",
+            "Tesseract-$env:RELEASE_VERSION-third-party-sources.zip",
+            "sbom.cdx.json",
+            "release-metadata.json"
+          ) | Sort-Object
+          $actualPayloadNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+          foreach ($line in @(Get-Content -LiteralPath release/SHA256SUMS.txt)) {
+            if ($line -notmatch '^([0-9a-f]{64})  ([^\\/]+)$') {
+              throw "Malformed final manifest line: $line"
+            }
+            $expectedHash = $Matches[1]
+            $name = $Matches[2]
+            if (-not $actualPayloadNames.Add($name)) { throw "Duplicate final manifest entry: $name" }
+            $path = Join-Path release $name
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Final signed payload is missing: $name" }
+            $actualHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actualHash -ne $expectedHash) { throw "Final signed payload SHA256 mismatch: $name" }
+          }
+          if (Compare-Object -ReferenceObject $expectedPayloadNames -DifferenceObject @($actualPayloadNames | Sort-Object)) {
+            throw "Final manifest does not cover exactly the five fixed payload files."
+          }
+
+          $headers = @{
+            Accept = "application/vnd.github+json"
+            Authorization = "Bearer $env:GH_TOKEN"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+          $escapedTag = [Uri]::EscapeDataString($env:RELEASE_TAG)
+          $existingRelease = $null
+          try {
+            $releaseUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/releases/tags/$escapedTag"
+            $existingRelease = Invoke-RestMethod -Method Get -Uri $releaseUri -Headers $headers
+          }
+          catch {
+            $statusCode = if ($_.Exception.Response) {
+              [int] $_.Exception.Response.StatusCode
+            }
+            else {
+              0
+            }
+            if ($statusCode -ne 404) { throw }
+          }
+          if ($existingRelease) {
+            $assetNames = @($existingRelease.assets | ForEach-Object name)
+            throw "Release already exists for $env:RELEASE_TAG with assets [$($assetNames -join ', ')]; refusing overwrite."
+          }
+
+      - name: Publish new GitHub Release without replacement
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ needs.build-windows.outputs.release_version }}
+          RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+          EXPECTED_TAG_OBJECT: ${{ needs.build-windows.outputs.tag_object_sha }}
+          IS_PRERELEASE: ${{ needs.build-windows.outputs.is_prerelease }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+            -ExpectedCommit $env:RELEASE_COMMIT
+
+          $assets = @(
+            "release/Tesseract-Setup-$env:RELEASE_VERSION-win-x64.exe",
+            "release/Tesseract-$env:RELEASE_VERSION-win-x64-portable.zip",
+            "release/sbom.cdx.json",
+            "release/release-metadata.json",
+            "release/Tesseract-$env:RELEASE_VERSION-third-party-sources.zip",
+            "release/SHA256SUMS.txt",
+            "release/SHA256SUMS.txt.sig",
+            "release/Tesseract-$env:RELEASE_VERSION-attestation.sigstore.json"
+          )
+          $appNotesStart = "<!-- tesseract-app-notes:start -->"
+          $appNotesEnd = "<!-- tesseract-app-notes:end -->"
+          $releaseBodyPath = Join-Path `
+            $env:RUNNER_TEMP `
+            "tesseract-release-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT.md"
+          try {
+            $headers = @{
+              Accept = "application/vnd.github+json"
+              Authorization = "Bearer $env:GH_TOKEN"
+              "X-GitHub-Api-Version" = "2022-11-28"
+            }
+            $notesRequest = @{
+              tag_name = $env:RELEASE_TAG
+              target_commitish = $env:RELEASE_COMMIT
+            } | ConvertTo-Json
+            $generatedNotes = Invoke-RestMethod `
+              -Method Post `
+              -Uri "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/releases/generate-notes" `
+              -Headers $headers `
+              -ContentType "application/json" `
+              -Body $notesRequest
+            $changelog = ([string] $generatedNotes.body) -replace "`r`n?", "`n"
+            if ([string]::IsNullOrWhiteSpace($changelog)) {
+              throw "GitHub generated an empty changelog; refusing to publish ambiguous app notes."
+            }
+            if ($changelog.Contains($appNotesStart) -or $changelog.Contains($appNotesEnd)) {
+              throw "Generated changelog contains a reserved Tesseract app-notes marker."
+            }
+
+            # Only the generated changelog belongs between these markers.  The
+            # updater extracts this section for its explanation window; the
+            # installation/signature policy remains visible on GitHub only.
+            $releaseBody = @(
+              $appNotesStart,
+              $changelog.Trim(),
+              "",
+              $appNotesEnd,
+              "",
+              "## Installation and signature verification",
+              "",
+              "> [!WARNING]",
+              '> Windows packages are intentionally not Authenticode-signed. Windows may show an Unknown Publisher or SmartScreen warning. Verify `SHA256SUMS.txt.sig`, SHA-256 hashes, and the GitHub attestation before installation.',
+              "",
+              "The detached Ed25519 signature proves that the checksum manifest was authorized by the Tesseract project update key. It is not an Authenticode certificate and does not remove Windows publisher warnings."
+            ) -join "`n"
+            [IO.File]::WriteAllText(
+              $releaseBodyPath,
+              $releaseBody + "`n",
+              [Text.UTF8Encoding]::new($false)
+            )
+
+            $createArguments = @(
+              "release", "create", $env:RELEASE_TAG
+            ) + $assets + @(
+              "--repo", $env:EXPECTED_REPOSITORY,
+              "--verify-tag",
+              "--fail-on-no-commits",
+              "--draft",
+              "--notes-file", $releaseBodyPath,
+              "--title", "Tesseract $env:RELEASE_TAG"
+            )
+            if ($env:IS_PRERELEASE -eq "true") {
+              $createArguments += "--prerelease"
+            }
+            # Recheck immediately before the externally visible write.  This
+            # rejects same-commit replacement with either a new annotated tag
+            # object or a lightweight tag during notes generation.
+            & .\scripts\verify_release_tag_identity.ps1 `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -Tag $env:RELEASE_TAG `
+              -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+              -ExpectedCommit $env:RELEASE_COMMIT
+            # Upload into an explicit draft first. This creates a checkpoint
+            # after every asset has arrived but before the Release is public.
+            # Existing releases and conflicting assets still fail closed; no
+            # overwrite or clobber path is permitted.
+            & gh @createArguments
+            if ($LASTEXITCODE -ne 0) {
+              throw "GitHub draft Release creation or asset upload failed; no overwrite fallback is permitted."
+            }
+
+            $draftJson = & gh release view $env:RELEASE_TAG `
+              --repo $env:EXPECTED_REPOSITORY `
+              --json "tagName,isDraft,isPrerelease,name,assets"
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($draftJson -join "`n"))) {
+              throw "Could not read back the uploaded draft Release. The draft is retained for manual inspection."
+            }
+            $draftRelease = ($draftJson -join "`n") | ConvertFrom-Json
+            $expectedPrerelease = $env:IS_PRERELEASE -eq "true"
+            if (
+              [string] $draftRelease.tagName -cne $env:RELEASE_TAG -or
+              [string] $draftRelease.name -cne "Tesseract $env:RELEASE_TAG" -or
+              $draftRelease.isDraft -ne $true -or
+              [bool] $draftRelease.isPrerelease -ne $expectedPrerelease
+            ) {
+              throw "Uploaded draft Release identity or state mismatch. The draft is retained for manual inspection."
+            }
+
+            $expectedAssetNames = @($assets | ForEach-Object { Split-Path -Leaf $_ }) | Sort-Object
+            $actualAssetNames = @($draftRelease.assets | ForEach-Object { [string] $_.name }) | Sort-Object
+            if (Compare-Object -ReferenceObject $expectedAssetNames -DifferenceObject $actualAssetNames) {
+              throw "Uploaded draft Release asset set mismatch. The draft is retained for manual inspection."
+            }
+            foreach ($asset in @($draftRelease.assets)) {
+              $assetName = [string] $asset.name
+              $localAsset = $assets | Where-Object { (Split-Path -Leaf $_) -ceq $assetName }
+              if (@($localAsset).Count -ne 1) {
+                throw "Uploaded draft Release contains an unexpected or duplicate asset: $assetName"
+              }
+              $localSize = (Get-Item -LiteralPath $localAsset).Length
+              if ([long] $asset.size -ne $localSize) {
+                throw "Uploaded draft Release asset size mismatch: $assetName"
+              }
+              $localDigest = "sha256:$((Get-FileHash -LiteralPath $localAsset -Algorithm SHA256).Hash.ToLowerInvariant())"
+              if ([string] $asset.digest -cne $localDigest) {
+                throw "Uploaded draft Release asset digest mismatch: $assetName"
+              }
+            }
+
+            # Recheck only after all assets are uploaded and immediately before
+            # changing the draft into an externally visible Release.
+            & .\scripts\verify_release_tag_identity.ps1 `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -Tag $env:RELEASE_TAG `
+              -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+              -ExpectedCommit $env:RELEASE_COMMIT
+
+            $publishArguments = @(
+              "release", "edit", $env:RELEASE_TAG,
+              "--repo", $env:EXPECTED_REPOSITORY,
+              "--draft=false"
+            )
+            if ($expectedPrerelease) {
+              $publishArguments += @("--prerelease", "--latest=false")
+            }
+            else {
+              $publishArguments += @("--prerelease=false", "--latest")
+            }
+            & gh @publishArguments
+            if ($LASTEXITCODE -ne 0) {
+              throw "GitHub draft publication command failed. Remote state is uncertain; no automatic retry or replacement is permitted."
+            }
+
+            # A repository tag ruleset is the primary write-time exclusion.
+            # This postcondition also makes any concurrent replacement visible
+            # instead of reporting success on a different tag object.
+            & .\scripts\verify_release_tag_identity.ps1 `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -Tag $env:RELEASE_TAG `
+              -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+              -ExpectedCommit $env:RELEASE_COMMIT
+
+            $publishedJson = & gh release view $env:RELEASE_TAG `
+              --repo $env:EXPECTED_REPOSITORY `
+              --json "tagName,isDraft,isImmutable,isPrerelease,name,assets,publishedAt"
+            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($publishedJson -join "`n"))) {
+              throw "Could not verify the published GitHub Release. No automatic retry is permitted."
+            }
+            $publishedRelease = ($publishedJson -join "`n") | ConvertFrom-Json
+            $publishedAssetNames = @($publishedRelease.assets | ForEach-Object { [string] $_.name }) | Sort-Object
+            if (
+              [string] $publishedRelease.tagName -cne $env:RELEASE_TAG -or
+              [string] $publishedRelease.name -cne "Tesseract $env:RELEASE_TAG" -or
+              $publishedRelease.isDraft -ne $false -or
+              $publishedRelease.isImmutable -ne $true -or
+              [bool] $publishedRelease.isPrerelease -ne $expectedPrerelease -or
+              [string]::IsNullOrWhiteSpace([string] $publishedRelease.publishedAt) -or
+              (Compare-Object -ReferenceObject $expectedAssetNames -DifferenceObject $publishedAssetNames)
+            ) {
+              throw "Published GitHub Release identity, state, or asset set mismatch. No automatic retry is permitted."
+            }
+
+            # Close the post-publication observation window as well: Release
+            # state and the exact build-bound tag object must both be current
+            # at the final successful workflow boundary.
+            & .\scripts\verify_release_tag_identity.ps1 `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -Tag $env:RELEASE_TAG `
+              -ExpectedTagObjectSha $env:EXPECTED_TAG_OBJECT `
+              -ExpectedCommit $env:RELEASE_COMMIT
+          }
+          finally {
+            Remove-Item -LiteralPath $releaseBodyPath -Force -ErrorAction SilentlyContinue
+          }

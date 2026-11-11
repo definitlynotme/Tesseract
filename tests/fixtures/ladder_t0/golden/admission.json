@@ -1,0 +1,1980 @@
+{
+ "gate_contract_unavailable": {
+  "calls": {},
+  "gate": {
+   "binding": null,
+   "group": null,
+   "reason": "contract_unavailable"
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=gated reason=contract_unavailable predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-8ee154b9e86c0e92 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=contract_unavailable episode=7)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "contract_unavailable"
+  },
+  "register_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> loss_total=0 observer=ob-efcf2c67b7ccb1f7 scope=sc-1033936d7dddda7f scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> loss_total=0 observer=ob-efcf2c67b7ccb1f7 scope=sc-1033936d7dddda7f scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-13e23e579e681dd8 seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "contract_unavailable"
+  }
+ },
+ "gate_d4_busy": {
+  "calls": {},
+  "gate": {
+   "binding": [
+    [
+     "FINAL-EXIT",
+     "PROXY-FALLBACK",
+     "TIER3-AUTO",
+     "n1"
+    ],
+    "n1"
+   ],
+   "group": [
+    "TIER3-AUTO",
+    "n1",
+    "http://t0-tier3.test/generate_204",
+    "204"
+   ],
+   "reason": null
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=gated reason=d4_busy predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-e013279a0b9b5f05 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=d4_busy episode=7)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "d4_busy"
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> loss_total=0 observer=ob-c6683c061ee6054f scope=sc-ae22c238340f97f5 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> loss_total=0 observer=ob-c6683c061ee6054f scope=sc-ae22c238340f97f5 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-0881650fddc71f1d seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "d4_busy"
+  }
+ },
+ "gate_facility_hold": {
+  "calls": {},
+  "gate": {
+   "binding": [
+    [
+     "FINAL-EXIT",
+     "PROXY-FALLBACK",
+     "TIER3-AUTO",
+     "n1"
+    ],
+    "n1"
+   ],
+   "group": [
+    "TIER3-AUTO",
+    "n1",
+    "http://t0-tier3.test/generate_204",
+    "204"
+   ],
+   "reason": null
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=gated reason=facility_hold predicate=codex_arm arm_evaluated=false arm_check=not_evaluated source=cheap observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a32d1b515acfee34 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=facility_hold episode=7)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "facility_hold"
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> loss_total=0 observer=ob-3bb75a3134f31ec6 scope=sc-c74576d2cf70772d scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> loss_total=0 observer=ob-3bb75a3134f31ec6 scope=sc-c74576d2cf70772d scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-409a8f7ddccfca87 seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "facility_hold"
+  }
+ },
+ "gate_non_member": {
+  "calls": {},
+  "gate": {
+   "binding": null,
+   "group": null,
+   "reason": "non_member"
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=a9bc968431e5 rule=FAST episode=7 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6aabbeb8f3fdecd2 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=a9bc968431e5 reason=non_member episode=7)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=a9bc968431e5 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "non_member"
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> loss_total=0 observer=ob-a67ef36b2f3d84e7 scope=sc-380b7a519516b708 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> loss_total=0 observer=ob-a67ef36b2f3d84e7 scope=sc-380b7a519516b708 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-8db5b1ca38d9c755 seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "non_member"
+  }
+ },
+ "gate_route_unavailable": {
+  "calls": {},
+  "gate": {
+   "binding": null,
+   "group": null,
+   "reason": "route_unavailable"
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=snapshot_missing source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5f020b6fa06a03a seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=snapshot_missing site=admission route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5f020b6fa06a03a seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=not_armed episode=7 arm_check=snapshot_missing)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=b20325c61482 rule=FAST episode=7 arm_check=snapshot_missing route_epoch=1 arm_route_epoch=1 snapshot_epoch=-1 key_attempt=0 disposition=skipped_route:route_unavailable key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5f020b6fa06a03a seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=snapshot_missing site=admission route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=b20325c61482 rule=FAST episode=1 arm_check=snapshot_missing route_epoch=1 arm_route_epoch=1 snapshot_epoch=-1 key_attempt=0 disposition=skipped_route:route_unavailable key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0 observer=ob-76e4083ab23d23cf scope=sc-1e0f8c705b11b8fa scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0 observer=ob-76e4083ab23d23cf scope=sc-1e0f8c705b11b8fa scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ba959101104140c6 seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  }
+ },
+ "gate_status_failure": {
+  "calls": {},
+  "gate": {
+   "binding": [
+    [
+     "FINAL-EXIT",
+     "PROXY-FALLBACK",
+     "TIER3-AUTO",
+     "n1"
+    ],
+    "n1"
+   ],
+   "group": [
+    "TIER3-AUTO",
+    "n1",
+    "http://t0-tier3.test/generate_204",
+    "204"
+   ],
+   "reason": null
+  },
+  "lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=gated reason=status_failure_sample predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-e48ebbba318d1074 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=status_failure_sample episode=7)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ]
+  },
+  "register": {
+   "job": null,
+   "outcome": {},
+   "reason": "status_failure_sample"
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> loss_total=0 observer=ob-04e31d955ea39936 scope=sc-78c4481437011463 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> loss_total=0 observer=ob-04e31d955ea39936 scope=sc-78c4481437011463 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-648a0079f136d6fc seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": "status_failure_sample"
+  }
+ },
+ "gate_t3_full_dead_placeholders": {
+  "calls": {
+   "delay": [
+    [
+     "n1"
+    ]
+   ],
+   "provider": [
+    [
+     "TIER3B-RUNTIME"
+    ]
+   ],
+   "proxy": [
+    [
+     "TIER3-AUTO"
+    ]
+   ]
+  },
+  "gate": {
+   "binding": [
+    [
+     "FINAL-EXIT",
+     "PROXY-FALLBACK",
+     "TIER3-AUTO",
+     "n1"
+    ],
+    "n1"
+   ],
+   "group": [
+    "TIER3-AUTO",
+    "n1",
+    "http://t0-tier3.test/generate_204",
+    "204"
+   ],
+   "reason": null
+  },
+  "lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:7df0f2bab9bd8f8d35b30a46\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+    "INFO Runtime recovery phase completed | {\"final_204\": false, \"incident_hash\": \"hmac:7df0f2bab9bd8f8d35b30a46\", \"origin\": \"post_dial\", \"outcome\": {\"from_ref\": {\"identity_hash\": \"hmac:7708077b85ab0e1f3d30209a\", \"pool_kind\": \"tier3b\", \"proxy_name_hash\": \"hmac:84f14127c4d4a19a3851826b\", \"tier\": \"tier3\"}, \"incident_hash\": \"hmac:4faa8e3891bcd923a42bc016\", \"reason\": \"post_dial_not_reproduced\", \"route_epoch\": 1, \"status\": \"controller_hold\", \"to_ref\": null}, \"phase\": \"terminal\", \"put\": false, \"readback\": false, \"reason_code\": \"post_dial_not_reproduced\", \"result\": \"controller_hold\", \"route_epoch\": 1}"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=7 result=active reason=none predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-b38be52a5cab2d62 seq=<seq> loss_total=0)"
+   ],
+   "observer:probe_result": [
+    "INFO Post-dial observer probe_result (t=<t> name=A_C leaf=b20325c61482 class=pass ms=<ms> queue_wait_ms=<queue_wait_ms>)"
+   ],
+   "observer:probe_start": [
+    "DEBUG Post-dial observer probe_start (t=<t> name=A_C leaf=b20325c61482 timeout_ms=5000)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:7df0f2bab9bd8f8d35b30a46 reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-b38be52a5cab2d62 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=terminal incident=hmac:7df0f2bab9bd8f8d35b30a46 reason=reason-hmac:75e2c45675a21277354424da t=<t> v=1 mono_ns=<mono_ns> instance=rt-b38be52a5cab2d62 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=7 mode=act)"
+   ],
+   "observer:verdict": [
+    "INFO Post-dial observer verdict (t=<t> verdict=NOT_REPRODUCED reason=accused_pass kind=FAST leaf=b20325c61482 successor=none results=__A_C_:__pass__ probes=A_C t_ms=<t_ms> toks=tok-a,tok-b commit_allowed=false durable=off skipped=-)"
+   ]
+  },
+  "register": {
+   "job": {
+    "binding_chain": [
+     "FINAL-EXIT",
+     "PROXY-FALLBACK",
+     "TIER3-AUTO",
+     "n1"
+    ],
+    "binding_leaf": "n1",
+    "deadline_minus_now": 6,
+    "durable": false,
+    "episode": 1,
+    "expected_status": "204",
+    "failure_error_type": "post_dial_fast",
+    "kind": "FAST",
+    "ladder": false,
+    "leaf": "n1",
+    "mutation_facility": 0,
+    "mutation_intent": 0,
+    "provider_name": "TIER3B-RUNTIME",
+    "runner": "PostDialObserverRunner",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "ticket": {
+     "facility_epoch": 0,
+     "from": "n1",
+     "incident": "post-dial-<I1>",
+     "route_epoch": 1,
+     "selector_intent_revision": 0,
+     "window_s": 6.0
+    },
+    "tokens": [
+     "tok-a",
+     "tok-b"
+    ]
+   },
+   "outcome": {},
+   "reason": null
+  },
+  "register_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "register_lines": {
+   "log:Runtime recovery phase completed": [
+    "INFO Runtime recovery phase completed | {\"incident_hash\": \"hmac:047c8b2e0f4b64d0b07a9ddb\", \"origin\": \"post_dial\", \"phase\": \"incident_bound\", \"reason_code\": \"\", \"route_epoch\": 1}",
+    "INFO Runtime recovery phase completed | {\"final_204\": false, \"incident_hash\": \"hmac:047c8b2e0f4b64d0b07a9ddb\", \"origin\": \"post_dial\", \"outcome\": {\"from_ref\": {\"identity_hash\": \"hmac:7708077b85ab0e1f3d30209a\", \"pool_kind\": \"tier3b\", \"proxy_name_hash\": \"hmac:84f14127c4d4a19a3851826b\", \"tier\": \"tier3\"}, \"incident_hash\": \"hmac:1ba3eabe803ce65457f7b9d6\", \"reason\": \"post_dial_t0_released\", \"route_epoch\": 1, \"status\": \"controller_hold\", \"to_ref\": null}, \"phase\": \"terminal\", \"put\": false, \"readback\": false, \"reason_code\": \"post_dial_t0_released\", \"result\": \"controller_hold\", \"route_epoch\": 1}"
+   ],
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0 observer=ob-1702157742f1eb02 scope=sc-8be117fe7198e36f scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0 observer=ob-1702157742f1eb02 scope=sc-8be117fe7198e36f scope_seq=1)"
+   ],
+   "observer:recovery_phase": [
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=incident_bound incident=hmac:047c8b2e0f4b64d0b07a9ddb reason=none t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer recovery_phase (origin=post_dial phase=terminal incident=hmac:047c8b2e0f4b64d0b07a9ddb reason=reason-hmac:961b0056c068f444c32dad37 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2a7aa75ec0052c47 seq=<seq> loss_total=0)"
+   ]
+  },
+  "shadow_read": {
+   "job": null,
+   "outcome": {},
+   "reason": null
+  }
+ },
+ "gw": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=ce46d1f0cd01 rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a47173cc59bc74d5 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a47173cc59bc74d5 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a47173cc59bc74d5 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=ce46d1f0cd01 reason=non_member episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a47173cc59bc74d5 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a47173cc59bc74d5 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=ce46d1f0cd01 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "gw1": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  }
+ },
+ "not_armed_rearm_off_gw": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": false,
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=ce46d1f0cd01 rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=ce46d1f0cd01 reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=ce46d1f0cd01 rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=0 disposition=skipped_route:non_member key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0 observer=ob-3ea61c957fe1e784 scope=sc-9f8b9dc00256bd7c scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0 observer=ob-3ea61c957fe1e784 scope=sc-9f8b9dc00256bd7c scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ceccfd0303b8bedb seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=ce46d1f0cd01 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 0,
+   "judge_refresh_would_queue": 0
+  },
+  "tickets": []
+ },
+ "not_armed_rearm_off_t1": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": false,
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=3393b15f5aed rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=3393b15f5aed reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=3393b15f5aed rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=0 disposition=skipped_route:non_member key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0 observer=ob-ee5762a93752606a scope=sc-73a4806f33b48adc scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0 observer=ob-ee5762a93752606a scope=sc-73a4806f33b48adc scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d2c1b5ee739989c3 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=3393b15f5aed toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 0,
+   "judge_refresh_would_queue": 0
+  },
+  "tickets": []
+ },
+ "not_armed_rearm_off_t3": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": false,
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=b20325c61482 rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=0 disposition=would_queue key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0 observer=ob-446f6e4f9bbe8da0 scope=sc-3c93baaeb8945981 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0 observer=ob-446f6e4f9bbe8da0 scope=sc-3c93baaeb8945981 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-17d84f3d265d1adb seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 0,
+   "judge_refresh_would_queue": 1
+  },
+  "tickets": []
+ },
+ "not_armed_rearm_on_gw": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": false,
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=ce46d1f0cd01 rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=ce46d1f0cd01 reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=ce46d1f0cd01 rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=0 disposition=skipped_route:non_member key_on=1 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0 observer=ob-1cb98a6ffbb19c4e scope=sc-07fab5a5eecd0dba scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0 observer=ob-1cb98a6ffbb19c4e scope=sc-07fab5a5eecd0dba scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-5d1531cd0703774e seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=ce46d1f0cd01 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 0,
+   "judge_refresh_would_queue": 0
+  },
+  "tickets": []
+ },
+ "not_armed_rearm_on_t1": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": false,
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=3393b15f5aed rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=3393b15f5aed reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=3393b15f5aed rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=0 disposition=skipped_route:non_member key_on=1 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0 observer=ob-743a02da9d3257c0 scope=sc-883091b11a6c5b39 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0 observer=ob-743a02da9d3257c0 scope=sc-883091b11a6c5b39 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d4783ce30841a237 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=3393b15f5aed toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 0,
+   "judge_refresh_would_queue": 0
+  },
+  "tickets": []
+ },
+ "not_armed_rearm_on_t3": {
+  "admission": {
+   "job": null,
+   "outcome": {},
+   "reason": "not_armed"
+  },
+  "armed": false,
+  "armed_after": true,
+  "calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=1 result=gated reason=not_armed predicate=codex_arm arm_evaluated=true arm_check=route_epoch source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=2 arm_route_epoch=2 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=not_armed episode=1 arm_check=route_epoch)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=not_armed_route_epoch leaf=b20325c61482 rule=FAST episode=1 arm_check=route_epoch route_epoch=2 arm_route_epoch=1 snapshot_epoch=2 key_attempt=1 disposition=queued key_on=1 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0 observer=ob-aacd00bfad8eed74 scope=sc-2b819eefef9ac5a7 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0 observer=ob-aacd00bfad8eed74 scope=sc-2b819eefef9ac5a7 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c65f116828bf7a42 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=act)"
+   ]
+  },
+  "refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 0,
+   "judge_refresh_queued_not_armed": 1,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 1,
+   "judge_refresh_would_queue": 0
+  },
+  "tickets": []
+ },
+ "shadow_t1": {
+  "calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=shadow actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> loss_total=0 observer=ob-7b4a24dcff52e11c scope=sc-8c644c8b52213535 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=shadow)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=shadow act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> loss_total=0 observer=ob-7b4a24dcff52e11c scope=sc-8c644c8b52213535 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-54c1b539efbedd98 seq=<seq> loss_total=0)"
+   ],
+   "observer:would_judge": [
+    "INFO Post-dial observer would_judge (t=<t> rule=FAST leaf=3393b15f5aed episode=1 gate=non_member mode=shadow)",
+    "INFO Post-dial observer would_judge (t=<t> rule=FAST leaf=7130afaa1bdb episode=1 gate=route_binding_mismatch mode=shadow)"
+   ],
+   "observer:would_trigger": [
+    "INFO Post-dial observer would_trigger (t=<t> rule=FAST leaf=3393b15f5aed toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=shadow)",
+    "INFO Post-dial observer would_trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=shadow)"
+   ]
+  },
+  "tickets": []
+ },
+ "shadow_t3": {
+  "calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=shadow actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> loss_total=0 observer=ob-afe631ef5615e786 scope=sc-01c521f6138d6216 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=shadow)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=shadow act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> loss_total=0 observer=ob-afe631ef5615e786 scope=sc-01c521f6138d6216 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f529ea2c9d0792b8 seq=<seq> loss_total=0)"
+   ],
+   "observer:would_judge": [
+    "INFO Post-dial observer would_judge (t=<t> rule=FAST leaf=b20325c61482 episode=1 gate=open mode=shadow)",
+    "INFO Post-dial observer would_judge (t=<t> rule=FAST leaf=7130afaa1bdb episode=1 gate=route_binding_mismatch mode=shadow)"
+   ],
+   "observer:would_trigger": [
+    "INFO Post-dial observer would_trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=shadow)",
+    "INFO Post-dial observer would_trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=1 mode=shadow)"
+   ]
+  },
+  "tickets": []
+ },
+ "t1": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d7ae2a8eb5117edc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d7ae2a8eb5117edc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=3393b15f5aed rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d7ae2a8eb5117edc seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=3393b15f5aed reason=non_member episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d7ae2a8eb5117edc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-d7ae2a8eb5117edc seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=3393b15f5aed toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "nodeA :: VLESS": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  }
+ },
+ "t1_flat": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9fb593e657e5ddcc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9fb593e657e5ddcc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=3393b15f5aed rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9fb593e657e5ddcc seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=3393b15f5aed reason=non_member episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9fb593e657e5ddcc seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-9fb593e657e5ddcc seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=3393b15f5aed toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "nodeA :: VLESS": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  }
+ },
+ "t1_user": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6485d6ff29a0d8c2 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6485d6ff29a0d8c2 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=0df7948bf81a rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6485d6ff29a0d8c2 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=0df7948bf81a reason=non_member episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6485d6ff29a0d8c2 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-6485d6ff29a0d8c2 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=0df7948bf81a toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "nodeA :: TROJAN": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  }
+ },
+ "t2": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-19a413445de3041e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-19a413445de3041e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=8a01e27a3b9e rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-19a413445de3041e seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=8a01e27a3b9e reason=non_member episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-19a413445de3041e seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-19a413445de3041e seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=8a01e27a3b9e toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "t2a": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  }
+ },
+ "t2_pinned": {
+  "_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 2,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 2,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [],
+  "_register_tickets": [],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=b20325c61482 rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a4e9b647f26d9d26 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a4e9b647f26d9d26 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer admission (mode=act leaf=aeddc4ce7c50 rule=FAST episode=3 result=gated reason=non_member predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a4e9b647f26d9d26 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=b20325c61482 reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)",
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=aeddc4ce7c50 reason=non_member episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=b20325c61482 rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a4e9b647f26d9d26 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-a4e9b647f26d9d26 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=b20325c61482 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)",
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=aeddc4ce7c50 toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  },
+  "t2b": {
+   "gate": {
+    "binding": null,
+    "group": null,
+    "reason": "non_member"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "non_member"
+   }
+  }
+ },
+ "t3": {
+  "_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 1,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 1,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [
+   {
+    "incident": "post-dial-<I1>",
+    "reason": "post_dial_t0_released",
+    "status": "controller_hold",
+    "to": null
+   }
+  ],
+  "_register_tickets": [
+   {
+    "facility_epoch": 0,
+    "from": "n1",
+    "incident": "post-dial-<I1>",
+    "route_epoch": 1,
+    "selector_intent_revision": 0,
+    "window_s": 6.0
+   }
+  ],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-293a6aebe5c0b962 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-293a6aebe5c0b962 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": [
+     [
+      "FINAL-EXIT",
+      "PROXY-FALLBACK",
+      "TIER3-AUTO",
+      "n1"
+     ],
+     "n1"
+    ],
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": null
+   },
+   "register": {
+    "job": {
+     "binding_chain": [
+      "FINAL-EXIT",
+      "PROXY-FALLBACK",
+      "TIER3-AUTO",
+      "n1"
+     ],
+     "binding_leaf": "n1",
+     "deadline_minus_now": 6,
+     "durable": false,
+     "episode": 1,
+     "expected_status": "204",
+     "failure_error_type": "post_dial_fast",
+     "kind": "FAST",
+     "ladder": false,
+     "leaf": "n1",
+     "mutation_facility": 0,
+     "mutation_intent": 0,
+     "provider_name": "TIER3B-RUNTIME",
+     "runner": "PostDialObserverRunner",
+     "test_url": "http://t0-tier3.test/generate_204",
+     "ticket": {
+      "facility_epoch": 0,
+      "from": "n1",
+      "incident": "post-dial-<I1>",
+      "route_epoch": 1,
+      "selector_intent_revision": 0,
+      "window_s": 6.0
+     },
+     "tokens": [
+      "tok-a",
+      "tok-b"
+     ]
+    },
+    "outcome": {},
+    "reason": null
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": null
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  }
+ },
+ "t3_full": {
+  "_calls": {
+   "proxies": [
+    []
+   ]
+  },
+  "_outcomes": [],
+  "_refresh_counts": {
+   "judge_refresh_bounded_attempts": 0,
+   "judge_refresh_bounded_retry": 0,
+   "judge_refresh_queued_mismatch": 1,
+   "judge_refresh_queued_not_armed": 0,
+   "judge_refresh_single_flight": 0,
+   "judge_refresh_skipped_activation_hold": 0,
+   "judge_refresh_skipped_incident": 0,
+   "judge_refresh_source_was_ready": 0,
+   "judge_refresh_worker_started": 1,
+   "judge_refresh_would_queue": 0
+  },
+  "_register_calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "_register_outcomes": [
+   {
+    "incident": "post-dial-<I1>",
+    "reason": "post_dial_t0_released",
+    "status": "controller_hold",
+    "to": null
+   }
+  ],
+  "_register_tickets": [
+   {
+    "facility_epoch": 0,
+    "from": "n1",
+    "incident": "post-dial-<I1>",
+    "route_epoch": 1,
+    "selector_intent_revision": 0,
+    "window_s": 6.0
+   }
+  ],
+  "_tickets": [],
+  "_trigger_lines": {
+   "observer:admission": [
+    "INFO Post-dial observer admission (mode=act leaf=7130afaa1bdb rule=FAST episode=3 result=gated reason=route_binding_mismatch predicate=codex_arm arm_evaluated=true arm_check=armed source=checked observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-45b8b655a17dc743 seq=<seq> loss_total=0)"
+   ],
+   "observer:gated": [
+    "INFO Post-dial observer gated (t=<t> rule=FAST leaf=7130afaa1bdb reason=route_binding_mismatch episode=3)"
+   ],
+   "observer:judge_refresh": [
+    "INFO Post-dial observer judge_refresh (cause=route_binding_mismatch leaf=7130afaa1bdb rule=FAST episode=3 arm_check=armed route_epoch=1 arm_route_epoch=1 snapshot_epoch=1 key_attempt=1 disposition=queued key_on=0 source_was_ready=0 observer=unknown scope=unknown scope_seq=0 policy_revision=0 t=<t> v=1 mono_ns=<mono_ns> instance=rt-45b8b655a17dc743 seq=<seq> loss_total=0)"
+   ],
+   "observer:trigger": [
+    "INFO Post-dial observer trigger (t=<t> rule=FAST leaf=7130afaa1bdb toks=tok-a,tok-b n=2 first_ev_ms=50.0 episode=3 mode=act)"
+   ]
+  },
+  "n1": {
+   "gate": {
+    "binding": [
+     [
+      "FINAL-EXIT",
+      "PROXY-FALLBACK",
+      "TIER3-AUTO",
+      "n1"
+     ],
+     "n1"
+    ],
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": null
+   },
+   "register": {
+    "job": {
+     "binding_chain": [
+      "FINAL-EXIT",
+      "PROXY-FALLBACK",
+      "TIER3-AUTO",
+      "n1"
+     ],
+     "binding_leaf": "n1",
+     "deadline_minus_now": 6,
+     "durable": false,
+     "episode": 1,
+     "expected_status": "204",
+     "failure_error_type": "post_dial_fast",
+     "kind": "FAST",
+     "ladder": false,
+     "leaf": "n1",
+     "mutation_facility": 0,
+     "mutation_intent": 0,
+     "provider_name": "TIER3B-RUNTIME",
+     "runner": "PostDialObserverRunner",
+     "test_url": "http://t0-tier3.test/generate_204",
+     "ticket": {
+      "facility_epoch": 0,
+      "from": "n1",
+      "incident": "post-dial-<I1>",
+      "route_epoch": 1,
+      "selector_intent_revision": 0,
+      "window_s": 6.0
+     },
+     "tokens": [
+      "tok-a",
+      "tok-b"
+     ]
+    },
+    "outcome": {},
+    "reason": null
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": null
+   }
+  },
+  "n2": {
+   "gate": {
+    "binding": null,
+    "group": [
+     "TIER3-AUTO",
+     "n1",
+     "http://t0-tier3.test/generate_204",
+     "204"
+    ],
+    "reason": "route_binding_mismatch"
+   },
+   "register": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   },
+   "shadow_read": {
+    "job": null,
+    "outcome": {},
+    "reason": "route_binding_mismatch"
+   }
+  }
+ }
+}

@@ -1,0 +1,8 @@
+{
+  "common.action.save": "KO save",
+  "common.items": "{n, plural, other {# node other}}",
+  "common.hint": "KO press <kbd>Ctrl K</kbd> to open {name}",
+  "common.mode": "{mode, select, tun {KO TUN} other {KO system proxy}}",
+  "common.tier": "Vanguard KO self-hosted",
+  "common.skipped.timeout": "KO timed out"
+}

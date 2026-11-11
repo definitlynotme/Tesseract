@@ -1,0 +1,138 @@
+migrations:
+  tier3_source_portfolio_defaults_v1: true
+  tier3_source_default_delivery_v1: true
+  tier3_source_portfolio_defaults_v2: true
+
+# Templates do nothing until a source explicitly names fetch_profile.
+# fetch_paths on a source replaces its template; [] means original URL only.
+# Roads are tried in order: the source's own address first, then each enabled
+# road once its delay has passed, and the first usable answer cancels the rest.
+# Tier3 is the last-resort connection guarantee, so reachability outranks
+# privacy here: enough roads are enabled by default that one blocked or
+# rate-limited host cannot cost you the list. Every road is editable config,
+# bound to a source, never hardcoded and never tied to one candidate.
+# github_api is GitHub's own host and exposes the request to nobody new, but
+# its unauthenticated quota is 60 requests/hour per IP and then answers 403,
+# so it cannot be the only road. The relays are third parties: each only ever
+# learns which public list is being fetched, and only after GitHub itself has
+# failed to answer within the delay. Set enabled: false on any you distrust.
+# Measured on a blocked campus WLAN, 2026-09-20: the canonical addresses
+# timed out; github_api served all four lists in 1.2-9.5s until its quota ran
+# out; gh-proxy.com and ghfast.top served them in 1.6-11.4s with no quota;
+# both jsDelivr hosts were reset or took 60-90s.
+# Non-GitHub sources can declare an explicit backup, without URL rewriting:
+#   fetch_paths:
+#     - {kind: url, url: "https://replica.example/sub", enabled: true, delay_seconds: 0.75}
+# For repository sources, a fixed backup must also name its unit (file path).
+# Authenticated sources use the original address only; headers/query secrets
+# are never inherited by alternate roads.
+fetch_profiles:
+  github_public:
+    - kind: github_api
+      enabled: true
+      delay_seconds: 0.0
+    - kind: github_proxy
+      url: https://gh-proxy.com/
+      enabled: true
+      delay_seconds: 0.75
+    - kind: github_proxy
+      url: https://ghfast.top/
+      enabled: true
+      delay_seconds: 1.5
+    - kind: github_proxy
+      url: https://ghproxy.net/
+      enabled: false
+      delay_seconds: 1.5
+    - kind: github_cdn
+      url: https://testingcf.jsdelivr.net
+      enabled: false
+      delay_seconds: 0.75
+    - kind: github_cdn
+      url: https://cdn.jsdelivr.net
+      enabled: false
+      delay_seconds: 0.75
+
+github_repos:
+  - url: https://github.com/V2RayRoot/V2RayConfig
+    fetch_profile: github_public
+  - url: https://github.com/barry-far/V2ray-Config
+    fetch_profile: github_public
+telegram_channels:
+  - '@V2RayRootFree'
+subscription_urls:
+  - url: https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/all_sub.txt
+    fetch_profile: github_public
+  - url: https://github.com/Epodonios/v2ray-configs/raw/main/All_Configs_Sub.txt
+    fetch_profile: github_public
+  # Small curated lists with a high share of nodes that pass the full check
+  # (protocol probe + Google HTTPS) from mainland networks. Measured
+  # 2026-09-29 on a physical WLAN, three cold starts: of 78 admitted nodes,
+  # these five supplied 64 while holding about 550 of ~12,000 candidates;
+  # with them a true cold start reached 25 nodes in 39-79 s, without them the
+  # whole supply held about 15. added_in lets an existing sources.yaml receive
+  # exactly these entries once (tier3_source_portfolio_defaults_v2).
+  - url: https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt
+    fetch_profile: github_public
+    added_in: tier3_source_portfolio_defaults_v2
+  - url: https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt
+    fetch_profile: github_public
+    added_in: tier3_source_portfolio_defaults_v2
+  - url: https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_RAW.txt
+    fetch_profile: github_public
+    added_in: tier3_source_portfolio_defaults_v2
+  - url: https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub
+    fetch_profile: github_public
+    added_in: tier3_source_portfolio_defaults_v2
+  - url: https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list_raw.txt
+    fetch_profile: github_public
+    added_in: tier3_source_portfolio_defaults_v2
+local_files: []
+
+github_discovery:
+  enabled: true
+  max_repositories: 30
+  min_nodes_per_file: 3
+  candidate_paths:
+    - Config/vless.txt
+    - Config/vmess.txt
+    - Config/trojan.txt
+    - Config/shadowsocks.txt
+    - Config/hysteria2.txt
+    - Splitted-By-Protocol/vless.txt
+    - Splitted-By-Protocol/vmess.txt
+    - Splitted-By-Protocol/trojan.txt
+    - Splitted-By-Protocol/ss.txt
+    - Splitted-By-Protocol/hy2.txt
+    - Splitted-By-Protocol/tuic.txt
+    - subscriptions/filtered/subs/vless.txt
+    - subscriptions/filtered/subs/vmess.txt
+    - subscriptions/filtered/subs/trojan.txt
+    - subscriptions/filtered/subs/ss.txt
+    - All_Configs_Sub.txt
+    - sub
+    - sub.txt
+    - v2ray.txt
+    - clash.yaml
+    - nodes.txt
+    - Sub1.txt
+    - Sub2.txt
+    - Sub3.txt
+    - Sub4.txt
+    - Sub5.txt
+    - Sub6.txt
+    - Sub7.txt
+    - Sub8.txt
+    - All_Configs_base64_Sub.txt
+    - Base64/Sub1_base64.txt
+    - Base64/Sub2_base64.txt
+    - Base64/Sub3_base64.txt
+    - Base64/Sub4_base64.txt
+    - Base64/Sub5_base64.txt
+    - Base64/Sub6_base64.txt
+    - Base64/Sub7_base64.txt
+    - Base64/Sub8_base64.txt
+  queries:
+    - v2ray free subscription
+    - vless vmess trojan free
+    - clash free nodes
+    - proxy subscription v2ray

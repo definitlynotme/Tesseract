@@ -1,0 +1,28 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "traffic.history",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "sampled_at_ms": 1790000000000,
+    "source": "temporary_snapshot",
+    "h24": [
+      {
+        "t_ms": 1789999700000,
+      "down_bps": 4096,
+      "up_bps": 1024,
+      "sample_count": 300
+      }
+    ],
+    "live": [
+      {
+        "t_ms": 1789999999000,
+        "down_bps": 4096,
+        "up_bps": 1024
+      }
+    ]
+  }
+}

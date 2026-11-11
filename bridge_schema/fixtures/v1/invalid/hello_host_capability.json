@@ -1,0 +1,68 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "hello",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "proto": 1,
+    "app_version": "0.1.0",
+    "runtime_pid": 4242,
+    "lang": "zh_CN",
+    "caps": {
+      "commands": [
+        "service.start",
+        "host.saveFile"
+      ],
+      "topics": [
+        "alerts.desktop",
+        "alerts.history",
+        "bastion.pool",
+        "bastion.sources",
+        "config.changed",
+        "config.items",
+        "core.info",
+        "exit.identity",
+        "gateway.current",
+        "geo.status",
+        "jobs",
+        "killswitch.state",
+        "logs.batch",
+        "logs.feed",
+        "network.mode",
+        "nodes.list",
+        "protocols.mix",
+        "route.published",
+        "service.collect",
+        "service.state",
+        "shutdown",
+        "subscriptions.list",
+        "tier.transition",
+        "tiers.summary",
+        "traffic.history",
+        "traffic.tick",
+        "ui.language",
+        "update.prepareExit",
+        "update.state"
+      ],
+      "features": []
+    },
+    "scope": {
+      "kind": "custom",
+      "id": "fixture"
+    },
+    "network_recovery": {
+      "proxy": {
+        "state": "not_needed",
+        "error_code": null,
+        "remaining_count": 0
+      },
+      "firewall": {
+        "state": "not_needed",
+        "error_code": null,
+        "remaining_count": 0
+      }
+    }
+  },
+  "expected": "enum:caps.commands"
+}

@@ -1,0 +1,39 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "exit.identity",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "current": {
+      "request_id": "example",
+      "generation": 1,
+      "binding_id": null,
+      "status": "idle",
+      "reason_code": null,
+      "v4": {
+        "status": "unknown",
+        "address": null,
+        "country": null,
+        "reason_code": null,
+        "observed_at_ms": null
+      },
+      "v6": {
+        "status": "unknown",
+        "address": null,
+        "country": null,
+        "reason_code": null,
+        "observed_at_ms": null
+      },
+      "fresh": false,
+      "observed_at_ms": null,
+      "native_fallback_verified": false,
+      "native_fallback_verified_commit_rejected": false,
+      "native_fallback_unverified_budget": false,
+      "manual_execution_binding_stale": false
+    },
+    "previous": null
+  }
+}

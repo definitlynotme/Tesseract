@@ -1,0 +1,746 @@
+{
+  "alerts.test_reason.alerts_test_unknown_target": {
+    "m": "找不到要测试的已保存渠道，它可能已被删除。刷新后再试。",
+    "_desc": "提醒测试失败（alerts.test reason_code alerts_test_unknown_target）：target_id 指向的已保存渠道不存在"
+  },
+  "alerts.test_reason.alerts_test_saved_read_failed": {
+    "m": "读不出已保存的渠道设置，没有发送测试。",
+    "_desc": "提醒测试失败（alerts.test reason_code alerts_test_saved_read_failed）：读取已保存渠道时出错"
+  },
+  "alerts.test_reason.alerts_test_endpoint_changed": {
+    "m": "发送地址改了。请重新填写这个渠道的密钥或令牌，再测试。",
+    "_desc": "提醒测试被拒绝（alerts.test reason_code alerts_test_endpoint_changed）：草稿改了服务器、地址或端口，但仍要沿用已保存的密钥"
+  },
+  "alerts.sec.title": {
+    "m": "提醒与通知",
+    "_desc": "配置页第 6 节的标题，也用于左侧分区索引和命令面板；索引里空间紧"
+  },
+  "alerts.paused.title": {
+    "m": "暂停全部提醒",
+    "_desc": "开关行的标题，也作开关的无障碍名称"
+  },
+  "alerts.paused.word.paused": {
+    "m": "已暂停",
+    "_desc": "「正在使用」列表每行右侧的标记：全部提醒已暂停（已保存），空间紧"
+  },
+  "alerts.paused.word.draft": {
+    "m": "保存后暂停",
+    "_desc": "同一位置：打开了「暂停全部提醒」但还没保存，空间紧"
+  },
+  "alerts.summary.active": {
+    "m": "{n, plural, other {已启用 # 种}}{ok, plural, =0 {} other { · 已送达 #}}{bad, plural, =0 {} other { · 需要处理 #}}",
+    "_desc": "节标题右侧的摘要：已启用的提醒方式数 n；ok 为最近一次已送达的方式数、bad 为需要处理的方式数，为 0 时不显示那一段。「·」分隔"
+  },
+  "alerts.summary.paused": {
+    "m": "{n, plural, other {已暂停 · # 种提醒方式保留配置}}",
+    "_desc": "节标题右侧的摘要：全部提醒已暂停；n 为保留着配置的提醒方式数"
+  },
+  "alerts.summary.pause_on_save": {
+    "m": "保存后暂停全部提醒",
+    "_desc": "节标题右侧的摘要：打开了暂停开关，尚未保存"
+  },
+  "alerts.summary.resume_on_save": {
+    "m": "保存后恢复提醒",
+    "_desc": "节标题右侧的摘要：关闭了暂停开关，尚未保存"
+  },
+  "alerts.in_use.title": {
+    "m": "已配置的提醒方式",
+    "_desc": "配置过的提醒方式列表的标题（同一种方式可以有多个，按「名称 · 标识」逐个列出，含已停用的）"
+  },
+  "alerts.in_use.aria": {
+    "m": "已配置的提醒方式",
+    "_desc": "「已配置的提醒方式」列表的无障碍名称（屏幕阅读器）"
+  },
+  "alerts.in_use.empty": {
+    "m": "还没有配置提醒方式",
+    "_desc": "「已配置的提醒方式」列表的空状态"
+  },
+  "alerts.gallery.title": {
+    "m": "全部提醒方式",
+    "_desc": "15 种提醒方式按组排列的瓦片区的小标题"
+  },
+  "alerts.tile.aria": {
+    "m": "{name}：{none, select, yes {未配置，点按添加} other {{state}}}",
+    "_desc": "提醒方式瓦片的无障碍名称。name 为提醒方式名（Telegram 等）；none=yes 时这种方式还没配置；否则 state 为它的状态词（已停用、配置不完整等）"
+  },
+  "alerts.channel.row_aria": {
+    "m": "{name}：{paused, select, paused {已暂停 · } draft {保存后暂停 · } other {}}{state}，打开配置",
+    "_desc": "「正在使用」列表一行的无障碍名称。name 为提醒方式名；paused：paused 全部提醒已暂停、draft 保存后暂停、other 未暂停；state 为状态词"
+  },
+  "alerts.channel.scope_summary": {
+    "m": "{level} · {n, plural, other {#/{total} 类事件}}",
+    "_desc": "「正在使用」列表每行的第二行：提醒级别（仅紧急 / 异常与恢复 / 全部）和勾选的事件类别数 n / 总数 total"
+  },
+  "alerts.channel.last_failed": {
+    "m": "上次发送失败：<x>{note}</x>",
+    "_desc": "「正在使用」列表一行的错误说明；note 为发送失败的原因（运行时给出，数据，不译）"
+  },
+  "alerts.channel.hold": {
+    "m": "{name}：{issue}，点开修正后再保存",
+    "_desc": "保存被拦下的原因（保存条上显示）：一种改过的提醒方式有缺的或格式不对的字段。name 为提醒方式的名称（用户起的名字或方式名），issue 为具体问题（如「启用前先填写机器人 Token」）"
+  },
+  "alerts.state.none": {
+    "m": "未配置",
+    "_desc": "提醒方式的状态词：一个字段也没填，空间紧（徽标）"
+  },
+  "alerts.state.draft": {
+    "m": "配置不完整",
+    "_desc": "提醒方式的状态词：必填字段没填完，空间紧（徽标）"
+  },
+  "alerts.state.attention": {
+    "m": "需要处理",
+    "_desc": "提醒方式的状态词：字段格式不对，或上次发送失败，空间紧（徽标）"
+  },
+  "alerts.state.off": {
+    "m": "已停用",
+    "_desc": "提醒方式的状态词：配置好了但关闭了，空间紧（徽标）"
+  },
+  "alerts.state.off_builtin": {
+    "m": "未启用",
+    "_desc": "内置提醒方式（桌面通知、声音提示）的状态词：从未打开，空间紧（徽标）"
+  },
+  "alerts.state.delivered": {
+    "m": "已送达",
+    "_desc": "提醒方式的状态词：最近一次发送成功，空间紧（徽标）"
+  },
+  "alerts.state.unverified": {
+    "m": "已启用，未验证",
+    "_desc": "提醒方式的状态词：已启用，但还没有发送记录，空间紧（徽标）"
+  },
+  "alerts.recent.title": {
+    "m": "最近提醒",
+    "_desc": "最近发出的提醒列表的标题"
+  },
+  "alerts.severity.ok": {
+    "m": "正常",
+    "_desc": "最近提醒一行的级别标签：恢复类提醒，空间紧"
+  },
+  "alerts.severity.warn": {
+    "m": "警告",
+    "_desc": "最近提醒一行的级别标签，空间紧"
+  },
+  "alerts.severity.info": {
+    "m": "信息",
+    "_desc": "最近提醒一行的级别标签，空间紧"
+  },
+  "alerts.severity.error": {
+    "m": "错误",
+    "_desc": "最近提醒一行的级别标签，空间紧"
+  },
+  "alerts.delivery.ok": {
+    "m": "已送达",
+    "_desc": "一条提醒经某种方式的送达结果：成功，空间紧"
+  },
+  "alerts.delivery.failed": {
+    "m": "失败",
+    "_desc": "一条提醒经某种方式的送达结果：失败，空间紧"
+  },
+  "alerts.test.send": {
+    "m": "发送测试",
+    "_desc": "抽屉底部按钮：向这种提醒方式发一条测试消息，空间紧"
+  },
+  "alerts.test.sending": {
+    "m": "发送中",
+    "_desc": "同一按钮发送期间，空间紧"
+  },
+  "alerts.test.sent": {
+    "m": "已送达",
+    "_desc": "同一按钮发送成功后，空间紧"
+  },
+  "alerts.test.play": {
+    "m": "试听",
+    "_desc": "「声音提示」抽屉底部按钮：播放一次提示音，空间紧"
+  },
+  "alerts.test.playing": {
+    "m": "播放中",
+    "_desc": "同一按钮播放期间，空间紧"
+  },
+  "alerts.test.played": {
+    "m": "已播放",
+    "_desc": "同一按钮播放结束后，空间紧"
+  },
+  "alerts.test.need_field": {
+    "m": "先填写{field}",
+    "_desc": "发送测试被拦下：必填字段没填；field 为字段名。显示在按钮上，宜短"
+  },
+  "alerts.test.fix_field": {
+    "m": "先修正{field}",
+    "_desc": "发送测试被拦下：字段格式不对；field 为字段名。显示在按钮上，宜短"
+  },
+  "alerts.test.send_failed": {
+    "m": "发送失败",
+    "_desc": "提醒方式抽屉里「发送测试」按钮的失败字样（短，按钮内一行）；失败原因另见抽屉里的「上次发送失败」一行（运行时给出，alerts.test_reason.* 接线归 T-P4-05e）"
+  },
+  "alerts.drawer.subtitle": {
+    "m": "{group}{cost, select, yes { · 按条计费} other {}}",
+    "_desc": "提醒方式抽屉标题下的副标题：所属分组（聊天 / 推送等）；cost=yes 时附「按条计费」（WhatsApp、Pushover、SendGrid、Twilio 等付费服务）"
+  },
+  "alerts.drawer.last_failed": {
+    "m": "上次发送失败：<x>{note}</x>。{ch, select, telegram {在 Telegram 的 BotFather 里重新生成 Token，粘贴到下面，或用快速配置重新连接。} other {检查下面的配置后再发送测试。}}",
+    "_desc": "抽屉顶部的错误提示框；note 为失败原因（数据，不译）。ch=telegram 时给出 Telegram 的修复办法，其余方式给通用办法。BotFather、Token 不译"
+  },
+  "alerts.drawer.level.title": {
+    "m": "提醒哪些事件",
+    "_desc": "抽屉里提醒级别（仅紧急 / 异常与恢复 / 全部）一节的标题"
+  },
+  "alerts.drawer.advanced": {
+    "m": "高级设置",
+    "_desc": "抽屉里可展开的一节：目录标为高级的字段，以及（远程方式的）请求超时与失败重试"
+  },
+  "alerts.drawer.timeout_aria": {
+    "m": "请求超时（秒）",
+    "_desc": "请求超时输入框的无障碍名称"
+  },
+  "alerts.drawer.timeout_hint": {
+    "m": "大于 {min}，最多 {max, plural, other {# 秒}}；留空用默认值",
+    "_desc": "请求超时输入框下的范围提示；min 为下限（不含），max 为允许的最大秒数（来自提醒方式目录）"
+  },
+  "alerts.drawer.retries_aria": {
+    "m": "失败重试次数",
+    "_desc": "失败重试输入框的无障碍名称"
+  },
+  "alerts.drawer.retries_hint": {
+    "m": "{min}–{max, plural, other {# 次}}；留空用默认值",
+    "_desc": "失败重试输入框下的范围提示；min、max 为允许的最少、最多次数（来自提醒方式目录）"
+  },
+  "alerts.drawer.log.title": {
+    "m": "最近送达",
+    "_desc": "抽屉里这种方式最近 3 次送达记录一节的标题"
+  },
+  "alerts.drawer.log.empty": {
+    "m": "还没有送达记录",
+    "_desc": "最近送达的空状态"
+  },
+  "alerts.drawer.delete.action": {
+    "m": "删除此方式",
+    "_desc": "抽屉左下角的危险按钮：删除这种提醒方式的配置（保存后生效），空间紧"
+  },
+  "alerts.drawer.delete.title": {
+    "m": "删除「{name}」提醒方式？",
+    "_desc": "删除确认框标题；name 为提醒方式名"
+  },
+  "alerts.drawer.delete.body": {
+    "m": "会清除这里填写的配置（包括密钥），这种方式的送达记录也会一并删除。保存后生效，保存前可以撤销。",
+    "_desc": "删除确认框正文（用户已定：删除提醒方式时其送达记录一并清除，由后端完成）"
+  },
+  "alerts.drawer.delete.ok": {
+    "m": "删除",
+    "_desc": "删除确认框的确认按钮，空间紧"
+  },
+  "alerts.drawer.done": {
+    "m": "完成",
+    "_desc": "抽屉底部的主按钮：关闭抽屉（改动留在草稿里，要在配置页保存），空间紧"
+  },
+  "alerts.field.optional": {
+    "m": "可选",
+    "_desc": "字段标签旁的小字：这个字段可以不填，空间紧"
+  },
+  "alerts.field.show": {
+    "m": "显示",
+    "_desc": "密钥字段右侧眼睛按钮的悬停提示：显示明文，空间紧"
+  },
+  "alerts.field.hide": {
+    "m": "隐藏",
+    "_desc": "同一按钮在显示明文之后：重新遮住，空间紧"
+  },
+  "alerts.field.show_aria": {
+    "m": "显示{field}",
+    "_desc": "眼睛按钮的无障碍名称；field 为字段名（机器人 Token 等）"
+  },
+  "alerts.field.hide_aria": {
+    "m": "隐藏{field}",
+    "_desc": "眼睛按钮在显示明文之后的无障碍名称；field 为字段名"
+  },
+  "alerts.field.tone": {
+    "m": "提示音",
+    "_desc": "桌面通知、声音提示抽屉里的分段选择标题：提示音的强弱（轻柔 / 标准 / 醒目）"
+  },
+  "alerts.field.parse_mode.text": {
+    "m": "纯文本",
+    "_desc": "Telegram「消息格式」分段选择的一项，空间紧"
+  },
+  "alerts.field.parse_mode.markdown": {
+    "m": "Markdown",
+    "_desc": "Telegram「消息格式」分段选择的一项（格式名，一般不译），空间紧"
+  },
+  "alerts.field.parse_mode.html": {
+    "m": "HTML",
+    "_desc": "Telegram「消息格式」分段选择的一项（格式名，不译），空间紧"
+  },
+  "alerts.field.ntfy_priority.hint": {
+    "m": "5 最高，手机上会越过勿扰模式",
+    "_desc": "ntfy 优先级（1–5）分段选择下的提示"
+  },
+  "alerts.field.webhook_method": {
+    "m": "请求方式",
+    "_desc": "通用 Webhook 抽屉的分段选择标题：HTTP 请求方法"
+  },
+  "alerts.field.webhook_method.post": {
+    "m": "POST",
+    "_desc": "请求方式的一项（HTTP 方法名，不译），空间紧"
+  },
+  "alerts.field.webhook_method.put": {
+    "m": "PUT",
+    "_desc": "请求方式的一项（HTTP 方法名，不译），空间紧"
+  },
+  "alerts.quick.tab": {
+    "m": "快速配置",
+    "_desc": "Telegram 抽屉的分页：扫码或打开链接，自动填好 Token 和聊天 ID，空间紧"
+  },
+  "alerts.manual.tab": {
+    "m": "手动填写",
+    "_desc": "Telegram 抽屉的分页：自己填写各字段，空间紧"
+  },
+  "alerts.quick.or_open": {
+    "m": "或打开链接",
+    "_desc": "二维码旁的小标题：也可以直接打开下面的链接"
+  },
+  "alerts.quick.copy": {
+    "m": "复制链接",
+    "_desc": "复制按钮的无障碍名称和悬停提示"
+  },
+  "alerts.quick.open": {
+    "m": "打开链接",
+    "_desc": "在浏览器里打开配对链接的按钮，空间紧"
+  },
+  "alerts.quick.generate": {
+    "m": "生成链接",
+    "_desc": "生成配对链接和二维码的按钮，空间紧"
+  },
+  "alerts.quick.generating": {
+    "m": "正在生成",
+    "_desc": "同一按钮进行中，空间紧"
+  },
+  "alerts.quick.generated": {
+    "m": "已生成",
+    "_desc": "同一按钮完成后，空间紧"
+  },
+  "alerts.quick.regenerate": {
+    "m": "重新生成",
+    "_desc": "生成过一次之后同一按钮的文字，空间紧"
+  },
+  "alerts.quick.qr_aria": {
+    "m": "配置二维码",
+    "_desc": "二维码图片的无障碍名称"
+  },
+  "alerts.quick.waiting": {
+    "m": "等待你在 Telegram 里点「开始」…",
+    "_desc": "生成链接之后的等待状态；「开始」同 step2"
+  },
+  "alerts.quick.still_waiting": {
+    "m": "{n, plural, other {仍在等待 · 已检查 # 次}}",
+    "_desc": "等待状态：已经查询了 n 次还没收到回应"
+  },
+  "alerts.quick.connected": {
+    "m": "已连接 · 聊天 ID 已填好，保存后生效",
+    "_desc": "配对成功：字段已自动填进草稿（仍要保存才生效）"
+  },
+  "alerts.test_reason.alerts_test_invalid_draft": {
+    "m": "这个渠道的设置不完整或格式不对，没有发送测试。先修正标出的字段。",
+    "_desc": "预留（T-P4-05e）：提醒测试失败（alerts.test reason_code alerts_test_invalid_draft）：草稿没有通过校验"
+  },
+  "alerts.test_reason.alerts_test_runtime_unavailable": {
+    "m": "提醒服务暂时不可用，没有发送测试。稍后再试。",
+    "_desc": "预留（T-P4-05e）：提醒测试失败（reason_code alerts_test_runtime_unavailable）：后台的提醒组件不可用"
+  },
+  "alerts.test_reason.alerts_test_delivery_failed": {
+    "m": "测试消息没有送达。检查地址和密钥后再试。",
+    "_desc": "预留（T-P4-05e）：提醒测试失败（reason_code alerts_test_delivery_failed）：服务方拒绝或连接失败"
+  },
+  "alerts.test_reason.alerts_test_timeout": {
+    "m": "发送测试超时，服务方没有及时回应。检查网络后再试。",
+    "_desc": "预留（T-P4-05e）：提醒测试失败（reason_code alerts_test_timeout）"
+  },
+  "alerts.test_reason.alerts_desktop_busy": {
+    "m": "上一条桌面测试通知还没显示完，稍后再试。",
+    "_desc": "预留（T-P4-05e）：桌面通知测试失败（reason_code alerts_desktop_busy）：已有一条测试通知在显示"
+  },
+  "alerts.test_reason.alerts_desktop_unavailable": {
+    "m": "现在无法显示桌面通知。",
+    "_desc": "预留（T-P4-05e）：桌面通知测试失败（reason_code alerts_desktop_unavailable）：窗口外壳不可用"
+  },
+  "alerts.test_reason.alerts_desktop_failed": {
+    "m": "桌面通知没有显示出来。",
+    "_desc": "预留（T-P4-05e）：桌面通知测试失败（reason_code alerts_desktop_failed）"
+  },
+  "alerts.test_reason.alerts_desktop_receipt_timeout": {
+    "m": "没有收到桌面通知已显示的确认。",
+    "_desc": "预留（T-P4-05e）：桌面通知测试失败（reason_code alerts_desktop_receipt_timeout）：外壳没有及时回执"
+  },
+  "alerts.test_reason.alerts_desktop_dropped": {
+    "m": "桌面通知没有显示：系统或通知设置把它拦下了。",
+    "_desc": "预留（T-P4-05e）：桌面通知测试失败（reason_code alerts_desktop_dropped）：通知被丢弃（如勿扰模式）"
+  },
+  "alerts.onboarding_reason.onboarding_auxiliary_link": {
+    "m": "这个链接只用于在手机上订阅，不会自动填写配置。",
+    "_desc": "预留（T-P4-05e）：快速配置的说明（Onboarding reason_code onboarding_auxiliary_link）：ntfy / Pushover 的辅助链接"
+  },
+  "alerts.onboarding_reason.onboarding_inputs_required": {
+    "m": "先填写机器人 Token，再生成链接。",
+    "_desc": "预留（T-P4-05e）：快速配置被拦下（reason_code onboarding_inputs_required）：缺少必填输入（Telegram 的 Bot Token）"
+  },
+  "alerts.onboarding_reason.onboarding_remote_rejected": {
+    "m": "服务方拒绝了这次配对。检查 Token 后重新生成。",
+    "_desc": "预留（T-P4-05e）：快速配置失败（reason_code onboarding_remote_rejected）"
+  },
+  "alerts.onboarding_reason.onboarding_unknown_state": {
+    "m": "配对状态无法识别，请重新生成链接。",
+    "_desc": "预留（T-P4-05e）：快速配置失败（reason_code onboarding_unknown_state）：服务方返回了未知状态"
+  },
+  "alerts.onboarding_reason.onboarding_expired": {
+    "m": "链接已过期，重新生成一个。",
+    "_desc": "预留（T-P4-05e）：快速配置结束（reason_code onboarding_expired）：10 分钟内没有完成配对"
+  },
+  "alerts.onboarding_reason.onboarding_request_cancelled": {
+    "m": "配对已取消。",
+    "_desc": "预留（T-P4-05e）：快速配置结束（reason_code onboarding_request_cancelled）：用户取消"
+  },
+  "alerts.onboarding_reason.onboarding_closed": {
+    "m": "配对已结束。",
+    "_desc": "预留（T-P4-05e）：快速配置结束（reason_code onboarding_closed）：会话已关闭"
+  },
+  "alerts.onboarding_reason.onboarding_owner_revoked": {
+    "m": "窗口已关闭，配对随之结束。",
+    "_desc": "预留（T-P4-05e）：快速配置结束（reason_code onboarding_owner_revoked）：发起配对的页面已关闭"
+  },
+  "alerts.onboarding_reason.onboarding_blocked": {
+    "m": "现在不能开始配对。",
+    "_desc": "预留（T-P4-05e）：快速配置被拦下（reason_code onboarding_blocked）"
+  },
+  "alerts.onboarding_reason.onboarding_failed": {
+    "m": "配对失败，重新生成链接再试。",
+    "_desc": "预留（T-P4-05e）：快速配置失败（reason_code onboarding_failed）"
+  },
+  "alerts.unit.seconds": {
+    "m": "秒",
+    "_desc": "提醒方式抽屉「高级」里请求超时输入框右侧的单位（秒），空间极紧"
+  },
+  "alerts.unit.times": {
+    "m": "次",
+    "_desc": "提醒方式抽屉「高级」里失败重试输入框右侧的单位（次），空间极紧"
+  },
+  "alerts.severity.critical": {
+    "m": "严重",
+    "_desc": "最近提醒一行的级别标签：critical（熔断已触发、紧急回退等），空间紧"
+  },
+  "alerts.state.dropped": {
+    "m": "未显示",
+    "_desc": "提醒方式的状态词：最近一次桌面通知没有显示出来（系统或通知设置拦下），空间紧（徽标）"
+  },
+  "alerts.state.unknown_type": {
+    "m": "不支持的方式",
+    "_desc": "提醒方式的状态词：配置里有这个版本的提醒方式目录不认识的类型（配置原样保留），空间紧（徽标）"
+  },
+  "alerts.delivery.dropped": {
+    "m": "未显示",
+    "_desc": "一次送达的结果：桌面通知没有显示出来，空间紧"
+  },
+  "alerts.recent.empty": {
+    "m": "还没有发出过提醒",
+    "_desc": "「最近提醒」的空状态"
+  },
+  "alerts.recent.all": {
+    "m": "查看全部",
+    "_desc": "「最近提醒」标题旁的链接：到运行日志查看全部提醒，空间紧"
+  },
+  "alerts.catalog.missing.title": {
+    "m": "读不到提醒方式目录",
+    "_desc": "提醒区的提示框标题：后台没有给出提醒方式的表单目录，暂时不能添加或编辑提醒方式"
+  },
+  "alerts.catalog.missing.body": {
+    "m": "暂时不能添加或修改提醒方式；已保存的设置不受影响。",
+    "_desc": "同一提示框的正文；下方有「重试」按钮"
+  },
+  "alerts.delete.records_failed.title": {
+    "m": "配置已删除，但相关记录未能清理",
+    "_desc": "保存后提醒区的提示框标题：提醒方式已从配置中删除，但它的送达记录没能删掉（后端 delivery_records_delete_failed）"
+  },
+  "alerts.acl.plaintext": {
+    "m": "提醒方式的密钥和令牌以明文保存在本机的配置文件及其备份里。",
+    "_desc": "提醒区顶部的一行说明（alerts.catalog.acl.plaintext_storage）：密钥以明文保存"
+  },
+  "alerts.acl.unconfirmed.title": {
+    "m": "配置文件的访问权限没能确认",
+    "_desc": "提醒区的警告标题（alerts.catalog.acl.access_state=unconfirmed）：没能把配置文件限制为只有当前用户能读"
+  },
+  "alerts.acl.unconfirmed.body": {
+    "m": "{n, plural, other {有 # 个配置文件或备份没能限制为只有你能读取。}}共用这台电脑的人可能读到其中的密钥。",
+    "_desc": "同一警告的正文；n 为没能确认权限的文件数"
+  },
+  "alerts.tile.add": {
+    "m": "再添加一个",
+    "_desc": "提醒方式瓦片旁「+」按钮的悬停提示：再添加一个同类的提醒方式，空间紧"
+  },
+  "alerts.tile.add_aria": {
+    "m": "再添加一个{name}",
+    "_desc": "同一按钮的无障碍名称；name 为提醒方式名（Telegram 等）"
+  },
+  "alerts.tile.count": {
+    "m": "{n, plural, other {# 个}}",
+    "_desc": "提醒方式瓦片上的个数：同一种方式配置了多个时显示，空间紧"
+  },
+  "alerts.channel.scope_kept": {
+    "m": "{level} · 提醒范围保持原样",
+    "_desc": "「已配置的提醒方式」每行的第二行：读不到这项的事件范围时（保持已保存的设置）；level 为提醒级别"
+  },
+  "alerts.level.custom": {
+    "m": "自定义（保留现有设置）",
+    "_desc": "提醒级别分段选择里的一项：已保存的级别不是三个预设之一，原样保留；也用于列表行的第二行"
+  },
+  "alerts.drawer.scope.title": {
+    "m": "提醒范围",
+    "_desc": "抽屉里事件类别（层级节点、路由健康等）复选框一节的标题"
+  },
+  "alerts.drawer.delivery": {
+    "m": "投递",
+    "_desc": "「高级设置」里请求超时与失败重试的小标题，空间紧"
+  },
+  "alerts.drawer.locked.save": {
+    "m": "正在保存配置，稍后再修改。",
+    "_desc": "抽屉表单被锁定时的说明：配置页正在保存"
+  },
+  "alerts.drawer.locked.test": {
+    "m": "正在发送测试，完成后可以继续修改。",
+    "_desc": "抽屉表单被锁定时的说明：测试进行中"
+  },
+  "alerts.drawer.locked.pair": {
+    "m": "正在配对，完成或取消后可以继续修改。",
+    "_desc": "抽屉表单被锁定时的说明：快速配置进行中"
+  },
+  "alerts.scope.kept": {
+    "m": "读不到已保存的提醒范围，不改就保持原样。",
+    "_desc": "抽屉的提醒范围一节：后台没有给出这项设置时的说明（保存时不会覆盖）"
+  },
+  "alerts.scope.choose": {
+    "m": "重新选择",
+    "_desc": "同一说明旁的按钮：改为自己勾选提醒范围（会替换已保存的设置），空间紧"
+  },
+  "alerts.field.label": {
+    "m": "名称",
+    "_desc": "抽屉里提醒方式名称字段的标签（用户自己起的名字，列表显示为「名称 · 标识」）"
+  },
+  "alerts.field.implicit": {
+    "m": "留空时使用：{value}",
+    "_desc": "字段下的提示：不填时后台使用的默认值（不会写进配置）；value 为默认值（数据）"
+  },
+  "alerts.field.range_hint": {
+    "m": "{min}–{max}",
+    "_desc": "数字字段下的范围提示；min、max 为允许的范围（来自提醒方式目录，可能有一端为空）"
+  },
+  "alerts.field.keep": {
+    "m": "保持现有设置",
+    "_desc": "数字输入框的占位文字：读不到已保存的值，留空就保持不变"
+  },
+  "alerts.field.custom_value": {
+    "m": "自定义（保留现有设置）",
+    "_desc": "分段选择里的一项：已保存的值不在可选项里，原样保留"
+  },
+  "alerts.field.secret.saved": {
+    "m": "已设置 · 留空则保持不变",
+    "_desc": "已保存的密钥（或请求头）输入框的占位文字：值不回显，留空则保持不变"
+  },
+  "alerts.field.secret.cleared": {
+    "m": "保存后清除",
+    "_desc": "密钥输入框的占位文字：点了「清除」，保存后删除已保存的值"
+  },
+  "alerts.field.secret.reenter": {
+    "m": "发送地址改了，需要重新填写",
+    "_desc": "密钥输入框的占位文字：改了服务器、地址或端口，已保存的密钥不能沿用，要重新填写"
+  },
+  "alerts.field.secret.clear": {
+    "m": "清除",
+    "_desc": "密钥字段标签旁的按钮：保存后删除已保存的密钥，空间紧"
+  },
+  "alerts.field.secret.undo_clear": {
+    "m": "撤销清除",
+    "_desc": "同一按钮在点了「清除」之后，空间紧"
+  },
+  "alerts.field.headers.hint": {
+    "m": "每行一个「名称: 值」；填写后替换普通请求头。",
+    "_desc": "请求头字段下的提示：写法与后果；「名称: 值」示意写法"
+  },
+  "alerts.issue.required": {
+    "m": "启用前先填写{field}",
+    "_desc": "字段问题：启用的提醒方式缺必填字段；field 为字段名。出现在字段下、列表行和保存条"
+  },
+  "alerts.issue.reenter": {
+    "m": "发送地址改了，请重新填写{field}",
+    "_desc": "字段问题：改了服务器、地址或端口，已保存的密钥不能沿用（裁定 31b-10）；field 为字段名"
+  },
+  "alerts.issue.pattern": {
+    "m": "{field}的格式不对",
+    "_desc": "字段问题：不符合目录给出的格式；field 为字段名"
+  },
+  "alerts.issue.range": {
+    "m": "{field}应在 {min}–{max} 之间",
+    "_desc": "字段问题：数字超出范围；field 为字段名，min、max 为范围（来自目录）"
+  },
+  "alerts.issue.number": {
+    "m": "{field}要填数字",
+    "_desc": "字段问题：不是数字；field 为字段名"
+  },
+  "alerts.issue.json": {
+    "m": "{field}不是有效的 JSON",
+    "_desc": "字段问题：JSON 写法不对；field 为字段名，JSON 不译"
+  },
+  "alerts.issue.headers": {
+    "m": "{field}每行要写成「名称: 值」",
+    "_desc": "字段问题：请求头写法不对；field 为字段名"
+  },
+  "alerts.issue.http": {
+    "m": "{field}以 http:// 开头：提醒内容会明文发送",
+    "_desc": "字段警告（不阻止保存，G22）：地址用的是 http://；field 为字段名，http:// 原样保留"
+  },
+  "alerts.issue.empty_scope": {
+    "m": "至少勾选一类事件",
+    "_desc": "字段问题：提醒范围一项也没勾（阻止保存）"
+  },
+  "alerts.issue.label_empty": {
+    "m": "名称不能清空，可以改成别的名字",
+    "_desc": "字段问题：清空了已保存的名称（后台不接受空名称）"
+  },
+  "alerts.issue.headers_kept": {
+    "m": "发送地址改了：只有同名的请求头会被替换，已保存的其他含凭据的请求头仍会发往新地址",
+    "_desc": "字段警告（不阻止保存）：改了发送地址并重填了请求头；已保存的含凭据请求头不回显、页面无法逐个删除，只有名称相同的会被新值替换，其余的继续随提醒发往新地址（裁定 31b-10 的说明）"
+  },
+  "alerts.test.waiting": {
+    "m": "等待显示",
+    "_desc": "桌面通知测试按钮进行中：等待窗口外壳确认通知已显示，空间紧"
+  },
+  "alerts.test.sent_line": {
+    "m": "测试消息已送达。",
+    "_desc": "测试成功后抽屉里的一行结果"
+  },
+  "alerts.test.shown_line": {
+    "m": "测试通知已显示。",
+    "_desc": "桌面通知测试成功（外壳确认已显示）后抽屉里的一行结果"
+  },
+  "alerts.test.played_line": {
+    "m": "已播放提示音。",
+    "_desc": "声音提示试听成功后抽屉里的一行结果"
+  },
+  "alerts.test.reenter_first": {
+    "m": "发送地址改了：重新填写密钥后才能测试。",
+    "_desc": "抽屉底部的一行说明：改了地址且还没重填密钥时，不能用已保存的配置测试（裁定 31b-10）"
+  },
+  "alerts.quick.token_saved": {
+    "m": "已保存 · 快速配置需要重新填写",
+    "_desc": "快速配置里机器人 Token 输入框的占位文字：已保存的 Token 不回显，配对要重新填写"
+  },
+  "alerts.quick.refresh": {
+    "m": "刷新",
+    "_desc": "配对等待中的按钮：立即检查一次，空间紧"
+  },
+  "alerts.quick.cancel": {
+    "m": "取消",
+    "_desc": "配对等待中的按钮：取消这次配对，空间紧"
+  },
+  "alerts.quick.qr_missing": {
+    "m": "二维码无法显示，请打开或复制链接。",
+    "_desc": "二维码位置的替代说明：后台没有给出可显示的二维码时（G54）"
+  },
+  "alerts.quick.failed_short": {
+    "m": "没有生成",
+    "_desc": "「生成链接」按钮失败时的文字（原因另见下方说明），空间紧"
+  },
+  "alerts.aux.title": {
+    "m": "在手机上订阅（可选）",
+    "_desc": "ntfy / Pushover 抽屉里的一节标题：生成在手机上订阅的链接，不会自动填写配置"
+  },
+  "alerts.aux.generate": {
+    "m": "生成订阅链接",
+    "_desc": "同一节的按钮，空间紧"
+  },
+  "alerts.aux.code": {
+    "m": "订阅代码",
+    "_desc": "Pushover 订阅链接所需的订阅代码输入框标签（Pushover 网站上的 Subscription code）"
+  },
+  "alerts.aux.need_ntfy": {
+    "m": "先在上面填写服务器和主题。",
+    "_desc": "ntfy 订阅链接需要本次填写的服务器和主题（已保存的不回显）"
+  },
+  "alerts.aux.need_code": {
+    "m": "先填写订阅代码。",
+    "_desc": "Pushover 订阅链接需要订阅代码"
+  },
+  "alerts.channel.delivery_failed": {
+    "m": "最近一次没有送达",
+    "_desc": "「已配置的提醒方式」一行和抽屉里的失败原因：远程提醒方式最近一次发送失败（后端只给出通用的失败码，不带服务方原文）"
+  },
+  "alerts.field.provider": {
+    "m": "服务商",
+    "_desc": "邮件（SMTP）抽屉里的分段选择标题：选 Gmail 或 Outlook / Microsoft 365 会自动填入服务器、端口和加密方式，选「自定义」不改动已填内容（与旧版「服务商」下拉相同；T-P4-H3）"
+  },
+  "alerts.field.headers.named_aria": {
+    "m": "已保存的含凭据请求头",
+    "_desc": "请求头字段下一组名称标签的无障碍名称：已保存的含凭据请求头（只列名称，值不显示），每个旁边有「清除」（T-P4-H3）"
+  },
+  "alerts.field.headers.clear_aria": {
+    "m": "保存后清除请求头 {name}",
+    "_desc": "已保存的含凭据请求头旁「清除」按钮的无障碍名称；name 为请求头名称，原样保留（T-P4-H3）"
+  },
+  "alerts.field.headers.undo_clear_aria": {
+    "m": "撤销清除请求头 {name}",
+    "_desc": "同一按钮在点了「清除」之后的无障碍名称；name 为请求头名称，原样保留（T-P4-H3）"
+  },
+  "alerts.issue.reenter_headers": {
+    "m": "发送地址改了，请重新填写或清除这些请求头：{names}",
+    "_desc": "字段问题（阻止保存，裁定 31b-10）：改了发送地址，已保存的含凭据请求头不能沿用，要逐个重新填写（同名）或清除；names 为请求头名称列表（页面按当前语言的列表格式连接，名称本身原样保留）。出现在字段下、列表行和保存条（T-P4-H3）"
+  },
+  "alerts.field.bot_token.hint": {
+    "m": "在 @BotFather 创建机器人后获得",
+    "_desc": "Telegram 机器人 Token 字段下的提示（快速配置和手动填写两处）：Token 从哪里来。@BotFather 是 Telegram 官方机器人的用户名，各语言原样保留"
+  },
+  "alerts.notify.sec.title": {
+    "m": "提醒",
+    "_desc": "设置页「提醒」区的标题（侧栏目录同名）。提醒只在本机显示"
+  },
+  "alerts.notify.on.title": {
+    "m": "桌面提醒",
+    "_desc": "设置页「提醒」区的总开关：关掉后不再弹出任何提醒（运行日志照常记录）"
+  },
+  "alerts.notify.events.title": {
+    "m": "提醒这些事",
+    "_desc": "设置页「提醒」区：下面几个事件开关的小标题"
+  },
+  "alerts.notify.connection.title": {
+    "m": "连接问题",
+    "_desc": "事件开关：连接相关的提醒"
+  },
+  "alerts.notify.connection.desc": {
+    "m": "中断与恢复、启动失败、系统代理被改写",
+    "_desc": "「连接问题」开关的说明：它包含哪几种提醒，用顿号分隔"
+  },
+  "alerts.notify.tier.title": {
+    "m": "层级回退",
+    "_desc": "事件开关：流量改经下一个层级时的提醒"
+  },
+  "alerts.notify.update.title": {
+    "m": "新版本",
+    "_desc": "事件开关：发现新版本时的提醒"
+  },
+  "alerts.notify.sound.title": {
+    "m": "提示音",
+    "_desc": "开关：提醒出现时是否播放 Windows 的通知提示音"
+  },
+  "alerts.notify.preview": {
+    "m": "预览提醒",
+    "_desc": "按钮：立即弹出一张预览提醒卡片，看看它的样子。2–4 个字"
+  },
+  "alerts.notify.preview.waiting": {
+    "m": "正在显示…",
+    "_desc": "「预览提醒」按钮等待卡片显示时的文字"
+  },
+  "alerts.notify.preview.shown": {
+    "m": "已显示",
+    "_desc": "「预览提醒」成功：卡片已经显示在屏幕上"
+  },
+  "alerts.notify.preview.failed": {
+    "m": "没有显示",
+    "_desc": "「预览提醒」失败时按钮上的短文字；具体原因显示在按钮旁"
+  },
+  "alerts.notify.history": {
+    "m": "查看提醒记录",
+    "_desc": "链接：打开运行日志并只看提醒"
+  }
+}

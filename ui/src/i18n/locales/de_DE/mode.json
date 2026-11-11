@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN und System-Proxy zusammen",
+  "mode.mixed.label": "System-Proxy + TUN",
+  "mode.mixed.short": "Beide",
+  "mode.switch.confirm.body": "{mode, select, tun {Der Proxy-Dienst wird neu gestartet und der Datenverkehr kurz unterbrochen. Der TUN-Modus übernimmt den gesamten Datenverkehr dieses Computers.} mixed {Der Proxy-Dienst wird neu gestartet und der Datenverkehr kurz unterbrochen. Der TUN-Modus übernimmt den gesamten Datenverkehr dieses Computers.} other {Der Proxy-Dienst wird neu gestartet und der Datenverkehr kurz unterbrochen.}}",
+  "mode.switch.confirm.ok": "Wechseln",
+  "mode.switch.confirm.title": "Zu „{label}“ wechseln?",
+  "mode.system.desc": "Gilt nur für Apps, die den System-Proxy verwenden",
+  "mode.system.label": "System-Proxy",
+  "mode.system.short": "System",
+  "mode.tun.desc": "Übernimmt den gesamten Datenverkehr über einen virtuellen Adapter (TUN)",
+  "mode.tun.label": "TUN-Modus",
+  "mode.tun.short": "TUN"
+}

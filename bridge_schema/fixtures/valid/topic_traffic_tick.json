@@ -1,0 +1,20 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "traffic.tick",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "t_ms": 1790000000000,
+    "up_bps": 2048,
+    "down_bps": 8192,
+    "session": {
+      "up_bytes": 512000,
+      "down_bytes": 1024000
+    },
+    "running": true,
+    "error_code": null
+  }
+}

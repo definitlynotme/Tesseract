@@ -1,0 +1,22 @@
+{
+  "epoch": "v1-fixture",
+  "id": 26,
+  "key": "sentinel",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "snapshot": {
+    "data": {
+      "items": []
+    },
+    "epoch": "v1-fixture",
+    "key": "sentinel",
+    "kind": "snapshot",
+    "produced_at_ms": 1790812800000,
+    "rev": 1,
+    "sent_at_ms": 1790812800001,
+    "t": "evt",
+    "topic": "nodes.list"
+  },
+  "t": "snapshot_res",
+  "topic": "nodes.list"
+}

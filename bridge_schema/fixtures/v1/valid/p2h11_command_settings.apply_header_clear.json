@@ -1,0 +1,32 @@
+{
+  "t": "req",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "id": 1,
+  "req_id": "request-1",
+  "owner": "window-1",
+  "cmd": "settings.apply",
+  "args": {
+    "base_rev": 3,
+    "changes": [
+      {
+        "section": "alerts",
+        "values": {},
+        "secrets": [
+          {
+            "field": "headers.Authorization",
+            "target_id": "hook",
+            "action": "clear"
+          },
+          {
+            "field": "headers.X-Api-Key",
+            "target_id": "hook",
+            "action": "clear"
+          }
+        ]
+      }
+    ]
+  },
+  "from": "page"
+}

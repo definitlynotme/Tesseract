@@ -1,0 +1,31 @@
+{
+  "t": "res",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "id": 1,
+  "req_id": "request-1",
+  "owner": "window-1",
+  "cmd": "logs.query",
+  "ok": true,
+  "data": {
+    "records": [
+      {
+        "seq": 1,
+        "ts_ms": 1,
+        "rx_ms": 1,
+        "key": "example",
+        "source": "TESSERACT",
+        "level": "debug",
+        "category": "example",
+        "title": "Example text",
+        "detail": "Example text",
+        "raw": "Example text"
+      }
+    ],
+    "watermark": 1,
+    "next_cursor": null,
+    "gap": true,
+    "dropped": 1
+  }
+}

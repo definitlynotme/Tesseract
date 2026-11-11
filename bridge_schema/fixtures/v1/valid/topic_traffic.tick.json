@@ -1,0 +1,20 @@
+{
+  "data": {
+    "down_bps": 0,
+    "error_code": null,
+    "running": false,
+    "session": {
+      "down_bytes": 0,
+      "up_bytes": 0
+    },
+    "t_ms": 1791400577584,
+    "up_bps": 0
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "traffic.tick"
+}

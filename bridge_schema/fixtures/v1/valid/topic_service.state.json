@@ -1,0 +1,47 @@
+{
+  "data": {
+    "core": {
+      "cleanup_pending": false,
+      "core_generation": 0,
+      "pid": null,
+      "process_generation": 0,
+      "running": false
+    },
+    "freshness": {
+      "sampled_at_ms": 1791400577583,
+      "snapshot_revision": 1,
+      "stale": false,
+      "uptime_s": null
+    },
+    "intent": {
+      "desired_running": false,
+      "lifecycle_revision": 0,
+      "runtime_generation": 0,
+      "stop_requested": false
+    },
+    "readiness": {
+      "lifecycle_revision": 0,
+      "network_context_epoch": 0,
+      "publication_revision": 0,
+      "reason": "Mihomo Core is stopped",
+      "remaining_ms": null,
+      "route_epoch": 0,
+      "state": "fail_closed",
+      "validation_active": false
+    },
+    "runtime": {
+      "failure": null,
+      "failure_code": null,
+      "runtime_running": false,
+      "shutdown_cleanup_pending": false,
+      "startup_phase": "stopped"
+    }
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "service.state"
+}

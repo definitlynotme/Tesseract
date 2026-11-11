@@ -1,0 +1,19 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "jobs",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "op": "job-42",
+    "name": "service.start",
+    "state": "done",
+    "started_at_ms": 1789999999000,
+    "result": {
+      "startup_phase": "running",
+      "failure_code": null
+    }
+  }
+}

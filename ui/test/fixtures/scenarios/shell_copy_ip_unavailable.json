@@ -1,0 +1,288 @@
+{
+  "name": "shell_copy_ip_unavailable",
+  "desc": "S18 复制出口 IP 不可用：出口冲突（identity_conflict），面板命令禁用、不显示 IP",
+  "lang": "zh_CN",
+  "allow_host": [
+    "host_notify_ready",
+    "host_set_page",
+    "host_ready",
+    "host_notify_rendered",
+    "host_confirm_quit",
+    "host_force_restart",
+    "rt_resync"
+  ],
+  "steps": [
+    {
+      "deliver": {
+        "t": "rt:reset",
+        "epoch": "rt-fixture-e1",
+        "reason": "reconnect"
+      }
+    },
+    {
+      "deliver": {
+        "t": "hello",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "proto": 1,
+        "app_version": "1.0.0",
+        "runtime_pid": 4381,
+        "lang": "zh_CN",
+        "caps": {
+          "commands": [
+            "service.start",
+            "service.stop",
+            "service.restart",
+            "app.quit",
+            "exit.verify",
+            "mode.set",
+            "app.update.check",
+            "app.update.install"
+          ],
+          "topics": [
+            "service.state",
+            "route.published",
+            "tiers.summary",
+            "traffic.tick",
+            "traffic.history",
+            "logs.batch",
+            "core.info",
+            "jobs",
+            "network.mode",
+            "killswitch.state",
+            "exit.identity",
+            "update.state",
+            "tier.transition"
+          ],
+          "features": []
+        },
+        "scope": {
+          "kind": "custom",
+          "id": "rt-fixture"
+        },
+        "network_recovery": {
+          "proxy": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          },
+          "firewall": {
+            "state": "not_needed",
+            "error_code": null,
+            "remaining_count": 0
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "service.state",
+        "rev": 6,
+        "kind": "snapshot",
+        "data": {
+          "intent": {
+            "desired_running": true,
+            "stop_requested": false,
+            "lifecycle_revision": 12,
+            "runtime_generation": 4
+          },
+          "runtime": {
+            "runtime_running": true,
+            "startup_phase": "running",
+            "shutdown_cleanup_pending": false,
+            "failure_code": null,
+            "failure": null
+          },
+          "core": {
+            "running": true,
+            "pid": 7654,
+            "process_generation": 4,
+            "core_generation": 8,
+            "cleanup_pending": false
+          },
+          "readiness": {
+            "state": "ready",
+            "validation_active": false,
+            "reason": "",
+            "remaining_ms": null,
+            "publication_revision": 36,
+            "lifecycle_revision": 12,
+            "route_epoch": 7,
+            "network_context_epoch": 2
+          },
+          "freshness": {
+            "sampled_at_ms": 1790000000000,
+            "snapshot_revision": 51,
+            "stale": false,
+            "uptime_s": 120
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "tiers.summary",
+        "rev": 1,
+        "kind": "snapshot",
+        "data": {
+          "carrier": "vanguard",
+          "offline_reason": null,
+          "order": [
+            "vanguard",
+            "sentinel",
+            "bastion",
+            "gateway"
+          ],
+          "degraded": false,
+          "fallback": false,
+          "tiers": {
+            "vanguard": {
+              "enabled": true,
+              "total": 3,
+              "usable": 2
+            },
+            "sentinel": {
+              "enabled": true,
+              "total": 2,
+              "usable": 1
+            },
+            "bastion": {
+              "enabled": true,
+              "total": 40,
+              "usable": 25
+            },
+            "gateway": {
+              "enabled": false,
+              "total": 0,
+              "usable": 0
+            }
+          },
+          "pool": {
+            "usable": 26,
+            "total": 45
+          }
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "network.mode",
+        "rev": 2,
+        "kind": "snapshot",
+        "data": {
+          "mode": "system",
+          "admin": true,
+          "switching": false,
+          "proxy_state": "owned",
+          "drift": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "killswitch.state",
+        "rev": 3,
+        "kind": "snapshot",
+        "data": {
+          "enabled": true,
+          "active": false,
+          "admin": true,
+          "error": null,
+          "triggered": false
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "update.state",
+        "rev": 4,
+        "kind": "snapshot",
+        "data": {
+          "state": "idle",
+          "version": null,
+          "update_available": false,
+          "installable": false,
+          "error": null,
+          "current_version": "1.0.0",
+          "previous_version": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "evt",
+        "epoch": "rt-fixture-e1",
+        "produced_at_ms": 1790000000000,
+        "sent_at_ms": 1790000000001,
+        "topic": "exit.identity",
+        "rev": 5,
+        "kind": "snapshot",
+        "data": {
+          "current": {
+            "request_id": "x-1",
+            "generation": 8,
+            "binding_id": "b-1",
+            "status": "partial",
+            "reason_code": "identity_conflict",
+            "v4": {
+              "status": "ok",
+              "address": "198.51.100.7",
+              "country": "JP",
+              "reason_code": null,
+              "observed_at_ms": 1790000000000
+            },
+            "v6": {
+              "status": "failed",
+              "address": null,
+              "country": null,
+              "reason_code": "timeout",
+              "observed_at_ms": 1790000000000
+            },
+            "fresh": true,
+            "observed_at_ms": 1790000000000,
+            "native_fallback_verified": false,
+            "native_fallback_verified_commit_rejected": false,
+            "native_fallback_unverified_budget": false,
+            "manual_execution_binding_stale": false
+          },
+          "previous": null
+        }
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:language",
+        "language": "zh_CN",
+        "epoch": "rt-fixture-e1"
+      }
+    },
+    {
+      "deliver": {
+        "t": "host:visibility",
+        "visible": true,
+        "epoch": "rt-fixture-e1"
+      }
+    }
+  ]
+}

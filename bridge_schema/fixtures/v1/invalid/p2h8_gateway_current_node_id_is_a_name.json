@@ -1,0 +1,21 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "selected": "Tokyo-2",
+      "effective": "Tokyo-2",
+      "missing": false,
+      "applied": true,
+      "pending": null,
+      "selected_node_id": "Tokyo-2"
+    }
+  },
+  "expected": "invariant:gateway.current.selected_node_id"
+}

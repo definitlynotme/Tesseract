@@ -1,0 +1,301 @@
+{
+ "_note": "T-P6-05 UI guard: declared enum values of bridge_protocol (page topics and query replies) that ui/test/fixtures/scenarios did not carry when this file was written. Items 1 and 3 report them as known; any other untested value fails. Shrink it as fixtures gain these values; add to it only with a Claude ruling.",
+ "generated_utc": "2026-10-26T23:59:37Z",
+ "gaps": {
+  "res:alerts.deliveries": {
+   ".items[].state": [
+    "disabled",
+    "dropped",
+    "incomplete",
+    "unverified"
+   ]
+  },
+  "res:app.info": {
+   ".listeners[].kind": [
+    "http",
+    "socks"
+   ]
+  },
+  "res:autostart.state": {
+   ".target": [
+    "other"
+   ]
+  },
+  "res:config.snapshot": {
+   ".pending.effect": [
+    "recheck",
+    "reload",
+    "restart"
+   ],
+   ".pending.state": [
+    "applied",
+    "applying",
+    "cancelled",
+    "failed",
+    "pending",
+    "superseded"
+   ]
+  },
+  "res:import.specs": {
+   ".protocols[].fields[].type": [
+    "multichoice",
+    "number",
+    "textarea"
+   ]
+  },
+  "res:logs.query": {
+   ".records[].level": [
+    "critical",
+    "debug",
+    "error",
+    "info",
+    "warn"
+   ],
+   ".records[].source": [
+    "ALERT",
+    "MIHOMO",
+    "TESSERACT",
+    "UNKNOWN"
+   ]
+  },
+  "res:logs.tail": {
+   ".records[].level": [
+    "critical"
+   ],
+   ".records[].source": [
+    "UNKNOWN"
+   ]
+  },
+  "res:nodes.detail": {
+   ".last_diagnostic.mode": [
+    "chain"
+   ],
+   ".last_diagnostic.state": [
+    "cancelled",
+    "failed",
+    "running",
+    "superseded"
+   ],
+   ".node.status": [
+    "unknown"
+   ]
+  },
+  "topic:alerts.delivery": {
+   ".items[].state": [
+    "disabled",
+    "dropped",
+    "incomplete",
+    "unverified"
+   ]
+  },
+  "topic:alerts.onboarding": {
+   ".sessions[].allowed_actions[]": [
+    "cancel",
+    "complete",
+    "open_link",
+    "poll",
+    "show_qr"
+   ],
+   ".sessions[].state": [
+    "blocked",
+    "cancelled",
+    "configured",
+    "expired",
+    "failed",
+    "missing",
+    "pending",
+    "ready"
+   ]
+  },
+  "topic:config.changed": {
+   ".pending.effect": [
+    "recheck",
+    "reload",
+    "restart"
+   ],
+   ".pending.state": [
+    "applied",
+    "applying",
+    "cancelled",
+    "failed",
+    "pending",
+    "superseded"
+   ],
+   ".sections[].effect": [
+    "autostart",
+    "deferred",
+    "recheck",
+    "reload",
+    "restart",
+    "ui"
+   ]
+  },
+  "topic:exit.identity": {
+   ".current.trigger": [
+    "recheck"
+   ],
+   ".current.v4.status": [
+    "cancelled"
+   ],
+   ".current.v4.type": [
+    "backbone",
+    "business",
+    "isp",
+    "mobile",
+    "residential"
+   ],
+   ".current.v6.status": [
+    "cancelled"
+   ],
+   ".current.v6.type": [
+    "backbone",
+    "business",
+    "hosting",
+    "isp",
+    "mobile",
+    "residential"
+   ],
+   ".previous.status": [
+    "cancelled",
+    "failed",
+    "idle",
+    "partial",
+    "running",
+    "superseded"
+   ],
+   ".previous.trigger": [
+    "manual",
+    "recheck"
+   ],
+   ".previous.v4.status": [
+    "cancelled",
+    "failed",
+    "running",
+    "unknown"
+   ],
+   ".previous.v4.type": [
+    "backbone",
+    "business",
+    "hosting",
+    "isp",
+    "mobile",
+    "residential"
+   ],
+   ".previous.v6.status": [
+    "cancelled",
+    "failed",
+    "running",
+    "unknown"
+   ],
+   ".previous.v6.type": [
+    "backbone",
+    "business",
+    "hosting",
+    "isp",
+    "mobile",
+    "residential"
+   ]
+  },
+  "topic:gateway.current": {
+   ".pending.effect": [
+    "recheck",
+    "reload",
+    "restart"
+   ],
+   ".pending.state": [
+    "applied",
+    "applying",
+    "cancelled",
+    "failed",
+    "pending",
+    "superseded"
+   ]
+  },
+  "topic:jobs": {
+   ".name": [
+    "alerts.test",
+    "app.quit",
+    "app.update.check",
+    "app.update.install",
+    "exit.verify",
+    "gateway.select",
+    "geo.update",
+    "import.apply",
+    "logs.exportBundle",
+    "logs.exportFiltered",
+    "mode.set",
+    "nodes.delete",
+    "nodes.diagnose",
+    "nodes.update",
+    "service.restart",
+    "settings.apply",
+    "subscriptions.refresh"
+   ],
+   ".result.startup_phase": [
+    "collecting",
+    "core_standby",
+    "failed",
+    "running",
+    "stopped",
+    "stopping"
+   ],
+   ".state": [
+    "cancelled",
+    "done",
+    "queued",
+    "running",
+    "superseded"
+   ]
+  },
+  "topic:logs.batch": {
+   ".records[].category": [
+    "health"
+   ],
+   ".records[].source": [
+    "ALERT"
+   ]
+  },
+  "topic:logs.feed": {
+   ".level": [
+    "debug"
+   ],
+   ".reason": [
+    "core_not_running",
+    "stream_error"
+   ]
+  },
+  "topic:network.mode": {
+   ".mode": [
+    "mixed",
+    "tun"
+   ]
+  },
+  "topic:service.state": {
+   ".runtime.startup_phase": [
+    "stopping"
+   ]
+  },
+  "topic:subscriptions.list": {
+   ".items[].tier": [
+    "vanguard"
+   ]
+  },
+  "topic:tier.transition": {
+   ".from": [
+    "bastion",
+    "gateway",
+    "sentinel"
+   ],
+   ".to": [
+    "bastion",
+    "gateway"
+   ]
+  },
+  "topic:traffic.history": {
+   ".source": [
+    "bucketed"
+   ]
+  }
+ },
+ "_p1_note": "2026-10-27 T-P6-05 fix round 2 (review 1 MUST 1): the P1 topic entries (topic:jobs, topic:logs.batch, topic:service.state, topic:traffic.history) were added when sidecar_probe.P1_ENUM_PATHS brought the function-validated P1 topics into the enum coverage; they await a Claude ruling (T-P6-05_报告.md, fix record round 2)."
+}

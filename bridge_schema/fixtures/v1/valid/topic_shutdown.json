@@ -1,0 +1,17 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "shutdown",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "phase": "draining",
+    "recovery": {
+      "proxy": "not_needed",
+      "firewall": "not_needed"
+    },
+    "workers_pending": true
+  }
+}

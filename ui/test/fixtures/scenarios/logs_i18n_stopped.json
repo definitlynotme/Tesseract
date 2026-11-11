@@ -1,0 +1,346 @@
+{
+ "name": "logs_i18n_stopped",
+ "desc": "T-P4-04d: the logs page in fixture mode, service stopped (rt_start_job's snapshots without the service.start step) plus the same ASCII-only logs.batch as logs_i18n_running.",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "app.quit"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "traffic.tick",
+      "traffic.history",
+      "logs.batch",
+      "core.info",
+      "jobs"
+     ],
+     "features": []
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": false,
+      "startup_phase": "stopped",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": false,
+      "pid": null,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": null
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "tiers.summary",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "carrier": "vanguard",
+     "offline_reason": null,
+     "order": [
+      "vanguard",
+      "sentinel",
+      "bastion",
+      "gateway"
+     ],
+     "degraded": false,
+     "fallback": false,
+     "tiers": {
+      "vanguard": {
+       "enabled": true,
+       "total": 3,
+       "usable": 2
+      },
+      "sentinel": {
+       "enabled": true,
+       "total": 2,
+       "usable": 1
+      },
+      "bastion": {
+       "enabled": true,
+       "total": 40,
+       "usable": 25
+      },
+      "gateway": {
+       "enabled": false,
+       "total": 0,
+       "usable": 0
+      }
+     },
+     "pool": {
+      "usable": 5,
+      "total": 7
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "logs.batch",
+    "rev": 1,
+    "kind": "edge",
+    "data": {
+     "from_seq": 42,
+     "records": [
+      {
+       "seq": 42,
+       "ts_ms": 1790431080000,
+       "rx_ms": 1790431080009,
+       "source": "TESSERACT",
+       "level": "info",
+       "category": "runtime",
+       "key": "runtime.start_requested",
+       "title": "Starting service",
+       "detail": "Collecting node sources and preparing the core.",
+       "raw": "Desktop runtime start requested (generation=40)"
+      },
+      {
+       "seq": 43,
+       "ts_ms": 1790431082000,
+       "rx_ms": 1790431082009,
+       "source": "MIHOMO",
+       "level": "info",
+       "category": "runtime",
+       "key": "log.raw",
+       "title": "",
+       "detail": "",
+       "raw": "Start initial configuration in progress"
+      },
+      {
+       "seq": 44,
+       "ts_ms": 1790431085000,
+       "rx_ms": 1790431085009,
+       "source": "TESSERACT",
+       "level": "error",
+       "category": "update",
+       "key": "log.raw",
+       "title": "",
+       "detail": "",
+       "raw": "Traceback (most recent call last):\n  File \"collector.py\", line 214, in refresh_source\n    body = fetch(source.url, timeout=8.0)\nSourceTimeout: sub.example.com timed out after 8.0s"
+      },
+      {
+       "seq": 45,
+       "ts_ms": 1790605200000,
+       "rx_ms": 1790605200009,
+       "source": "TESSERACT",
+       "level": "warn",
+       "category": "routing",
+       "key": "tier.sentinel_active",
+       "title": "Traffic on Sentinel",
+       "detail": "Vanguard has no usable node; Sentinel carries the traffic.",
+       "raw": "Tier mode changed: tier1_degraded -> tier2_active (tier1=0/2 tier2=4)"
+      },
+      {
+       "seq": 46,
+       "ts_ms": 1790605800000,
+       "rx_ms": 1790605800009,
+       "source": "TESSERACT",
+       "level": "error",
+       "category": "update",
+       "key": "update.sources_failed",
+       "title": "Source refresh failed",
+       "detail": "All 5 sources failed; the current nodes are kept.",
+       "raw": "Node source refresh failed for all sources (round 1)"
+      },
+      {
+       "seq": 47,
+       "ts_ms": 1790605920000,
+       "rx_ms": 1790605920009,
+       "source": "TESSERACT",
+       "level": "error",
+       "category": "update",
+       "key": "update.sources_failed",
+       "title": "Source refresh failed",
+       "detail": "All 5 sources failed; the current nodes are kept.",
+       "raw": "Node source refresh failed for all sources (round 2)"
+      },
+      {
+       "seq": 48,
+       "ts_ms": 1790606040000,
+       "rx_ms": 1790606040009,
+       "source": "TESSERACT",
+       "level": "error",
+       "category": "update",
+       "key": "update.sources_failed",
+       "title": "Source refresh failed",
+       "detail": "All 5 sources failed; the current nodes are kept.",
+       "raw": "Node source refresh failed for all sources (round 3)"
+      },
+      {
+       "seq": 49,
+       "ts_ms": 1790606100000,
+       "rx_ms": 1790606100009,
+       "source": "TESSERACT",
+       "level": "warn",
+       "category": "routing",
+       "key": "tier.bastion_active",
+       "title": "Traffic on Bastion",
+       "detail": "Bastion has 6 usable nodes, switched from Sentinel.",
+       "raw": "Tier mode changed: tier2_active -> tier3_active (tier1=0/2 tier2=0 tier3=6)"
+      },
+      {
+       "seq": 50,
+       "ts_ms": 1790606101000,
+       "rx_ms": 1790606101009,
+       "source": "TESSERACT",
+       "level": "critical",
+       "category": "circuit_breaker",
+       "key": "killswitch.triggered",
+       "title": "Kill switch triggered",
+       "detail": "All tiers are down; outbound traffic is blocked.",
+       "raw": "Killswitch TRIGGERED: all tiers down, outbound blocked"
+      },
+      {
+       "seq": 51,
+       "ts_ms": 1790653800000,
+       "rx_ms": 1790653800009,
+       "source": "TESSERACT",
+       "level": "info",
+       "category": "runtime",
+       "key": "runtime.start_requested",
+       "title": "Starting service",
+       "detail": "Collecting node sources and preparing the core.",
+       "raw": "Desktop runtime start requested (generation=41)"
+      },
+      {
+       "seq": 52,
+       "ts_ms": 1790653803000,
+       "rx_ms": 1790653803009,
+       "source": "MIHOMO",
+       "level": "debug",
+       "category": "connection",
+       "key": "log.raw",
+       "title": "",
+       "detail": "",
+       "raw": "[DNS] cache hit api.example.com --> 198.51.100.12 (ttl=120)"
+      },
+      {
+       "seq": 53,
+       "ts_ms": 1790653920000,
+       "rx_ms": 1790653920009,
+       "source": "UNKNOWN",
+       "level": "warn",
+       "category": "other",
+       "key": "log.raw",
+       "title": "",
+       "detail": "",
+       "raw": "unparsed line from an unknown writer"
+      },
+      {
+       "seq": 54,
+       "ts_ms": 1790654100000,
+       "rx_ms": 1790654100009,
+       "source": "TESSERACT",
+       "level": "info",
+       "category": "alert",
+       "key": "alert.delivered",
+       "title": "Alert delivered",
+       "detail": "1 channel delivered.",
+       "raw": "Alert delivered: kind=fallback channels=1 ok=1"
+      },
+      {
+       "seq": 55,
+       "ts_ms": 1790654280000,
+       "rx_ms": 1790654280009,
+       "source": "TESSERACT",
+       "level": "info",
+       "category": "configuration",
+       "key": "proxy.system_set",
+       "title": "System proxy set",
+       "detail": "127.0.0.1:7890 written to the Windows proxy settings.",
+       "raw": "System proxy set: 127.0.0.1:7890 bypass=localhost;127.*"
+      }
+     ],
+     "dropped": 0,
+     "dropped_total": 0,
+     "gap": false
+    },
+    "seq": 42
+   }
+  }
+ ]
+}

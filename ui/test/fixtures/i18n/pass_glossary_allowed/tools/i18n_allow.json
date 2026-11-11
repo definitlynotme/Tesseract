@@ -1,0 +1,19 @@
+{
+  "_doc": "fixture",
+  "entries": [
+    {
+      "check": "glossary",
+      "id": "common.items",
+      "lang": "en_US",
+      "term_id": "node",
+      "reason": "fixture: \"server\" is the agreed English word here"
+    },
+    {
+      "check": "glossary",
+      "id": "common.tier",
+      "lang": "en_US",
+      "term_id": "tier_vanguard",
+      "reason": "fixture: deliberate"
+    }
+  ]
+}

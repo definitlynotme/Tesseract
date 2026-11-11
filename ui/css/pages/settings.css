@@ -1,0 +1,594 @@
+/* ==========================================================================
+   pages/settings.css — 配置
+   A section index (sticky, scroll spy) on the left; seven frameless sections
+   of settings rows on the right, capped at a readable measure so a label and
+   its control stay close. Framed objects only where something is edited as a
+   set: the rule / resolver / source / channel lists, token boxes, Geo cells.
+   The unsaved-change dot sits in the left gutter (never shifts a label); a
+   changed row also carries an effect tag and a one-row undo.
+   ========================================================================== */
+.page-settings { --set-side: 176px; --set-gap: 48px; --set-top: 20px; --sub-in: 18px; --set-max: 740px; }
+@media (max-width: 1180px) { .page-settings { --set-side: 156px; --set-gap: 36px; } }
+@media (max-height: 760px) { .page-settings { --set-top: 16px; } }
+
+.set { display: grid; grid-template-columns: var(--set-side) minmax(0, 1fr); column-gap: var(--set-gap); align-items: start; min-width: 0; }
+.set-main { min-width: 0; max-width: var(--set-max); padding-bottom: 12px; }
+
+/* ---- section index ------------------------------------------------------------ */
+.set-side { position: sticky; top: var(--set-top); z-index: 2; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.set-toc .toc-a { min-width: 0; }
+.set-toc-l { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13 (决定_P5裁定 P5-e #5: interface words are read whole): an index label wraps to a second
+   line (en Bastion emergency pool); the index column grows past --set-side only when one word is
+   longer than its room (de Verbindungsqualität, Benachrichtigungen: min-content), so the other
+   languages keep the column as designed. The marker takes the link's height (T.ui.toc). */
+.set { grid-template-columns: minmax(var(--set-side), min-content) minmax(0, 1fr); }
+/* (at most 28 px more: the longest real index word, de Verbindungsqualität, needs 24 at 1060; a
+   longer word breaks in its line instead of taking the settings column's room) */
+.set-side { max-width: calc(var(--set-side) + 28px); }
+.set-toc .toc-a { height: auto; min-height: 30px; padding-top: 5px; padding-bottom: 5px; line-height: 18px; white-space: normal; }
+.set-toc-l { overflow: visible; overflow-wrap: break-word; }
+
+/* ---- section heads -------------------------------------------------------------- */
+.set .fsec-head { gap: 16px; }
+.set-hd-l { flex: 1 1 auto; min-width: 0; }
+/* T-P5-06: a title word longer than the room beside the head's actions does not run out of its box:
+   the actions move to a line of their own (right-aligned) when the title's longest word and the
+   actions do not fit side by side */
+.set .fsec-head { flex-wrap: wrap; }
+.set .fsec-head > .set-hd-l { flex-basis: 0; min-width: min-content; }
+.set .fsec-head > .set-hd-a { margin-left: auto; }
+.set-hd-a { flex: none; display: flex; align-items: center; gap: 8px; padding-bottom: 1px; }
+.set-hd-m { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); white-space: nowrap; }
+
+/* ---- rows: title line, live state, effect tag, gutter dot ------------------------- */
+.set .frow-t { flex-wrap: wrap; row-gap: 4px; min-height: 20px; }
+.set-t { white-space: nowrap; }
+/* T-P5-11: a row title longer than the room the row's controls leave it (es Versión y
+   actualizaciones beside three buttons) wraps instead of running under them */
+.set-t { white-space: normal; min-width: 0; }
+.set .frow-d .sw, .set .field-msg .sw, .set-retired .sw { white-space: normal; }
+.set .frow-d .sw > .ic, .set .set-inline-e .ic { color: var(--c-err); vertical-align: -3px; margin-right: 5px; }
+.set .frow-d .mono { font-size: var(--fs-12); }
+.set .frow.is-invalid .frow-d, .set-vrow.is-invalid .frow-d { color: var(--c-err); }
+/* F-01: a row's description line or a field's message line with nothing to say (no hint, no error,
+   no state's reason) folds away instead of leaving an empty strip (settings.js note: .is-blank) */
+.set .frow-d.is-blank, .set .field-msg.is-blank, .set-ch-form .field-msg.is-blank { display: none; }
+.set-live { display: inline-flex; align-items: center; font-size: var(--fs-12); line-height: 18px; font-weight: var(--fw-regular); color: var(--c-ink-2); white-space: nowrap; }
+.set-live .sw > .sdot { display: inline-block; margin-right: 6px; vertical-align: 1px; }
+.set-live.is-warn { color: var(--c-warn); font-weight: var(--fw-semi); }   /* on but not in effect (no administrator rights) */
+
+.set-eff-w { display: inline-flex; align-items: center; gap: 2px; }
+/* what a change will do (会重启服务, 下次启动生效): F-02, a mark beside the title, no chip; the
+   heavier effects are bold umber */
+.set-eff { display: inline-flex; align-items: center; height: 20px; padding: 0 0 0 4px; border-radius: var(--r-xs); background: none;
+  font-size: var(--fs-12); line-height: 20px; font-weight: var(--fw-regular); letter-spacing: var(--track-mark); color: var(--c-ink-2); white-space: nowrap; }
+.set-eff .sw > .ic { width: 12px; height: 12px; vertical-align: -1.5px; margin-right: 4px; color: var(--c-ink-3); }
+.set-eff.is-warn { color: var(--c-warn); font-weight: var(--fw-semi); }
+.set-eff.is-warn .sw > .ic { color: var(--c-warn); }
+.set-undo.icon-btn.sm { width: 22px; height: 22px; margin: -1px 0; }   /* lays out 20 px tall: the title line never grows when the tag comes */
+
+/* sub-rows (the kill switch's exceptions, the egress retry) hang off a hairline;
+   their changed dot still lands in the page gutter, on the same line as the rows' */
+.set-sub { position: relative; margin: 2px 0 0 2px; padding-left: 16px; box-shadow: inset 1px 0 0 var(--c-line-2); }
+.set-sub-h { padding: 2px 0 2px; font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-medium); color: var(--c-ink-3); }
+.set-subrow { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 24px; padding: 10px 0; min-width: 0; }
+.set-subrow + .set-subrow { box-shadow: inset 0 1px 0 var(--c-line); }
+.set-subrow.is-block { grid-template-columns: minmax(0, 1fr); }
+.set-subrow-x { grid-column: 1 / -1; min-width: 0; }
+.set-subrow::before, .set-retired::before {
+  content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--c-changed);
+  scale: 0; transition: scale var(--spring-dur) var(--spring);
+}
+.set-subrow::before { left: calc(-14px - var(--sub-in)); top: 17px; }
+.set-subrow.is-changed::before, .set-retired.is-changed::before { scale: 1; }
+.set-ks-sub-wrap { display: flex; flex-direction: column; gap: 10px; }
+
+/* ---- 接管方式: two live switches (系统代理 · 虚拟网卡) in a sub-block, the status line under them ---- */
+.set-mode-sws { margin-top: 2px; }
+/* the system proxy's bypass list opens under its switch while it is on */
+.set-bypass { display: flex; flex-direction: column; gap: 6px; }
+.set-bypass[hidden] { display: none; }
+.set-bypass-t { font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-medium); color: var(--c-ink-3); }
+/* without administrator rights the line under 虚拟网卡 says why its switch is locked (the lock on
+   the reason's first line when it wraps) */
+.set-mode-gate { display: flex; align-items: flex-start; gap: 6px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.set-mode-gate[hidden] { display: none; }
+.set-mode-gate > .ic { flex: none; width: 13px; height: 13px; margin-top: 2.5px; color: var(--c-warn); }
+.set-mode-gate > span { min-width: 0; }
+/* a locked switch (aria-disabled: no administrator rights) reads as the component's disabled one,
+   on or off, and does not answer the pointer */
+.set-mode-sws .switch[aria-disabled="true"] { opacity: .5; cursor: default; }
+.set-mode-sws .switch[aria-disabled="true"]:hover { background: var(--c-switch-off); }
+.set-mode-sws .switch[aria-disabled="true"][aria-checked="true"]:hover { background: var(--c-accent); }
+.set-mode-st { display: flex; align-items: center; min-height: 20px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); transition: color .2s var(--ease-out); }
+.set-mode-st .sw > .sdot { display: inline-block; margin-right: 7px; vertical-align: 1px; }
+.set-mode-st .sw > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+.set-mode-st .mono { font-size: var(--fs-12); }
+.set-mode-st.is-done { color: var(--c-ok); }
+.set-mode-st .sw > .ic { width: 13px; height: 13px; margin-right: 6px; vertical-align: -2px; }
+.set-mode-st.is-gated .sw > .ic { color: var(--c-warn); }
+
+/* ---- token boxes (bypass, kill-switch exceptions): chips + an input in one control ---- */
+.set-tok-box { flex-wrap: wrap; align-items: center; gap: 6px; height: auto; min-height: 36px; padding: 5px 6px; cursor: text; }
+.set-tok-box > .set-tok-in { flex: 1 1 150px; min-width: 120px; height: 24px; padding: 0 4px;
+  font-family: var(--font-mono); font-size: var(--fs-12); letter-spacing: -.01em; word-spacing: normal; }   /* typed values are technical */
+.set-tok-box > .set-tok-in::placeholder { font-family: var(--font-sans); font-size: var(--fs-13); letter-spacing: 0; }
+.set-tok-i { height: 24px; gap: 3px; padding: 0 4px 0 8px; font-weight: var(--fw-medium); color: var(--c-ink); cursor: default; }
+.set-tok-i.mono .set-tok-v { font-family: var(--font-mono); font-size: var(--fs-12); letter-spacing: -.01em; word-spacing: normal; }
+.set-tok-v { white-space: nowrap; }
+.set-tok-i.is-armed { box-shadow: inset 0 0 0 1.5px var(--c-ink-3); }
+/* an added entry carries the changed dot inside the chip, after its value */
+.set-tok-i.is-item-changed .set-tok-v::after { content: ""; display: inline-block; width: 5px; height: 5px; margin-left: 5px; border-radius: 50%; background: var(--c-changed); vertical-align: 2px; }
+
+/* ---- 路由规则 ----------------------------------------------------------------------- */
+
+.set-add-f { gap: 6px; }
+.set-add { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.set-add > .seg, .set-add > .select, .set-add > .btn { flex: none; }
+.set-add-in { flex: 1 1 auto; min-width: 0; }
+/* T-P5-11: a long action word or kind label (ru) moves the field to a line of its own instead of
+   pushing the input out of its box */
+.set-add { flex-wrap: wrap; row-gap: 8px; }
+.set-add-in { flex-basis: 220px; }
+/* 写法: the prefixes live in a popover beside the input (not a permanent row of syntax chips) */
+
+.set-rl-h { display: flex; align-items: center; gap: 8px; min-height: 28px; margin-top: 4px; min-width: 0; font-size: var(--fs-12); color: var(--c-ink-3); }
+.set-rl-t { font-size: var(--fs-13); color: var(--c-ink); white-space: nowrap; }
+.set-rl-m { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13: a head's note (the custom rules' count) is read whole: it wraps beside the title */
+.set-rl-h { align-items: flex-start; padding: 5px 0; line-height: 18px; }
+.set-rl-h .link-btn { margin-top: -4px; margin-bottom: -4px; }
+.set-rl-m { white-space: normal; overflow: visible; overflow-wrap: break-word; }
+.set-rl-m.swap { grid-template-columns: minmax(0, 1fr); }
+.set-rl-m > .sw { white-space: normal; }
+.set-rl-h .link-btn { flex: none; margin-right: -6px; }
+#set-geo-link-t { margin-left: 3px; }
+
+/* editable lists: one hairline frame, rows inset so their hover wash and drag lift sit inside it */
+.set-rl, .set-chlist, .set-recent { position: relative; padding: 4px; border-radius: var(--r-panel); background: var(--c-surface); }
+/* the hairline frame is drawn on ::before; when the list gains or loses a row, ::after
+   draws the frame at its old height and the two cross-fade while the rows glide, so the
+   frame's edge never cuts through a row (opacity only; --set-dh is the height it had) */
+.set-rl::before, .set-chlist::before, .set-recent::before,
+.set-rl::after, .set-chlist::after, .set-recent::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--c-line); pointer-events: none;
+}
+.set-rl::after, .set-chlist::after, .set-recent::after { bottom: calc(-1 * var(--set-dh, 0px)); opacity: 0; }
+/* the value column is capped so what it is (域名后缀 · 含子域名) reads right beside it */
+.set-rule { --cols: 20px 66px minmax(140px, 250px) minmax(0, 1fr) 28px; gap: 10px; padding: 0 6px 0 4px; }
+/* T-P5-11: the action chip's column is as wide as the chip, and every chip is as wide as the widest
+   action word of the language (settings.js puts the other two words under the shown one,
+   invisible), so the column lines up from row to row; 66 px stays the floor (zh_CN as designed) */
+.set-rule { --cols: 20px max-content minmax(140px, 250px) minmax(0, 1fr) 28px; }
+.set-rule .set-rule-k { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-13: what a value is (fr Suffixe de domaine · sous-domaines inclus, a resolver's role) is read
+   whole: it wraps to a second line and the row grows */
+.set-rule .set-rule-k { white-space: normal; overflow: visible; overflow-wrap: break-word; line-height: 16px; padding: 4px 0; }
+/* an added or edited item: the changed dot in the page gutter, on the item's line (the
+   list frame's 4 px inset puts the row 4 px right of the rows' own dot column) */
+.set-rule::before {
+  content: ""; position: absolute; left: -18px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%;
+  background: var(--c-changed); scale: 0; transition: scale var(--spring-dur) var(--spring); pointer-events: none;
+}
+.set-rule.is-item-changed::before { scale: 1; }
+.set-rule .grip { margin-left: 0; }
+.set-act { justify-content: flex-start; width: 66px; gap: 4px; color: var(--c-ink-2); }
+.set-act { width: auto; min-width: 66px; }
+.set-act-g { display: inline-grid; }
+.set-act-g > span { grid-area: 1 / 1; white-space: nowrap; }
+.set-act-z { visibility: hidden; }
+.set-act .ic { width: 13px; height: 13px; }
+.set-rule-v { font-size: var(--fs-12); color: var(--c-ink); }
+.set-rule-k { font-size: var(--fs-12); color: var(--c-ink-3); white-space: nowrap; }
+.set-rl-empty { display: flex; align-items: center; min-height: 36px; padding: 0 10px; font-size: var(--fs-12); color: var(--c-ink-3); }
+/* 不会生效: a rule an earlier rule of another action covers (or a configuration-file rule the
+   backend drops). The value steps back; the mark says it in words, the reason in its tooltip */
+.set-rule.is-shadowed .set-rule-v { color: var(--c-ink-3); text-decoration: line-through; text-decoration-color: var(--c-ink-4); }
+.set-rule-sh { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; white-space: nowrap; vertical-align: top; color: var(--c-warn); font-weight: var(--fw-semi); cursor: default; }
+.set-rule-k > .set-rule-sh:first-child { margin-left: 0; }
+.set-rule-sh .ic { flex: none; width: 12px; height: 12px; }
+/* 配置文件中的规则: read-only rows, no handle, action or delete (the columns stay those of a rule) */
+.set-adv { display: flex; flex-direction: column; gap: 4px; }
+.set-adv[hidden] { display: none; }
+.set-adv-t { justify-content: center; }
+.set-res-r { --cols: 44px minmax(140px, 280px) minmax(0, 1fr) 28px; padding-left: 8px; }
+.set-res-t, .set-src-t { justify-content: center; }
+.set-src-r { --cols: 96px minmax(0, 1fr) 52px; padding-left: 8px; }
+.set-src-r .li-act { gap: 2px; }
+.set-src-r.is-editing { --cols: 96px minmax(0, 1fr) auto; background: var(--c-surface); }
+.set-src-r.is-editing:hover { background: var(--c-surface); }
+.set-inline { height: 26px; }
+.set-inline-a { display: flex; gap: 2px; }
+.set-inline-e { display: none; grid-column: 2 / -1; align-items: flex-start; padding: 0 0 7px; font-size: var(--fs-12); line-height: 18px; color: var(--c-err); }
+.set-inline-e > .ic { flex: none; margin-top: 2px; }
+.set-inline-e > span { min-width: 0; }
+/* a long address in a message breaks instead of running out of the column */
+.set .field-msg, .set-inline-e, .set .frow-d { overflow-wrap: anywhere; }
+.set-src-r.is-invalid .set-inline-e { display: flex; }
+.set-src-r.is-invalid .set-inline { box-shadow: inset 0 0 0 1px var(--c-err); }
+.set-src-r.is-invalid .set-inline:focus-within { box-shadow: inset 0 0 0 1px var(--c-err), 0 0 0 1px var(--c-err); }
+
+/* ---- DNS custom resolvers ---------------------------------------------------------- */
+.set-res { display: flex; flex-direction: column; gap: 10px; padding-top: 2px; }
+.set-res-req { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; min-height: 20px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.set-res-req-l { margin-right: 2px; }
+
+/* ---- 延迟上限: slider + a live three-band preview of the user's own nodes -------------- */
+.set-rowhead { display: flex; align-items: flex-start; gap: 16px; min-width: 0; }
+.set-rowhead > .frow-l { flex: 1 1 auto; }
+.set-rowhead > .btn { flex: none; }
+.set-lat-top { display: grid; grid-template-columns: var(--lat-a, 29%) minmax(0, 1fr); align-items: center; min-width: 0; margin-top: 2px; }
+.set-lat-read { display: flex; flex-direction: column; min-width: 0; padding-right: 16px; }
+.set-lat-v { font-size: var(--fs-18); line-height: 24px; font-weight: var(--fw-semi); letter-spacing: -.01em; color: var(--c-ink); white-space: nowrap; }
+.set-lat-def { display: flex; align-items: center; gap: 4px; min-height: 22px; font-size: var(--fs-12); color: var(--c-ink-3); white-space: nowrap; }
+.set-lat-def .link-btn { height: 22px; margin: 0 0 0 -2px; padding: 0 6px; }
+/* T-P5-06: 默认 800 ms · 恢复默认 in the narrow readout column: the restore link moves to a second
+   line, and the default words wrap, instead of running past the column */
+.set-lat-def { flex-wrap: wrap; row-gap: 0; white-space: normal; }
+.set-lat-def .link-btn { white-space: nowrap; }
+/* T-P5-13: the settings column can be up to 28 px narrower (the index column, above): the restore
+   link's own words wrap too when its line is shorter than they are (de Standard wiederherstellen) */
+.set-lat-def .link-btn { white-space: normal; height: auto; min-height: 22px; text-align: left; }
+.set-lat-sl { min-width: 0; }
+.set-lat-sl .sl-bubble { display: none; }   /* the readout on the left already shows the value */
+.set-lat-prev { position: relative; margin-top: 2px; padding-top: 30px; }
+.set-lat-dots { position: absolute; left: 0; right: 0; top: 0; height: 30px; }
+/* T-P5-13: the column can change width after the dots were placed (the index column takes the
+   language's longest word): a dot's old place, still moving to its new one, never widens the page
+   (horizontal clip only; the dots' places are clamped 5 px inside, their hover scale fits the margin) */
+.set-lat-dots { overflow-x: clip; overflow-clip-margin: 4px; }
+.set-ld { position: absolute; left: -5px; bottom: 5px; width: 10px; height: 10px; display: grid; place-items: center; cursor: default; transition: transform .24s var(--ease-out); }
+.set-ld i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--c-ok-dot); transition: background-color .2s var(--ease-out), box-shadow .2s var(--ease-out), scale .2s var(--ease-out); }
+.set-ld:hover i { scale: 1.35; }
+.set-ld.b-slow i { background: linear-gradient(90deg, var(--c-warn-dot) 50%, transparent 50%); box-shadow: inset 0 0 0 1.5px var(--c-warn-dot); }
+.set-ld.b-down i { background: transparent; box-shadow: inset 0 0 0 2px var(--c-fail-dot); }
+.set-lat-bar { position: relative; height: 8px; border-radius: var(--r-xs); overflow: hidden; background: var(--c-well-2); }
+.set-lat-bar > i { position: absolute; inset: 0; transform-origin: 0 50%; transition: transform .24s var(--ease-out); }
+.set-lat-bar > .b-ok { background: var(--c-ok-2); }
+.set-lat-bar > .b-slow { background: var(--c-warn-2); }
+.set-lat-bar > .b-down { background: var(--c-err-2); }
+.set-lat-cut { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; pointer-events: none; transition: transform .24s var(--ease-out); }
+.set-lat-cut::before { content: ""; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; background: var(--c-surface); }
+.set-lat-axis { position: relative; height: 18px; margin-top: 6px; overflow: clip; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); font-variant-numeric: tabular-nums; }
+.set-lat-end { position: absolute; top: 0; white-space: nowrap; transition: opacity .15s var(--ease-out); }
+.set-lat-end.l { left: 0; }
+.set-lat-end.r { right: 0; }
+.set-lat-end.is-hid { opacity: 0; }
+.set-lat-mk { position: absolute; left: 0; top: 0; width: 100%; height: 16px; pointer-events: none; transition: transform .24s var(--ease-out); }
+.set-lat-mk > span { position: absolute; left: 0; top: 0; translate: -50% 0; white-space: nowrap; color: var(--c-ink-2); transition: translate .2s var(--ease-out); }
+.set-lat-mk.is-end > span { translate: -100% 0; }
+.set-lat-sum { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; margin-top: 2px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-lat-lead { margin-right: 2px; }
+.set-lat-sum b { font-weight: var(--fw-semi); color: var(--c-ink); }
+
+/* ---- Bastion ------------------------------------------------------------------------ */
+.set-num { flex: none; }
+
+/* ---- 提醒 (10-30 redesign): five switches, a preview and the history link --------------- */
+.set-n-grp { padding: 14px 0 2px; box-shadow: inset 0 1px 0 var(--c-line); font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); }
+.set-n-grp + .frow { box-shadow: none; }
+.set-n-row { padding-left: 14px; }
+.set-n-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; padding: 14px 0 2px; box-shadow: inset 0 1px 0 var(--c-line); }
+.set-n-res { min-width: 0; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); overflow-wrap: anywhere; }
+.set-n-res.is-err { color: var(--c-err); }
+
+/* ---- 提醒与通知 (retired channel UI; removed with the P8 clean-up) ------------------------ */
+.set-al-notes { display: flex; flex-direction: column; gap: 8px; }
+.set-al-notes:not(:empty) { margin-bottom: 12px; }
+.set-al-plain { display: flex; align-items: flex-start; gap: 6px; min-width: 0; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); overflow-wrap: anywhere; }
+.set-al-plain .ic { flex: none; width: 13px; height: 13px; margin-top: 2px; }
+.set-al-plain > span { min-width: 0; }
+.set-chrow { --cols: 28px minmax(0, 1fr) auto 16px; width: 100%; text-align: left; }
+.set-chrow .li-sub .t-err { color: var(--c-fail); }
+/* T-P5-13: a channel's scope summary or its last failure is read whole: it wraps under the name */
+.set-chrow .li-sub { white-space: normal; overflow-wrap: anywhere; }
+.set-ch-ic { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-ctl); background: var(--c-well); color: var(--c-ink-2); }
+.set-ch-ic .ic { width: 16px; height: 16px; }
+.set-ch-st { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; min-width: 0; }
+.set-ch-at { font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); white-space: nowrap; }
+/* paused: a word with a pause glyph, the delivery health kept on the line under it (never faded) */
+.set-ch-pz { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-2); white-space: nowrap; }
+.set-ch-pz .ic { width: 12px; height: 12px; color: var(--c-ink-3); }
+.set-ch-hl { display: inline-flex; align-items: center; white-space: nowrap; }
+.set-ch-hl .set-ch-at { margin-left: 4px; }
+.set-ch-go { width: 16px; height: 16px; color: var(--c-ink-4); transition: translate .2s var(--ease-out), color .15s var(--ease-out); }
+.set-chrow:hover .set-ch-go, .set-chrow:focus-visible .set-ch-go { color: var(--c-ink-2); translate: 2px 0; }
+.set-ch-empty { display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: var(--r-panel); box-shadow: inset 0 0 0 1px var(--c-line); font-size: var(--fs-12); color: var(--c-ink-3); }
+.set-chgal-h { margin-top: 6px; font-size: var(--fs-12); line-height: 16px; font-weight: var(--fw-medium); color: var(--c-ink-3); }
+.set-chgal { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.set-chg { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: start; gap: 12px; min-width: 0; }
+.set-chg-l { padding-top: 7px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); overflow-wrap: anywhere; }
+.set-chg-t { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.set-ch {
+  position: relative; display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 10px 0 9px; border-radius: var(--r-ctl);
+  font-size: var(--fs-13); color: var(--c-ink-2); white-space: nowrap; background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line-2); --press: .96;
+}
+.set-ch .ic { width: 15px; height: 15px; color: var(--c-ink-3); transition: color .15s var(--ease-out); }
+.set-ch:hover { color: var(--c-ink); background: var(--c-surface-hover); box-shadow: inset 0 0 0 1px var(--c-line-3); }
+.set-ch:hover .ic, .set-ch.is-set .ic { color: var(--c-ink-2); }
+.set-ch.is-set { color: var(--c-ink); }
+.set-ch-s:empty { display: none; }
+.set-ch-s .st { font-weight: var(--fw-regular); }
+/* a tile with a draft carries the changed dot inside, after its state (not a badge on the corner) */
+.set-ch.is-changed::after { content: ""; flex: none; width: 6px; height: 6px; margin-left: -1px; border-radius: 50%; background: var(--c-changed); }
+.set-rec { --cols: 40px minmax(46px, max-content) minmax(0, 1fr) auto; }
+.set-recent .set-rec:hover { background: none; }   /* a record, not a control: no hover wash */
+/* an event time reads as it does in 运行日志 (.logs-time): sans, 12, tabular, tertiary ink */
+.set-rec-t { font-size: var(--fs-12); line-height: 20px; color: var(--c-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* time, level and the first delivery sit on the title's line */
+.set-rec-t, .set-rec .sev, .set-rec-d { align-self: start; }
+.set-rec-t { margin-top: 1px; }
+.set-rec .sev, .set-rec-d { margin-top: 3px; }
+.set-rec-m { font-size: var(--fs-13); line-height: 20px; color: var(--c-ink); }
+.set-rec .li-sub { white-space: normal; }   /* a record reads in full: a long detail wraps instead of losing its end */
+.set-rec-d { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-2); white-space: nowrap; }
+
+/* channel editor (drawer) */
+.set-ch-err { margin-bottom: 14px; }
+.set-ch-on { padding: 0 0 14px; margin-bottom: 14px; box-shadow: inset 0 -1px 0 var(--c-line); }
+.set-ch-tabs { margin: -6px 0 14px; }
+.set-quick { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.set-qr { display: flex; align-items: flex-start; gap: 16px; min-width: 0; }
+.set-qr-code { flex: none; width: 128px; height: 128px; padding: 6px; border-radius: var(--r-panel); box-shadow: inset 0 0 0 1px var(--c-line); background: var(--c-surface); }
+.set-qr-svg { width: 100%; height: 100%; shape-rendering: crispEdges; }
+.set-qr-svg rect { fill: var(--c-ink); }
+.set-qr-svg rect.bg { fill: var(--c-surface); }
+.set-qr-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.set-qr-l { font-size: var(--fs-12); color: var(--c-ink-3); }
+.set-qr-link { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink); overflow-wrap: anywhere; }
+.set-qr-st { display: flex; min-height: 18px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-qr-st .sw { white-space: normal; }
+.set-qr-st .sw > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+.set-qr-st.is-ok { color: var(--c-ok); }
+.set-full { grid-column: 1 / -1; }
+.set-ch-fields .field.set-nohint:not(.is-invalid) > .field-msg { display: none; }
+.set-ch-fields .seg:not(.block) { align-self: flex-start; }
+.set-eye.icon-btn.sm { margin-right: -6px; }
+.set-ch-sec { margin-top: 16px; padding-top: 16px; box-shadow: inset 0 1px 0 var(--c-line); }
+.set-ch-h { margin-bottom: 8px; font-size: var(--fs-13); line-height: 20px; font-weight: var(--fw-semi); color: var(--c-ink); }
+.set-ch-lvd { margin-top: 8px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.set-ch-lvd:empty { display: none; }   /* a kept custom filter: no line (F-01) */
+.set-ch-scope { gap: 8px; }
+.set-adv-t { margin-left: -8px; font-size: var(--fs-13); color: var(--c-ink-2); }
+.set-adv { margin-top: 10px; }
+
+/* T-P4-05e: a row is 「名称 · 标识」 (the key is data); a tile with instances has a + beside it */
+.set-ch-name { min-width: 0; }
+.set-ch-key { color: var(--c-ink-3); }
+.set-ch-w { display: inline-flex; align-items: center; gap: 2px; min-width: 0; }
+.set-ch-add.icon-btn.sm { width: 24px; height: 24px; color: var(--c-ink-3); }
+.set-ch-s { font-size: var(--fs-12); color: var(--c-ink-3); }
+.set-recent-all { margin-right: -8px; font-size: var(--fs-12); }
+.set-recent-row .frow-t .spacer { flex: 1 1 auto; }
+/* the drawer's form (catalog-driven): required marks, warnings (http://), multi-line values */
+.set-ch-form .field.is-req > .field-lab::after { content: " *"; color: var(--c-ink-3); }
+.set-ch-form .field.is-warn > .field-msg { color: var(--c-warn); }
+.set-ch-form .field-lab { display: flex; align-items: baseline; gap: 6px; }
+.set-sec-f { position: relative; }
+/* (F-01 round 1) the word ends on the input's right edge: .link-btn's own margin-right -6px is dropped
+   here, so right -6px plus the 6px padding put the hover wash just past the edge and the word on it */
+.set-sec-clear.link-btn { position: absolute; top: -2px; right: -6px; margin: 0; padding: 0 6px; height: 20px; font-size: var(--fs-12); }
+.set-ch-tabox { height: auto; padding: 0; }
+.set-ch-ta { width: 100%; min-height: 64px; padding: 7px 10px; border: 0; background: none; resize: vertical; font: inherit; font-family: var(--font-mono); font-size: var(--fs-12); line-height: 18px; color: var(--c-ink); }
+/* request headers may carry credentials: dots unless the field is being edited (WebView2 / Chromium) */
+.set-ch-ta.set-ta-mask { -webkit-text-security: disc; }
+.set-ch-bool { padding: 2px 0; }
+.set-ch-bool.set-nohint > .field-msg:empty { display: none; }
+.set-ch-kept { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-ch-kept .ic { flex: none; width: 13px; height: 13px; color: var(--c-ink-3); }
+.set-ch-kept[hidden], .set-ch-scope[hidden] { display: none; }
+.set-ch-subh { margin: 14px 0 8px; font-size: var(--fs-12); font-weight: var(--fw-medium); color: var(--c-ink-3); }
+.set-ch-lock, .set-ch-gate { margin-bottom: 12px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-ch-gate { margin: 12px 0 0; color: var(--c-warn); }
+.set-ch-test { display: flex; align-items: flex-start; gap: 6px; margin-top: 14px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-ch-test .ic { flex: none; width: 14px; height: 14px; margin-top: 2px; }
+.set-ch-test.is-ok { color: var(--c-ok); }
+.set-ch-test.is-err { color: var(--c-err); }
+.set-ch-lockable[inert] { opacity: .55; transition: opacity .15s var(--ease-out); }
+.set-ch-aux .set-qr { margin-top: 12px; }
+.set-ch-aux > .btn { margin-top: 4px; }
+.set-ch-log .set-ch-logt { margin-left: 8px; color: var(--c-ink-3); }
+/* the pairing QR: the sidecar's SVG as an image (never markup); without one, words in its place */
+.set-qr-img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.set-qr-code.is-missing { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 10px; }
+.set-qr-miss { font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-2); overflow-wrap: anywhere; }
+.set-qr-pay { font-size: var(--fs-12); line-height: 16px; color: var(--c-ink); overflow-wrap: anywhere; }
+.set-qr-st.is-err { color: var(--c-err); }
+.set-ch-log dd { gap: 8px; flex-wrap: nowrap; min-width: 0; }
+.set-ch-logt { color: var(--c-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.set-ch-raw { flex: none; font-size: var(--fs-12); color: var(--c-ink-3); }
+.set-ch-none { font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+
+/* ---- 应用 ---------------------------------------------------------------------------- */
+.set-ver { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; }
+.set-ver b { font-weight: var(--fw-medium); color: var(--c-ink-2); }
+.set-sep { color: var(--c-ink-4); }
+.set-upd-st { display: flex; min-height: 18px; margin-top: 6px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-upd-st .sw > .ic { width: 13px; height: 13px; color: var(--c-ok); vertical-align: -2px; }
+.set-upd-st .sw > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+.set-upd-st.is-err { color: var(--c-err); }
+.set-upd-st.is-err .sw > .ic { color: var(--c-err); margin-right: 5px; }
+.set-upd-st .sw { white-space: normal; }
+.set-upd-new { font-weight: var(--fw-semi); color: var(--c-ink); }
+.set-upd-prog { max-width: 280px; margin-top: 8px; }
+.set-upd-btns { gap: 6px; align-self: start; }   /* top-aligned like the Geo row's 立即更新 */
+.set-geo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: var(--r-panel); box-shadow: inset 0 0 0 1px var(--c-line); }
+.set-geo-i { display: flex; flex-direction: column; gap: 3px; min-width: 0; padding: 10px 12px 11px; }
+.set-geo-i + .set-geo-i { box-shadow: inset 1px 0 0 var(--c-line); }
+.set-geo-n { display: flex; align-items: baseline; gap: 6px; min-width: 0; font-size: var(--fs-13); line-height: 18px; color: var(--c-ink); white-space: nowrap; }
+.set-geo-n small { font-size: var(--fs-12); color: var(--c-ink-3); overflow: hidden; text-overflow: ellipsis; }
+/* T-P5-06: a long database word (interface text) wraps in its quarter instead of running into the
+   next one; the database's own name (data) never forces a line (basis 0): it takes the rest of
+   the label's line and ellipsizes there, as before */
+.set-geo-n { flex-wrap: wrap; row-gap: 0; white-space: normal; }
+.set-geo-n small { flex: 1 1 0; min-width: 0; white-space: nowrap; }
+.set-geo-s { display: flex; min-height: 18px; min-width: 0; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-geo-s .sw { white-space: normal; }
+/* T-P5-11: the state words (de Vor 8 Tagen · Aktualisierung überfällig) wrap in the card */
+.set-geo-s .st { flex: 0 1 auto; white-space: normal; min-width: 0; }
+.set-geo-s .sw > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+.set-geo .st { white-space: normal; align-items: flex-start; }
+.set-geo .st::before { margin-top: 4px; }
+
+/* ---- T-P4-05d: real data ------------------------------------------------------------------
+   control widths (were inline styles: CSP without 'unsafe-inline', architecture §9) */
+.set-num.w-port { width: 128px; }
+.set-num.w-min { width: 112px; }
+.select.w-dns, .select.w-lang { width: 168px; }
+.select.w-res { width: 112px; }
+.select.w-src { width: 132px; }
+/* T-P5-11: the widths above are floors: a longer current value (de Automatisch (empfohlen)) widens
+   its select instead of being cut */
+.select.w-dns, .select.w-lang, .select.w-res, .select.w-src { width: auto; }
+.select.w-dns, .select.w-lang { min-width: 168px; }
+.select.w-res { min-width: 112px; }
+.select.w-src { min-width: 132px; }
+.set-ch-fields.f-cols-2, .set-adv.f-cols-2 { --f-cols: 2; }
+.set-ch-log { --kv-w: 88px; }
+
+/* the page's status line: loading · the snapshot could not be read (重试) · read_errors (打开配置目录,
+   no path: G48) · a save waiting for the service */
+.set-status { display: flex; flex-direction: column; gap: 10px; }
+.set-status:not(:empty) { margin-bottom: 18px; }
+.set-st-line { display: flex; align-items: center; gap: 8px; min-height: 20px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); }
+.set-st-line > .ic { flex: none; width: 14px; height: 14px; color: var(--c-ink-3); }
+.set-st-line > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+.set-st-errs { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; font-size: var(--fs-12); line-height: 18px; overflow-wrap: anywhere; }
+.set-st-errs li::before { content: "2"; margin-right: 6px; color: var(--c-ink-4); }
+
+/* a value the snapshot does not carry: the control is read-only (inert) and the title says so */
+.set .is-unknown:not(.input-pre) { opacity: .55; }
+.set-unk { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: var(--r-xs); background: var(--c-well);
+  font-size: var(--fs-12); line-height: 20px; font-weight: var(--fw-regular); color: var(--c-ink-3); white-space: nowrap; cursor: default; }
+
+/* a list the projection withheld whole (secret_fields_set): editing replaces the whole list */
+.set-hidden-note { display: flex; align-items: center; gap: 6px; min-height: 18px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+.set-hidden-note > .ic { flex: none; width: 13px; height: 13px; }
+.set-hidden-note[hidden] { display: none; }
+
+/* each saved row's own result (SaveResult section by section): 已生效 · 待生效 · 未生效 · 下次启动生效.
+   F-02: marks, not chips: done in ink-2, not yet in the voice, not applied in bold umber, not
+   saved in bold clay */
+.set-res-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 0 0 4px; border-radius: var(--r-xs);
+  font-size: var(--fs-12); line-height: 20px; font-weight: var(--fw-regular); letter-spacing: var(--track-mark); white-space: nowrap; cursor: default;
+  background: none; color: var(--c-ink-2); }
+.set-res-tag.is-applied { color: var(--c-ok); }
+.set-res-tag.is-pending, .set-res-tag.is-next_start { color: var(--c-voice); font-family: var(--font-voice); font-style: var(--voice-style); font-size: calc(var(--fs-12) * var(--voice-scale)); font-weight: var(--voice-weight); letter-spacing: var(--voice-track); }
+.set-res-tag.is-not_applied, .set-res-tag.is-external { color: var(--c-warn); font-weight: var(--fw-semi); }
+.set-res-tag.is-failed { color: var(--c-err); font-weight: var(--fw-semi); }
+
+/* the status lines carry runtime reasons (a failed switch, an update error): they wrap, and a long
+   word (an address) breaks */
+.set-mode-st .sw, .set-upd-st .sw { white-space: normal; overflow-wrap: anywhere; }
+/* the mode status line: a failed switch, a rewritten system proxy */
+.set-mode-st.is-err { color: var(--c-err); }
+.set-mode-st.is-err .sw > .ic { color: var(--c-err); }
+
+/* the kind chips of the resolver and source lists sit in a fixed column: a long word ends in an ellipsis */
+.set-res-t, .set-src-t { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 20px; text-align: center; }
+/* T-P5-13: the kind column is as wide as the widest kind word (settings.js kindChip stacks them),
+   the designed width stays its floor; the word is never cut */
+.set-res-r { --cols: minmax(44px, max-content) minmax(140px, 280px) minmax(0, 1fr) 28px; }
+.set-src-r { --cols: minmax(96px, max-content) minmax(0, 1fr) 52px; }
+.set-src-r.is-editing { --cols: minmax(96px, max-content) minmax(0, 1fr) auto; }
+.set-res-t, .set-src-t { overflow: visible; }
+.set-res-t .set-act-g, .set-src-t .set-act-g { justify-items: center; }
+/* a long word in a page callout (an address, a name) breaks instead of widening the page */
+.set .callout-body { overflow-wrap: anywhere; }
+/* ---- 配置整理 P2: the rules as one list, each filled in; combinations; rule sets ---------------- */
+/* the sentence 当 [种类] [内容] 时 [动作] [添加]: the two words are quiet, the controls carry it */
+.set-when-w { flex: none; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-3); }
+.select.w-kind { width: 152px; }        /* (ru 「Автоопределение」, the longest default, fits) */
+.select.w-val { width: 168px; }
+.select.w-behav { width: 116px; }
+.set-when > [hidden], .set-combo-i > [hidden] { display: none; }
+.set-rule-more { display: flex; margin-top: 2px; }
+.set-rule-more .link-btn { gap: 4px; margin-left: -6px; }
+.set-rule-more .link-btn .ic { width: 14px; height: 14px; }
+/* 组合条件: a small form under the field, one condition per line */
+.set-combo { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 12px; border-radius: var(--r-panel); background: var(--c-well); }
+.set-combo[hidden] { display: none; }
+.set-combo-l { display: flex; flex-direction: column; gap: 6px; }
+.set-combo-i { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.set-combo-i > .set-add-in { flex: 1 1 200px; min-width: 0; }
+.set-combo-not { flex: none; color: var(--c-ink-3); }
+.set-combo-not[aria-pressed="true"] { color: var(--c-warn); box-shadow: inset 0 0 0 1px var(--c-warn); }
+.set-combo-more .link-btn { gap: 4px; margin-left: -6px; }
+.set-combo-a { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.set-combo-a > .spacer { flex: 1 1 auto; }
+/* a combination in the list: its conditions inline, each its kind word and its content; one that
+   does not fit goes on to the next line (every condition is the rule: none is cut off) */
+.set-rule-combo { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; row-gap: 2px; min-width: 0; padding: 4px 0; }
+.set-cond { display: inline-flex; flex-wrap: wrap; align-items: baseline; column-gap: 4px; min-width: 0; }
+.set-cond > .mono { min-width: 0; overflow-wrap: anywhere; }
+.set-cond-k, .set-cond-not { font-size: var(--fs-12); color: var(--c-ink-3); white-space: nowrap; }
+.set-cond-not { color: var(--c-warn); }
+.set-rule-sep { color: var(--c-ink-4); }
+/* 未启用: a rule kept from the old configuration that did not take effect; it steps back until an
+   action is picked for it */
+.set-rule.is-off .set-rule-v, .set-rule.is-off .set-act { opacity: .55; }
+.set-rule-sh.set-rule-off { color: var(--c-ink-3); }
+/* 解析域名: an IP rule that also matches host names by resolving them */
+.set-rule-res { display: inline-flex; margin-left: 8px; padding: 0 5px; border-radius: var(--r-xs); line-height: 16px; white-space: nowrap; color: var(--c-ink-3); box-shadow: inset 0 0 0 1px var(--c-line-2); cursor: default; }
+/* 规则集: name, content, address (a withheld one: its words) */
+.set-set-r { --cols: minmax(80px, 160px) max-content minmax(0, 1fr) 28px; padding-left: 8px; }
+.set-set-n { font-size: var(--fs-13); color: var(--c-ink); }
+.set-set-t { justify-content: center; }
+.set-set-u { font-size: var(--fs-12); color: var(--c-ink-2); }
+.set-set-hid { color: var(--c-ink-3); }
+.set-set-name { flex: 0 1 150px; min-width: 90px; }
+.set-sets > .set-rl[hidden] { display: none; }
+
+/* the latency preview while a recheck runs (SectionResult.effect recheck) */
+.set-lat-rc { display: inline-flex; align-items: center; gap: 6px; color: var(--c-ink-2); }
+.set-lat-rc > .spin { width: 12px; height: 12px; border-width: 1.5px; color: var(--c-ink-3); }
+
+/* sources: the value is a secret: the sidecar's masked hint, or 来源 N · 已设置 (R-05, U4) */
+.set-src-v { font-size: var(--fs-12); color: var(--c-ink); }
+.set-src-set { font-size: var(--fs-12); color: var(--c-ink-3); }
+
+/* D8: 开机自启时进入托盘 rests while autostart is off */
+#set-tray-row.is-off .switch { opacity: .55; }
+
+/* Geo: failures by message_key, the disabled reason */
+.set-geo.is-one { grid-template-columns: minmax(0, 1fr); }
+.set-geo-err { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.set-geo-err[hidden] { display: none; }
+.set-geo-e { display: flex; align-items: flex-start; gap: 6px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-2); overflow-wrap: anywhere; }
+.set-geo-e > .ic { flex: none; width: 13px; height: 13px; margin-top: 2.5px; color: var(--c-warn); }
+.set-upd-meta { margin-top: 4px; font-size: var(--fs-12); line-height: 18px; color: var(--c-ink-3); }
+
+/* 更新说明: the publisher's text, plain (never parsed as markup: R-09) */
+.set-notes-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); }
+
+/* ---- update notes (sheet) -------------------------------------------------------------- */
+.set-notes { display: flex; flex-direction: column; gap: 6px; padding-bottom: 4px; }
+.set-notes-h { margin-top: 8px; font-size: var(--fs-13); font-weight: var(--fw-semi); color: var(--c-ink); }
+.set-notes-h:first-child { margin-top: 0; }
+.set-notes ul { display: flex; flex-direction: column; gap: 4px; }
+.set-notes li { display: flex; gap: 8px; font-size: var(--fs-13); line-height: 20px; color: var(--c-ink-2); }
+.set-notes li::before { content: ""; flex: none; width: 4px; height: 4px; margin-top: 8px; border-radius: 50%; background: var(--c-ink-4); }
+
+/* ---- leaving with drafts (T.confirm plus a third action) ------------------------------ */
+.dlg.set-leave .dlg-title .ic { color: var(--c-warn); }
+.dlg.set-leave .set-leave-drop { margin-right: auto; }
+
+/* ---- "here": a short wash on the row a link or a problem glides to --------------------- */
+.set .frow.set-hit::after, .set .fsec.set-hit::after {
+  content: ""; position: absolute; inset: 0 -12px; border-radius: var(--r-panel); background: var(--c-sel);
+  mix-blend-mode: multiply; pointer-events: none; opacity: 0;
+}
+.set .fsec.set-hit::after { inset: -10px -12px 0; }
+.set-ghost { z-index: 0; }
+
+/* ---- narrow fallback (< 1060 px, web builds only): the index becomes a wrapped row above the content ---- */
+@media (max-width: 1059px) {
+  .set { grid-template-columns: minmax(0, 1fr); row-gap: 16px; }
+  .set-side { position: static; }
+  .set-toc { flex-direction: row; flex-wrap: wrap; }
+  .set-toc .toc-ind { display: none; }
+  .set-opts { --opt-cols: 1 !important; }
+  .set-geo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .set-chg { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+}

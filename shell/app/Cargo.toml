@@ -1,0 +1,38 @@
+[package]
+name = "tesseract-shell"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+# T-P6-01 (plan §9.3): extra strings of the one VERSIONINFO tauri-build writes (tauri-winres reads
+# this table). The dist names the shell Tesseract.exe; versions come from app_version.txt (build.rs).
+[package.metadata.tauri-winres]
+OriginalFilename = "Tesseract.exe"
+InternalName = "Tesseract"
+Comments = "https://github.com/definitlynotme/Tessract"
+
+[features]
+# T-P6-06: the distribution build (scripts/build_shell_preview.py, later the release script):
+# admits the default scope, runs the frozen sidecar next to the shell, titles the window
+# "Tesseract". Off for every development build, test, e2e run and p3 smoke.
+distribution = []
+
+[dependencies]
+bridge_host = { path = "../bridge_host" }
+tauri = { version = "=2.11.5", default-features = false, features = ["wry", "custom-protocol"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+webview2-com = "=0.38.2"
+windows = { version = "0.61", features = ["Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_System_Threading", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_Controls",
+    # T-P3-06: save dialog (COM), file/handle grants, SHA-256 + Authenticode, residual process scan, local time.
+    "Win32_System_Com", "Win32_UI_Shell_Common", "Win32_Storage_FileSystem", "Win32_Security", "Win32_Security_Cryptography",
+    "Win32_Security_WinTrust", "Win32_System_ProcessStatus", "Win32_System_SystemInformation",
+    # T-P3-07: DWM cloak until the page is ready (DWMWA_CLOAK / DWMWA_CLOAKED).
+    "Win32_Graphics_Dwm",
+    # 10-30 notice cards (notice.rs): the monitor's DPI for placement, the notification sound.
+    "Win32_UI_HiDpi", "Win32_Media_Audio"] }
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", default-features = false, features = ["codegen"] }
+serde_json = "1"

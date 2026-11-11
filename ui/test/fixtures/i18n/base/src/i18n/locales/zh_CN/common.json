@@ -1,0 +1,26 @@
+{
+  "common.action.save": {
+    "m": "保存",
+    "_desc": "通用按钮"
+  },
+  "common.items": {
+    "m": "{n, plural, other {# 个节点}}",
+    "_desc": "节点计数"
+  },
+  "common.hint": {
+    "m": "按 <kbd>Ctrl K</kbd> 打开{name}",
+    "_desc": "快捷键提示"
+  },
+  "common.mode": {
+    "m": "{mode, select, tun {TUN 模式} other {系统代理}}",
+    "_desc": "网络模式"
+  },
+  "common.tier": {
+    "m": "Vanguard 自建",
+    "_desc": "层级名称"
+  },
+  "common.skipped.timeout": {
+    "m": "等待超时，操作没有执行。",
+    "_desc": "ack.skipped_reason = timeout"
+  }
+}

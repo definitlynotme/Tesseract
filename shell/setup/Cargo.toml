@@ -1,0 +1,51 @@
+# Tesseract Setup: the installer's own window (design: README.md).
+#
+# A small WebView2 bootstrapper around the existing Inno Setup installer. The Inno package is
+# embedded at build time (TESSERACT_SETUP_PAYLOAD, see build.rs) and run silently, elevated;
+# this window only shows what it does. Without WebView2, or with command-line switches
+# (/VERYSILENT, /DIR=...), it hands over to the Inno package unchanged.
+#
+# Its own workspace on purpose: it is not part of the shell build and needs nothing of Tauri.
+# Versions are pinned to the shell's Cargo.lock so the shared registry cache serves them.
+[package]
+name = "tesseract-setup"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+[workspace]
+
+[[bin]]
+name = "tesseract-setup"
+path = "src/main.rs"
+
+[dependencies]
+tao = { version = "=0.35.3", default-features = false, features = ["rwh_06"] }
+wry = { version = "=0.55.1", default-features = false, features = ["protocol"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "=0.10.9"
+windows = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_Graphics_Dwm",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_Shell_Common",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+embed-resource = "=3.0.11"
+sha2 = "=0.10.9"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true

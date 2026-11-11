@@ -1,0 +1,15 @@
+/* ==========================================================================
+   index.css — stylesheet bundle entry (both targets). Same order as the
+   prototype index.html <link> list. Demo-only rules live in design.css, which
+   only the design target bundles (P4 architecture §1.1, §1.2).
+   ========================================================================== */
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./base.css";
+@import "./components.css";
+@import "./shell.css";
+@import "./letter.css";
+@import "./pages/overview.css";
+@import "./pages/tiers.css";
+@import "./pages/logs.css";
+@import "./pages/settings.css";

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "name": "mihomo",
+      "version": "1.19.27",
+      "source_path": "mihomo-v1.19.27-source.zip",
+      "sha256": "1ceb58df46e52900f9f4c9bcb4e6bad19a5fb138ed131b60dca793845893d709",
+      "source_url": "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.27.zip",
+      "license": "GPL-3.0-only"
+    },
+    {
+      "name": "pyside-shiboken",
+      "version": "6.11.0",
+      "source_path": "pyside-setup-6.11.0-source.tar.xz",
+      "sha256": "48d5c44d7c3ed861055d5491486e6a220ef5006573cae01a5fae3fb69d786336",
+      "source_url": "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.11.0-src/pyside-setup-everywhere-src-6.11.0.tar.xz",
+      "license": "GPL-3.0-only"
+    },
+    {
+      "name": "qtbase",
+      "version": "6.11.0",
+      "source_path": "qtbase-6.11.0-source.tar.xz",
+      "sha256": "231ad85979864d914dc9568a1b71c91d6cf20d7b2021d059103bf0eb51cb755e",
+      "source_url": "https://download.qt.io/official_releases/qt/6.11/6.11.0/submodules/qtbase-everywhere-src-6.11.0.tar.xz",
+      "license": "GPL-3.0-only"
+    },
+    {
+      "name": "qtsvg",
+      "version": "6.11.0",
+      "source_path": "qtsvg-6.11.0-source.tar.xz",
+      "sha256": "dfa8d653be07087d9407ed4a4ebae847f8953e0b7abd829f089803ab652a30e6",
+      "source_url": "https://download.qt.io/official_releases/qt/6.11/6.11.0/submodules/qtsvg-everywhere-src-6.11.0.tar.xz",
+      "license": "GPL-3.0-only"
+    },
+    {
+      "name": "cpython-windows-license",
+      "version": "3.12.7",
+      "source_path": "CPython-3.12.7-WINDOWS-LICENSE-AND-NOTICES.txt",
+      "sha256": "e502c6b880ff58d614901495a9009c136539cd0b1e2a2abb8fc00b934c203419",
+      "source_url": "https://www.python.org/ftp/python/3.12.7/python-3.12.7-embed-amd64.zip#LICENSE.txt",
+      "license": "PSF-2.0"
+    },
+    {
+      "name": "wintun-license",
+      "version": "0.14.1",
+      "source_path": "WINTUN-PREBUILT-LICENSE.txt",
+      "sha256": "9aaf948856ce8845a762121306039ef09d0eeb4d9e4f4c355647d4081e818087",
+      "source_url": "https://www.wintun.net/builds/wintun-0.14.1.zip#PREBUILT-BINARIES-LICENSE.txt",
+      "license": "LicenseRef-WinTun-Prebuilt"
+    }
+  ]
+}

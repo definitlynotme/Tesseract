@@ -1,0 +1,2538 @@
+{
+ "gw": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "EXIT-SELECT",
+    "gw1"
+   ],
+   "leaf": "gw1",
+   "pool_kind": "gateway"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "EXIT-SELECT",
+    "gw1"
+   ],
+   "leaf": "gw1",
+   "pool_kind": "gateway"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "EXIT-SELECT",
+    [
+     "gw1"
+    ]
+   ],
+   [
+    "FINAL-EXIT",
+    [
+     "EXIT-SELECT",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "EXIT-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "gw1"
+    ],
+    "now": "gw1",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "EXIT-SELECT",
+     "REJECT"
+    ],
+    "now": "EXIT-SELECT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER3-AUTO"
+    ],
+    "now": "TIER3-AUTO",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "REJECT"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {},
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> loss_total=0 observer=ob-f8c022828799ebb7 scope=sc-394da48a420376f2 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> loss_total=0 observer=ob-f8c022828799ebb7 scope=sc-394da48a420376f2 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-e471c90d38f6d7ce seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t1": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "TIER1-nodeA-SELECT",
+    "TIER1-nodeA-AUTO",
+    "nodeA :: VLESS"
+   ],
+   "leaf": "nodeA :: VLESS",
+   "pool_kind": "tier1_variant"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "TIER1-nodeA-SELECT",
+    "TIER1-nodeA-AUTO",
+    "nodeA :: TROJAN"
+   ],
+   "leaf": "nodeA :: TROJAN",
+   "pool_kind": "tier1_variant"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ]
+   ],
+   [
+    "TIER1-nodeA-AUTO",
+    [
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeA-SELECT",
+    [
+     "TIER1-nodeA-AUTO",
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeB-AUTO",
+    [
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeB-SELECT",
+    [
+     "TIER1-nodeB-AUTO",
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "t2a",
+     "t2b"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER1-SELECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ],
+    "now": "TIER1-nodeA-SELECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER1-nodeA-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ],
+    "now": "nodeA :: VLESS",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-nodeA-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeA-AUTO",
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ],
+    "now": "TIER1-nodeA-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER1-nodeB-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ],
+    "now": "nodeB :: VLESS",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-nodeB-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeB-AUTO",
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ],
+    "now": "TIER1-nodeB-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "t2a",
+     "t2b"
+    ],
+    "now": "t2a",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0 observer=ob-75d09e6b18a8261d scope=sc-255ed7ec497f20cf scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0 observer=ob-75d09e6b18a8261d scope=sc-255ed7ec497f20cf scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-c35bc1f38ba90b38 seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t1_flat": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "nodeA :: VLESS"
+   ],
+   "leaf": "nodeA :: VLESS",
+   "pool_kind": "tier1_variant"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "nodeB :: VLESS"
+   ],
+   "leaf": "nodeB :: VLESS",
+   "pool_kind": "tier1_variant"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "nodeA :: VLESS",
+     "nodeB :: VLESS"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "nodeA :: VLESS",
+     "nodeB :: VLESS"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "t2a",
+     "t2b"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER1-SELECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "nodeA :: VLESS",
+     "nodeB :: VLESS"
+    ],
+    "now": "nodeA :: VLESS",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "nodeA :: VLESS",
+     "nodeB :: VLESS"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "t2a",
+     "t2b"
+    ],
+    "now": "t2a",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0 observer=ob-2a94e2dc7c222e6b scope=sc-1bfe382a270acb37 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0 observer=ob-2a94e2dc7c222e6b scope=sc-1bfe382a270acb37 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-1dc93c3a9241f038 seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t1_user": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-nodeA-SELECT",
+    "nodeA :: TROJAN"
+   ],
+   "leaf": "nodeA :: TROJAN",
+   "pool_kind": "tier1_variant"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2a"
+   ],
+   "leaf": "t2a",
+   "pool_kind": "tier2"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ]
+   ],
+   [
+    "TIER1-nodeA-AUTO",
+    [
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeA-SELECT",
+    [
+     "TIER1-nodeA-AUTO",
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeB-AUTO",
+    [
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ]
+   ],
+   [
+    "TIER1-nodeB-SELECT",
+    [
+     "TIER1-nodeB-AUTO",
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "t2a",
+     "t2b"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER1-SELECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ],
+    "now": "TIER1-nodeA-SELECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "TIER1-nodeA-SELECT",
+     "TIER1-nodeB-SELECT"
+    ],
+    "now": "TIER1-nodeA-SELECT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER1-nodeA-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ],
+    "now": "nodeA :: VLESS",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-nodeA-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeA-AUTO",
+     "nodeA :: VLESS",
+     "nodeA :: TROJAN"
+    ],
+    "now": "nodeA :: TROJAN",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER1-nodeB-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ],
+    "now": "nodeB :: VLESS",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-nodeB-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-nodeB-AUTO",
+     "nodeB :: VLESS",
+     "nodeB :: TROJAN"
+    ],
+    "now": "TIER1-nodeB-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "t2a",
+     "t2b"
+    ],
+    "now": "t2a",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0 observer=ob-ff887e7ab539cb01 scope=sc-c3400ce47fa992ae scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0 observer=ob-ff887e7ab539cb01 scope=sc-c3400ce47fa992ae scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-ade18c43e1a0e1a9 seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t2": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2a"
+   ],
+   "leaf": "t2a",
+   "pool_kind": "tier2"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2b"
+   ],
+   "leaf": "t2b",
+   "pool_kind": "tier2"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "t2a",
+     "t2b",
+     "t2c"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER2-AUTO",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "REJECT"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "t2a",
+     "t2b",
+     "t2c"
+    ],
+    "now": "t2a",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0 observer=ob-41ee5dcd69dfbad7 scope=sc-4d3fc762947500c2 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0 observer=ob-41ee5dcd69dfbad7 scope=sc-4d3fc762947500c2 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-fd4f6c857cf46184 seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t2_pinned": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2b"
+   ],
+   "leaf": "t2b",
+   "pool_kind": "tier2"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2a"
+   ],
+   "leaf": "t2a",
+   "pool_kind": "tier2"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "t2a",
+     "t2b",
+     "t2c"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER2-AUTO",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "REJECT"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "t2b",
+    "members": [
+     "t2a",
+     "t2b",
+     "t2c"
+    ],
+    "now": "t2b",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 0,
+    "records": [],
+    "shadow": [],
+    "triggers": []
+   },
+   "tier3_n1": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0 observer=ob-ed586c40da81c5f5 scope=sc-9a7fe9c77aac7fa4 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0 observer=ob-ed586c40da81c5f5 scope=sc-9a7fe9c77aac7fa4 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-88c656583ad04a2d seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t3": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n1"
+   ],
+   "leaf": "n1",
+   "pool_kind": "tier3b"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n2"
+   ],
+   "leaf": "n2",
+   "pool_kind": "tier3b"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "REJECT"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER3-AUTO"
+    ],
+    "now": "TIER3-AUTO",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "REJECT"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "REJECT"
+    ],
+    "now": "REJECT",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=7130afaa1bdb fixed=none alive=2/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0 observer=ob-3b736e7e46671d70 scope=sc-d3f5da2509ec0d05 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0 observer=ob-3b736e7e46671d70 scope=sc-d3f5da2509ec0d05 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-2e31854cc3e68662 seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ },
+ "t3_full": {
+  "armed_at_start": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n1"
+   ],
+   "leaf": "n1",
+   "pool_kind": "tier3b"
+  },
+  "binding_after_move": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n2"
+   ],
+   "leaf": "n2",
+   "pool_kind": "tier3b"
+  },
+  "builds": [
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   },
+   {
+    "context": {
+     "gateway_groups": [
+      "EXIT-SELECT"
+     ],
+     "tier3_members": [
+      "n1",
+      "n2",
+      "n3"
+     ]
+    },
+    "lines": {}
+   }
+  ],
+  "calls": {
+   "proxies": [
+    [],
+    []
+   ]
+  },
+  "group_graph": [
+   [
+    "FINAL-EXIT",
+    [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ]
+   ],
+   [
+    "GENERAL",
+    [
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "GLOBAL",
+    [
+     "GENERAL",
+     "FINAL-EXIT"
+    ]
+   ],
+   [
+    "PROXY-FALLBACK",
+    [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ]
+   ],
+   [
+    "TIER1-AUTO",
+    [
+     "p1"
+    ]
+   ],
+   [
+    "TIER1-SELECT",
+    [
+     "TIER1-AUTO",
+     "p1"
+    ]
+   ],
+   [
+    "TIER2-AUTO",
+    [
+     "q1"
+    ]
+   ],
+   [
+    "TIER3-AUTO",
+    [
+     "n1",
+     "n2",
+     "n3"
+    ]
+   ]
+  ],
+  "groups": {
+   "FINAL-EXIT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "PROXY-FALLBACK",
+     "REJECT"
+    ],
+    "now": "PROXY-FALLBACK",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GENERAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "FINAL-EXIT"
+    ],
+    "now": "FINAL-EXIT",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "GLOBAL": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "GENERAL",
+     "FINAL-EXIT"
+    ],
+    "now": "GENERAL",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "PROXY-FALLBACK": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "TIER1-SELECT",
+     "TIER2-AUTO",
+     "TIER3-AUTO"
+    ],
+    "now": "TIER3-AUTO",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "p1"
+    ],
+    "now": "p1",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER1-SELECT": {
+    "expected": "",
+    "fixed": "",
+    "members": [
+     "TIER1-AUTO",
+     "p1"
+    ],
+    "now": "TIER1-AUTO",
+    "test_url": "",
+    "type": "Selector"
+   },
+   "TIER2-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "q1"
+    ],
+    "now": "q1",
+    "test_url": "http://t0-contract.test/generate_204",
+    "type": "Fallback"
+   },
+   "TIER3-AUTO": {
+    "expected": "204",
+    "fixed": "",
+    "members": [
+     "n1",
+     "n2",
+     "n3"
+    ],
+    "now": "n1",
+    "test_url": "http://t0-tier3.test/generate_204",
+    "type": "Fallback"
+   }
+  },
+  "refreshed": true,
+  "replay": {
+   "active_leaf": {
+    "polls": 8,
+    "records": [
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 1, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.0, \"tok\": \"2bf0307f10f9\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 2, \"origin\": \"user\", \"port\": 443, \"t\": 1790000000.994, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 3, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.014, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 4, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.034, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 5, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.054, \"tok\": \"026c24f725fe\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 6, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.074, \"tok\": \"e5a9e3974181\"}",
+     "{\"ev\": \"open\", \"leaf\": \"b20325c61482\", \"oid\": 7, \"origin\": \"user\", \"port\": 443, \"t\": 1790000001.094, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 2, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 81.0, \"oid\": 3, \"t\": 1790000001.095, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 61.0, \"oid\": 4, \"t\": 1790000001.095, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 141.0, \"oid\": 5, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 121.0, \"oid\": 6, \"t\": 1790000001.195, \"tok\": \"e5a9e3974181\"}",
+     "{\"bracket_ok\": true, \"class\": \"FAILED_FAST\", \"ev\": \"outcome\", \"leaf\": \"b20325c61482\", \"life_ms\": 101.0, \"oid\": 7, \"t\": 1790000001.195, \"tok\": \"026c24f725fe\"}"
+    ],
+    "shadow": [
+     "FAST_SPREAD"
+    ],
+    "triggers": [
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 3,
+      "new_episode": true,
+      "t_rel": 1.095,
+      "tokens": 2
+     },
+     {
+      "episode": 1,
+      "kind": "FAST",
+      "leaf": "n1",
+      "n_events": 6,
+      "new_episode": false,
+      "t_rel": 1.195,
+      "tokens": 2
+     }
+    ]
+   }
+  },
+  "republish_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=7130afaa1bdb fixed=none alive=2/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=route_epoch site=publish route_epoch=2 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=1 new=2 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0)"
+   ]
+  },
+  "start_lines": {
+   "log:Runtime route view": [
+    "INFO Runtime route view (group=TIER3-AUTO now=b20325c61482 fixed=none alive=3/3 stale_fixed=False exhausted=False core_generation=9)"
+   ],
+   "observer:arm_diagnostics_state": [
+    "INFO Post-dial observer arm_diagnostics_state (v=1 t=<t> mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> state=started loss_total=0)"
+   ],
+   "observer:arm_state": [
+    "INFO Post-dial observer arm_state (armed=false check=no_arm site=publish route_epoch=1 arm_route_epoch=-1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0)",
+    "INFO Post-dial observer arm_state (armed=true check=armed site=try_arm route_epoch=1 arm_route_epoch=1 predicate=codex_arm since_ms=<since_ms> t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0)"
+   ],
+   "observer:observer_policy": [
+    "INFO Post-dial observer observer_policy (mode=act actual_rules=AGED,FAST policy_revision=1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0 observer=ob-844e3fc2de9f3a26 scope=sc-25a9c20032edda85 scope_seq=2)"
+   ],
+   "observer:observer_started": [
+    "INFO Post-dial observer observer_started (mode=act)"
+   ],
+   "observer:observer_started_context": [
+    "INFO Post-dial observer observer_started_context (mode=act act_rules=AGED,FAST t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0 observer=ob-844e3fc2de9f3a26 scope=sc-25a9c20032edda85 scope_seq=1)"
+   ],
+   "observer:route_epoch": [
+    "INFO Post-dial observer route_epoch (site=refresh_runtime_route_snapshot_serialized old=0 new=1 armed_before=unknown armed_before_check=not_sampled_under_route_lock arm_route_epoch=-1 t=<t> v=1 mono_ns=<mono_ns> instance=rt-f5d08f1dde5c532a seq=<seq> loss_total=0)"
+   ]
+  },
+  "static_context": {
+   "gateway_groups": [
+    "EXIT-SELECT"
+   ],
+   "tier3_members": [
+    "n1",
+    "n2",
+    "n3"
+   ]
+  }
+ }
+}

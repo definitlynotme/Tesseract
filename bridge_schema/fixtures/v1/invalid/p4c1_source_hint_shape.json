@@ -1,0 +1,51 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "bastion.sources",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "items": [
+        {
+          "id": "src-github",
+          "kind": "github_repos",
+          "display": "github_repos",
+          "enabled": true,
+          "hint": "o•••/r•••"
+        },
+        {
+          "id": "src-telegram",
+          "kind": "telegram_channels",
+          "display": "telegram_channels",
+          "enabled": true,
+          "hint": "@c•••"
+        },
+        {
+          "id": "src-sub",
+          "kind": "subscription_urls",
+          "display": "subscription_urls",
+          "enabled": false,
+          "hint": "h•••"
+        },
+        {
+          "id": "src-file",
+          "kind": "local_files",
+          "display": "local_files",
+          "enabled": true,
+          "hint": "fo•••"
+        },
+        {
+          "id": "src-legacy",
+          "kind": "local_files",
+          "display": "local_files",
+          "enabled": true
+        }
+      ]
+    }
+  },
+  "expected": "invariant:bastion.sources.items[3].hint"
+}

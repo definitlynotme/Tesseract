@@ -1,0 +1,19 @@
+{
+  "cmd": "app.sessionEnd",
+  "data": {
+    "recovery": {
+      "firewall": "not_needed",
+      "proxy": "not_needed"
+    },
+    "workers_pending": true,
+    "writes_revoked": true
+  },
+  "epoch": "v1-fixture",
+  "id": 2,
+  "ok": true,
+  "owner": "shell",
+  "produced_at_ms": 1790812800000,
+  "req_id": "req-2",
+  "sent_at_ms": 1790812800001,
+  "t": "res"
+}

@@ -1,0 +1,83 @@
+# cargo-deny policy for the Tauri shell (T-P6-02, migration plan §9.3/§9.5).
+#
+#   cargo deny --manifest-path shell/app/Cargo.toml check licenses bans sources
+#
+# cargo-deny finds this file by walking up from shell/app/Cargo.toml.
+# scripts/shell_release_licenses.py reads [licenses] from this same file, so the
+# release collector and cargo-deny enforce one allow list.
+# Advisories are not part of this gate (they need a network database fetch).
+
+[graph]
+# The shell only ships for 64-bit Windows; other targets' crates never link.
+targets = ["x86_64-pc-windows-msvc"]
+exclude-dev = true
+
+[licenses]
+# Allow list = exactly the licenses the shipped graph needs (2026-10-26,
+# shell/Cargo.lock: tauri 2.11.5, webview2-com 0.38.2; 230 third-party crates
+# for x86_64-pc-windows-msvc including build dependencies, 135 of them linked
+# into Tesseract.exe, per `cargo tree -p tesseract-shell`; cargo-deny 0.20.2
+# reports licenses ok, bans ok, sources ok):
+#   MIT          - most crates, alone or as one choice of "MIT OR Apache-2.0";
+#                  also satisfies "Unlicense OR MIT", "0BSD OR MIT OR
+#                  Apache-2.0", "MIT OR Zlib OR Apache-2.0" and dpi's
+#                  "Apache-2.0 AND MIT".
+#   Apache-2.0   - tao (Apache-2.0 only), dpi (AND clause), and
+#                  "CC0-1.0 OR MIT-0 OR Apache-2.0" (dunce).
+#   Unicode-3.0  - ICU4X crates (icu_*, zerovec, yoke, tinystr, litemap, ...)
+#                  and unicode-ident's "(MIT OR Apache-2.0) AND Unicode-3.0".
+#   Zlib         - foldhash (Zlib only; via tauri-utils -> dom_query).
+#   MPL-2.0      - cssparser, cssparser-macros, dtoa-short, selectors (via
+#                  tauri-utils -> dom_query; build only) and option-ext (tauri
+#                  -> dirs -> dirs-sys; linked). Weak file-level copyleft, compatible with the
+#                  project's GPL-3.0-only; the unmodified crate sources ship in
+#                  the third-party source bundle.
+# BSD-2/3-Clause and ISC are not listed because no shipped crate needs them;
+# add one only together with the crate that needs it.
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Unicode-3.0",
+    "Zlib",
+    "MPL-2.0",
+]
+confidence-threshold = 0.93
+unused-allowed-license = "warn"
+include-build = true
+
+# First-party workspace crates have no `license` field. They are Tesseract
+# itself, distributed under the project license (LICENSE, GPL-3.0-only).
+[[licenses.clarify]]
+crate = "tesseract-shell"
+expression = "GPL-3.0-only"
+license-files = []
+
+[[licenses.clarify]]
+crate = "bridge_host"
+expression = "GPL-3.0-only"
+license-files = []
+
+[[licenses.exceptions]]
+crate = "tesseract-shell"
+allow = ["GPL-3.0-only"]
+
+[[licenses.exceptions]]
+crate = "bridge_host"
+allow = ["GPL-3.0-only"]
+
+[bans]
+# tauri/wry pull several windows-sys / windows generations; duplicates are
+# reported but are not a licensing or provenance problem.
+multiple-versions = "warn"
+# Registry dependencies must name a version; the shell's own path dependency
+# on bridge_host is exempt (tesseract-shell is publish = false).
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+# Only crates.io; no git or alternative registries (Cargo.lock checksums
+# then pin every crate's exact bytes).
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

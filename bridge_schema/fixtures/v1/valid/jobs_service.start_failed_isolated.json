@@ -1,0 +1,28 @@
+{
+  "data": {
+    "error": {
+      "code": "needs_route",
+      "message_key": "errors.start.no_validated_nodes",
+      "params": {},
+      "reason_code": "no_validated_nodes"
+    },
+    "name": "service.start",
+    "op": "job-1",
+    "owner": "window-1",
+    "req_id": "req-1000",
+    "result": {
+      "failure_code": "needs_route",
+      "startup_phase": "failed"
+    },
+    "started_at_ms": 1791400592084,
+    "state": "failed"
+  },
+  "epoch": "v1-fixture",
+  "kind": "edge",
+  "produced_at_ms": 1790812800000,
+  "rev": 3,
+  "sent_at_ms": 1790812800001,
+  "seq": 3,
+  "t": "evt",
+  "topic": "jobs"
+}

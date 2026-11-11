@@ -1,0 +1,16 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "core.info",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "running": true,
+    "pid": 7654,
+    "version": "1.19.27",
+    "generation": 8,
+    "cleanup_pending": false
+  }
+}

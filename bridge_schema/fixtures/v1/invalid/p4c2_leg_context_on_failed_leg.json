@@ -1,0 +1,84 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "exit.identity",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "current": {
+        "request_id": "req-manual",
+        "generation": 3,
+        "binding_id": "a1b2c3d4e5f6a1b2c3d4e5f6",
+        "status": "partial",
+        "reason_code": null,
+        "v4": {
+          "status": "ok",
+          "address": "203.0.113.7",
+          "country": "JP",
+          "reason_code": null,
+          "observed_at_ms": 1790812799990,
+          "city": "Tokyo",
+          "timezone": "Asia/Tokyo",
+          "asn": "13335",
+          "org": "Example Networks, Inc.",
+          "type": "hosting",
+          "single_source": true
+        },
+        "v6": {
+          "status": "failed",
+          "address": null,
+          "country": null,
+          "reason_code": "identity_unavailable",
+          "observed_at_ms": null,
+          "city": "Tokyo"
+        },
+        "fresh": true,
+        "observed_at_ms": 1790812799990,
+        "native_fallback_verified": false,
+        "native_fallback_verified_commit_rejected": false,
+        "native_fallback_unverified_budget": false,
+        "manual_execution_binding_stale": false,
+        "trigger": "manual"
+      },
+      "previous": {
+        "request_id": "req-auto",
+        "generation": 3,
+        "binding_id": "a1b2c3d4e5f6a1b2c3d4e5f6",
+        "status": "partial",
+        "reason_code": null,
+        "v4": {
+          "status": "ok",
+          "address": "203.0.113.7",
+          "country": "JP",
+          "reason_code": null,
+          "observed_at_ms": 1790812799990,
+          "city": "Tokyo",
+          "timezone": "Asia/Tokyo",
+          "asn": "13335",
+          "org": "Example Networks, Inc.",
+          "type": "hosting",
+          "single_source": false
+        },
+        "v6": {
+          "status": "failed",
+          "address": null,
+          "country": null,
+          "reason_code": "identity_unavailable",
+          "observed_at_ms": null
+        },
+        "fresh": false,
+        "observed_at_ms": 1790812799990,
+        "native_fallback_verified": false,
+        "native_fallback_verified_commit_rejected": false,
+        "native_fallback_unverified_budget": false,
+        "manual_execution_binding_stale": false,
+        "trigger": "auto"
+      }
+    }
+  },
+  "expected": "invariant:exit.identity.current.v6.context"
+}

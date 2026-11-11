@@ -1,0 +1,20 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "geo.status",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "running": true,
+    "updated_at_ms": null,
+    "errors": [
+      {
+        "code": "validation",
+        "message_key": "errors.validation.field",
+        "params": {}
+      }
+    ]
+  }
+}

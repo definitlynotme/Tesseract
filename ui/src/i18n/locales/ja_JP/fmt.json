@@ -1,0 +1,19 @@
+{
+  "fmt.ago.days": "{n, plural, other {# 日前}}",
+  "fmt.ago.hours": "{n, plural, other {# 時間前}}",
+  "fmt.ago.minutes": "{n, plural, other {# 分前}}",
+  "fmt.ago.now": "たった今",
+  "fmt.lat.down": "利用不可",
+  "fmt.lat.ok": "正常",
+  "fmt.lat.slow": "低速",
+  "fmt.ms": "{n, number, integer} ms",
+  "fmt.qty": "{num} {unit}",
+  "fmt.unit.b": "B",
+  "fmt.unit.gb": "GB",
+  "fmt.unit.kb": "KB",
+  "fmt.unit.mb": "MB",
+  "fmt.unit.per_second": "{unit}/s",
+  "fmt.uptime.hours_minutes": "{h} 時間 {m} 分",
+  "fmt.uptime.minutes": "{m} 分",
+  "fmt.uptime.under_minute": "1 分未満"
+}

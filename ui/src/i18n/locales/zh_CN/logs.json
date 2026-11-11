@@ -1,0 +1,858 @@
+{
+  "logs.level.debug": {
+    "m": "调试",
+    "_desc": "日志级别 debug（v1 Log.level）：级别标签、原始日志表的级别列；空间紧"
+  },
+  "logs.level.info": {
+    "m": "信息",
+    "_desc": "日志级别 info（v1 Log.level）：级别标签；空间紧"
+  },
+  "logs.level.ok": {
+    "m": "正常",
+    "_desc": "原型的「正常」级别（表示好的结果，不是 v1 枚举，合同里没有 ok；映射_logs §2）。B-23 / C7 未交付前不显示：原型和设计稿仍显示它"
+  },
+  "logs.level.warn": {
+    "m": "警告",
+    "_desc": "日志级别 warn（v1 Log.level）：级别标签；空间紧"
+  },
+  "logs.level.error": {
+    "m": "错误",
+    "_desc": "日志级别 error（v1 Log.level）：级别标签；空间紧"
+  },
+  "logs.level.critical": {
+    "m": "严重",
+    "_desc": "日志级别 critical（v1 Log.level）：级别标签；空间紧"
+  },
+  "logs.source.tesseract": {
+    "m": "Tesseract",
+    "_desc": "日志来源 TESSERACT（v1 Log.source）：产品名，不译；来源列、筛选 chip、阅读器副标题"
+  },
+  "logs.source.mihomo": {
+    "m": "Mihomo",
+    "_desc": "日志来源 MIHOMO（v1 Log.source）：代理核心的名字，不译；来源列、筛选 chip"
+  },
+  "logs.source.alert": {
+    "m": "Tesseract",
+    "_desc": "日志来源 ALERT（v1 Log.source）：提醒模块自己的日志行，界面上算作 Tesseract（类别为「运行告警」；映射_logs §2，G45 / W-22）；产品名，不译"
+  },
+  "logs.source.unknown": {
+    "m": "未知来源",
+    "_desc": "日志来源 UNKNOWN（v1 Log.source）：认不出是谁写的日志行；来源列、筛选 chip；空间紧"
+  },
+  "logs.category.runtime": {
+    "m": "运行状态",
+    "_desc": "日志类别 runtime（v1 Log.category）：服务启动、停止、核心进程；筛选 chip、阅读器副标题"
+  },
+  "logs.category.routing": {
+    "m": "路由",
+    "_desc": "日志类别 routing：流量走哪一层、出口可用与否；筛选 chip"
+  },
+  "logs.category.health": {
+    "m": "层级健康",
+    "_desc": "日志类别 health：各层级节点的健康检查与延迟；筛选 chip"
+  },
+  "logs.category.circuit_breaker": {
+    "m": "熔断",
+    "_desc": "日志类别 circuit_breaker：熔断保护（所有层级都不可用时阻断出站）；筛选 chip"
+  },
+  "logs.category.verification": {
+    "m": "出口验证",
+    "_desc": "原型的「验证」类别（出口验证），v1 没有这个运行时类别（方案 §4.1【C7】）。B-23 / C7 未交付前不显示：原型和设计稿仍显示它"
+  },
+  "logs.category.update": {
+    "m": "更新",
+    "_desc": "日志类别 update：节点来源、订阅、规则数据的更新；筛选 chip"
+  },
+  "logs.category.configuration": {
+    "m": "配置",
+    "_desc": "日志类别 configuration：系统代理、网络模式等配置变化；筛选 chip"
+  },
+  "logs.category.connection": {
+    "m": "连接",
+    "_desc": "日志类别 connection：单次连接、DNS 解析；筛选 chip"
+  },
+  "logs.category.alert": {
+    "m": "运行告警",
+    "_desc": "日志类别 alert：提醒的推送与送达；筛选 chip"
+  },
+  "logs.category.other": {
+    "m": "其他",
+    "_desc": "日志类别 other：不属于以上任何一类；筛选 chip"
+  },
+  "logs.noise.timeout": {
+    "m": "连接超时",
+    "_desc": "原始日志里被折叠成一行的同类连接记录：连接超时；折叠按钮上的词，也用在阅读器标题"
+  },
+  "logs.noise.refused": {
+    "m": "连接被拒绝",
+    "_desc": "同上，一类折叠的连接记录：连接被拒绝"
+  },
+  "logs.noise.dns": {
+    "m": "域名解析失败",
+    "_desc": "同上，一类折叠的连接记录：域名解析失败"
+  },
+  "logs.noise.conn": {
+    "m": "连接记录",
+    "_desc": "同上，一类折叠的连接记录：正常的转发记录（不是错误）"
+  },
+  "logs.tier_link.aria": {
+    "m": "{name}，查看层级",
+    "_desc": "日志正文里层级代号链接的无障碍名称（点击跳到层级页）。name 为层级代号（不译）"
+  },
+  "logs.view.events": {
+    "m": "关键事件",
+    "_desc": "视图分段的一项：只列登记过的关键事件（启动、回退、熔断……）；也是事件列表的无障碍名称；空间紧"
+  },
+  "logs.view.raw": {
+    "m": "原始日志",
+    "_desc": "视图分段的另一项：Tesseract 与 Mihomo 输出的原始行；也是原始日志表的无障碍名称；空间紧"
+  },
+  "logs.bar.view.aria": {
+    "m": "视图",
+    "_desc": "视图分段（关键事件 / 原始日志）的无障碍名称"
+  },
+  "logs.bar.search": {
+    "m": "搜索日志",
+    "_desc": "日志页搜索框的占位文字和无障碍名称"
+  },
+  "logs.bar.level.aria": {
+    "m": "级别",
+    "_desc": "级别分段（全部 / 问题 / 错误）的无障碍名称"
+  },
+  "logs.bar.level.all": {
+    "m": "全部",
+    "_desc": "级别分段：显示全部级别；空间紧"
+  },
+  "logs.bar.level.issue": {
+    "m": "问题",
+    "_desc": "级别分段：只看警告和错误；空间紧"
+  },
+  "logs.bar.level.issue_tip": {
+    "m": "只看警告和错误",
+    "_desc": "「问题」的悬停提示"
+  },
+  "logs.bar.level.error": {
+    "m": "错误",
+    "_desc": "级别分段：只看错误；空间紧"
+  },
+  "logs.bar.filter": {
+    "m": "筛选",
+    "_desc": "工具条按钮：打开来源与类别筛选；也是它没有选中项时的无障碍名称；空间紧"
+  },
+  "logs.bar.filter_aria": {
+    "m": "筛选，已选 {n, plural, other {# 项}}",
+    "_desc": "「筛选」按钮在有选中项时的无障碍名称；n 为已选的来源、类别与「只看本次运行」的个数"
+  },
+  "logs.bar.more.aria": {
+    "m": "导出与更多操作",
+    "_desc": "工具条「⋯」图标按钮的无障碍名称"
+  },
+  "logs.bar.more.tip": {
+    "m": "导出诊断包、导出与更多操作",
+    "_desc": "工具条「⋯」图标按钮的悬停提示"
+  },
+  "logs.panel.aria": {
+    "m": "日志",
+    "_desc": "日志面板（运行摘要、列表、状态行）的无障碍名称"
+  },
+  "logs.follow.live": {
+    "m": "实时跟随",
+    "_desc": "跟随按钮的文字：新日志到达时列表停在最新处；空间紧"
+  },
+  "logs.follow.paused": {
+    "m": "已暂停",
+    "_desc": "跟随按钮的文字：已暂停更新，新日志先保留；空间紧"
+  },
+  "logs.follow.tip_live": {
+    "m": "暂停更新",
+    "_desc": "跟随按钮在实时跟随时的悬停提示（点击暂停）"
+  },
+  "logs.follow.tip_paused": {
+    "m": "继续更新",
+    "_desc": "跟随按钮在暂停时的悬停提示（点击继续）"
+  },
+  "logs.follow.aria_live": {
+    "m": "实时跟随。点击暂停",
+    "_desc": "跟随按钮在实时跟随时的无障碍名称"
+  },
+  "logs.follow.aria_paused": {
+    "m": "{n, plural, =0 {已暂停。点击继续} other {已暂停，保留了 # 条新日志。点击继续}}",
+    "_desc": "跟随按钮在暂停时的无障碍名称；n 为暂停后到达、按当前筛选可见的新日志条数"
+  },
+  "logs.run.title": {
+    "m": "{scope, select, current {本次运行} other {上次运行}}",
+    "_desc": "运行摘要条的开头：服务运行（或启动、停止）中说本次运行，已停止后说上次运行"
+  },
+  "logs.run.meta.running": {
+    "m": "<x>{time} 开始 · </x>已运行 {uptime}",
+    "_desc": "运行摘要条，服务运行中：time 为本次运行开始的时刻（hh:mm:ss），uptime 为已运行时长；<x> 包住的部分在窄窗口里隐藏"
+  },
+  "logs.run.meta.starting": {
+    "m": "正在启动 · {phase, select, collect {收集节点} verify {验证出口} other {就绪}} {step}/{total}",
+    "_desc": "运行摘要条，服务启动中：phase 为当前启动阶段（collect 收集节点、verify 验证出口、ready 就绪），step / total 为第几步、共几步"
+  },
+  "logs.run.meta.stopping": {
+    "m": "{cancelling, select, yes {正在取消启动} other {正在停止服务}}",
+    "_desc": "运行摘要条，服务正在停止：cancelling 为 yes 时是启动途中被取消"
+  },
+  "logs.run.meta.ended": {
+    "m": "{start}–{end} · 运行了 {duration}",
+    "_desc": "运行摘要条，服务已停止：start / end 为上次运行开始与结束的时刻（hh:mm:ss），duration 为时长"
+  },
+  "logs.run.meta.stopped": {
+    "m": "{start} 开始 · 已停止",
+    "_desc": "运行摘要条，服务已停止但最近一次运行没有结束记录：start 为开始时刻"
+  },
+  "logs.run.count.none": {
+    "m": "没有错误或警告",
+    "_desc": "运行摘要条右侧：本次（或上次）运行没有错误或警告"
+  },
+  "logs.run.count.errors_word": {
+    "m": "{n, plural, other {错误}}",
+    "_desc": "运行摘要条右侧计数按钮里数字后面的词（「3 错误」）；n 为错误个数（数字单独显示）；空间紧"
+  },
+  "logs.run.count.warnings_word": {
+    "m": "{n, plural, other {警告}}",
+    "_desc": "运行摘要条右侧计数按钮里数字后面的词（「2 警告」）；n 为警告个数；空间紧"
+  },
+  "logs.run.count.errors_aria": {
+    "m": "{n, plural, other {# 个错误}}",
+    "_desc": "错误计数的读屏文字"
+  },
+  "logs.run.count.warnings_aria": {
+    "m": "{n, plural, other {# 个警告}}",
+    "_desc": "警告计数的读屏文字"
+  },
+  "logs.run.count.errors_tip": {
+    "m": "{scope, select, current {只看本次运行的错误} other {只看上次运行的错误}}",
+    "_desc": "错误计数按钮的悬停提示与无障碍名称（点击后筛选）；scope：current 服务运行中，other 已停止"
+  },
+  "logs.run.count.warnings_tip": {
+    "m": "{scope, select, current {只看本次运行的警告和错误} other {只看上次运行的警告和错误}}",
+    "_desc": "警告计数按钮的悬停提示与无障碍名称（点击后按「问题」级别筛选，含错误）"
+  },
+  "logs.list.day.recent": {
+    "m": "{rel} · {date} · {weekday}",
+    "_desc": "列表里的日期分隔行（两天以内）：rel 为「今天 / 昨天 / 前天」，date 为月日，weekday 为星期，三者都由 Intl 按当前语言生成（如「今天 · 9月29日 · 周二」）；只译分隔与语序"
+  },
+  "logs.list.day.date": {
+    "m": "{date} · {weekday}",
+    "_desc": "列表里的日期分隔行（更早的日子）：date 为月日，weekday 为星期，由 Intl 生成（如「9月26日 · 周五」）"
+  },
+  "logs.list.day.count": {
+    "m": "{n, plural, other {# 条}}",
+    "_desc": "日期分隔行右侧：这一天在当前筛选下的条数"
+  },
+  "logs.list.run.started": {
+    "m": "运行开始 · {time}",
+    "_desc": "列表里的运行分隔行：一次运行从这里开始；time 为开始时刻（hh:mm:ss）"
+  },
+  "logs.list.run.continued": {
+    "m": "接前一天的运行 · 始于 {time}",
+    "_desc": "列表里的运行分隔行：这一天的日志属于前一天开始的那次运行；time 为它的开始时刻"
+  },
+  "logs.list.run.meta.current": {
+    "m": "本次运行",
+    "_desc": "运行分隔行的补充：这是正在进行的运行"
+  },
+  "logs.list.run.meta.failed": {
+    "m": "启动失败",
+    "_desc": "运行分隔行的补充：这次启动失败了"
+  },
+  "logs.list.run.meta.ran": {
+    "m": "运行了 {duration}",
+    "_desc": "运行分隔行的补充：这次运行的时长"
+  },
+  "logs.list.origin.start": {
+    "m": "这里从 {day} {time} 开始",
+    "_desc": "列表最上方的历史起点行：内存里最早一条日志的时刻；day 为「今天 / 昨天 / 前天」或月日（Intl），time 为 hh:mm:ss"
+  },
+  "logs.list.origin.dropped": {
+    "m": "更早的 {n, plural, other {# 条}}只保存在日志文件里",
+    "_desc": "历史起点行的补充（原型文案，只在 B-25 放行后出现）：更早的日志已不在内存里、只保存在日志文件中；n 为条数"
+  },
+  "logs.list.origin.open_folder": {
+    "m": "打开日志文件夹",
+    "_desc": "历史起点行里的链接按钮：在资源管理器中打开日志文件夹"
+  },
+  "logs.list.fold.aria": {
+    "m": "{n, plural, other {展开重复的 # 次}}",
+    "_desc": "关键事件里连续重复的事件被折叠成一行，「×N」按钮的无障碍名称；n 为重复次数"
+  },
+  "logs.list.fold.tip": {
+    "m": "{n, plural, other {重复 # 次}} · 首次 {time}",
+    "_desc": "「×N」按钮的悬停提示；time 为第一次出现的时刻"
+  },
+  "logs.list.fold.count": {
+    "m": "{n, plural, other {重复 # 次}}",
+    "_desc": "「×N」计数的读屏文字"
+  },
+  "logs.list.fold.nth": {
+    "m": "第 {n} 次",
+    "_desc": "展开重复事件后，每一行前面的序号（第几次）；空间紧"
+  },
+  "logs.raw.col.time": {
+    "m": "时间",
+    "_desc": "原始日志表的列标题；空间紧"
+  },
+  "logs.raw.col.level": {
+    "m": "级别",
+    "_desc": "原始日志表的列标题；空间紧"
+  },
+  "logs.raw.col.source": {
+    "m": "来源",
+    "_desc": "原始日志表的列标题；空间紧"
+  },
+  "logs.raw.col.message": {
+    "m": "消息",
+    "_desc": "原始日志表的列标题：日志行的原文，不翻译、不改写"
+  },
+  "logs.raw.line_at": {
+    "m": "第 {n} 行",
+    "_desc": "多行日志（例如异常堆栈）里搜索命中的不是第一行时，显示命中的是第几行；空间紧"
+  },
+  "logs.raw.lines_more": {
+    "m": "（{n, plural, other {另有 # 行}}）",
+    "_desc": "多行日志只显示第一行时的补充：还有几行"
+  },
+  "logs.raw.lines_total": {
+    "m": "（{n, plural, other {共 # 行}}）",
+    "_desc": "多行日志显示的是搜索命中的那一行时的补充：一共几行"
+  },
+  "logs.raw.noise.aria": {
+    "m": "{kind} ×{n}，展开每一条",
+    "_desc": "原始日志里同类连接记录折叠行的按钮无障碍名称；kind 为类别词（logs.noise.*），n 为条数"
+  },
+  "logs.raw.noise.targets": {
+    "m": "{n, plural, other {# 个目标}}",
+    "_desc": "折叠行的补充：涉及多少个不同的目标地址；后面跟着目标地址（数据，不译）"
+  },
+  "logs.pill.word": {
+    "m": "{n, plural, other {条新日志}}",
+    "_desc": "列表底部浮标里数字后面的词（「12 条新日志」）；n 为条数（数字单独显示）"
+  },
+  "logs.pill.resume": {
+    "m": " · 继续",
+    "_desc": "浮标在暂停时追加的文字：点击继续实时跟随；开头的空格和分隔点要保留"
+  },
+  "logs.pill.count": {
+    "m": "{n, plural, other {# 条新日志}}",
+    "_desc": "浮标数字的读屏文字"
+  },
+  "logs.pill.aria_new": {
+    "m": "{n, plural, other {# 条新日志，跳到最新}}",
+    "_desc": "浮标的无障碍名称（列表不在底部时，点击跳到最新）"
+  },
+  "logs.pill.aria_held": {
+    "m": "{n, plural, other {# 条新日志，继续实时跟随}}",
+    "_desc": "浮标的无障碍名称（暂停时，点击继续）"
+  },
+  "logs.empty.filtered.title": {
+    "m": "过滤后没有日志",
+    "_desc": "空状态标题：当前的搜索或筛选条件下没有记录"
+  },
+  "logs.empty.filtered.clear_search": {
+    "m": "清除搜索",
+    "_desc": "空状态按钮：只清掉搜索词（其他筛选保留）"
+  },
+  "logs.empty.filtered.clear_filters": {
+    "m": "清除筛选",
+    "_desc": "空状态按钮：清掉全部筛选条件"
+  },
+  "logs.empty.filtered.other_view": {
+    "m": "在{view, select, raw {原始日志} other {关键事件}}中查看 {n, plural, other {# 条}}",
+    "_desc": "空状态按钮：另一个视图里有符合条件的记录；view 为另一个视图，n 为条数"
+  },
+  "logs.empty.cleared.title": {
+    "m": "当前视图已清空",
+    "_desc": "空状态标题：用户用「清空当前视图」把记录移出了视图"
+  },
+  "logs.empty.cleared.undo": {
+    "m": "撤销",
+    "_desc": "清空后的撤销按钮"
+  },
+  "logs.empty.paused.title": {
+    "m": "已暂停",
+    "_desc": "空状态标题：暂停更新时没有可显示的记录"
+  },
+  "logs.empty.none.events_title": {
+    "m": "暂无事件日志",
+    "_desc": "空状态标题：还没有任何关键事件"
+  },
+  "logs.empty.none.raw_title": {
+    "m": "暂无原始日志",
+    "_desc": "空状态标题：还没有任何原始日志行"
+  },
+  "logs.filter.aria": {
+    "m": "筛选来源与类别",
+    "_desc": "筛选弹层的无障碍名称"
+  },
+  "logs.filter.run_only": {
+    "m": "只看{scope, select, current {本次运行} other {上次运行}}",
+    "_desc": "筛选弹层的勾选项：只显示当前（或上一次）运行的日志；scope：current 服务运行中，other 已停止"
+  },
+  "logs.filter.source": {
+    "m": "来源",
+    "_desc": "筛选弹层的分组标题：按日志来源筛选"
+  },
+  "logs.filter.category": {
+    "m": "类别",
+    "_desc": "筛选弹层的分组标题：按日志类别筛选"
+  },
+  "logs.filter.clear": {
+    "m": "清除筛选",
+    "_desc": "筛选弹层底部的链接按钮"
+  },
+  "logs.footer.feed.state": {
+    "m": "{state, select, live {实时} reconnecting {重连中} connecting {连接中} cancelling {取消中} stopping {正在停止} stdout {经标准输出（断流中）} disconnected {未连接} other {未启动}}",
+    "_desc": "页脚状态行里每个日志来源（Tesseract、Mihomo）后面的状态词：live 正在接收；reconnecting 断开后重连；connecting 服务启动中；cancelling 正在取消启动；stopping 正在停止；stdout Mihomo 的控制端口日志流断了，改由标准输出接收；disconnected 界面还没连上后台服务；other 服务未运行"
+  },
+  "logs.footer.feed.mihomo_tip": {
+    "m": "控制端口 {controller}",
+    "_desc": "页脚 Mihomo 状态的悬停提示（只在日志流实时接收、已知控制端口地址时出现）：controller 为控制端口地址 host:port（数据，不译）"
+  },
+  "logs.footer.updated": {
+    "m": "最近更新 <x>{time}</x>",
+    "_desc": "页脚：最后一条日志的时刻；time 为 hh:mm:ss（没有日志时为「—」），<x> 包住的部分用等宽数字显示"
+  },
+  "logs.footer.total": {
+    "m": "共 {total, plural, other {# 条}}",
+    "_desc": "页脚：没有筛选时，当前视图的总条数"
+  },
+  "logs.footer.shown": {
+    "m": "显示 <b>{n, number}</b> / {total, plural, other {# 条}}",
+    "_desc": "页脚：有筛选时，可见条数（加粗）与总条数"
+  },
+  "logs.footer.debug": {
+    "m": "DEBUG 采集中",
+    "_desc": "页脚的小标签：正在采集 Mihomo 的调试日志；DEBUG 是日志级别名，不译；空间紧"
+  },
+  "logs.reader.aria": {
+    "m": "日志详情：{title}",
+    "_desc": "日志阅读器（右侧面板）的无障碍名称；title 为面板标题（事件标题是后端按语言生成的数据）"
+  },
+  "logs.reader.title.noise": {
+    "m": "{kind} ×{n}",
+    "_desc": "阅读器标题：打开的是一组折叠的连接记录；kind 为类别词（logs.noise.*），n 为条数"
+  },
+  "logs.reader.title.raw": {
+    "m": "{source} 原始日志",
+    "_desc": "阅读器标题：打开的是一条没有对应关键事件的原始日志；source 为来源名"
+  },
+  "logs.reader.sub": {
+    "m": "{source} · {category}",
+    "_desc": "阅读器副标题：日志的来源与类别（logs.source.*、logs.category.*）"
+  },
+  "logs.reader.kv.time": {
+    "m": "时间",
+    "_desc": "阅读器信息表的项名：日志的时刻；空间紧（约 4 个汉字宽）"
+  },
+  "logs.reader.kv.repeat": {
+    "m": "重复",
+    "_desc": "阅读器信息表的项名：连续重复的次数；空间紧"
+  },
+  "logs.reader.kv.repeat_value": {
+    "m": "{n, plural, other {# 次}} · 首次 {same, select, yes {{time}} other {{day} {time}}}",
+    "_desc": "「重复」的值：n 为次数；首次出现的时刻，same 为 yes 时与最后一次同一天，只写 time，否则写 day（今天 / 昨天 / 月日，Intl）和 time"
+  },
+  "logs.reader.kv.range": {
+    "m": "范围",
+    "_desc": "阅读器信息表的项名：折叠的一组记录的时间范围；空间紧"
+  },
+  "logs.reader.kv.range_value": {
+    "m": "共 {n, plural, other {# 条}} · {from}–{to}",
+    "_desc": "「范围」的值：条数与首尾时刻（hh:mm:ss）"
+  },
+  "logs.reader.kv.targets": {
+    "m": "目标",
+    "_desc": "阅读器信息表的项名：折叠的连接记录涉及的目标地址（数据，不译）；空间紧"
+  },
+  "logs.reader.kv.tier": {
+    "m": "层级",
+    "_desc": "阅读器信息表的项名：这条事件提到的层级；空间紧"
+  },
+  "logs.reader.raw.title": {
+    "m": "原文",
+    "_desc": "阅读器的小节标题：日志行的原文"
+  },
+  "logs.reader.raw.copy": {
+    "m": "复制原文",
+    "_desc": "复制原文按钮的无障碍名称与悬停提示"
+  },
+  "logs.reader.raw.wrap": {
+    "m": "自动换行",
+    "_desc": "原文自动换行开关的无障碍名称与悬停提示"
+  },
+  "logs.reader.diag.toggle": {
+    "m": "诊断信息",
+    "_desc": "阅读器底部的展开按钮：显示接收时间、序号、事件键等诊断信息"
+  },
+  "logs.reader.diag.received": {
+    "m": "接收时间",
+    "_desc": "诊断信息的项名：Tesseract 收到这条日志的时刻；空间紧"
+  },
+  "logs.reader.diag.seq": {
+    "m": "序号",
+    "_desc": "诊断信息的项名：日志的序号；空间紧"
+  },
+  "logs.reader.diag.key": {
+    "m": "事件键",
+    "_desc": "诊断信息的项名：登记的事件键（如 runtime.start_requested，不译）；空间紧"
+  },
+  "logs.reader.action.copy_json": {
+    "m": "复制 JSON",
+    "_desc": "阅读器底部按钮：把这条日志复制为 JSON；JSON 不译"
+  },
+  "logs.action.locate_raw": {
+    "m": "在原始日志中定位",
+    "_desc": "按钮与右键菜单项：切到原始日志视图并选中这条记录"
+  },
+  "logs.action.locate_events": {
+    "m": "在关键事件中查看",
+    "_desc": "按钮与右键菜单项：切到关键事件视图并选中这条记录"
+  },
+  "logs.locate.relaxed": {
+    "m": "已放宽筛选，以显示这条记录。",
+    "_desc": "提示条：为了显示要定位的记录，自动去掉了挡住它的筛选条件"
+  },
+  "logs.copy.done": {
+    "m": "{n, plural, =1 {已复制} other {已复制 # 条}}",
+    "_desc": "行内短暂显示的反馈：复制成功；n 为复制的条数"
+  },
+  "logs.copy.repeat_note": {
+    "m": "（重复 {n, plural, other {# 次}}，首次 {first}）",
+    "_desc": "复制到剪贴板的文字末尾追加的一行：折叠的重复事件；n 为次数，first 为第一次的完整时刻"
+  },
+  "logs.menu.details": {
+    "m": "查看详情",
+    "_desc": "日志行右键菜单：打开阅读器"
+  },
+  "logs.menu.copy": {
+    "m": "{n, plural, =1 {复制这一条} other {复制这 # 条}}",
+    "_desc": "日志行右键菜单：复制；n 为这一行包含的条数（折叠的重复事件大于 1）"
+  },
+  "logs.menu.export_filtered": {
+    "m": "导出当前筛选",
+    "_desc": "日志行右键菜单：导出当前视图里可见的记录"
+  },
+  "logs.more.group.export": {
+    "m": "导出",
+    "_desc": "「⋯」菜单的分组标题"
+  },
+  "logs.more.group.capture": {
+    "m": "采集",
+    "_desc": "「⋯」菜单的分组标题：调试日志采集"
+  },
+  "logs.more.group.files": {
+    "m": "文件",
+    "_desc": "「⋯」菜单的分组标题"
+  },
+  "logs.more.bundle": {
+    "m": "导出诊断包",
+    "_desc": "「⋯」菜单项：生成包含日志、配置与运行状态的诊断包"
+  },
+  "logs.more.export_count": {
+    "m": "{n, plural, other {# 条}}",
+    "_desc": "导出菜单项右侧的小字：会导出的条数"
+  },
+  "logs.more.debug": {
+    "m": "{on, select, yes {停止采集 Mihomo 调试日志} other {采集 Mihomo 调试日志}}",
+    "_desc": "「⋯」菜单项：开始或停止采集 Mihomo 的调试级日志；on 为 yes 时正在采集"
+  },
+  "logs.more.folder": {
+    "m": "打开日志文件夹",
+    "_desc": "「⋯」菜单项：在资源管理器中打开日志文件夹"
+  },
+  "logs.more.clear": {
+    "m": "清空当前视图",
+    "_desc": "「⋯」菜单项：把当前视图里的记录移出视图（不删除日志，可撤销）"
+  },
+  "logs.bundle.busy": {
+    "m": "正在生成诊断包…",
+    "_desc": "「⋯」按钮在生成诊断包时的状态文字（读屏与提示）"
+  },
+  "logs.bundle.done": {
+    "m": "诊断包已保存",
+    "_desc": "「⋯」按钮在诊断包生成后的状态文字"
+  },
+  "logs.bundle.meta": {
+    "m": "{size} · {n, plural, other {# 个文件}}",
+    "_desc": "诊断包结果弹层（T-P4-05c）：保存下来的诊断包有多大（size 为已格式化的大小，如 1.2 MB）、里面有几个文件（n）。页面拿不到文件名和保存位置，所以不写"
+  },
+  "logs.bundle.privacy": {
+    "m": "包含日志里的域名和 IP 地址，分享前请确认。",
+    "_desc": "诊断包结果弹层的隐私提醒"
+  },
+  "logs.bundle.open_folder": {
+    "m": "打开所在文件夹",
+    "_desc": "诊断包结果弹层的按钮：在资源管理器里显示这个文件"
+  },
+  "logs.bundle.aria": {
+    "m": "诊断包已保存",
+    "_desc": "诊断包结果弹层的无障碍名称（T-P4-05c：页面拿不到文件名，只说已保存）"
+  },
+  "logs.export.done": {
+    "m": "{n, plural, other {已导出 # 条日志}}",
+    "_desc": "提示条标题：导出完成；n 为条数"
+  },
+  "logs.clear.restored": {
+    "m": "{n, plural, other {已恢复当前视图的 # 条日志}}",
+    "_desc": "提示条：撤销清空后恢复的条数"
+  },
+  "logs.debug.started": {
+    "m": "已开始采集 Mihomo 调试日志。",
+    "_desc": "提示条：开始采集调试日志（与 logs.debug.stopped 对称；F-01 删去了「日志量会明显增加」与经标准输出时级别跟随核心配置的说明）"
+  },
+  "logs.debug.stopped": {
+    "m": "已停止采集 Mihomo 调试日志。",
+    "_desc": "提示条：停止采集调试日志"
+  },
+  "logs.folder.opened_data": {
+    "m": "已打开数据目录",
+    "_desc": "提示条：「打开日志文件夹」成功。打开的是作用域的数据目录（外壳 host.openFolder{kind:data}），与旧版一致：monitor.log、events.jsonl 在这里，logs 子目录里是 shell.log、sidecar-stderr.log；所以说「数据目录」（D17、G47，T-P4-H2）"
+  },
+  "logs.nav_badge.aria": {
+    "m": "{kind, select, error {{n, plural, other {# 条新的错误}}} other {{n, plural, other {# 条新的层级变化}}}}",
+    "_desc": "侧栏「运行日志」上的未读徽标的读屏文字：离开日志页期间到达的错误（kind=error）或层级变化（kind=route）条数"
+  },
+  "logs.palette.go_issues": {
+    "m": "本次运行的问题",
+    "_desc": "命令面板「前往」组的命令：打开运行日志并只看本次运行的警告和错误"
+  },
+  "logs.palette.view": {
+    "m": "{to, select, raw {切换到原始日志} other {切换到关键事件}}",
+    "_desc": "命令面板「运行日志」组的命令：切换视图；to 为要切到的视图"
+  },
+  "logs.palette.follow": {
+    "m": "{paused, select, yes {继续实时跟随} other {暂停日志更新}}",
+    "_desc": "命令面板「运行日志」组的命令：暂停或继续；paused 为 yes 时当前已暂停"
+  },
+  "logs.palette.bundle": {
+    "m": "导出诊断包",
+    "_desc": "命令面板「运行日志」组的命令"
+  },
+  "logs.palette.issues": {
+    "m": "只看本次运行的问题",
+    "_desc": "命令面板「运行日志」组的命令：级别设为「问题」并只看本次运行"
+  },
+  "logs.palette.reset": {
+    "m": "清除筛选",
+    "_desc": "命令面板「运行日志」组的命令"
+  },
+  "logs.palette.keywords.go_issues": {
+    "m": "wenti 错误 问题 本次运行 警告",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：本次运行的问题（前往运行日志）"
+  },
+  "logs.palette.keywords.view": {
+    "m": "yuanshi shijian 原始 事件",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：切换关键事件 / 原始日志"
+  },
+  "logs.palette.keywords.follow": {
+    "m": "zanting 暂停 跟随",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：暂停或继续实时跟随"
+  },
+  "logs.palette.keywords.bundle": {
+    "m": "zhenduan 诊断 分享",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：导出诊断包"
+  },
+  "logs.palette.keywords.issues": {
+    "m": "wenti 错误 警告",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：只看本次运行的问题"
+  },
+  "logs.palette.keywords.reset": {
+    "m": "qingchu 清除",
+    "_desc": "命令面板搜索用的关键词（空格分隔，不显示）：本语言里用户可能输入的词。各语言通用的英文关键词写在代码里；拼音只出现在中文目录。命令：清除筛选"
+  },
+  "logs.feed_reason.controller_disabled": {
+    "m": "未启用外部控制器",
+    "_desc": "日志来源状态旁的原因：Mihomo 在运行但没有开外部控制器，拿不到实时日志流"
+  },
+  "logs.feed_reason.core_not_running": {
+    "m": "Mihomo 未运行",
+    "_desc": "日志来源状态旁的原因：核心没有运行"
+  },
+  "logs.feed_reason.stream_error": {
+    "m": "日志流中断",
+    "_desc": "日志来源状态旁的原因：连接 /logs 失败或断开，正在用标准输出或重连"
+  },
+  "logs.noise.failed": {
+    "m": "连接失败",
+    "_desc": "原始日志里折叠成一行的噪声类别：单次连接失败（事件键 mihomo.connection_failed）；空间紧"
+  },
+  "logs.list.run.meta.cancelled": {
+    "m": "已取消",
+    "_desc": "运行分隔行的补充：这次启动在完成前被取消（只在 B-20 放行、后台发出取消事件时出现；之前显示为已停止）"
+  },
+  "logs.list.origin.evicted": {
+    "m": "更早的 {n, plural, other {# 条}}已从内存移除",
+    "_desc": "历史起点行的补充：更早的日志已从界面的内存里移除；n 为条数。B-25 未做：不保证这些行写进了文件，所以只说移出内存"
+  },
+  "logs.list.origin.evicted_some": {
+    "m": "更早的记录已从内存移除",
+    "_desc": "历史起点行的补充：更早的日志已从内存移除，但不知道有多少条"
+  },
+  "logs.list.gap": {
+    "m": "{n, plural, other {此处有 # 条日志未送达}}",
+    "_desc": "列表里的缺口行：实时日志在这里丢了 n 条（后台来不及发送或界面断开期间被淘汰）；两个视图都显示，不被筛选隐藏"
+  },
+  "logs.list.gap_unknown": {
+    "m": "此处有日志未送达",
+    "_desc": "列表里的缺口行：实时日志在这里有丢失，但不知道丢了多少条"
+  },
+  "logs.list.restart": {
+    "m": "应用后台已重新启动 · {time}",
+    "_desc": "列表里的分隔行：后台服务进程重新启动了，之前的日志已清出界面（重新载入的从这里开始）；time 为时刻"
+  },
+  "logs.list.boundary": {
+    "m": "{to, select, stdout {Mihomo 日志改由标准输出接收} mihomo_api {Mihomo 日志恢复经控制端口接收} other {Mihomo 日志来源已断开}}",
+    "_desc": "列表里的来源边界行：Mihomo 日志从这里起换了来源（stdout 标准输出；mihomo_api 控制端口；other 没有来源，例如核心停止）。F-01 起不再附「衔接处可能重复或缺失」"
+  },
+  "logs.run.stale": {
+    "m": "数据未更新",
+    "_desc": "运行摘要条右侧的小标签：运行状态暂时没有收到新数据，显示的是最后一次的值"
+  },
+  "logs.run.meta.failed": {
+    "m": "启动失败",
+    "_desc": "运行摘要条：上次启动失败（没有可显示的原因时）"
+  },
+  "logs.run.meta.failed_reason": {
+    "m": "启动失败 · {reason}",
+    "_desc": "运行摘要条：上次启动失败；reason 为失败原因的整句（与总览页的启动失败原因同源）"
+  },
+  "logs.run.meta.unknown": {
+    "m": "正在连接后台服务…",
+    "_desc": "运行摘要条：界面还没收到后台服务的状态"
+  },
+  "logs.load.loading": {
+    "m": "正在载入日志…",
+    "_desc": "页脚：首次进入时正在从后台取日志历史"
+  },
+  "logs.load.failed_title": {
+    "m": "无法载入日志",
+    "_desc": "空状态标题：从后台取日志历史失败"
+  },
+  "logs.load.retry": {
+    "m": "重试",
+    "_desc": "按钮：重新取日志历史，或重新取新语言的日志标题"
+  },
+  "logs.load.relabel_failed": {
+    "m": "日志标题没能换成新的语言。",
+    "_desc": "警告条：切换界面语言后重新取日志失败，旧的标题文字保留"
+  },
+  "logs.pill.cut": {
+    "m": "{n, plural, other {（其中 # 条已被挤出）}}",
+    "_desc": "暂停时「N 条新日志」浮标的补充：暂停期间内存满了，其中 n 条新日志已被挤出、继续后也不会出现"
+  },
+  "logs.footer.dropped": {
+    "m": "{n, plural, other {已丢弃 # 条}}",
+    "_desc": "页脚小标签：日志太多来不及处理而丢弃的条数；为 0 时不显示"
+  },
+  "logs.footer.dropped_tip": {
+    "m": "调试 {debug} · 信息 {info} · 警告 {warn} · 错误 {error} · 严重 {critical}",
+    "_desc": "「已丢弃」标签的悬停提示：按级别分的丢弃条数（没有分级明细时没有提示）"
+  },
+  "logs.reader.resize": {
+    "m": "调整详情面板宽度",
+    "_desc": "详情面板左边缘拖动条的无障碍名称（拖动或用左右方向键调整，双击恢复默认）"
+  },
+  "logs.locate.gone": {
+    "m": "这条记录已不在内存中。",
+    "_desc": "提示条：要定位的记录已从内存里移除（内存只保留最近的日志）"
+  },
+  "logs.copy.failed": {
+    "m": "没能复制到剪贴板。",
+    "_desc": "警告条：复制失败（剪贴板被拒绝）"
+  },
+  "logs.export.busy": {
+    "m": "正在导出…",
+    "_desc": "「⋯」按钮在导出当前视图时的状态文字"
+  },
+  "logs.export.saved": {
+    "m": "已导出",
+    "_desc": "「⋯」按钮在导出完成后的状态文字"
+  },
+  "logs.export.fail_short": {
+    "m": "导出失败",
+    "_desc": "「⋯」按钮在导出失败后的状态文字"
+  },
+  "logs.export.expired": {
+    "m": "这次导出已失效，请重新导出。",
+    "_desc": "错误条：导出用的保存授权过期或已用过（not_allowed）"
+  },
+  "logs.export.dialog_open": {
+    "m": "另一个对话框还开着，关掉后再试。",
+    "_desc": "警告条：另存为对话框打不开，因为另一个系统对话框还开着"
+  },
+  "logs.export.dialog_failed": {
+    "m": "无法打开保存对话框",
+    "_desc": "错误条标题：系统另存为对话框打不开"
+  },
+  "logs.export.interrupted": {
+    "m": "导出已中断，请重新导出。",
+    "_desc": "警告条：导出在完成前被取消，或后台服务重新启动了"
+  },
+  "logs.bundle.failed": {
+    "m": "诊断包导出失败",
+    "_desc": "错误条标题：生成或写入诊断包失败"
+  },
+  "logs.export.failed": {
+    "m": "日志导出失败",
+    "_desc": "错误条标题：导出当前视图失败"
+  },
+  "logs.export.reveal": {
+    "m": "在文件夹中显示",
+    "_desc": "提示条按钮：在资源管理器中定位刚导出的文件"
+  },
+  "logs.export.missing": {
+    "m": "{n, plural, other {其中 # 条已从内存淘汰，未导出}}",
+    "_desc": "导出完成提示的补充：有 n 条在导出时已不在后台内存里，没有写进文件"
+  },
+  "logs.export.gone": {
+    "m": "找不到导出的文件，请重新导出。",
+    "_desc": "警告条：要定位的导出文件已失效"
+  },
+  "logs.bundle.more_files": {
+    "m": "{n, plural, other {另有 # 个文件}}",
+    "_desc": "诊断包结果弹层：文件清单只列前几个，其余的条数"
+  },
+  "logs.clear.done": {
+    "m": "{view, select, raw {原始日志} other {关键事件}}已清空",
+    "_desc": "提示条：清空了当前视图（只是移出视图，可在 5 秒内撤销）"
+  },
+  "logs.clear.restored_partial": {
+    "m": "已恢复 {n, plural, other {# 条}}（{gone, plural, other {# 条}}已不在内存中）",
+    "_desc": "提示条：撤销清空后恢复了 n 条，另有 gone 条已从内存移除、无法恢复"
+  },
+  "logs.debug.not_applied": {
+    "m": "调试级别没有生效：Mihomo 的日志现在不经控制端口接收。",
+    "_desc": "警告条：调试级别设置被接受但没有生效"
+  },
+  "logs.debug.failed": {
+    "m": "无法切换 Mihomo 调试日志",
+    "_desc": "错误条标题：切换调试日志失败"
+  },
+  "logs.debug.not_running": {
+    "m": "服务没有运行。",
+    "_desc": "错误条正文：切换调试日志失败，因为服务没有运行"
+  },
+  "logs.folder.opened_logs_only": {
+    "m": "已打开日志文件夹",
+    "_desc": "提示条：打开了日志文件夹（原型文案，只在 B-24 放行后出现）"
+  },
+  "logs.folder.failed": {
+    "m": "无法打开日志文件夹",
+    "_desc": "提示条或错误条标题：打开日志文件夹失败"
+  },
+  "logs.more.export_json": {
+    "m": "导出当前视图为 JSON",
+    "_desc": "「⋯」菜单项：把当前视图里可见的记录导出为 JSON 文件；JSON 不译"
+  },
+  "logs.more.export_text": {
+    "m": "导出当前视图为文本",
+    "_desc": "「⋯」菜单项：把当前视图里可见的记录导出为纯文本文件"
+  },
+  "logs.load.failed_partial": {
+    "m": "没能载入之前的日志。",
+    "_desc": "警告条：从后台取日志历史失败，但列表里已有之后实时收到的日志（此时列表不是空的，空状态「无法载入日志」不出现）；带「重试」按钮"
+  }
+}

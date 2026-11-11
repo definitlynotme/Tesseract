@@ -1,0 +1,34 @@
+{
+  "schema_version": 5,
+  "fixture_role": "observed_global_visibility_tail_characterization",
+  "performance": {
+    "final_pool_healthy": 19,
+    "target_alive": 25,
+    "observed_stall_ms": 200000,
+    "timing_precision": "approximate_from_authoritative_report"
+  },
+  "candidate_pipeline": {
+    "unique_candidate_count": 7794,
+    "tcp_start_acked_count": 4815,
+    "tcp_responsive_count": 1493,
+    "fast_completion_count": 1476,
+    "fast_pass_count": 20,
+    "deep_completion_count": 142,
+    "deep_pass_count": 1,
+    "validated_pass_count": 21,
+    "net_new_pass_count": 19
+  },
+  "production_selection": {
+    "service_selected_count": 8,
+    "service_fast_pass_count": 0,
+    "structural_routing_was_enabled": true,
+    "whole_inventory_visibility_was_available": false
+  },
+  "event_truth": {
+    "candidate_identity": "runtime_hmac_only",
+    "raw_uri_available": false,
+    "credentials_available": false,
+    "individual_event_trace_available": false,
+    "aggregate_values_must_not_be_synthesized_into_events": true
+  }
+}

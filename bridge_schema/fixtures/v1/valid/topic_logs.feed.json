@@ -1,0 +1,23 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "logs.feed",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "state": "connected",
+    "level": "info",
+    "updated_at_ms": 1,
+    "dropped": {
+      "debug": 1,
+      "info": 1,
+      "warn": 1,
+      "error": 1,
+      "critical": 1,
+      "total": 5
+    },
+    "run_id": null
+  }
+}

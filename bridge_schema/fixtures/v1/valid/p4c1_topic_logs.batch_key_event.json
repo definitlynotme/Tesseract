@@ -1,0 +1,46 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "logs.batch",
+  "rev": 1,
+  "kind": "edge",
+  "data": {
+    "from_seq": 41,
+    "records": [
+      {
+        "seq": 41,
+        "ts_ms": 1790812800041,
+        "rx_ms": 1790812800041,
+        "source": "TESSERACT",
+        "level": "info",
+        "category": "runtime",
+        "key": "service.started",
+        "title": "Service started",
+        "detail": "Core is running.",
+        "raw": "",
+        "is_key_event": true,
+        "run_id": "4f0c7b2d9a8e4c11b3d5e6f708192a3b"
+      },
+      {
+        "seq": 42,
+        "ts_ms": 1790812800042,
+        "rx_ms": 1790812800042,
+        "source": "MIHOMO",
+        "level": "info",
+        "category": "connection",
+        "key": "log.raw",
+        "title": "[TCP] 192.0.2.1:53123 --> example.invalid:443",
+        "detail": "",
+        "raw": "[TCP] 192.0.2.1:53123 --> example.invalid:443",
+        "is_key_event": false,
+        "run_id": "4f0c7b2d9a8e4c11b3d5e6f708192a3b"
+      }
+    ],
+    "dropped": 0,
+    "dropped_total": 0,
+    "gap": false
+  },
+  "seq": 7
+}

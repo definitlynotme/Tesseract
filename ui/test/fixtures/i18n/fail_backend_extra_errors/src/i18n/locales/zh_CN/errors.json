@@ -1,0 +1,10 @@
+{
+  "errors.timeout": {
+    "m": "操作超时。检查网络后再试。",
+    "_desc": "通用错误 timeout"
+  },
+  "errors.page_only": {
+    "m": "页面自己的错误说明，应放在页面命名空间。",
+    "_desc": "误写进 errors 的前端 id"
+  }
+}

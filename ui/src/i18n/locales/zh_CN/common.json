@@ -1,0 +1,298 @@
+{
+  "common.action.add": {
+    "m": "添加",
+    "_desc": "通用按钮：添加一项"
+  },
+  "common.action.apply": {
+    "m": "应用",
+    "_desc": "通用按钮：让设置立即生效"
+  },
+  "common.action.back": {
+    "m": "返回",
+    "_desc": "通用按钮：回到上一步或上一页"
+  },
+  "common.action.cancel": {
+    "m": "取消",
+    "_desc": "通用按钮：放弃当前操作并关闭"
+  },
+  "common.action.clear": {
+    "m": "清空",
+    "_desc": "清空输入或筛选"
+  },
+  "common.action.close": {
+    "m": "关闭",
+    "_desc": "通用按钮：关闭面板、抽屉或提示"
+  },
+  "common.action.continue": {
+    "m": "继续",
+    "_desc": "通用按钮：继续当前流程"
+  },
+  "common.action.copied": {
+    "m": "已复制",
+    "_desc": "复制成功后的短提示"
+  },
+  "common.action.copy": {
+    "m": "复制",
+    "_desc": "通用按钮：复制到剪贴板"
+  },
+  "common.action.delete": {
+    "m": "删除",
+    "_desc": "通用按钮：删除一项（确认框的确认按钮也用它）"
+  },
+  "common.action.details": {
+    "m": "详情",
+    "_desc": "通用按钮或链接：展开详细信息"
+  },
+  "common.action.disable": {
+    "m": "停用",
+    "_desc": "通用按钮或开关文字：停用一项"
+  },
+  "common.action.discard": {
+    "m": "放弃更改",
+    "_desc": "确认框按钮：丢弃未保存的更改"
+  },
+  "common.action.done": {
+    "m": "完成",
+    "_desc": "分步流程的结束按钮"
+  },
+  "common.action.edit": {
+    "m": "编辑",
+    "_desc": "通用按钮：编辑一项"
+  },
+  "common.action.enable": {
+    "m": "启用",
+    "_desc": "通用按钮或开关文字：启用一项"
+  },
+  "common.action.export": {
+    "m": "导出",
+    "_desc": "通用按钮：导出数据"
+  },
+  "common.action.import": {
+    "m": "导入",
+    "_desc": "通用按钮：导入数据"
+  },
+  "common.action.learn_more": {
+    "m": "了解更多",
+    "_desc": "链接文字：打开说明"
+  },
+  "common.action.next": {
+    "m": "下一步",
+    "_desc": "分步流程的前进按钮"
+  },
+  "common.action.ok": {
+    "m": "确定",
+    "_desc": "通用确认按钮"
+  },
+  "common.action.open": {
+    "m": "打开",
+    "_desc": "通用按钮：打开文件、文件夹或链接"
+  },
+  "common.action.refresh": {
+    "m": "刷新",
+    "_desc": "通用按钮：重新获取数据"
+  },
+  "common.action.remove": {
+    "m": "移除",
+    "_desc": "通用按钮：从列表移除一项（不一定删除数据）"
+  },
+  "common.action.reset": {
+    "m": "恢复默认",
+    "_desc": "通用按钮：把设置恢复成默认值"
+  },
+  "common.action.retry": {
+    "m": "重试",
+    "_desc": "通用按钮：再执行一次失败的操作"
+  },
+  "common.action.save": {
+    "m": "保存",
+    "_desc": "通用按钮：保存当前更改"
+  },
+  "common.action.search": {
+    "m": "搜索",
+    "_desc": "搜索框的无障碍名称或按钮"
+  },
+  "common.action.select_all": {
+    "m": "全选",
+    "_desc": "列表的全选操作"
+  },
+  "common.action.show_less": {
+    "m": "收起",
+    "_desc": "折叠区域的收起按钮"
+  },
+  "common.action.show_more": {
+    "m": "展开",
+    "_desc": "折叠区域的展开按钮"
+  },
+  "common.action.test": {
+    "m": "测试",
+    "_desc": "通用按钮：发送一次测试"
+  },
+  "common.action.view_logs": {
+    "m": "查看日志",
+    "_desc": "通知或错误里的操作：前往运行日志"
+  },
+  "common.reason_unknown": {
+    "m": "原因未知",
+    "_desc": "后端给出的原因码没有对应文案时的兜底说明"
+  },
+  "common.skipped.admin_required": {
+    "m": "需要管理员权限，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = admin_required）时给用户的一句话"
+  },
+  "common.skipped.cancelled": {
+    "m": "操作已取消。",
+    "_desc": "命令未被接受（ack.skipped_reason = cancelled）时给用户的一句话"
+  },
+  "common.skipped.conflict": {
+    "m": "状态已经变了，操作没有执行。刷新后再试。",
+    "_desc": "命令未被接受（ack.skipped_reason = conflict）时给用户的一句话"
+  },
+  "common.skipped.epoch_mismatch": {
+    "m": "后台刚重启过，操作没有执行。再试一次。",
+    "_desc": "命令未被接受（ack.skipped_reason = epoch_mismatch）时给用户的一句话"
+  },
+  "common.skipped.frame_too_large": {
+    "m": "提交的内容太大，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = frame_too_large）时给用户的一句话"
+  },
+  "common.skipped.internal": {
+    "m": "出现意外错误，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = internal）时给用户的一句话"
+  },
+  "common.skipped.invalid_enum": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = invalid_enum）时给用户的一句话"
+  },
+  "common.skipped.invalid_json": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = invalid_json）时给用户的一句话"
+  },
+  "common.skipped.invalid_type": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = invalid_type）时给用户的一句话"
+  },
+  "common.skipped.invalid_utf8": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = invalid_utf8）时给用户的一句话"
+  },
+  "common.skipped.io": {
+    "m": "读写出错，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = io）时给用户的一句话"
+  },
+  "common.skipped.job_capacity": {
+    "m": "排队的操作太多，这次没有执行。稍后再试。",
+    "_desc": "命令未被接受（ack.skipped_reason = job_capacity）时给用户的一句话"
+  },
+  "common.skipped.lifecycle_busy": {
+    "m": "服务正在启动或停止，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = lifecycle_busy）时给用户的一句话"
+  },
+  "common.skipped.missing_field": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = missing_field）时给用户的一句话"
+  },
+  "common.skipped.needs_route": {
+    "m": "没有可用的层级，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = needs_route）时给用户的一句话"
+  },
+  "common.skipped.no_sources": {
+    "m": "没有启用的节点来源，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = no_sources）时给用户的一句话"
+  },
+  "common.skipped.not_allowed": {
+    "m": "当前不允许这个操作。",
+    "_desc": "命令未被接受（ack.skipped_reason = not_allowed）时给用户的一句话"
+  },
+  "common.skipped.not_cancellable": {
+    "m": "这个操作已经不能取消，会继续完成。",
+    "_desc": "命令未被接受（ack.skipped_reason = not_cancellable）时给用户的一句话"
+  },
+  "common.skipped.not_object": {
+    "m": "请求格式不对，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = not_object）时给用户的一句话"
+  },
+  "common.skipped.not_running": {
+    "m": "服务没有运行，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = not_running）时给用户的一句话"
+  },
+  "common.skipped.proto_mismatch": {
+    "m": "界面与后台版本不一致，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = proto_mismatch）时给用户的一句话"
+  },
+  "common.skipped.runtime_gone": {
+    "m": "后台已重启，操作没有执行。再试一次。",
+    "_desc": "命令未被接受（ack.skipped_reason = runtime_gone）时给用户的一句话"
+  },
+  "common.skipped.runtime_listener_conflict": {
+    "m": "端口被占用，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = runtime_listener_conflict）时给用户的一句话"
+  },
+  "common.skipped.runtime_listener_unavailable": {
+    "m": "无法监听端口，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = runtime_listener_unavailable）时给用户的一句话"
+  },
+  "common.skipped.runtime_unavailable": {
+    "m": "后台暂不可用，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = runtime_unavailable）时给用户的一句话"
+  },
+  "common.skipped.sequence_gap": {
+    "m": "界面正在重新同步，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = sequence_gap）时给用户的一句话"
+  },
+  "common.skipped.snapshot_required": {
+    "m": "界面数据需要刷新，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = snapshot_required）时给用户的一句话"
+  },
+  "common.skipped.source_supply_no_egress": {
+    "m": "获取来源时没有可用的出口，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = source_supply_no_egress）时给用户的一句话"
+  },
+  "common.skipped.superseded": {
+    "m": "已被之后的操作取代。",
+    "_desc": "命令未被接受（ack.skipped_reason = superseded）时给用户的一句话"
+  },
+  "common.skipped.timeout": {
+    "m": "等待超时，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = timeout）时给用户的一句话"
+  },
+  "common.skipped.validation": {
+    "m": "内容有误，操作没有执行。",
+    "_desc": "命令未被接受（ack.skipped_reason = validation）时给用户的一句话"
+  },
+  "common.state.failed": {
+    "m": "失败",
+    "_desc": "结果为失败的短状态词"
+  },
+  "common.state.loading": {
+    "m": "正在加载…",
+    "_desc": "数据加载中的占位文字"
+  },
+  "common.state.none": {
+    "m": "无",
+    "_desc": "没有任何项时的短词"
+  },
+  "common.state.off": {
+    "m": "关",
+    "_desc": "开关的「关」状态短词"
+  },
+  "common.state.on": {
+    "m": "开",
+    "_desc": "开关的「开」状态短词"
+  },
+  "common.state.saved": {
+    "m": "已保存",
+    "_desc": "保存成功的短提示"
+  },
+  "common.state.still_working": {
+    "m": "仍在处理…",
+    "_desc": "操作超过慢反馈阈值仍未结束时的提示"
+  },
+  "common.state.unknown": {
+    "m": "未知",
+    "_desc": "状态或数值未知时的短词"
+  },
+  "common.state.working": {
+    "m": "正在处理…",
+    "_desc": "按钮忙碌态与进行中提示；DESIGN §8：进行中用「正在…」加省略号"
+  }
+}

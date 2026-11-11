@@ -1,0 +1,60 @@
+{
+ "also_exercised_sha256": {
+  "runtime_egress_recovery.py": "16c011111ed12e2f00fd827b588ce7c6aecce3a68806c8fa0ced0a5956177abb",
+  "runtime_manual_validation.py": "e84539913e1d15f3f7e8c307810df4ece5789d8aef67f01d51cf9986ffaae13f",
+  "runtime_probe_broker.py": "40d4dfbd95a85b36000561471645c70cfd821e620ad02af7165f4ca0aa7c49b2",
+  "runtime_route_audit.py": "562fdef37543efda16c8b31935238d032b5e0a583437e43a1844396ec4d40627",
+  "tests/fixtures/post_dial/replay.py": "b12562d9bac2a9e26b95ce6729c219cd9421364010ee0f31e7e61f419f067063"
+ },
+ "captured_at": "2026-10-27T02:42:33-04:00",
+ "driver_sha256": {
+  "t0_driver.py": "98c42c5b3321688c20730cc530753e31736c841179129ad000947f2e1574bc67",
+  "t0_rules.py": "6d6aca5c793265b93be1563f3fab9b70d39a3916b3f40a4b58d9e9c525e09a32"
+ },
+ "families": [
+  "policy",
+  "route",
+  "admission",
+  "probe",
+  "reads",
+  "commit",
+  "closes",
+  "e2e",
+  "switch",
+  "tickets",
+  "lease_busy"
+ ],
+ "golden_sha256": {
+  "golden/admission.json": "e540456ccdbacc02b8640af396a5c74419c4eb49bf10f790dabf4d3a997025d7",
+  "golden/closes.json": "2ab0c6d4e90d5a8550c77be31a7aca48d062625c42923dd2cf2dc8460c4cc279",
+  "golden/commit.json": "868d2c6c43221168088d59c66f4017f92cde1771d97df7a5eedc1f830c8b4311",
+  "golden/e2e.json": "4c8308d954be2e5519b84d1aead0a9e92fd958e34d0b4990d2333f663cc41cc5",
+  "golden/lease_busy.json": "b554a6a8bd34182cab1cd8e7435a55af6cd6bbfeb086b813d0b926dbf1f4f4f0",
+  "golden/policy.json": "ac034f49377e637feaa3998ae399d8f82caf705a64d308580fd33f82f1fccf7d",
+  "golden/probe.json": "92f64b26dc3335b6da54f88c46b0919215b769f7ae6ba80ee9b0694fbeccfd6f",
+  "golden/reads.json": "a9beee6382c975dfbc3c6ef259ba2cd0e644f3c9dcf13709dadf4e4033e035ae",
+  "golden/route.json": "f4d086854537540fcc42fc7effab858d57c5f9f6ef759ba3bab498c9ec37ff2c",
+  "golden/switch.json": "4a97a48f8c8956cb092758092ff391f648edda9e077bd6361e1c062e63983d73",
+  "golden/tickets.json": "acee9a48dceae1c8ab1c9ab8437a37d3dcd3bfbe10210518c244d990f669ec3f"
+ },
+ "note": "Key-off reference of the pre-ladder tree. One golden set; every variant (keys absent, keys false, overshoot_repair alone) must reproduce it, except the exemptions in t0_rules.py. Re-capture only from a tree without the ladder hunks and after peers signalled stable.",
+ "platform": "Windows-11-10.0.26300-SP0",
+ "product_sha256": {
+  "desktop_runtime.py": "af994b215b4dc02bbe1a80bd8548fc9ddda07625ff6d14bd540c380f57755a21",
+  "mihomo_api.py": "c86a4ec42bd26f91a0c04b84f0f1334018e2f69faae67fe6f8c6d9b2da0c7e93",
+  "runtime_node_judge.py": "edb88f86a864ac297d15be888e5dbf25f5e980e7cd20f93334847cb057a9a81a",
+  "runtime_post_dial.py": "eaca6c26fe3d012a5a4275e9cc38d607b41d14ae1f90a0f3927f0fd1e9874b1e",
+  "runtime_post_dial_judge.py": "730c91ab8a174d51bf80a833e3cf4797ad2fc99fd1dba5506a805a23b594e8dd",
+  "runtime_post_dial_observer.py": "3398c45dc40bb773a8ec6a3f7b089a22fb16089804b503505346c2f4a7452b35",
+  "runtime_route_lease.py": "18d176db09e330ff3b651bb388441f3bf8a4826dea572b4aa69f91b86e939dc1"
+ },
+ "python": "3.12.7",
+ "runs_per_variant": 3,
+ "spec": ".build/claude-fallback/ref/spec_tier_ladder_v1.md §7.1, §9 Track 0",
+ "variants": [
+  "absent",
+  "false",
+  "overshoot_only"
+ ],
+ "variants_identical_at_capture": true
+}

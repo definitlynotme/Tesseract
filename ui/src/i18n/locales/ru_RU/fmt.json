@@ -1,0 +1,19 @@
+{
+  "fmt.ago.days": "{n, plural, one {# день назад} few {# дня назад} many {# дней назад} other {# дня назад}}",
+  "fmt.ago.hours": "{n, plural, one {# час назад} few {# часа назад} many {# часов назад} other {# часа назад}}",
+  "fmt.ago.minutes": "{n, plural, one {# минуту назад} few {# минуты назад} many {# минут назад} other {# минуты назад}}",
+  "fmt.ago.now": "только что",
+  "fmt.lat.down": "Недоступно",
+  "fmt.lat.ok": "Нормально",
+  "fmt.lat.slow": "Медленно",
+  "fmt.ms": "{n, number, integer} мс",
+  "fmt.qty": "{num} {unit}",
+  "fmt.unit.b": "Б",
+  "fmt.unit.gb": "ГБ",
+  "fmt.unit.kb": "КБ",
+  "fmt.unit.mb": "МБ",
+  "fmt.unit.per_second": "{unit}/с",
+  "fmt.uptime.hours_minutes": "{h} ч {m} мин",
+  "fmt.uptime.minutes": "{m} мин",
+  "fmt.uptime.under_minute": "меньше 1 мин"
+}

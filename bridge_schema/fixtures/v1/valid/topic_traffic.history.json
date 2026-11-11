@@ -1,0 +1,15 @@
+{
+  "data": {
+    "h24": [],
+    "live": [],
+    "sampled_at_ms": 1791400577584,
+    "source": "bucketed"
+  },
+  "epoch": "v1-fixture",
+  "kind": "snapshot",
+  "produced_at_ms": 1790812800000,
+  "rev": 1,
+  "sent_at_ms": 1790812800001,
+  "t": "evt",
+  "topic": "traffic.history"
+}

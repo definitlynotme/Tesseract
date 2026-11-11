@@ -1,0 +1,245 @@
+{
+ "name": "rt_runtime_gone",
+ "desc": "The sidecar exits: rt:reset(runtime_gone), the crash banner, then a new epoch with its hello and first snapshot.",
+ "lang": "zh_CN",
+ "steps": [
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "reconnect"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "app.quit"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "traffic.tick",
+      "traffic.history",
+      "logs.batch",
+      "core.info",
+      "jobs"
+     ],
+     "features": []
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e1",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 4
+     },
+     "runtime": {
+      "runtime_running": true,
+      "startup_phase": "running",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": true,
+      "pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": 120
+     }
+    }
+   }
+  },
+  {
+   "advance_ms": 500
+  },
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e1",
+    "reason": "runtime_gone"
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:banner",
+    "kind": "sidecar_crashed",
+    "active": true,
+    "state": "restarting",
+    "exit_code": 1,
+    "restarts": 1,
+    "limit": 3,
+    "epoch": "rt-fixture-e1"
+   }
+  },
+  {
+   "deliver": {
+    "t": "rt:reset",
+    "epoch": "rt-fixture-e2",
+    "reason": "runtime_gone"
+   }
+  },
+  {
+   "deliver": {
+    "t": "hello",
+    "epoch": "rt-fixture-e2",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "proto": 1,
+    "app_version": "1.0.0",
+    "runtime_pid": 4381,
+    "lang": "zh_CN",
+    "caps": {
+     "commands": [
+      "service.start",
+      "service.stop",
+      "service.restart",
+      "app.quit"
+     ],
+     "topics": [
+      "service.state",
+      "route.published",
+      "tiers.summary",
+      "traffic.tick",
+      "traffic.history",
+      "logs.batch",
+      "core.info",
+      "jobs"
+     ],
+     "features": []
+    },
+    "scope": {
+     "kind": "custom",
+     "id": "rt-fixture"
+    },
+    "network_recovery": {
+     "proxy": {
+      "state": "restored",
+      "error_code": null,
+      "remaining_count": 0
+     },
+     "firewall": {
+      "state": "not_needed",
+      "error_code": null,
+      "remaining_count": 0
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "evt",
+    "epoch": "rt-fixture-e2",
+    "produced_at_ms": 1790000000000,
+    "sent_at_ms": 1790000000001,
+    "topic": "service.state",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+     "intent": {
+      "desired_running": true,
+      "stop_requested": false,
+      "lifecycle_revision": 12,
+      "runtime_generation": 5
+     },
+     "runtime": {
+      "runtime_running": false,
+      "startup_phase": "stopped",
+      "shutdown_cleanup_pending": false,
+      "failure_code": null
+     },
+     "core": {
+      "running": false,
+      "pid": null,
+      "process_generation": 4,
+      "core_generation": 8,
+      "cleanup_pending": false
+     },
+     "readiness": {
+      "state": "ready",
+      "validation_active": false,
+      "reason": "",
+      "remaining_ms": null,
+      "publication_revision": 36,
+      "lifecycle_revision": 12,
+      "route_epoch": 7,
+      "network_context_epoch": 2
+     },
+     "freshness": {
+      "sampled_at_ms": 1790000000000,
+      "snapshot_revision": 51,
+      "stale": false,
+      "uptime_s": null
+     }
+    }
+   }
+  },
+  {
+   "deliver": {
+    "t": "host:banner",
+    "kind": "sidecar_crashed",
+    "active": false,
+    "state": "restarted",
+    "exit_code": 1,
+    "restarts": 1,
+    "limit": 3,
+    "epoch": "rt-fixture-e2"
+   }
+  }
+ ]
+}

@@ -1,0 +1,440 @@
+{
+ "call_sites": [
+  {
+   "args": [
+    "recovery_failure",
+    "candidate",
+    "snapshot_payload"
+   ],
+   "caller": "_check_exit_quality_impl",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "alternative",
+    "snapshot_payload"
+   ],
+   "caller": "_fast_recover_confirmed_alternative",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "ref",
+    "snapshot_payload"
+   ],
+   "caller": "_fresh_runtime_hot_standby",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "ref",
+    "snapshot_payload"
+   ],
+   "caller": "_probe_managed_alternative.probe_contract_for",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "ref",
+    "payload"
+   ],
+   "caller": "_refresh_one_runtime_hot_standby",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "ref",
+    "snapshot_payload"
+   ],
+   "caller": "_runtime_early_differential_plans",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "promotion_failure",
+    "refreshed_ref",
+    "refreshed_payload"
+   ],
+   "caller": "_start_runtime_failback.worker",
+   "keywords": {}
+  },
+  {
+   "args": [
+    "failure",
+    "evidence.ref",
+    "snapshot_payload"
+   ],
+   "caller": "_start_runtime_provisional_diversion",
+   "keywords": {}
+  }
+ ],
+ "gw": {
+  "actions": {
+   "gw1": null,
+   "n1": null,
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": null,
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": null,
+   "t2a": null,
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "EXIT-SELECT",
+    "gw1"
+   ],
+   "leaf": "gw1",
+   "pool_kind": "gateway"
+  }
+ },
+ "t1": {
+  "actions": {
+   "gw1": null,
+   "n1": {
+    "alternative_leaf": "n1",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER3-AUTO"
+   },
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": {
+    "alternative_leaf": "nodeA :: TROJAN",
+    "group": "TIER1-nodeA-AUTO",
+    "mode": "fixed",
+    "previous": "nodeA :: VLESS",
+    "target": "nodeA :: TROJAN"
+   },
+   "nodeA :: VLESS": {
+    "alternative_leaf": "nodeA :: VLESS",
+    "group": "TIER1-nodeA-SELECT",
+    "mode": "selector",
+    "previous": "TIER1-nodeA-AUTO",
+    "target": "nodeA :: VLESS"
+   },
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": {
+    "alternative_leaf": "nodeB :: VLESS",
+    "group": "TIER1-AUTO",
+    "mode": "fixed",
+    "previous": "TIER1-nodeA-SELECT",
+    "target": "TIER1-nodeB-SELECT"
+   },
+   "t2a": {
+    "alternative_leaf": "t2a",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER2-AUTO"
+   },
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "TIER1-nodeA-SELECT",
+    "TIER1-nodeA-AUTO",
+    "nodeA :: VLESS"
+   ],
+   "leaf": "nodeA :: VLESS",
+   "pool_kind": "tier1_variant"
+  }
+ },
+ "t1_flat": {
+  "actions": {
+   "gw1": null,
+   "n1": {
+    "alternative_leaf": "n1",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER3-AUTO"
+   },
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": {
+    "alternative_leaf": "nodeA :: VLESS",
+    "group": "TIER1-SELECT",
+    "mode": "selector",
+    "previous": "TIER1-AUTO",
+    "target": "nodeA :: VLESS"
+   },
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": {
+    "alternative_leaf": "nodeB :: VLESS",
+    "group": "TIER1-AUTO",
+    "mode": "fixed",
+    "previous": "nodeA :: VLESS",
+    "target": "nodeB :: VLESS"
+   },
+   "t2a": {
+    "alternative_leaf": "t2a",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER2-AUTO"
+   },
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-AUTO",
+    "nodeA :: VLESS"
+   ],
+   "leaf": "nodeA :: VLESS",
+   "pool_kind": "tier1_variant"
+  }
+ },
+ "t1_user": {
+  "actions": {
+   "gw1": null,
+   "n1": {
+    "alternative_leaf": "n1",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER3-AUTO"
+   },
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": {
+    "alternative_leaf": "nodeA :: TROJAN",
+    "group": "TIER1-SELECT",
+    "mode": "selector",
+    "previous": "TIER1-nodeA-SELECT",
+    "target": "TIER1-AUTO"
+   },
+   "nodeA :: VLESS": {
+    "alternative_leaf": "nodeA :: VLESS",
+    "group": "TIER1-nodeA-SELECT",
+    "mode": "selector",
+    "previous": "nodeA :: TROJAN",
+    "target": "TIER1-nodeA-AUTO"
+   },
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": {
+    "alternative_leaf": "nodeB :: VLESS",
+    "group": "TIER1-SELECT",
+    "mode": "selector",
+    "previous": "TIER1-nodeA-SELECT",
+    "target": "TIER1-nodeB-SELECT"
+   },
+   "t2a": {
+    "alternative_leaf": "t2a",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER1-SELECT",
+    "target": "TIER2-AUTO"
+   },
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER1-SELECT",
+    "TIER1-nodeA-SELECT",
+    "nodeA :: TROJAN"
+   ],
+   "leaf": "nodeA :: TROJAN",
+   "pool_kind": "tier1_variant"
+  }
+ },
+ "t2": {
+  "actions": {
+   "gw1": null,
+   "n1": {
+    "alternative_leaf": "n1",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER2-AUTO",
+    "target": "TIER3-AUTO"
+   },
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": null,
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": null,
+   "t2a": null,
+   "t2b": {
+    "alternative_leaf": "t2b",
+    "group": "TIER2-AUTO",
+    "mode": "fixed",
+    "previous": "t2a",
+    "target": "t2b"
+   },
+   "t2c": {
+    "alternative_leaf": "t2c",
+    "group": "TIER2-AUTO",
+    "mode": "fixed",
+    "previous": "t2a",
+    "target": "t2c"
+   },
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2a"
+   ],
+   "leaf": "t2a",
+   "pool_kind": "tier2"
+  }
+ },
+ "t2_pinned": {
+  "actions": {
+   "gw1": null,
+   "n1": {
+    "alternative_leaf": "n1",
+    "group": "PROXY-FALLBACK",
+    "mode": "fixed",
+    "previous": "TIER2-AUTO",
+    "target": "TIER3-AUTO"
+   },
+   "n2": null,
+   "n3": null,
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": null,
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": null,
+   "t2a": {
+    "alternative_leaf": "t2a",
+    "group": "TIER2-AUTO",
+    "mode": "fixed",
+    "previous": "t2b",
+    "target": "t2a"
+   },
+   "t2b": null,
+   "t2c": {
+    "alternative_leaf": "t2c",
+    "group": "TIER2-AUTO",
+    "mode": "fixed",
+    "previous": "t2b",
+    "target": "t2c"
+   },
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER2-AUTO",
+    "t2b"
+   ],
+   "leaf": "t2b",
+   "pool_kind": "tier2"
+  }
+ },
+ "t3": {
+  "actions": {
+   "gw1": null,
+   "n1": null,
+   "n2": {
+    "alternative_leaf": "n2",
+    "group": "TIER3-AUTO",
+    "mode": "fixed",
+    "previous": "n1",
+    "target": "n2"
+   },
+   "n3": {
+    "alternative_leaf": "n3",
+    "group": "TIER3-AUTO",
+    "mode": "fixed",
+    "previous": "n1",
+    "target": "n3"
+   },
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": null,
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": null,
+   "t2a": null,
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n1"
+   ],
+   "leaf": "n1",
+   "pool_kind": "tier3b"
+  }
+ },
+ "t3_full": {
+  "actions": {
+   "gw1": null,
+   "n1": null,
+   "n2": {
+    "alternative_leaf": "n2",
+    "group": "TIER3-AUTO",
+    "mode": "fixed",
+    "previous": "n1",
+    "target": "n2"
+   },
+   "n3": {
+    "alternative_leaf": "n3",
+    "group": "TIER3-AUTO",
+    "mode": "fixed",
+    "previous": "n1",
+    "target": "n3"
+   },
+   "nodeA :: TROJAN": null,
+   "nodeA :: VLESS": null,
+   "nodeB :: TROJAN": null,
+   "nodeB :: VLESS": null,
+   "t2a": null,
+   "t2b": null,
+   "t2c": null,
+   "zz": null
+  },
+  "allow_true_matches_default": true,
+  "binding": {
+   "chain": [
+    "FINAL-EXIT",
+    "PROXY-FALLBACK",
+    "TIER3-AUTO",
+    "n1"
+   ],
+   "leaf": "n1",
+   "pool_kind": "tier3b"
+  }
+ }
+}

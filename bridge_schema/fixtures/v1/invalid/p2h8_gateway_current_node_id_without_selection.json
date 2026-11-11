@@ -1,0 +1,21 @@
+{
+  "validator": "frame",
+  "frame": {
+    "t": "evt",
+    "epoch": "v1-fixture",
+    "produced_at_ms": 1790812800000,
+    "sent_at_ms": 1790812800001,
+    "topic": "gateway.current",
+    "rev": 1,
+    "kind": "snapshot",
+    "data": {
+      "selected": null,
+      "effective": null,
+      "missing": false,
+      "applied": false,
+      "pending": null,
+      "selected_node_id": "5be0c27d9a4f13e86b7d02ac"
+    }
+  },
+  "expected": "invariant:gateway.current.selected_node_id"
+}

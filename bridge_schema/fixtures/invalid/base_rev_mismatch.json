@@ -1,0 +1,24 @@
+{
+  "case": "patch_mismatch",
+  "baseline": {
+    "rev": 8,
+    "items": [
+      {
+        "id": "node-a",
+        "usable": true
+      }
+    ]
+  },
+  "patch": {
+    "base_rev": 7,
+    "rev": 9,
+    "changed": [
+      {
+        "id": "node-a",
+        "usable": false
+      }
+    ],
+    "removed": []
+  },
+  "error": "base_rev:mismatch"
+}

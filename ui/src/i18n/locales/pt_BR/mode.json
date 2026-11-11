@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN e proxy do sistema juntos",
+  "mode.mixed.label": "Proxy do sistema + TUN",
+  "mode.mixed.short": "Ambos",
+  "mode.switch.confirm.body": "{mode, select, tun {O serviço de proxy será reiniciado e o tráfego será interrompido brevemente. O modo TUN assume todo o tráfego deste computador.} mixed {O serviço de proxy será reiniciado e o tráfego será interrompido brevemente. O modo TUN assume todo o tráfego deste computador.} other {O serviço de proxy será reiniciado e o tráfego será interrompido brevemente.}}",
+  "mode.switch.confirm.ok": "Alternar",
+  "mode.switch.confirm.title": "Alternar para {label}?",
+  "mode.system.desc": "Abrange só os aplicativos que usam o proxy do sistema",
+  "mode.system.label": "Proxy do sistema",
+  "mode.system.short": "Sistema",
+  "mode.tun.desc": "Assume todo o tráfego por um adaptador virtual (TUN)",
+  "mode.tun.label": "Modo TUN",
+  "mode.tun.short": "TUN"
+}

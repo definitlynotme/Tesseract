@@ -1,0 +1,374 @@
+{
+ "proxies": {
+  "COMPATIBLE": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "cb00b95a-0ded-4e01-8141-3adf9e96c01a",
+   "interface": "",
+   "mptcp": false,
+   "name": "COMPATIBLE",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Compatible",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "DIRECT": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "3680373d-c6d2-437c-b59b-3c8d919de930",
+   "interface": "",
+   "mptcp": false,
+   "name": "DIRECT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Direct",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "FINAL-EXIT": {
+   "alive": true,
+   "all": [
+    "PROXY-FALLBACK",
+    "REJECT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "COMPATIBLE",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "FINAL-EXIT",
+   "now": "PROXY-FALLBACK",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "GENERAL": {
+   "alive": true,
+   "all": [
+    "FINAL-EXIT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "COMPATIBLE",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "GENERAL",
+   "now": "FINAL-EXIT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "GLOBAL": {
+   "alive": true,
+   "all": [
+    "GENERAL",
+    "FINAL-EXIT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "COMPATIBLE",
+   "extra": {},
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "GLOBAL",
+   "now": "GENERAL",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "L1": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {
+    "http://127.0.0.1:62082/generate_204": {
+     "alive": true,
+     "history": [
+      {
+       "delay": 0,
+       "time": "2026-11-04T12:59:49.0489222-05:00"
+      },
+      {
+       "delay": 11,
+       "time": "2026-11-04T12:59:49.1181396-05:00"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "delay": 0,
+     "time": "2026-11-04T12:59:49.0489222-05:00"
+    },
+    {
+     "delay": 11,
+     "time": "2026-11-04T12:59:49.1181396-05:00"
+    }
+   ],
+   "id": "c4c9d669-50e4-4c44-aef4-ba80b7c96dac",
+   "interface": "",
+   "mptcp": false,
+   "name": "L1",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Http",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "L2": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "aa8596e2-e493-442a-865d-e2d43bd65e29",
+   "interface": "",
+   "mptcp": false,
+   "name": "L2",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Http",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "P1-SELECT": {
+   "alive": false,
+   "all": [
+    "L1",
+    "L2"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "COMPATIBLE",
+   "extra": {
+    "http://127.0.0.1:62082/generate_204": {
+     "alive": false,
+     "history": [
+      {
+       "delay": 11,
+       "time": "2026-11-04T12:59:48.5314777-05:00"
+      },
+      {
+       "delay": 12,
+       "time": "2026-11-04T12:59:49.0771159-05:00"
+      },
+      {
+       "delay": 0,
+       "time": "2026-11-04T12:59:50.6546667-05:00"
+      }
+     ]
+    }
+   },
+   "hidden": false,
+   "history": [
+    {
+     "delay": 11,
+     "time": "2026-11-04T12:59:48.5314777-05:00"
+    },
+    {
+     "delay": 12,
+     "time": "2026-11-04T12:59:49.0771159-05:00"
+    },
+    {
+     "delay": 0,
+     "time": "2026-11-04T12:59:50.6546667-05:00"
+    }
+   ],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "P1-SELECT",
+   "now": "L1",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "",
+   "tfo": false,
+   "type": "Selector",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "PASS": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "00000000-0000-0000-0000-000000000000",
+   "interface": "",
+   "mptcp": false,
+   "name": "PASS",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Pass",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "PASS-RULE": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "00000000-0000-0000-0000-000000000000",
+   "interface": "",
+   "mptcp": false,
+   "name": "PASS-RULE",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "PassRule",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "PROXY-FALLBACK": {
+   "alive": true,
+   "all": [
+    "TIER1-AUTO"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "REJECT",
+   "expectedStatus": "204",
+   "extra": {},
+   "fixed": "",
+   "hidden": false,
+   "history": [],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "PROXY-FALLBACK",
+   "now": "TIER1-AUTO",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "http://127.0.0.1:62082/generate_204",
+   "tfo": false,
+   "type": "Fallback",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  },
+  "REJECT": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "9f32f233-0066-437f-942a-e244b52a5861",
+   "interface": "",
+   "mptcp": false,
+   "name": "REJECT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "Reject",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "REJECT-DROP": {
+   "alive": true,
+   "dialer-proxy": "",
+   "extra": {},
+   "history": [],
+   "id": "962e2a43-a3e5-4177-9691-7b4718aa924a",
+   "interface": "",
+   "mptcp": false,
+   "name": "REJECT-DROP",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "tfo": false,
+   "type": "RejectDrop",
+   "udp": true,
+   "uot": false,
+   "xudp": false
+  },
+  "TIER1-AUTO": {
+   "alive": true,
+   "all": [
+    "P1-SELECT"
+   ],
+   "dialer-proxy": "",
+   "emptyFallback": "COMPATIBLE",
+   "expectedStatus": "204",
+   "extra": {
+    "http://127.0.0.1:62082/generate_204": {
+     "alive": true,
+     "history": [
+      {
+       "delay": 12,
+       "time": "2026-11-04T12:59:48.5319931-05:00"
+      }
+     ]
+    }
+   },
+   "fixed": "",
+   "hidden": false,
+   "history": [
+    {
+     "delay": 12,
+     "time": "2026-11-04T12:59:48.5319931-05:00"
+    }
+   ],
+   "icon": "",
+   "interface": "",
+   "mptcp": false,
+   "name": "TIER1-AUTO",
+   "now": "P1-SELECT",
+   "provider-name": "",
+   "routing-mark": 0,
+   "smux": false,
+   "testUrl": "http://127.0.0.1:62082/generate_204",
+   "tfo": false,
+   "type": "Fallback",
+   "udp": false,
+   "uot": false,
+   "xudp": false
+  }
+ }
+}

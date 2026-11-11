@@ -1,0 +1,16 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "network.mode",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "mode": "system",
+    "admin": true,
+    "switching": false,
+    "proxy_state": "owned",
+    "drift": false
+  }
+}

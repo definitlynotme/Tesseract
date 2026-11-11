@@ -1,0 +1,18 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "core.info",
+  "rev": 3,
+  "kind": "patch",
+  "data": {
+    "changed": [
+      {
+        "id": "core-1",
+        "running": true
+      }
+    ],
+    "removed": []
+  }
+}

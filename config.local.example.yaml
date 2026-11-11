@@ -1,0 +1,206 @@
+# Copy to config.local.yaml for private overrides.
+# Keep real nodes, subscription URLs, and credentials out of source control.
+
+migrations:
+  tier3_min_alive_default_v2: true
+  routing_direct_defaults_v1: true
+  routing_rule_defaults_v2: true
+  routing_rule_defaults_v3: true
+
+tiers:
+  tier1:
+    nodes: []
+  tier2:
+    nodes: []
+    subscription_urls: []
+  tier3:
+    # Disabled by default. Turn this on from Settings to allow Bastion fallback
+    # when no Vanguard/Sentinel/Gateway nodes are configured.
+    enabled: false
+    nodes: []
+    subscription_urls: []
+    min_alive_nodes: 3
+    # Advanced/internal override. It can raise the automatic target but cannot
+    # lower the hidden reserve derived from min_alive_nodes.
+    # pi_controller:
+    #   target_alive: 25
+    # Optional local override. Explicit worker/process maxima remain absolute
+    # caps even when risk_control canary expansion is enabled. They count
+    # helper processes, each hosting validation_slots_per_process identities
+    # (shipped 8 x 8). To opt out of the batch backend and return to the
+    # single-slot path, set all of these together:
+    # validation_slots_per_process: 1
+    # tcp_breadth_per_identity: 1.0
+    # validation_worker_max: 24
+    # full_validation_process_max: 24
+    # validation_concurrency_max: 16
+    # source_stream_no_growth_tail_seconds: 120
+    # risk_control:
+    #   rollout_mode: shadow
+    #   hard_worker_max: 16
+    #   baseline_capacity_canary_enabled: false
+  exit:
+    # Optional Gateway Layer. When present, Clash uses these as FINAL-EXIT.
+    subscription_urls: []
+    nodes: []
+
+egress_proxy:
+  enabled: false
+  scheme: http
+  server: ''
+  port: 0
+  username: ''
+  password: ''
+
+alerts:
+  telegram:
+    enabled: false
+    bot_token: ''
+    chat_id: ''
+    parse_mode: HTML
+    silent: false
+    protect_content: false
+    disable_link_preview: true
+  whatsapp:
+    enabled: false
+    mode: text
+    access_token: ''
+    phone_number_id: ''
+    to: ''
+    api_url: ''
+    graph_api_version: v25.0
+    template:
+      name: ''
+      language: en_US
+      body_params:
+        - '{severity}'
+        - '{title}'
+        - '{message}'
+        - '{timestamp}'
+  # Optional unified channels for additional providers. Legacy sections above
+  # still work. Supported grouped types include:
+  # chat: slack, discord, teams, google_chat
+  # push: ntfy, pushover, gotify
+  # email: email_smtp, email_sendgrid
+  # sms: sms_twilio
+  # generic: generic_webhook
+  channels:
+    - id: ops-webhook
+      type: generic_webhook
+      label: Ops Webhook
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        url: ''
+        body_format: json
+        headers: {}
+        payload:
+          app: '{app}'
+          severity: '{severity}'
+          title: '{title}'
+          message: '{message}'
+          timestamp: '{timestamp}'
+    - id: phone-ntfy
+      type: ntfy
+      label: Phone Push
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        server: https://ntfy.sh
+        topic: ''
+        token: ''
+        priority: ''
+        tags: []
+    - id: smtp-email
+      type: email_smtp
+      label: SMTP Email
+      enabled: false
+      alert_types: []
+      config:
+        enabled: false
+        host: ''
+        port: 587
+        starttls: true
+        ssl: false
+        username: ''
+        password: ''
+        from_addr: ''
+        to_addrs: []
+    - id: twilio-critical-sms
+      type: sms_twilio
+      label: Critical SMS
+      enabled: false
+      # SMS can create provider costs; keep the default to severe alerts only.
+      alert_types:
+        - CRITICAL
+        - EMERGENCY
+        - KILL_SWITCH_ON
+      config:
+        enabled: false
+        account_sid: ''
+        auth_token: ''
+        from_number: ''
+        messaging_service_sid: ''
+        to_numbers: []
+
+ui:
+  language: en_US
+  theme: daylight
+
+routing:
+  rules:
+    # routing.rules.direct is the ONLY authorization source for public DIRECT
+    # traffic. No country or bootstrap-source direct rule is applied by default;
+    # add geosite:CN, geoip:CN, or any domain/IP here yourself to route it DIRECT.
+    # Rules are evaluated in order: direct, proxy, reject, then raw/rule_sets.
+    # System exit-detection and static-data refresh always use FINAL-EXIT and
+    # cannot be overridden by these lists.
+    # Unmatched traffic uses MATCH,GENERAL and is rejected when no proxy is
+    # available. Local/LAN bypass remains separate under
+    # client.system_proxy.bypass.
+    # raw and rule_sets must not target DIRECT or COMPATIBLE. The retired
+    # AI-FIXED-IP policy is ignored.
+    # Plain domains and bare IP addresses are accepted. Prefixes are also accepted:
+    # domain:, suffix:, keyword:, geosite:, geoip:, ip-cidr:, ip-cidr6:, process:.
+    direct: []
+    proxy: []
+    reject: []
+    raw: []
+    rule_sets: []
+  # HTTP rule-provider updates default to FINAL-EXIT; DIRECT/COMPATIBLE are not accepted,
+  # and references to the retired AI-FIXED-IP policy fall back to FINAL-EXIT.
+  rule_providers: {}
+
+subscription_server:
+  # Required before changing host to 0.0.0.0 or a LAN IP.
+  token: ''
+  cors_allowed_origins: []
+
+killswitch:
+  # Optional Windows firewall-based fuse, off by default. It needs
+  # Administrator rights; when on, Tesseract adds outbound block rules while
+  # every proxy tier is unavailable.
+  enabled: false
+  allow_lan: true
+  additional_whitelist: []
+  # Keep false unless you intentionally allow specific DNS resolver IPs.
+  allow_dns: false
+  dns_whitelist: []
+  dynamic_whitelist_refresh_interval: 300
+
+client:
+  ipv6: false
+  egress_recovery:
+    enabled: true
+    max_rotations: 2
+    exclusion_ttl_seconds: 120
+    retry_source_refresh: true
+  dns:
+    # Keep the legacy DNS path by default. Advanced users can enable
+    # respect_rules to route ordinary DNS upstream traffic through the rule engine.
+    respect_rules: false
+    ipv6: false
+  system_proxy:
+    enabled: true

@@ -1,0 +1,215 @@
+{
+  "catalog_version": "1.19.27",
+  "cases": [
+    {
+      "case_id": "mihomo_dns_resolve_failed",
+      "origin": "mihomo",
+      "level": "WARNING",
+      "payload": "[TCP] dial DIRECT 127.0.0.1:58165 --> raw.githubusercontent.com:443 error: dns resolve failed: all DNS requests failed, first error: requesting https://dns.alidns.com:443/dns-query: Get \"https://dns.alidns.com:443/dns-query?dns=AAABAAABAAAAAAAAA3JhdxFnaXRodWJ1c2VyY29udGVudANjb20AAAEAAQ\": dns resolve failed: all DNS requests failed, first error: read udp 172.21.6.66:60746->223.5.5.5:53: i/o timeout (resErr:<nil>)",
+      "event_key": "mihomo.dns_resolve_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "mihomo_connection_timeout",
+      "origin": "mihomo",
+      "level": "WARNING",
+      "payload": "[TCP] dial DIRECT (match DomainSuffix/githubusercontent.com) 127.0.0.1:57989 --> raw.githubusercontent.com:443 error: dial tcp 185.199.111.133:443: i/o timeout\ndial tcp 185.199.110.133:443: i/o timeout",
+      "event_key": "mihomo.connection_timeout",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "mihomo_connection_failed",
+      "origin": "mihomo",
+      "level": "WARNING",
+      "payload": "[TCP] dial FINAL-EXIT (match Match/) 127.0.0.1:57981 --> example.org:443 error: dial tcp 192.0.2.1:443: connection refused",
+      "event_key": "mihomo.connection_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "runner_started",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Started mihomo: mihomo.exe -f config.yaml",
+      "event_key": "runtime.mihomo_started",
+      "event_params": {},
+      "match_kind": "core_runner_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "runner_stopped",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Stopped mihomo",
+      "event_key": "runtime.mihomo_stopped",
+      "event_params": {},
+      "match_kind": "core_runner_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "runner_forced_stop",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Killed mihomo after graceful stop timed out",
+      "event_key": "runtime.mihomo_forced_stop",
+      "event_params": {},
+      "match_kind": "core_runner_pattern",
+      "expected_effective_level": "WARNING"
+    },
+    {
+      "case_id": "runner_hot_reload_ok",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Hot-reloaded config via http://127.0.0.1:9090/configs",
+      "event_key": "configuration.applied",
+      "event_params": {},
+      "match_kind": "core_runner_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "runner_hot_reload_failed",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Hot reload failed: connection refused",
+      "event_key": "configuration.failed",
+      "event_params": {},
+      "match_kind": "core_runner_pattern",
+      "expected_effective_level": "ERROR"
+    },
+    {
+      "case_id": "mihomo_stop_failed",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "mihomo did not exit after kill request",
+      "event_key": "runtime.mihomo_stop_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "ERROR"
+    },
+    {
+      "case_id": "mihomo_reader_failed",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "mihomo log reader stopped: pipe closed",
+      "event_key": "runtime.mihomo_log_reader_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "ERROR"
+    },
+    {
+      "case_id": "mihomo_ready",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "Initial configuration complete, total time: 37ms",
+      "event_key": "runtime.mihomo_ready",
+      "event_params": {"duration": "37ms"},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "mihomo_optional_dns_listener_failed",
+      "origin": "mihomo",
+      "level": "ERROR",
+      "payload": "Start DNS server(UDP) error: listen udp 127.0.0.1:1053: bind: Only one usage of each socket address",
+      "event_key": "runtime.mihomo_optional_dns_listener_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "WARNING"
+    },
+    {
+      "case_id": "mihomo_optional_dns_listener_failed_logfmt",
+      "origin": "mihomo",
+      "level": "ERROR",
+      "payload": "time=\"2026-08-30T10:00:00.0000000+08:00\" level=error msg=\"Start DNS server(TCP) error: listen tcp 127.0.0.1:1053: bind: Only one usage of each socket address\"",
+      "event_key": "runtime.mihomo_optional_dns_listener_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "WARNING"
+    },
+    {
+      "case_id": "mihomo_config_failed",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "configuration invalid: proxy provider missing",
+      "event_key": "mihomo.configuration_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "ERROR"
+    },
+    {
+      "case_id": "mihomo_start_failed",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "listen tcp 127.0.0.1:7890 failed: address already in use",
+      "event_key": "runtime.mihomo_failed",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "ERROR"
+    },
+    {
+      "case_id": "mihomo_stopped",
+      "origin": "mihomo",
+      "level": "ERROR",
+      "payload": "mihomo core exited normally",
+      "event_key": "runtime.mihomo_stopped",
+      "event_params": {},
+      "match_kind": "mihomo_pattern",
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "boundary_runner_prefix",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "prefix Started mihomo: core",
+      "event_key": null,
+      "event_params": {},
+      "match_kind": null,
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "boundary_runner_suffix",
+      "origin": "core_runner",
+      "level": "INFO",
+      "payload": "Stopped mihomo suffix",
+      "event_key": null,
+      "event_params": {},
+      "match_kind": null,
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "boundary_unknown_info",
+      "origin": "mihomo",
+      "level": "INFO",
+      "payload": "accepted connection from 127.0.0.1",
+      "event_key": null,
+      "event_params": {},
+      "match_kind": null,
+      "expected_effective_level": "INFO"
+    },
+    {
+      "case_id": "boundary_unknown_warning",
+      "origin": "mihomo",
+      "level": "WARNING",
+      "payload": "future core warning vocabulary",
+      "event_key": "mihomo.uncategorized_warning",
+      "event_params": {},
+      "match_kind": "mihomo_safe_fallback",
+      "expected_effective_level": "WARNING"
+    },
+    {
+      "case_id": "boundary_unknown_error",
+      "origin": "mihomo",
+      "level": "ERROR",
+      "payload": "future core error vocabulary",
+      "event_key": "mihomo.uncategorized_error",
+      "event_params": {},
+      "match_kind": "mihomo_safe_fallback",
+      "expected_effective_level": "ERROR"
+    }
+  ]
+}

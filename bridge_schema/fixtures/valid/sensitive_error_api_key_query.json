@@ -1,0 +1,13 @@
+{
+  "t": "error",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "id": 19,
+  "error": {
+    "code": "io",
+    "message_key": "errors.bridge.io",
+    "params": {},
+    "detail": "GET /auth/callback?api_key=CANARY_API_KEY"
+  }
+}

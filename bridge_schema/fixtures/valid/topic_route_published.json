@@ -1,0 +1,30 @@
+{
+  "t": "evt",
+  "epoch": "sidecar-4381-1790000000000",
+  "produced_at_ms": 1790000000000,
+  "sent_at_ms": 1790000000002,
+  "topic": "route.published",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "publication_revision": 20,
+    "owner": {
+      "process_pid": 7654,
+      "process_generation": 4,
+      "core_generation": 8,
+    "semantic_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "route_epoch": 7,
+      "network_context_epoch": 2
+    },
+    "selected_chain": [
+      "TIER1",
+      "node-a"
+    ],
+    "leaf": "node-a",
+  "managed_tier": "vanguard",
+    "observed_at_ms": 1790000000000,
+    "valid": true,
+    "invalid_reason": null,
+    "fail_closed_confirmed": false
+  }
+}

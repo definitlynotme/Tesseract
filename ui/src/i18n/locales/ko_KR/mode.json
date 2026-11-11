@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN과 시스템 프록시 함께 사용",
+  "mode.mixed.label": "시스템 프록시 + TUN",
+  "mode.mixed.short": "둘 다",
+  "mode.switch.confirm.body": "{mode, select, tun {프록시 서비스가 다시 시작되어 트래픽이 잠시 중단됩니다. TUN 모드는 이 컴퓨터의 모든 트래픽을 처리합니다.} mixed {프록시 서비스가 다시 시작되어 트래픽이 잠시 중단됩니다. TUN 모드는 이 컴퓨터의 모든 트래픽을 처리합니다.} other {프록시 서비스가 다시 시작되어 트래픽이 잠시 중단됩니다.}}",
+  "mode.switch.confirm.ok": "전환",
+  "mode.switch.confirm.title": "{label}(으)로 전환하시겠습니까?",
+  "mode.system.desc": "시스템 프록시를 지원하는 앱만 처리",
+  "mode.system.label": "시스템 프록시",
+  "mode.system.short": "시스템",
+  "mode.tun.desc": "가상 어댑터(TUN)로 모든 트래픽 처리",
+  "mode.tun.label": "TUN 모드",
+  "mode.tun.short": "TUN"
+}

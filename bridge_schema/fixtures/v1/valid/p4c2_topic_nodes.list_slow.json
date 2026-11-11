@@ -1,0 +1,42 @@
+{
+  "t": "evt",
+  "epoch": "v1-fixture",
+  "produced_at_ms": 1790812800000,
+  "sent_at_ms": 1790812800001,
+  "topic": "nodes.list",
+  "rev": 1,
+  "kind": "snapshot",
+  "data": {
+    "items": [
+      {
+        "id": "1f0e2d3c4b5a69788796a5b4",
+        "name": "HK-01 :: VLESS Reality",
+        "tier": "vanguard",
+        "kind": "manual",
+        "enabled": true,
+        "status": "healthy",
+        "reason_code": null,
+        "protocol": "vless",
+        "latency_ms": 180,
+        "subscription_id": null,
+        "slow": true,
+        "last_checked_at_ms": 1790812795000
+      },
+      {
+        "id": "2a1b0c9d8e7f6a5b4c3d2e1f",
+        "name": "HK-01 :: VLESS Reality",
+        "tier": "vanguard",
+        "kind": "manual",
+        "enabled": true,
+        "status": "failed",
+        "reason_code": "timeout",
+        "protocol": "vless",
+        "latency_ms": null,
+        "subscription_id": null,
+        "slow": false,
+        "last_checked_at_ms": null
+      }
+    ]
+  },
+  "key": "vanguard"
+}

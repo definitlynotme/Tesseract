@@ -1,0 +1,100 @@
+/* ==========================================================================
+   notice.css: the notice card window (plan .build/提醒模块重设计_20261030.md §4;
+   the mockup .build/claude_notice_mockup). The window is transparent and exactly
+   as large as the stack (shell/app/src/notice.rs places it at the bottom-right of
+   the work area): only the cards draw. Tokens only (ui/DESIGN.md §3); page-local
+   classes carry the nc- prefix; no coloured bar on the card (DESIGN §9).
+   ========================================================================== */
+@import "../../css/fonts.css";
+@import "../../css/tokens.css";
+@import "../../css/base.css";
+
+:root {
+  /* = WIDTH_CSS in shell/app/src/notice.rs: the card, 12 px to the screen edge, 24 px of shadow room */
+  --nc-width: 396px;
+  --nc-card: 360px;
+}
+html, body { background: transparent; }
+body { overflow: hidden; }
+
+/* ---- the stack: newest at the bottom, near the tray ---------------------------------- */
+.nstack {
+  position: fixed; right: 0; bottom: 0; width: var(--nc-width);
+  padding: 16px 12px 12px 24px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+}
+.nstack:empty { padding: 0; }
+.nc-more {
+  height: 24px; padding: 0 10px; border-radius: var(--r-pill); display: inline-flex; align-items: center; flex: none;
+  background: var(--c-surface); box-shadow: var(--sh-float); font-size: var(--fs-12); color: var(--c-ink-2);
+}
+
+/* ---- one card ---------------------------------------------------------------------------- */
+.nc {
+  position: relative; flex: none; width: var(--nc-card); padding: 10px 10px 12px 12px; border-radius: var(--r-float);
+  background: var(--c-surface); box-shadow: var(--sh-float); cursor: default;
+  transition: scale var(--spring-dur) var(--spring);
+}
+.nc:active:not(:has(button:active)) { scale: .99; transition-duration: var(--dur-press); }
+.nc-hd { display: flex; align-items: center; gap: 6px; height: 20px; margin-bottom: 6px; font-size: var(--fs-12); line-height: 16px; color: var(--c-ink-3); }
+.nc-mark { width: 14px; height: 14px; overflow: visible; flex: none; }
+.nc-mark path { fill: none; stroke: var(--c-ink); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.nc-mark circle { fill: var(--c-accent); }
+.nc-app { font-family: var(--font-brand); color: var(--c-ink-2); word-spacing: 0; }
+.nc-sep { color: var(--c-ink-4); }
+/* the level word is a mark (DESIGN §3.5): 12 px, semibold, tracked, in the icon's hue */
+.nc-lv { font-weight: var(--fw-semi); letter-spacing: var(--track-mark); }
+.nc-err .nc-lv { color: var(--c-err); }
+.nc-warn .nc-lv { color: var(--c-warn); }
+.nc-time { margin-left: auto; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nc-x {
+  flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: var(--c-ink-3);
+  transition-property: background-color, color, scale; transition-duration: var(--dur-micro), var(--dur-micro), var(--spring-dur);
+  transition-timing-function: var(--ease-out), var(--ease-out), var(--spring);
+}
+.nc-x:hover { background: var(--c-wash); color: var(--c-ink); }
+.nc-x:active { background: var(--c-wash-2); scale: .88; transition-duration: var(--dur-press); }
+.nc-x .ic { width: 12px; height: 12px; }
+
+.nc-bd { display: flex; gap: 10px; align-items: flex-start; }
+/* severity is the icon's shape plus the level word; the hue sits on the icon only */
+.nc-ic {
+  position: relative; flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  transition: background-color var(--dur-panel) var(--ease-out), color var(--dur-panel) var(--ease-out);
+}
+.nc-ic > .ic { grid-area: 1 / 1; width: 16px; height: 16px; }
+.nc-err  .nc-ic { background: var(--c-err-tint);    color: var(--c-err); }
+.nc-warn .nc-ic { background: var(--c-warn-tint);   color: var(--c-warn); }
+.nc-info .nc-ic { background: var(--c-accent-tint); color: var(--c-accent-ink); }
+.nc-ok   .nc-ic { background: var(--c-ok-tint);     color: var(--c-ok-dot); }
+/* the countdown ring is the timer (as in the in-app toast); a sticky card has none */
+.nc-ring { position: absolute; inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); rotate: -90deg; overflow: visible; pointer-events: none; }
+.nc-ring circle { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; opacity: .45; }
+.nc-ring.is-off { display: none; }
+
+.nc-tx { flex: 1; min-width: 0; padding-top: 3px; }
+.nc-t { font-size: var(--fs-14); font-weight: var(--fw-semi); line-height: 20px; color: var(--c-ink); overflow: hidden; }
+.nc-m { margin-top: 2px; color: var(--c-ink-2); line-height: 20px; overflow: hidden; }
+.nc-t > span, .nc-m > span { display: block; }
+/* the body: two lines at most */
+.nc-m > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+/* swapText: old and new words share one cell while they roll */
+.nc-t.is-swap, .nc-m.is-swap { display: grid; }
+.nc-t.is-swap > span, .nc-m.is-swap > span { grid-area: 1 / 1; }
+/* the quoted reason in the voice, then the fix */
+.nc-r { margin-top: 4px; color: var(--c-ink-3); line-height: 20px; }
+.nc-r .t-voice { color: var(--c-voice); }
+.nc-ft { display: flex; justify-content: flex-end; margin-top: 8px; }
+.nc-btn {
+  display: inline-flex; align-items: center; justify-content: center; height: 24px; padding: 0 8px; border-radius: var(--r-xs);
+  font-size: var(--fs-12); line-height: 1; font-weight: var(--fw-medium); white-space: nowrap;
+  color: var(--c-ink); background: var(--c-surface); box-shadow: inset 0 0 0 1px var(--c-line-2);
+  transition-property: background-color, box-shadow, scale; transition-duration: var(--dur-micro), var(--dur-micro), var(--spring-dur);
+  transition-timing-function: var(--ease-out), var(--ease-out), var(--spring);
+}
+.nc-btn:hover { background: var(--c-btn-hover); box-shadow: inset 0 0 0 1px var(--c-line-3); }
+.nc-btn:active { background: var(--c-well); scale: var(--press, .965); transition-duration: var(--dur-press); }
+
+/* reduced motion (the shell's TESSERACT_REDUCED_MOTION or the system setting): fades only */
+html.is-reduced *, html.is-reduced *::before, html.is-reduced *::after { transition-duration: .001ms !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .001ms !important; } }

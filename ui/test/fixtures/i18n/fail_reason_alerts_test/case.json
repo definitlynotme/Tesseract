@@ -1,0 +1,4 @@
+{
+  "extends": "base",
+  "expect": "reason.alerts.test_reason"
+}

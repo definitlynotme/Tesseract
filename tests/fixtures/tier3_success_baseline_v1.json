@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "pool_revision_milestones_ms": {
+    "1": 9218,
+    "3": 17687,
+    "25": 51234
+  },
+  "commits": [
+    {"candidate_hash": "bdcd925c55376d2c", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "cef2335f3e1dd411", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "482aa20e195a6d32", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "83a4126575107f9b", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "9e096d6467927d0f", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "c89ac0ca90899ec1", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "8f1bed33952198b7", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "98c1df49bfd24f7f", "stage": "canonical_deep", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "cff2ee708cd462d3", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "4ac3ea28f29c5690", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "3de3ff0501d8d681", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "04e6aa7886e27ba1", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "187103b3542c7d21", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "bd536c2de24b40b9", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "e162777a7b898ada", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "1c37b9606a33d1cd", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "0aa8a128c29087a7", "stage": "fast_probe", "endpoint_hash": "86bfbc7028bd3c7f", "endpoint_result": "pass"},
+    {"candidate_hash": "a747f07d4d580a0d", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "1a0a24d7b5ad0d06", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "87fb76502016cdd2", "stage": "fast_probe", "endpoint_hash": "9db3ec07b794b6af", "endpoint_result": "pass"},
+    {"candidate_hash": "a415053dd86150df", "stage": "fast_probe", "endpoint_hash": "1c37718551be7e0f", "endpoint_result": "pass"},
+    {"candidate_hash": "0861e12cd0e9b99a", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "0c39454eeb78f9b2", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "1b63cf2a0d6d26b4", "stage": "fast_probe", "endpoint_hash": "edb92d22c930c190", "endpoint_result": "pass"},
+    {"candidate_hash": "b61e5845690a837a", "stage": "fast_probe", "endpoint_hash": "9db3ec07b794b6af", "endpoint_result": "pass"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "mode.mixed.desc": "TUN とシステムプロキシを併用",
+  "mode.mixed.label": "システムプロキシ + TUN",
+  "mode.mixed.short": "両方",
+  "mode.switch.confirm.body": "{mode, select, tun {プロキシサービスが再起動し、トラフィックが一時的に中断します。TUN モードでは、このコンピューターのすべてのトラフィックを処理します。} mixed {プロキシサービスが再起動し、トラフィックが一時的に中断します。TUN モードでは、このコンピューターのすべてのトラフィックを処理します。} other {プロキシサービスが再起動し、トラフィックが一時的に中断します。}}",
+  "mode.switch.confirm.ok": "切り替え",
+  "mode.switch.confirm.title": "{label}に切り替えますか？",
+  "mode.system.desc": "システムプロキシに対応したアプリのみ処理",
+  "mode.system.label": "システムプロキシ",
+  "mode.system.short": "システム",
+  "mode.tun.desc": "仮想アダプター（TUN）ですべてのトラフィックを処理",
+  "mode.tun.label": "TUN モード",
+  "mode.tun.short": "TUN"
+}
