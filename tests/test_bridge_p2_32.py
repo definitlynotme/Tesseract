@@ -641,8 +641,16 @@ def test_session_port_reads_public_state_only():
 
 # -- lab harness: Job reaping and dry-run ---------------------------------------------------
 
+def _require_lab():
+    # The P2-ab lab harness is local evidence under .build/, which is never
+    # published; the public tree and CI skip the tests that drive it.
+    if not (LAB / 'run_sidecar_audit.py').is_file():
+        pytest.skip('the P2-ab lab harness lives under .build/ (local evidence only)')
+
+
 def _load_lab_module(name):
     import importlib.util
+    _require_lab()
     spec = importlib.util.spec_from_file_location('p2ab_' + name, LAB / f'{name}.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -674,6 +682,7 @@ def test_harness_job_reaps_every_child_process(tmp_path):
 
 
 def _harness(*argv, timeout=120):
+    _require_lab()
     env = {key: value for key, value in os.environ.items()
            if not key.startswith(('TESSERACT_', 'V87_', 'TIER3_LAB_'))}
     return subprocess.run([sys.executable, '-B', str(LAB / 'run_sidecar_audit.py'), *argv],

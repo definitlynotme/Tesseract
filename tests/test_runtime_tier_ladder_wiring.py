@@ -1216,7 +1216,12 @@ def test_w12_view_line_format_and_absent_with_the_key_off(make: Any) -> None:
     assert "path=FE,PF,T1S,T1,T1XS,T1X,L" in lines[-1]
     off = make("t1", ladder=False)
     assert messages(off, "Runtime ladder view") == []
-    sys.path.insert(0, str(ROOT / ".build" / "claude-fallback" / "gates"))
+    # The cross-check against the gate runner's markers needs its gatelib,
+    # which is local evidence under .build/ (never published).
+    gates = ROOT / ".build" / "claude-fallback" / "gates"
+    if not (gates / "gatelib.py").is_file():
+        pytest.skip("gatelib lives under .build/ (local evidence only); format checks above passed")
+    sys.path.insert(0, str(gates))
     try:
         import gatelib
     finally:

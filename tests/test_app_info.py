@@ -58,7 +58,9 @@ class AppInfoTests(unittest.TestCase):
             public_key_id(
                 decode_public_key(app_info.APP_UPDATE_SIGNING_PUBLIC_KEY)
             ),
-            "sha256:c7b50d82e80cf8ebb59ff9c9a84f743404ec04b4ab2626e5622cae7bf14ecb65",
+            # The key of the first public release (generated 11-11 by
+            # scripts/publish_release.ps1; the earlier key had no private half).
+            "sha256:57d071cf00d545c428b06af3a779c5d3a1d823aa2ff1f81a42d3ff7bec5d74c9",
         )
 
     def test_load_app_version_uses_default_when_build_version_file_is_missing(self) -> None:

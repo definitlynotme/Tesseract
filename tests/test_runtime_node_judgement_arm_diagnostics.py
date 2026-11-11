@@ -24,6 +24,11 @@ from runtime_post_dial_observer import PostDialObserverRunner, format_observer_r
 
 
 BASE = Path(__file__).resolve().parents[1] / ".build/claude-fallback/handoff-baseline-20261003"
+# The oracle is the frozen handoff copy kept in local evidence (.build/ is
+# never published), so the public tree and CI have nothing to compare with.
+if not (BASE / "desktop_runtime.py").is_file():
+    pytest.skip("needs the frozen handoff baseline under .build/ (local evidence only)",
+                allow_module_level=True)
 
 
 def original(name: str):

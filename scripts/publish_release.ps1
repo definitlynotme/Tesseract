@@ -511,11 +511,18 @@ function Wait-ReleaseRun([string] $RunId) {
 
 if ($resumeMode -ne "verify") {
     Write-Step "Release workflow"
+    # Follow the run of the commit the tag names now: a tag of the same name
+    # that was pushed before may have left a failed run behind.
+    $remoteTags = Invoke-Tool "git" @("ls-remote", "--tags", $remoteUrl)
+    $tagLine = @($remoteTags.Out -split "\r?\n" | Where-Object { $_ -match ("\srefs/tags/" + [regex]::Escape($tag) + "\^\{\}$") }) | Select-Object -First 1
+    $tagSha = if ($tagLine) { ($tagLine -split "\s+")[0] } else { $null }
+    if (-not $tagSha) { Stop-Publish "Cannot read $tag on GitHub: $($remoteTags.Err)" }
     $runId = $null
     for ($attempt = 0; $attempt -lt 36 -and -not $runId; $attempt++) {
         if ($attempt -gt 0) { Start-Sleep -Seconds 5 }
         $runs = Invoke-Tool "gh" @("run", "list", "--repo", $Repository, "--workflow", "release-windows.yml", "--limit", "20",
-            "--json", "databaseId,headBranch", "--jq", ".[] | select(.headBranch == `"$tag`") | .databaseId")
+            "--json", "databaseId,headBranch,headSha",
+            "--jq", ".[] | select(.headBranch == `"$tag`" and .headSha == `"$tagSha`") | .databaseId")
         if ($runs.Code -eq 0 -and $runs.Out) { $runId = ($runs.Out -split "\r?\n")[0] }
     }
     if (-not $runId) { Stop-Publish "No release workflow run for $tag appeared; see https://github.com/$Repository/actions and run this script again." }

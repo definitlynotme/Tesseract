@@ -532,16 +532,20 @@ class ManagerTests(unittest.TestCase):
             handoff_headroom_source,
         )
         self.assertIn("tcp_inflight_nodes=", refresh_source)
-        source_defaults = yaml.safe_load(
-            (Path(manager_module.__file__).with_name("sources.yaml")).read_text(
-                encoding="utf-8"
-            )
-        )
-        default_source_values = [
-            *list(source_defaults.get("github_repos") or []),
-            *list(source_defaults.get("subscription_urls") or []),
-            *list(source_defaults.get("telegram_channels") or []),
-        ]
+        # The shipped defaults are sources.example.yaml (published); a local
+        # sources.yaml (ignored by git, absent in CI) is checked too when present.
+        default_source_values = []
+        for sources_name in ("sources.example.yaml", "sources.yaml"):
+            sources_path = Path(manager_module.__file__).with_name(sources_name)
+            if not sources_path.is_file():
+                continue
+            source_defaults = yaml.safe_load(sources_path.read_text(encoding="utf-8")) or {}
+            default_source_values.extend([
+                *list(source_defaults.get("github_repos") or []),
+                *list(source_defaults.get("subscription_urls") or []),
+                *list(source_defaults.get("telegram_channels") or []),
+            ])
+        self.assertTrue(default_source_values)
         scheduler_source = Path(
             tier3_candidate_scheduler_module.__file__
         ).read_text(encoding="utf-8")
