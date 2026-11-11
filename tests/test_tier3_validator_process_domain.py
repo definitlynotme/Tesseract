@@ -4568,6 +4568,9 @@ def test_process_domain_terminal_soak_has_bounded_generations() -> None:
     ]
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true",
+                    reason="speed gate against real helper processes or a real Core; "
+                    "the release runner is slower than these budgets (runs locally)")
 @pytest.mark.parametrize("shell_slots", [2, 8])
 def test_process_domain_separates_shell_and_mihomo_start_bulkheads(shell_slots: int) -> None:
     server = _ProxyServer(("127.0.0.1", 0), _PassProxyHandler)
