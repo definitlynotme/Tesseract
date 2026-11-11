@@ -37,18 +37,6 @@ import uuid
 from copy import deepcopy
 from ctypes import wintypes
 from pathlib import Path
-import pytest
-
-
-# GitHub's hosted Windows release runner went silent 46-108 s after the tests that
-# launch a real sidecar process (runs 43108722900 and 43113692819: commit-status
-# heartbeat, cut within 15 s); run 43102395973 got past them. They pass on desktops
-# and are skipped on the release runner until the cause is known.
-_REAL_SIDECAR_ON_RELEASE_RUNNER = pytest.mark.skipif(
-    os.environ.get("GITHUB_ACTIONS") == "true",
-    reason="launches a real sidecar process; GitHub's release runner went silent after these "
-    "(runs 43108722900, 43113692819); runs on desktops",
-)
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -1318,9 +1306,21 @@ def _skip_unless_windows():
         pytest.skip("Windows integration")
 
 
-@_REAL_SIDECAR_ON_RELEASE_RUNNER
+def _skip_on_release_runner():
+    # scripts/build_shell_preview.py imports this module without pytest, so pytest is
+    # imported here, not at module level. GitHub's hosted Windows release runner went
+    # silent 46-108 s after the tests that launch a real sidecar process (runs
+    # 43108722900 and 43113692819, commit-status heartbeat); run 43102395973 got past
+    # them. They pass on desktops and are skipped on the release runner.
+    import pytest
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        pytest.skip("launches a real sidecar process; GitHub's release runner went silent after these "
+                    "(runs 43108722900, 43113692819); runs on desktops")
+
+
 def test_source_sidecar_answers_the_whole_v1_api_on_real_frames(tmp_path):
     """34 commands, 8 queries, 29 topics, on the real pipe; no Qt import."""
+    _skip_on_release_runner()
     _skip_unless_windows()
     sandbox = prepare_sandbox(tmp_path / "sandbox", frozen=False)
     summary = run(sandbox, exe=None, output=tmp_path / "out")

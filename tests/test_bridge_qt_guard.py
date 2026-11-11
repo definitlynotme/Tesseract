@@ -182,6 +182,19 @@ def test_graph_helper_module_is_outside_the_sidecar_closure():
     assert not any(module.startswith("tests") for module in graph["modules"])
 
 
+def test_build_helpers_in_p2_33_import_without_pytest():
+    """scripts/build_shell_preview.py imports host_facts, process_table and the sandbox
+    helpers from tests.test_bridge_p2_33 with pytest unavailable; a module-level
+    `import pytest` there failed release run 43119781754 at the assemble gate."""
+    script = ("import sys; sys.modules['pytest'] = None\n"
+              "import tests.test_bridge_p2_33 as m\n"
+              "print(callable(m.process_table), callable(m.host_facts), callable(m.prepare_sandbox))")
+    result = subprocess.run([sys.executable, "-B", "-c", script], cwd=ROOT, capture_output=True,
+                            text=True, timeout=120, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+    assert result.returncode == 0, result.stderr[-2000:]
+    assert result.stdout.strip() == "True True True"
+
+
 def test_graph_helpers_import_without_pytest():
     """The spec and the build check import this module; it must not need pytest."""
     script = ("import sys; sys.modules['pytest'] = None\n"
