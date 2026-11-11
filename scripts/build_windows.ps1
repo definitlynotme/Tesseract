@@ -1093,8 +1093,9 @@ Invoke-Native "source smoke test" $ReleasePython @(
 )
 $SourceSmokeStatus = "passed"
 
-# -TestsPassedInJob: the workflow's test-windows job ran exactly these tests on this
-# commit and passed (build-windows needs it and re-checks the commit).
+# -TestsPassedInJob: the workflow's test-windows job runs exactly these tests on this
+# commit; sign-release-manifest needs it to pass and checks the commit, so nothing
+# built here is signed or published otherwise.
 $FullTestStatus = if ($TestsPassedInJob) { "passed" } elseif ($SkipTests) { "skipped-partial" } else { "not_run" }
 $MihomoConfigStatus = if ($TestsPassedInJob) { "passed" } elseif ($SkipTests) { "skipped-partial" } else { "not_run" }
 if (-not $SkipTests) {

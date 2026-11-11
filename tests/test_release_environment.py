@@ -1777,13 +1777,15 @@ def test_release_workflow_fails_closed_on_malformed_or_failed_github_api(
 
 
 def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commit() -> None:
-    """A hosted runner of this repository is lost at 60 minutes into a job, so the
-    tests run in test-windows and build-windows starts only after them, on the same
-    commit, with -TestsPassedInJob recording what the test job proved."""
+    """The tests run in test-windows and the build in build-windows, at the same time
+    on separate runners; sign-release-manifest needs both and checks that they saw the
+    same commit, so -TestsPassedInJob only ever reaches a signed release when the test
+    job really passed on that commit."""
     workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "release-windows.yml").read_text(encoding="utf-8"))
     jobs = workflow["jobs"]
-    tests, build = jobs["test-windows"], jobs["build-windows"]
-    assert "needs" not in tests and build["needs"] == "test-windows"
+    tests, build, sign = jobs["test-windows"], jobs["build-windows"], jobs["sign-release-manifest"]
+    assert "needs" not in tests and "needs" not in build
+    assert sign["needs"] == ["build-windows", "test-windows"]
     assert tests["outputs"] == {"release_commit": "${{ steps.release.outputs.release_commit }}"}
     names = [step.get("name") for step in tests["steps"]]
     assert names[:3] == ["Check out the tagged source", "Set up exact release Python",
@@ -1792,11 +1794,15 @@ def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commi
     test_run = tests["steps"][-1]["run"]
     assert "-TestsOnly" in test_run and "-SkipTests" not in test_run
     build_steps = {step.get("name"): step for step in build["steps"]}
-    confirm = build_steps["Confirm the release tests passed on this commit"]
+    confirm = sign["steps"][0]
+    assert confirm["name"] == "Confirm the release tests passed on this commit"
     assert confirm["env"]["TESTED_COMMIT"] == "${{ needs.test-windows.outputs.release_commit }}"
-    assert confirm["env"]["RELEASE_COMMIT"] == "${{ steps.release.outputs.release_commit }}"
+    assert confirm["env"]["RELEASE_COMMIT"] == "${{ needs.build-windows.outputs.release_commit }}"
+    assert "-cne" in confirm["run"] and "throw" in confirm["run"]
     order = [step.get("name") for step in build["steps"]]
-    assert order.index("Validate signed tag, main ancestry, and source version") <         order.index("Confirm the release tests passed on this commit") <         order.index("Build unsigned-by-policy release artifacts")
+    assert "Confirm the release tests passed on this commit" not in order
+    assert order.index("Validate signed tag, main ancestry, and source version") < \
+        order.index("Build unsigned-by-policy release artifacts")
     build_run = build_steps["Build unsigned-by-policy release artifacts"]["run"]
     assert "-SkipTests" in build_run and "-TestsPassedInJob" in build_run and "-TestsOnly" not in build_run
     # The setup steps of both jobs are the same text, so both validate the same tag.

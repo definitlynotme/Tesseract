@@ -33,9 +33,9 @@ env:
 
 jobs:
   test-windows:
-    # Setup plus the full test suite in a job of its own (about 40 minutes);
-    # build-windows starts only after this job passed and checks that it tested
-    # the same commit. A hosted runner that goes silent is declared lost 45
+    # Setup plus the full test suite in a job of its own (about 40 minutes), at the
+    # same time as build-windows; sign-release-manifest needs both and checks that
+    # they saw the same commit. A hosted runner that goes silent is declared lost 45
     # minutes later with no log (runs 43038448816, 43046356338, 43057341629), so
     # both jobs post a commit-status heartbeat (scripts/ci_heartbeat.ps1, hence
     # statuses: write) whose last status names the test or stage in progress.
@@ -484,11 +484,6 @@ jobs:
           }
           catch { Write-Warning "Heartbeat not started: $_" }
           finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
-          # Temporary, for the 0.1.0 release: four runners (runs 43038448816, 43046356338,
-          # 43057341629, 43108722900) went silent 14-15 minutes into this job. Pass that
-          # point idle, so the next silence says whether job age alone takes the runner.
-          [System.IO.File]::WriteAllText($env:RELEASE_PROGRESS_FILE, "idle wait past job+15 min (runner-loss check)")
-          Start-Sleep -Seconds 540
           $result = "failure"
           try {
             .\scripts\build_windows.ps1 `
@@ -507,8 +502,10 @@ jobs:
           }
 
   build-windows:
+    # Runs at the same time as test-windows: sign-release-manifest needs both and
+    # checks that they saw the same commit, so nothing is signed or published
+    # unless the tests passed on exactly the commit that was built.
     runs-on: windows-2022
-    needs: test-windows
     timeout-minutes: 240
     permissions:
       contents: read
@@ -855,17 +852,6 @@ jobs:
           "tag_object_sha=$tagObjectSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "is_prerelease=$($isPrerelease.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      - name: Confirm the release tests passed on this commit
-        shell: pwsh
-        env:
-          TESTED_COMMIT: ${{ needs.test-windows.outputs.release_commit }}
-          RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
-        run: |
-          $ErrorActionPreference = "Stop"
-          if (-not $env:TESTED_COMMIT -or $env:TESTED_COMMIT -cne $env:RELEASE_COMMIT) {
-            throw "The release tests ran on '$($env:TESTED_COMMIT)', not on the commit being built ($($env:RELEASE_COMMIT))."
-          }
-
       - name: Install pinned Inno Setup
         shell: pwsh
         run: |
@@ -968,9 +954,6 @@ jobs:
           }
           catch { Write-Warning "Heartbeat not started: $_" }
           finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
-          # Temporary, for the 0.1.0 release: pass job+14-15 min idle (see test-windows).
-          [System.IO.File]::WriteAllText($env:RELEASE_PROGRESS_FILE, "idle wait past job+15 min (runner-loss check)")
-          Start-Sleep -Seconds 540
           $result = "failure"
           try {
             .\scripts\build_windows.ps1 `
@@ -1172,7 +1155,9 @@ jobs:
           compression-level: 0
 
   sign-release-manifest:
-    needs: build-windows
+    needs:
+      - build-windows
+      - test-windows
     runs-on: windows-2022
     timeout-minutes: 30
     environment:
@@ -1181,6 +1166,17 @@ jobs:
       contents: read
 
     steps:
+      - name: Confirm the release tests passed on this commit
+        shell: pwsh
+        env:
+          TESTED_COMMIT: ${{ needs.test-windows.outputs.release_commit }}
+          RELEASE_COMMIT: ${{ needs.build-windows.outputs.release_commit }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not $env:TESTED_COMMIT -or $env:TESTED_COMMIT -cne $env:RELEASE_COMMIT) {
+            throw "The release tests ran on '$($env:TESTED_COMMIT)', not on the commit that was built ($($env:RELEASE_COMMIT))."
+          }
+
       - name: Check out the exact tagged source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
