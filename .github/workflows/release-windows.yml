@@ -11,7 +11,10 @@ on:
 permissions: {}
 
 concurrency:
-  group: release-${{ github.ref }}
+  # One run per tagged commit. The commit is part of the key because GitHub can
+  # strand a run "queued" with no jobs (cancel and force-cancel answer 409, as for
+  # runs 43095284704 and 43098097814), and a stranded run keeps its group busy.
+  group: release-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: false
 
 env:
