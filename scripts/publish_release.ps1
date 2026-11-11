@@ -14,7 +14,11 @@ param(
     # Check everything and prepare the public commit locally; change nothing on GitHub.
     [switch] $DryRun,
     # Do not wait for the release workflow and the live update check.
-    [switch] $NoWatch
+    [switch] $NoWatch,
+    # The version tag is already on GitHub but its build failed and no release
+    # (not even a draft) uses it: delete it there and in the public clone, and
+    # tag a new commit of the current source instead. Never touches a release.
+    [switch] $MoveUnreleasedTag
 )
 
 # One-click public release (RELEASING.md):
@@ -291,15 +295,32 @@ if ($hazardRemotes) {
 #   "watch"  - the tag is on GitHub: wait for (or re-run) its release workflow;
 #   "verify" - the release is already published: only the live update check is left.
 $resumeMode = $null
+$moveTag = $false
+# Releases that use the tag, drafts included (the list shows drafts to the owner).
+function Get-TagReleaseCount {
+    $listed = Invoke-Tool "gh" @("api", "repos/$Repository/releases", "--paginate",
+        "--jq", "[.[] | select(.tag_name == `"$tag`")] | length")
+    if ($listed.Code -ne 0) { return -1 }
+    return (@($listed.Out -split "\r?\n" | Where-Object { $_ } | ForEach-Object { [int] $_ }) | Measure-Object -Sum).Sum
+}
 if ($tagOnGitHub) {
     $published = Invoke-Tool "gh" @("api", "repos/$Repository/releases/tags/$tag", "--jq", ".draft|tostring")
     if ($published.Code -eq 0 -and $published.Out -eq "false") {
         $resumeMode = "verify"
         Write-Ok "$tag is already published; only the live update check is left"
+        if ($MoveUnreleasedTag) { Stop-Publish "$tag is published; -MoveUnreleasedTag never moves a released tag." }
+    }
+    elseif ($MoveUnreleasedTag) {
+        $tagReleases = Get-TagReleaseCount
+        if ($tagReleases -ne 0) {
+            Stop-Publish "Cannot confirm that no release (or draft) uses $tag (found: $tagReleases); nothing is moved."
+        }
+        $moveTag = $true
+        Write-Todo "$tag is on GitHub without any release; it is moved to a new commit of the current source"
     }
     else {
         $resumeMode = "watch"
-        Write-Ok "$tag is already on GitHub; this run picks up its release workflow"
+        Write-Ok "$tag is already on GitHub; this run picks up its release workflow (pass -MoveUnreleasedTag to tag new source instead)"
     }
 }
 elseif (Test-Path -LiteralPath (Join-Path $PublicDir ".git")) {
@@ -343,6 +364,7 @@ else {
     $actions.Add("Generate a new update-signing key, put its public key into app_info.py and commit that")
 }
 
+if ($moveTag) { $actions.Add("Delete the unreleased tag $tag on GitHub and in $PublicDir (no release uses it)") }
 $actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and its 3 secrets")
 $actions.Add("Audit, commit and sign the public tree in $PublicDir, tag $tag, push main and $tag")
 }
@@ -470,6 +492,25 @@ foreach ($name in $secrets.Keys) {
     Write-Ok "secret $name"
 }
 $secrets = $null
+
+if ($moveTag) {
+    Write-Step "Move the unreleased tag $tag"
+    # Look again right before deleting: still no release or draft uses the tag.
+    if ((Get-TagReleaseCount) -ne 0) { Stop-Publish "A release (or draft) for $tag appeared meanwhile; nothing is deleted." }
+    $deleted = Invoke-Tool "git" @("-C", $PublicDir, "push", $remoteUrl, ":refs/tags/$tag")
+    $remoteTagsNow = Invoke-Tool "git" @("ls-remote", "--tags", $remoteUrl)
+    if ($remoteTagsNow.Code -ne 0) { Stop-Publish "Cannot read the tags of $remoteUrl`: $($remoteTagsNow.Err)" }
+    # A dropped connection can hide a delete that went through: the tag list decides.
+    if ($remoteTagsNow.Out -match ("\srefs/tags/" + [regex]::Escape($tag) + "(\^\{\})?(\r?\n|$)")) {
+        Stop-Publish "Deleting $tag on GitHub failed: $($deleted.Err)"
+    }
+    $localTagNow = Invoke-Tool "git" @("-C", $PublicDir, "rev-parse", "-q", "--verify", "refs/tags/$tag")
+    if ($localTagNow.Code -eq 0) {
+        $removedLocal = Invoke-Tool "git" @("-C", $PublicDir, "tag", "-d", $tag)
+        if ($removedLocal.Code -ne 0) { Stop-Publish "Deleting the local tag $tag failed: $($removedLocal.Err)" }
+    }
+    Write-Ok "$tag removed on GitHub and in $PublicDir; the new public commit gets it"
+}
 
 Write-Step "Publish source and tag"
 & (Join-Path $PSScriptRoot "push_to_github.ps1") -Release -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `

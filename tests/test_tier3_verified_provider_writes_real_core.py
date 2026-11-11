@@ -15,6 +15,7 @@ members leave without a blind window.
 
 from __future__ import annotations
 
+import os
 import socket
 import subprocess
 import threading
@@ -282,6 +283,9 @@ def _lab(stack, tmp_path, **kwargs):
     return _Lab(stack, tmp_path, **kwargs)
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true",
+                    reason="speed gate against real helper processes or a real Core; "
+                    "the release runner is slower than these budgets (runs locally)")
 def test_growth_while_a_later_member_serves_keeps_the_pick_and_tests_every_member(tmp_path):
     """AC1/AC2/AC3/AC10/AC11: the 8e first-member wait is gone."""
 

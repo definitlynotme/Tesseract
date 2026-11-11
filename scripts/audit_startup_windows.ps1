@@ -2003,7 +2003,9 @@ if ($ExerciseStartAction -and -not $NoQtAudit) {
     ).Count -gt 0
     $falseNoSourceSeen = @(
         $qtSamples | Where-Object {
-            [string]$_.startup.notice_text -match "没有可用来源|No available sources"
+            # Regex escapes for the zh_CN notice: Windows PowerShell 5.1 reads a
+            # BOM-less script in the system code page, so this file stays ASCII.
+            [string]$_.startup.notice_text -match "\u6ca1\u6709\u53ef\u7528\u6765\u6e90|No available sources"
         }
     ).Count -gt 0
 }

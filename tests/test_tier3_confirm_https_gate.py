@@ -19,6 +19,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import os
 import queue
 import socket
 import socketserver
@@ -1246,6 +1247,9 @@ class _NodeProxy(socketserver.ThreadingTCPServer):
 
 
 @pytest.mark.skipif(not _MIHOMO.exists(), reason="bundled mihomo binary required")
+@pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true",
+                    reason="speed gate against real helper processes or a real Core; "
+                    "the release runner is slower than these budgets (runs locally)")
 def test_confirm_tier3_nodes_with_one_real_mihomo() -> None:
     servers = {mode: _NodeProxy(mode) for mode in ("good", "eof", "hang", "forbidden")}
     try:

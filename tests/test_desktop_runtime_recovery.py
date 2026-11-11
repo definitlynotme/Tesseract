@@ -10,6 +10,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 
 from alerts import flush_logging_handlers
@@ -53,6 +54,29 @@ from runtime_tier_state import (
     tier3_export_node_signature,
 )
 from system_proxy import ProxySettings, SystemProxyManager
+
+
+@pytest.fixture(autouse=True)
+def _retry_tempdir_cleanup_while_background_writes_finish(monkeypatch):
+    """A runtime under test can still be writing into its temporary data
+    directory from a background thread when the test's ``with
+    TemporaryDirectory()`` block ends. On a slow machine (the release runner)
+    removing the directory then fails with WinError 145 ("not empty") or 32
+    ("in use") although every assertion passed. Retry the removal for a
+    bounded time; on a fast machine the first attempt succeeds."""
+    original_cleanup = tempfile.TemporaryDirectory.cleanup
+
+    def cleanup(self):
+        deadline = time.monotonic() + 15.0
+        while True:
+            try:
+                return original_cleanup(self)
+            except OSError as exc:
+                if getattr(exc, "winerror", None) not in (32, 145) or time.monotonic() >= deadline:
+                    raise
+                time.sleep(0.2)
+
+    monkeypatch.setattr(tempfile.TemporaryDirectory, "cleanup", cleanup)
 
 
 class MemoryProxyBackend:
@@ -4753,7 +4777,7 @@ proxies:
             )
 
             status = runtime.start_core()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             self.assertTrue(status["running"])
             self.assertEqual(traffic.started, 0)
@@ -4789,7 +4813,7 @@ proxies:
             runtime._verify_final_exit_identity = fail_identity
 
             status = runtime.start_core()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             self.assertTrue(status["running"])
             self.assertTrue(runtime.core_runner.is_running())
@@ -6152,7 +6176,7 @@ proxies:
                     self.assertFalse(result["reloaded"])
 
                 self.assertTrue(
-                    runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                    runtime._wait_for_tier3_egress_activation(timeout=30.0)
                 )
                 self.assertFalse(runtime._core_route_mutation_is_pending())
                 # A route mutation invalidates the previous authority.  When
@@ -6777,7 +6801,7 @@ proxies:
             restart_result = runtime.restart_core()
             self.assertTrue(restart_result["running"])
             release_probe.set()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=2.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # The old generation must not attach capture before its 204
             # completes, and restart invalidates it before publication.
@@ -7118,7 +7142,7 @@ proxies:
 
             self.assertTrue(intent.accepted)
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
             self.assertEqual(runtime.traffic_monitor.started, 0)
             self.assertFalse(backend.settings.enabled)
@@ -7187,7 +7211,7 @@ proxies:
                 self._commit_deferred_initial_egress_admission(runtime)
             )
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
 
             self.assertTrue(status["running"])
@@ -7260,7 +7284,7 @@ proxies:
                 self._commit_deferred_initial_egress_admission(runtime)
             )
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
 
             self.assertTrue(status["running"])
@@ -9016,7 +9040,7 @@ proxies:
             ):
                 runtime._queue_tier3_egress_activation()
                 self.assertTrue(
-                    runtime._wait_for_tier3_egress_activation(timeout=7.0)
+                    runtime._wait_for_tier3_egress_activation(timeout=30.0)
                 )
 
             self.assertEqual(
@@ -10548,7 +10572,7 @@ proxies:
             for _ in range(4):
                 runtime._queue_incremental_egress_recheck()
             release_first_probe.set()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=2))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # The provider event owns exactly one event-driven proof; later
             # notifications coalesce into that transaction and do not create
@@ -10627,7 +10651,7 @@ proxies:
                 reason=RuntimeReloadReason.MEMBERSHIP_UNREPRESENTABLE,
             )
             self.assertTrue(result["reloaded"])
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=2))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             self.assertTrue(manager.effective_states[-1][0])
             self.assertTrue(manager.tier3_traffic_capture_active)
@@ -10695,7 +10719,7 @@ proxies:
             )
 
             runtime._queue_tier3_egress_activation()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # The rollback profile has no steady-state automatic verifier.
             # A live capture route is left untouched until an explicit user
@@ -10761,7 +10785,7 @@ proxies:
             )
 
             runtime._queue_tier3_egress_activation()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # The rollback profile performs one activation contract. It does
             # not run the later qualification/rebaseline duplicate.
@@ -10932,7 +10956,7 @@ proxies:
             runtime._wait_runtime_recovery_outcome = wait_same_incident
 
             runtime._queue_tier3_egress_activation()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # A startup failure is terminal when the loaded graph contains no
             # independently verified alternative.  Do not retry the same bad
@@ -11143,7 +11167,7 @@ proxies:
             )
 
             runtime._queue_tier3_egress_activation()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=7.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             # The refreshed immutable authority already points at B. Startup
             # verifies that native-fallback leaf directly; it never opens the
@@ -11231,7 +11255,7 @@ proxies:
             runtime._queue_final_exit_identity_diagnostic = lambda **_kwargs: None
 
             runtime._queue_incremental_egress_recheck()
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             self.assertEqual(failed_leaf_probes, [])
             self.assertEqual(recovery_calls, [])
@@ -12744,7 +12768,7 @@ proxies:
 
             self.assertTrue(runtime.core_runner.started)
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
             self.assertEqual(runtime.traffic_monitor.started, 0)
             self.assertEqual(
@@ -12813,7 +12837,7 @@ proxies:
             runtime._sync_core_config_after_pool_update()
 
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=1.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
             self.assertGreater(guarded_lock.enter_count, 0)
             self.assertTrue(manager.effective_states[-1][0])
@@ -12878,7 +12902,7 @@ proxies:
                 False,
             )
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=2.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
             self.assertTrue(manager.effective_states[-1][0])
             self.assertIsNone(runtime.last_error)
@@ -12961,7 +12985,7 @@ proxies:
                 self._commit_deferred_initial_egress_admission(runtime)
             )
             self.assertTrue(
-                runtime._wait_for_tier3_egress_activation(timeout=2.0)
+                runtime._wait_for_tier3_egress_activation(timeout=30.0)
             )
             self.assertTrue(manager.effective_states[-1][0])
             self.assertEqual(runtime._last_tier3_core_sync_marker, runtime._tier3_core_sync_marker())
@@ -15991,7 +16015,7 @@ proxies:
             result = runtime.reload_core_config(
                 reason=RuntimeReloadReason.MEMBERSHIP_UNREPRESENTABLE,
             )
-            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+            self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             self.assertFalse(result["reloaded"])
             self.assertTrue(result["kept_existing_core"])
@@ -16311,7 +16335,7 @@ proxies:
                 candidate_revision[0] += 1
                 runtime._sync_core_config_after_pool_update()
                 runtime._queue_incremental_egress_recheck()
-                self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+                self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
                 rejected = yaml.safe_load(runtime_config.read_text(encoding="utf-8"))
                 self.assertEqual(
@@ -16338,7 +16362,7 @@ proxies:
                 # every raw health revision.
                 runtime._reset_tier3_standby_activation_failure()
                 runtime._queue_incremental_egress_recheck()
-                self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=1.0))
+                self.assertTrue(runtime._wait_for_tier3_egress_activation(timeout=30.0))
 
             recovered = yaml.safe_load(runtime_config.read_text(encoding="utf-8"))
             self.assertEqual([proxy["name"] for proxy in recovered["proxies"]], [])
