@@ -1805,3 +1805,18 @@ def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commi
     script = (ROOT / "scripts" / "build_windows.ps1").read_text(encoding="utf-8")
     assert "($SkipTests -and -not $TestsPassedInJob)" in script
     assert "-TestsOnly and -TestsPassedInJob belong to the official two-job release workflow." in script
+    # A hosted runner that goes silent keeps no log, so both long steps run the
+    # commit-status heartbeat; only the heartbeat's own process gets the token.
+    for job_name, step_name in (
+        ("test-windows", "Run the release tests"),
+        ("build-windows", "Build unsigned-by-policy release artifacts"),
+    ):
+        job = jobs[job_name]
+        step = next(s for s in job["steps"] if s.get("name") == step_name)
+        assert job["permissions"] == {"contents": "read", "statuses": "write"}, job_name
+        assert step["env"]["HEARTBEAT_TOKEN"] == "${{ github.token }}", job_name
+        assert "GH_TOKEN" not in step["env"], job_name
+        assert step["env"]["RELEASE_PROGRESS_FILE"] == "${{ runner.temp }}\\release-progress.txt", job_name
+        assert "scripts\\ci_heartbeat.ps1" in step["run"] and f"release-heartbeat/{job_name}" in step["run"], job_name
+        assert "Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN" in step["run"], job_name
+    assert "RELEASE_PROGRESS_FILE" in script and (ROOT / "tests" / "conftest.py").is_file()

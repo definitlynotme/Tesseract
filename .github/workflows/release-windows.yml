@@ -30,15 +30,17 @@ env:
 
 jobs:
   test-windows:
-    # Setup plus the full test suite in a job of its own (about 40 minutes).
-    # A GitHub-hosted runner of this repository is lost at exactly 60 minutes
-    # into a job (runs 43038448816, 43046356338, 43057341629), so no job here
-    # may come near an hour. build-windows starts only after this job passed
-    # and checks that it tested the same commit.
+    # Setup plus the full test suite in a job of its own (about 40 minutes);
+    # build-windows starts only after this job passed and checks that it tested
+    # the same commit. A hosted runner that goes silent is declared lost 45
+    # minutes later with no log (runs 43038448816, 43046356338, 43057341629), so
+    # both jobs post a commit-status heartbeat (scripts/ci_heartbeat.ps1, hence
+    # statuses: write) whose last status names the test or stage in progress.
     runs-on: windows-2022
     timeout-minutes: 120
     permissions:
       contents: read
+      statuses: write
     outputs:
       release_commit: ${{ steps.release.outputs.release_commit }}
 
@@ -463,14 +465,38 @@ jobs:
           RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
           RELEASE_TAG: ${{ github.ref_name }}
           EXPECTED_REPOSITORY: ${{ github.repository }}
+          HEARTBEAT_TOKEN: ${{ github.token }}
+          RELEASE_PROGRESS_FILE: ${{ runner.temp }}\release-progress.txt
         run: |
           $ErrorActionPreference = "Stop"
-          .\scripts\build_windows.ps1 `
-            -Version $env:RELEASE_VERSION `
-            -ExpectedGitCommit $env:RELEASE_COMMIT `
-            -Repository $env:EXPECTED_REPOSITORY `
-            -WorkflowRunId $env:GITHUB_RUN_ID `
-            -TestsOnly
+          # Heartbeat (scripts/ci_heartbeat.ps1): only its own process gets the token.
+          $heartbeat = $null
+          try {
+            $env:GH_TOKEN = $env:HEARTBEAT_TOKEN
+            $heartbeat = Start-Process pwsh -PassThru -NoNewWindow `
+              -RedirectStandardOutput "$env:RUNNER_TEMP\heartbeat.out" `
+              -RedirectStandardError "$env:RUNNER_TEMP\heartbeat.err" `
+              -ArgumentList @("-NoProfile", "-File", "scripts\ci_heartbeat.ps1",
+                "-Context", "release-heartbeat/test-windows", "-ProgressFile", $env:RELEASE_PROGRESS_FILE)
+          }
+          catch { Write-Warning "Heartbeat not started: $_" }
+          finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
+          $result = "failure"
+          try {
+            .\scripts\build_windows.ps1 `
+              -Version $env:RELEASE_VERSION `
+              -ExpectedGitCommit $env:RELEASE_COMMIT `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -WorkflowRunId $env:GITHUB_RUN_ID `
+              -TestsOnly
+            $result = "success"
+          }
+          finally {
+            if ($heartbeat) {
+              [System.IO.File]::WriteAllText("$env:RELEASE_PROGRESS_FILE.done", $result)
+              if (-not $heartbeat.WaitForExit(40000)) { Stop-Process -Id $heartbeat.Id -Force -ErrorAction SilentlyContinue }
+            }
+          }
 
   build-windows:
     runs-on: windows-2022
@@ -478,6 +504,7 @@ jobs:
     timeout-minutes: 240
     permissions:
       contents: read
+      statuses: write
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}
       release_windows_version: ${{ steps.release.outputs.release_windows_version }}
@@ -917,15 +944,39 @@ jobs:
           RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
           RELEASE_TAG: ${{ github.ref_name }}
           EXPECTED_REPOSITORY: ${{ github.repository }}
+          HEARTBEAT_TOKEN: ${{ github.token }}
+          RELEASE_PROGRESS_FILE: ${{ runner.temp }}\release-progress.txt
         run: |
           $ErrorActionPreference = "Stop"
-          .\scripts\build_windows.ps1 `
-            -Version $env:RELEASE_VERSION `
-            -ExpectedGitCommit $env:RELEASE_COMMIT `
-            -Repository $env:EXPECTED_REPOSITORY `
-            -WorkflowRunId $env:GITHUB_RUN_ID `
-            -SkipTests `
-            -TestsPassedInJob
+          # Heartbeat (scripts/ci_heartbeat.ps1): only its own process gets the token.
+          $heartbeat = $null
+          try {
+            $env:GH_TOKEN = $env:HEARTBEAT_TOKEN
+            $heartbeat = Start-Process pwsh -PassThru -NoNewWindow `
+              -RedirectStandardOutput "$env:RUNNER_TEMP\heartbeat.out" `
+              -RedirectStandardError "$env:RUNNER_TEMP\heartbeat.err" `
+              -ArgumentList @("-NoProfile", "-File", "scripts\ci_heartbeat.ps1",
+                "-Context", "release-heartbeat/build-windows", "-ProgressFile", $env:RELEASE_PROGRESS_FILE)
+          }
+          catch { Write-Warning "Heartbeat not started: $_" }
+          finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
+          $result = "failure"
+          try {
+            .\scripts\build_windows.ps1 `
+              -Version $env:RELEASE_VERSION `
+              -ExpectedGitCommit $env:RELEASE_COMMIT `
+              -Repository $env:EXPECTED_REPOSITORY `
+              -WorkflowRunId $env:GITHUB_RUN_ID `
+              -SkipTests `
+              -TestsPassedInJob
+            $result = "success"
+          }
+          finally {
+            if ($heartbeat) {
+              [System.IO.File]::WriteAllText("$env:RELEASE_PROGRESS_FILE.done", $result)
+              if (-not $heartbeat.WaitForExit(40000)) { Stop-Process -Id $heartbeat.Id -Force -ErrorAction SilentlyContinue }
+            }
+          }
 
       - name: Verify build metadata and unsigned manifest
         shell: pwsh

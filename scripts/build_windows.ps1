@@ -15,11 +15,10 @@ param(
     [switch] $SkipInstallerAcceptance,
     # Rebuild the web UI, shell and sidecar from scratch (.build/p6-*). Official builds always do.
     [switch] $CleanShellBuild,
-    # Official two-job release only. A GitHub-hosted runner of this repository is
-    # lost at exactly 60 minutes into a job, so the release workflow runs setup plus
-    # every test in one job (-TestsOnly, stops after the tests) and the build in a
-    # second job that starts only after the first passed on the same commit
-    # (-SkipTests -TestsPassedInJob, which records the tests as passed).
+    # Official two-job release only. The release workflow runs setup plus every
+    # test in one job (-TestsOnly, stops after the tests) and the build in a second
+    # job on a fresh runner that starts only after the first passed on the same
+    # commit (-SkipTests -TestsPassedInJob, which records the tests as passed).
     [switch] $TestsOnly,
     [switch] $TestsPassedInJob
 )
@@ -379,6 +378,10 @@ function Invoke-WithRetry([scriptblock] $Action, [string] $Description, [int] $A
 }
 
 function Invoke-Native([string] $Description, [string] $FilePath, [string[]] $Arguments) {
+    if ($env:RELEASE_PROGRESS_FILE) {
+        # Release workflow: name the stage for scripts/ci_heartbeat.ps1.
+        try { [System.IO.File]::WriteAllText($env:RELEASE_PROGRESS_FILE, $Description) } catch { }
+    }
     & $FilePath @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw "$Description failed with exit code $LASTEXITCODE."

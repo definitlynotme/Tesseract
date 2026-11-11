@@ -639,6 +639,16 @@ $secrets = $null
 if ($moveTag) {
     Write-Step "Move the unreleased tag $tag"
     foreach ($oldRun in $runningRuns) {
+        # GitHub can leave a run "queued" without ever creating its jobs: it can be
+        # neither cancelled ("has not been queued yet") nor run. It builds nothing, and
+        # after the move it could only fail its own tag check, so it does not block.
+        $oldState = Invoke-Tool "gh" @("run", "view", $oldRun, "--repo", $Repository, "--json", "status", "--jq", ".status")
+        $oldJobs = Invoke-Tool "gh" @("api", "repos/$Repository/actions/runs/$oldRun/jobs", "--jq", ".total_count")
+        if ($oldState.Code -eq 0 -and $oldState.Out -eq "queued" -and $oldJobs.Code -eq 0 -and $oldJobs.Out -eq "0") {
+            [void] (Invoke-Tool "gh" @("run", "cancel", $oldRun, "--repo", $Repository))
+            Write-Todo "release run $oldRun never started (GitHub left it queued with no jobs); moving on"
+            continue
+        }
         [void] (Invoke-Tool "gh" @("run", "cancel", $oldRun, "--repo", $Repository))
         $stopBy = (Get-Date).AddMinutes(5)
         do {
