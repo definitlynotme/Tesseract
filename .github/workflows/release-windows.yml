@@ -484,6 +484,11 @@ jobs:
           }
           catch { Write-Warning "Heartbeat not started: $_" }
           finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
+          # Temporary, for the 0.1.0 release: four runners (runs 43038448816, 43046356338,
+          # 43057341629, 43108722900) went silent 14-15 minutes into this job. Pass that
+          # point idle, so the next silence says whether job age alone takes the runner.
+          [System.IO.File]::WriteAllText($env:RELEASE_PROGRESS_FILE, "idle wait past job+15 min (runner-loss check)")
+          Start-Sleep -Seconds 540
           $result = "failure"
           try {
             .\scripts\build_windows.ps1 `
@@ -963,6 +968,9 @@ jobs:
           }
           catch { Write-Warning "Heartbeat not started: $_" }
           finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
+          # Temporary, for the 0.1.0 release: pass job+14-15 min idle (see test-windows).
+          [System.IO.File]::WriteAllText($env:RELEASE_PROGRESS_FILE, "idle wait past job+15 min (runner-loss check)")
+          Start-Sleep -Seconds 540
           $result = "failure"
           try {
             .\scripts\build_windows.ps1 `

@@ -1247,6 +1247,46 @@ else {
     "not_run"
 }
 
+if (-not $SkipPackagedSmoke -and $env:GITHUB_ACTIONS -eq "true") {
+    # The packaged smoke starts the real shell, which needs the WebView2 Runtime (without
+    # it the shell waits on a dialog). GitHub's runner image does not list the runtime,
+    # so install it when missing with the pinned, hash-checked bootstrapper the installer ships.
+    $WebView2ClientKeys = @(
+        "HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+        "HKLM:\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+        "HKCU:\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+    )
+    $ReadWebView2Version = {
+        foreach ($key in $WebView2ClientKeys) {
+            $pv = [string] (Get-ItemProperty -LiteralPath $key -Name pv -ErrorAction SilentlyContinue).pv
+            if ($pv -and $pv -ne "0.0.0.0") { return $pv }
+        }
+        return $null
+    }
+    $WebView2Version = & $ReadWebView2Version
+    if ($WebView2Version) {
+        Write-Host "WebView2 Runtime $WebView2Version is present for the packaged smoke."
+    }
+    else {
+        $WebView2Dir = Resolve-RepoPath "packaging\windows\webview2"
+        $WebView2Pin = [string] (Get-Content -LiteralPath (Join-Path $WebView2Dir "webview2-bootstrapper.manifest.json") -Raw | ConvertFrom-Json).sha256
+        $WebView2Setup = Join-Path $WebView2Dir "cache\MicrosoftEdgeWebview2Setup.exe"
+        if ((Get-Sha256 $WebView2Setup) -ne $WebView2Pin.ToLowerInvariant()) {
+            throw "The WebView2 bootstrapper does not match its pinned SHA-256."
+        }
+        if ((Get-AuthenticodeSignature -LiteralPath $WebView2Setup).Status -ne "Valid") {
+            throw "The WebView2 bootstrapper's Authenticode signature is not valid."
+        }
+        Write-Host "Installing the WebView2 Runtime for the packaged smoke (this runner has none)."
+        $WebView2Install = Start-Process -FilePath $WebView2Setup -ArgumentList @("/silent", "/install") -Wait -PassThru
+        $WebView2Version = & $ReadWebView2Version
+        if (-not $WebView2Version) {
+            throw "The WebView2 Runtime is still missing after its bootstrapper (exit $($WebView2Install.ExitCode))."
+        }
+        Write-Host "WebView2 Runtime $WebView2Version installed for the packaged smoke."
+    }
+}
+
 if (-not $SkipPackagedSmoke) {
     # Isolated custom scope only (never the default scope or a live profile):
     # the frozen sidecar's 16-helper validator smoke, then one cold start of the

@@ -34,6 +34,22 @@ function Read-Text([string] $Path) {
     return ""
 }
 
+# Machine state for each status: memory in use, process count, TCP connections and
+# how many of them are TIME_WAIT, so the last status before a silent runner shows it.
+function Read-Machine {
+    $parts = @()
+    try {
+        $os = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop
+        $parts += "m{0}%" -f [int] (100 - 100 * $os.FreePhysicalMemory / $os.TotalVisibleMemorySize)
+    } catch { }
+    try { $parts += "p{0}" -f @(Get-Process -ErrorAction Stop).Count } catch { }
+    try {
+        $tcp = @(Get-NetTCPConnection -ErrorAction Stop)
+        $parts += "t{0}w{1}" -f $tcp.Count, @($tcp | Where-Object { $_.State -eq "TimeWait" }).Count
+    } catch { }
+    return ($parts -join " ")
+}
+
 while ($true) {
     $minutes = [int] [Math]::Floor(((Get-Date) - $started).TotalMinutes)
     if (Test-Path -LiteralPath $doneFile) {
@@ -44,7 +60,7 @@ while ($true) {
     }
     $doing = Read-Text $ProgressFile
     if (-not $doing) { $doing = "starting" }
-    Send-Status "pending" "$minutes min: $doing"
+    Send-Status "pending" "$minutes min $(Read-Machine): $doing"
     for ($second = 0; $second -lt $IntervalSeconds -and -not (Test-Path -LiteralPath $doneFile); $second++) {
         Start-Sleep -Seconds 1
     }
