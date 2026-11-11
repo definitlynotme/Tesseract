@@ -55,6 +55,22 @@ powershell -ExecutionPolicy Bypass -File scripts\publish_release.ps1           #
 把私有历史推进公开仓库。gh 登录的账号必须是仓库所有者（`app_info.APP_REPOSITORY_URL`
 里的那个），不是时脚本会先 `gh auth switch`，再提示用登着所有者账号的浏览器重新登录。
 
+**无人值守**：加 `-Yes` 时所有确认（含失败任务最多 2 次重跑）都自动答 y，整个过程不需要
+输入；遇到会公开未跟踪的文件、gh 需要登录或补权限、SSH 签名钥匙不在 agent 里、release
+环境的 secrets 缺失或比私钥文件旧时直接停下，而不是提问。准备一次即可：
+
+- SSH 签名优先走 Windows 自带的 OpenSSH agent：把服务 `ssh-agent` 设为自动启动，执行一次
+  `%SystemRoot%\System32\OpenSSH\ssh-add.exe %USERPROFILE%\.ssh\id_ed25519`（重启后仍在）。
+  没有时 `push_to_github.ps1` 启动 Git 自带的 agent，问一次密码短语；`-NoPrompt` 则直接停。
+- release 环境里的 secrets 已存在且晚于私钥文件时直接沿用，不再问私钥密码；`-RenewSecrets`
+  强制重新写入（会问密码）。
+- 版本标签已推到 GitHub 但没有任何 Release（含草稿）用它时，`-MoveUnreleasedTag` 先取消该
+  标签仍在运行的工作流，再删掉标签、给当前源码重新打签名标签；已发布的标签永远不动。
+
+发布工作流分两个 job：`test-windows`（环境准备 + 全部测试）通过后，`build-windows` 才在同一
+提交上构建（不再重跑测试）。GitHub 托管 runner 在本仓库的单个 job 里大约 60 分钟就会失联，
+所以任何一个 job 都不能接近这个时长。
+
 下面是脚本内部做的分步流程，手动发布时参考：
 
 1. 在 `app_info.py` 设置 `APP_RELEASE_BASE_VERSION`（候选版用

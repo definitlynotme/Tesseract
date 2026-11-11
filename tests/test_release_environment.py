@@ -692,7 +692,8 @@ def test_release_workflow_pins_python_requires_honest_signing_and_rechecks_hashe
     assert "The exact release Python version is unavailable" in workflow
     assert "persist-credentials: false" in workflow
     checkout_revision = "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
-    assert workflow.count(f"actions/checkout@{checkout_revision}") == 3
+    # test-windows, build-windows, sign-release-manifest and publish-release check out the tag.
+    assert workflow.count(f"actions/checkout@{checkout_revision}") == 4
     assert "actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5" not in workflow
     # Leave ref unset so checkout v6 binds both the tag ref and the immutable
     # event commit.  Supplying ref explicitly drops that moved-tag check.
@@ -703,12 +704,13 @@ def test_release_workflow_pins_python_requires_honest_signing_and_rechecks_hashe
         for step in job.get("steps", ())
         if str(step.get("uses", "")).startswith("actions/checkout@")
     ]
-    assert len(checkout_steps) == 3
+    assert len(checkout_steps) == 4
     assert all("ref" not in step.get("with", {}) for step in checkout_steps)
-    assert workflow.count("# v6.0.2") == 3
+    assert workflow.count("# v6.0.2") == 4
     assert "tag_object_sha: ${{ steps.release.outputs.tag_object_sha }}" in workflow
     assert '"tag_object_sha=$tagObjectSha"' in workflow
-    assert workflow.count("scripts\\verify_release_tag_identity.ps1") == 10
+    # Once more in test-windows, whose tag validation is the same text as build-windows.
+    assert workflow.count("scripts\\verify_release_tag_identity.ps1") == 11
     assert workflow.count("needs.build-windows.outputs.tag_object_sha") == 4
     assert "GITHUB_OUTPUT" in workflow
     assert "Remove private signing material" in workflow
@@ -726,7 +728,7 @@ def test_release_workflow_pins_python_requires_honest_signing_and_rechecks_hashe
     assert uses
     assert all(re.fullmatch(r"[0-9a-f]{40}", revision) for revision in uses)
     assert workflow.count("contents: write") == 1
-    assert workflow.count("contents: read") == 3
+    assert workflow.count("contents: read") == 4  # test-windows, build-windows, signing, attestation
     assert workflow.count("id-token: write") == 1
     assert workflow.count("attestations: write") == 1
     assert workflow.index("contents: write") > workflow.index("publish-release:")
@@ -874,7 +876,7 @@ def test_release_workflow_pwsh_blocks_parse_with_windows_powershell_5() -> None:
         for step in job.get("steps", ())
         if step.get("shell") == "pwsh"
     ]
-    assert len(powershell_blocks) == 18
+    assert len(powershell_blocks) == 23
     powershell_sources = [
         *powershell_blocks,
         (ROOT / "scripts" / "verify_release_tag_identity.ps1").read_text(
@@ -1772,3 +1774,34 @@ def test_release_workflow_fails_closed_on_malformed_or_failed_github_api(
     assert completed.returncode != 0
     assert expected_error in completed.stdout + completed.stderr
     assert "ANCESTRY_OK" not in completed.stdout
+
+
+def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commit() -> None:
+    """A hosted runner of this repository is lost at 60 minutes into a job, so the
+    tests run in test-windows and build-windows starts only after them, on the same
+    commit, with -TestsPassedInJob recording what the test job proved."""
+    workflow = yaml.safe_load((ROOT / ".github" / "workflows" / "release-windows.yml").read_text(encoding="utf-8"))
+    jobs = workflow["jobs"]
+    tests, build = jobs["test-windows"], jobs["build-windows"]
+    assert "needs" not in tests and build["needs"] == "test-windows"
+    assert tests["outputs"] == {"release_commit": "${{ steps.release.outputs.release_commit }}"}
+    names = [step.get("name") for step in tests["steps"]]
+    assert names[:3] == ["Check out the tagged source", "Set up exact release Python",
+                         "Validate signed tag, main ancestry, and source version"]
+    assert names[-1] == "Run the release tests"
+    test_run = tests["steps"][-1]["run"]
+    assert "-TestsOnly" in test_run and "-SkipTests" not in test_run
+    build_steps = {step.get("name"): step for step in build["steps"]}
+    confirm = build_steps["Confirm the release tests passed on this commit"]
+    assert confirm["env"]["TESTED_COMMIT"] == "${{ needs.test-windows.outputs.release_commit }}"
+    assert confirm["env"]["RELEASE_COMMIT"] == "${{ steps.release.outputs.release_commit }}"
+    order = [step.get("name") for step in build["steps"]]
+    assert order.index("Validate signed tag, main ancestry, and source version") <         order.index("Confirm the release tests passed on this commit") <         order.index("Build unsigned-by-policy release artifacts")
+    build_run = build_steps["Build unsigned-by-policy release artifacts"]["run"]
+    assert "-SkipTests" in build_run and "-TestsPassedInJob" in build_run and "-TestsOnly" not in build_run
+    # The setup steps of both jobs are the same text, so both validate the same tag.
+    for name in names[:-1]:
+        assert next(s for s in tests["steps"] if s.get("name") == name) == build_steps[name], name
+    script = (ROOT / "scripts" / "build_windows.ps1").read_text(encoding="utf-8")
+    assert "($SkipTests -and -not $TestsPassedInJob)" in script
+    assert "-TestsOnly and -TestsPassedInJob belong to the official two-job release workflow." in script

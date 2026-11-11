@@ -18,7 +18,10 @@ param(
     # secret of the release environment).
     [string] $DenyFile = "",
     # Prepare and audit the public commit, but do not push anything.
-    [switch] $NoPush
+    [switch] $NoPush,
+    # Never ask for the SSH key passphrase (unattended runs): stop instead when
+    # no ssh-agent holds the key.
+    [switch] $NoPrompt
 )
 
 # One-step publish (RELEASING.md). This private working repository is never
@@ -91,10 +94,17 @@ $sourceCommit = ((Invoke-Git $RepoRoot @("rev-parse", "--short", "HEAD")) | Out-
 $version = ((& $python -B -c "from app_info import DEFAULT_APP_VERSION; print(DEFAULT_APP_VERSION)") | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or -not $version) { throw "Unable to read the version from app_info.py." }
 
-# The bootstrap signs with no terminal attached (it can never ask for a
-# passphrase), so the SSH key must be held by an agent that Git's own
-# ssh-keygen reaches: Git for Windows' ssh-agent. The passphrase is typed once
-# here; the agent this script starts is stopped again in the finally block.
+# Signing needs an ssh-agent that holds the key (the bootstrap signs with no
+# terminal attached, so it can never ask for a passphrase):
+#   1. Windows' own OpenSSH agent (service "ssh-agent"), preferred. A key added
+#      once with %SystemRoot%\System32\OpenSSH\ssh-add.exe stays loaded across
+#      reboots, so a release asks for nothing. Git's own ssh-keygen cannot reach
+#      that agent, so commit and tag are signed with Windows' ssh-keygen
+#      (gpg.ssh.program), which finds it while SSH_AUTH_SOCK is unset. The
+#      bootstrap runs git with an isolated configuration, so a first
+#      publication always takes 2.
+#   2. Git for Windows' ssh-agent, started here: the passphrase is typed once,
+#      and the agent is stopped again in the finally block.
 $gitRoot = Split-Path (Split-Path (Split-Path (((& git --exec-path) | Out-String).Trim() -replace '/', '\')))
 $sshBin = Join-Path $gitRoot "usr\bin"
 $sshAgent = Join-Path $sshBin "ssh-agent.exe"
@@ -111,20 +121,52 @@ function Get-AgentState([string] $Fingerprint) {
     if (($listing -join "`n") -match [regex]::Escape($Fingerprint)) { return 0 }
     return 1
 }
+$windowsSshAdd = Join-Path $env:SystemRoot "System32\OpenSSH\ssh-add.exe"
+$windowsSshKeygen = Join-Path $env:SystemRoot "System32\OpenSSH\ssh-keygen.exe"
+function Test-WindowsAgentHoldsKey([string] $Fingerprint) {
+    if (-not (Test-Path -LiteralPath $windowsSshAdd -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $windowsSshKeygen -PathType Leaf)) { return $false }
+    $service = Get-Service -Name "ssh-agent" -ErrorAction SilentlyContinue
+    if (-not $service -or $service.Status -ne "Running") { return $false }
+    $ErrorActionPreference = "Continue"
+    $socket = $env:SSH_AUTH_SOCK
+    Remove-Item Env:SSH_AUTH_SOCK -ErrorAction SilentlyContinue
+    try { $listing = & $windowsSshAdd -l 2>$null; $listed = ($LASTEXITCODE -eq 0) }
+    finally { if ($socket) { $env:SSH_AUTH_SOCK = $socket } }
+    return ($listed -and (($listing -join "`n") -match [regex]::Escape($Fingerprint)))
+}
 $keyFingerprint = (((& $sshKeygen -lf "$SshSigningKey.pub") | Out-String).Trim() -split '\s+')[1]
 if (-not $keyFingerprint -or -not $keyFingerprint.StartsWith("SHA256:")) { throw "Cannot read the fingerprint of $SshSigningKey.pub." }
 $originalAgentSocket = $env:SSH_AUTH_SOCK
 $originalAgentPid = $env:SSH_AGENT_PID
 $startedAgent = $false
-$agentState = Get-AgentState $keyFingerprint
-if ($agentState -eq 2) {
-    $agentOutput = ((& $sshAgent -s) | Out-String)
-    $socket = [regex]::Match($agentOutput, 'SSH_AUTH_SOCK=([^;]+);').Groups[1].Value
-    $agentPid = [regex]::Match($agentOutput, 'SSH_AGENT_PID=(\d+);').Groups[1].Value
-    if (-not $socket -or -not $agentPid) { throw "Could not start Git's ssh-agent." }
-    $env:SSH_AUTH_SOCK = $socket
-    $env:SSH_AGENT_PID = $agentPid
-    $startedAgent = $true
+# Extra git options for the two signing commands (commit -S, tag -s).
+$signingConfig = @()
+$firstPublication = -not (Test-Path -LiteralPath (Join-Path $PublicDir ".git"))
+if (-not $firstPublication -and (Test-WindowsAgentHoldsKey $keyFingerprint)) {
+    Remove-Item Env:SSH_AUTH_SOCK, Env:SSH_AGENT_PID -ErrorAction SilentlyContinue
+    $signingConfig = @("-c", "gpg.ssh.program=$($windowsSshKeygen -replace '\\', '/')")
+    $agentState = 0
+    Write-Host "Signing with $SshSigningKey through Windows' ssh-agent; no passphrase needed."
+}
+else {
+    $agentState = Get-AgentState $keyFingerprint
+    if ($agentState -ne 0 -and $NoPrompt) {
+        if ($firstPublication) {
+            throw "A first publication signs through Git's own ssh-agent and asks for the passphrase once; run it without -NoPrompt."
+        }
+        throw ("No ssh-agent holds $SshSigningKey, and -NoPrompt asks for nothing. Load the key once into Windows' " +
+            "ssh-agent (the ssh-agent service must be running): $windowsSshAdd $SshSigningKey")
+    }
+    if ($agentState -eq 2) {
+        $agentOutput = ((& $sshAgent -s) | Out-String)
+        $socket = [regex]::Match($agentOutput, 'SSH_AUTH_SOCK=([^;]+);').Groups[1].Value
+        $agentPid = [regex]::Match($agentOutput, 'SSH_AGENT_PID=(\d+);').Groups[1].Value
+        if (-not $socket -or -not $agentPid) { throw "Could not start Git's ssh-agent." }
+        $env:SSH_AUTH_SOCK = $socket
+        $env:SSH_AGENT_PID = $agentPid
+        $startedAgent = $true
+    }
 }
 
 try {
@@ -136,8 +178,7 @@ if ($agentState -ne 0) {
     }
 }
 
-$publicGit = Join-Path $PublicDir ".git"
-if (-not (Test-Path -LiteralPath $publicGit)) {
+if ($firstPublication) {
     # First publication: one SSH-signed root commit of the non-ignored tree,
     # audited before and after the commit (scripts\bootstrap_public_repository.py).
     New-Item -ItemType Directory -Force -Path $PublicDir | Out-Null
@@ -167,7 +208,17 @@ else {
         New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
         Copy-Item -LiteralPath $source -Destination $destination -Force
     }
-    Invoke-Git $PublicDir @("add", "--all") | Out-Null
+    # --force: the public tree is exactly the private listing above. A file that is
+    # tracked privately but matched by a .gitignore (the pinned WebView2 bootstrapper
+    # once was) must still be committed; `add --all` alone silently skips it.
+    Invoke-Git $PublicDir @("add", "--all", "--force") | Out-Null
+    $indexed = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    foreach ($path in @(((& git -C $PublicDir ls-files -z) -join "") -split "`0" | Where-Object { $_ })) { [void] $indexed.Add($path) }
+    $missing = @($files | Where-Object { (Test-Path -LiteralPath (Join-Path $RepoRoot $_) -PathType Leaf) -and -not $indexed.Contains($_) })
+    if ($missing.Count -gt 0) {
+        Invoke-Git $PublicDir @("reset", "--quiet") | Out-Null
+        throw "These source files did not reach the public index: $($missing -join ', ')"
+    }
     & git -C $PublicDir diff --cached --quiet
     if ($LASTEXITCODE -ne 0) {
         & $python -B scripts\audit_public_release.py --repo-root $PublicDir --deny-file $DenyFile
@@ -175,7 +226,7 @@ else {
             Invoke-Git $PublicDir @("reset", "--quiet") | Out-Null
             throw "Anonymity/secret audit failed; nothing was committed."
         }
-        Invoke-Git $PublicDir @("commit", "--quiet", "-S", "-m", "Tesseract $version") | Out-Null
+        Invoke-Git $PublicDir ($signingConfig + @("commit", "--quiet", "-S", "-m", "Tesseract $version")) | Out-Null
         Write-Host "Committed Tesseract $version (from private $sourceCommit) to $PublicDir."
     }
     else {
@@ -200,7 +251,7 @@ if ($Release) {
         Write-Host "Reusing signed tag $tag (it names the current public commit)."
     }
     else {
-        Invoke-Git $PublicDir @("tag", "-s", $tag, "-m", "Tesseract $version") | Out-Null
+        Invoke-Git $PublicDir ($signingConfig + @("tag", "-s", $tag, "-m", "Tesseract $version")) | Out-Null
         Write-Host "Created signed tag $tag."
     }
 }
@@ -225,12 +276,10 @@ if ($Release) {
 }
 }
 finally {
-    if ($startedAgent) {
-        # Stop the agent this script started (it holds the unlocked key) and
-        # give the caller its original agent settings back.
-        $ErrorActionPreference = "Continue"
-        & $sshAgent -k 2>$null | Out-Null
-        if ($originalAgentSocket) { $env:SSH_AUTH_SOCK = $originalAgentSocket } else { Remove-Item Env:SSH_AUTH_SOCK -ErrorAction SilentlyContinue }
-        if ($originalAgentPid) { $env:SSH_AGENT_PID = $originalAgentPid } else { Remove-Item Env:SSH_AGENT_PID -ErrorAction SilentlyContinue }
-    }
+    # Stop the agent this script started (it holds the unlocked key) and give
+    # the caller its original agent settings back.
+    $ErrorActionPreference = "Continue"
+    if ($startedAgent) { & $sshAgent -k 2>$null | Out-Null }
+    if ($originalAgentSocket) { $env:SSH_AUTH_SOCK = $originalAgentSocket } else { Remove-Item Env:SSH_AUTH_SOCK -ErrorAction SilentlyContinue }
+    if ($originalAgentPid) { $env:SSH_AGENT_PID = $originalAgentPid } else { Remove-Item Env:SSH_AGENT_PID -ErrorAction SilentlyContinue }
 }

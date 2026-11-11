@@ -29,17 +29,18 @@ env:
   FINAL_ARTIFACT_NAME: tesseract-windows-release
 
 jobs:
-  build-windows:
+  test-windows:
+    # Setup plus the full test suite in a job of its own (about 40 minutes).
+    # A GitHub-hosted runner of this repository is lost at exactly 60 minutes
+    # into a job (runs 43038448816, 43046356338, 43057341629), so no job here
+    # may come near an hour. build-windows starts only after this job passed
+    # and checks that it tested the same commit.
     runs-on: windows-2022
-    timeout-minutes: 240
+    timeout-minutes: 120
     permissions:
       contents: read
     outputs:
-      release_version: ${{ steps.release.outputs.release_version }}
-      release_windows_version: ${{ steps.release.outputs.release_windows_version }}
       release_commit: ${{ steps.release.outputs.release_commit }}
-      tag_object_sha: ${{ steps.release.outputs.tag_object_sha }}
-      is_prerelease: ${{ steps.release.outputs.is_prerelease }}
 
     steps:
       - name: Check out the tagged source
@@ -455,6 +456,460 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "cargo-about install failed." }
           (Join-Path $toolRoot "bin") | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+      - name: Run the release tests
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.release_version }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          .\scripts\build_windows.ps1 `
+            -Version $env:RELEASE_VERSION `
+            -ExpectedGitCommit $env:RELEASE_COMMIT `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -WorkflowRunId $env:GITHUB_RUN_ID `
+            -TestsOnly
+
+  build-windows:
+    runs-on: windows-2022
+    needs: test-windows
+    timeout-minutes: 240
+    permissions:
+      contents: read
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
+      release_windows_version: ${{ steps.release.outputs.release_windows_version }}
+      release_commit: ${{ steps.release.outputs.release_commit }}
+      tag_object_sha: ${{ steps.release.outputs.tag_object_sha }}
+      is_prerelease: ${{ steps.release.outputs.is_prerelease }}
+
+    steps:
+      - name: Check out the tagged source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up exact release Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-windows.lock.txt
+            requirements-release-signing.lock.txt
+
+      - name: Validate signed tag, main ancestry, and source version
+        id: release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if ($env:GITHUB_EVENT_NAME -ne "push" -or $env:GITHUB_REF_TYPE -ne "tag") {
+            throw "Official releases must be triggered by a pushed tag."
+          }
+          if ($env:RELEASE_TAG -notmatch '^v(?<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-rc\.(?:0|[1-9]\d*))?)$') {
+            throw "Release tag must be canonical vX.Y.Z or vX.Y.Z-rc.N: $env:RELEASE_TAG"
+          }
+          $version = $Matches.version
+          $isPrerelease = $version.Contains("-")
+
+          $headers = @{
+            Accept = "application/vnd.github+json"
+            Authorization = "Bearer $env:GH_TOKEN"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+          $escapedTag = [Uri]::EscapeDataString($env:RELEASE_TAG)
+          $refUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/ref/tags/$escapedTag"
+          $ref = Invoke-RestMethod -Method Get -Uri $refUri -Headers $headers
+          if ($ref.object.type -ne "tag") {
+            throw "Lightweight tags are not releasable; an annotated signed tag is required."
+          }
+          $tagObjectShaText = [string] $ref.object.sha
+          if ($tagObjectShaText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "GitHub tag reference returned an invalid tag-object SHA."
+          }
+          $tagObjectSha = $tagObjectShaText.ToLowerInvariant()
+
+          $tagObjectUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/tags/$tagObjectSha"
+          $tagObject = Invoke-RestMethod -Method Get -Uri $tagObjectUri -Headers $headers
+          if ($tagObject.tag -ne $env:RELEASE_TAG) {
+            throw "GitHub tag object name does not match the pushed ref."
+          }
+          if ($tagObject.object.type -ne "commit") {
+            throw "Nested or non-commit release tags are not allowed."
+          }
+          if ($tagObject.verification.verified -ne $true -or $tagObject.verification.reason -ne "valid") {
+            throw "GitHub did not verify the annotated tag signature: $($tagObject.verification.reason)"
+          }
+          $releaseCommitText = [string] $tagObject.object.sha
+          if ($releaseCommitText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "Verified release tag returned an invalid commit SHA."
+          }
+          $releaseCommit = $releaseCommitText.ToLowerInvariant()
+
+          # checkout intentionally does not persist the workflow token.  Resolve
+          # the current protected branch and its ancestry through authenticated
+          # GitHub APIs instead of teaching later build steps Git credentials.
+          $mainRefUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/git/ref/heads/main"
+          $mainRef = Invoke-RestMethod -Method Get -Uri $mainRefUri -Headers $headers
+          if ([string] $mainRef.ref -cne "refs/heads/main") {
+            throw "GitHub main reference name is not exact."
+          }
+          if ([string] $mainRef.object.type -cne "commit") {
+            throw "GitHub main reference does not target a commit."
+          }
+          $mainCommitText = [string] $mainRef.object.sha
+          if ($mainCommitText -notmatch '^[0-9a-fA-F]{40}$') {
+            throw "GitHub main reference returned an invalid commit SHA."
+          }
+          $mainCommit = $mainCommitText.ToLowerInvariant()
+
+          $compareUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/compare/${releaseCommit}...${mainCommit}"
+          $comparison = Invoke-RestMethod -Method Get -Uri $compareUri -Headers $headers
+          foreach ($requiredComparisonProperty in @(
+            "url",
+            "base_commit",
+            "merge_base_commit",
+            "status",
+            "ahead_by",
+            "behind_by",
+            "total_commits",
+            "commits"
+          )) {
+            if ($comparison.PSObject.Properties.Name -notcontains $requiredComparisonProperty) {
+              throw "GitHub comparison omitted '$requiredComparisonProperty'."
+            }
+          }
+          if ([string] $comparison.url -cne $compareUri) {
+            throw "GitHub comparison did not echo the exact release and main commits."
+          }
+
+          foreach ($countProperty in @("ahead_by", "behind_by", "total_commits")) {
+            $countValue = $comparison.$countProperty
+            if (
+              $null -eq $countValue -or
+              ($countValue -isnot [int] -and $countValue -isnot [long]) -or
+              [long] $countValue -lt 0
+            ) {
+              throw "GitHub comparison returned an invalid nonnegative integer for '$countProperty'."
+            }
+          }
+          if ($null -eq $comparison.commits) {
+            throw "GitHub comparison returned a null commits list."
+          }
+          $aheadBy = [long] $comparison.ahead_by
+          $behindBy = [long] $comparison.behind_by
+          $totalCommits = [long] $comparison.total_commits
+
+          $comparisonBaseText = [string] $comparison.base_commit.sha
+          $comparisonMergeBaseText = [string] $comparison.merge_base_commit.sha
+          if (
+            $comparisonBaseText -notmatch '^[0-9a-fA-F]{40}$' -or
+            $comparisonMergeBaseText -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "GitHub comparison returned an invalid base or merge-base SHA."
+          }
+          $comparisonBase = $comparisonBaseText.ToLowerInvariant()
+          $comparisonMergeBase = $comparisonMergeBaseText.ToLowerInvariant()
+          if (
+            $comparisonBase -cne $releaseCommit -or
+            $comparisonMergeBase -cne $releaseCommit
+          ) {
+            throw "Release tag target is not contained in the current protected main branch."
+          }
+
+          $compareCommits = @($comparison.commits)
+          $comparisonStatus = [string] $comparison.status
+          switch -CaseSensitive ($comparisonStatus) {
+            "identical" {
+              if (
+                $mainCommit -cne $releaseCommit -or
+                $aheadBy -ne 0 -or
+                $behindBy -ne 0 -or
+                $totalCommits -ne 0 -or
+                $compareCommits.Count -ne 0
+              ) {
+                throw "GitHub identical comparison is internally inconsistent."
+              }
+            }
+            "ahead" {
+              # With no pagination parameters GitHub returns at most 250
+              # commits, but documents that the last item is still the newest
+              # commit in the complete comparison.
+              $expectedReturnedCommitCount = [Math]::Min($totalCommits, [long] 250)
+              if (
+                $mainCommit -ceq $releaseCommit -or
+                $aheadBy -lt 1 -or
+                $behindBy -ne 0 -or
+                $totalCommits -lt 1 -or
+                $aheadBy -ne $totalCommits -or
+                $compareCommits.Count -ne $expectedReturnedCommitCount
+              ) {
+                throw "GitHub ahead comparison is internally inconsistent."
+              }
+              $compareHeadText = [string] $compareCommits[-1].sha
+              if ($compareHeadText -notmatch '^[0-9a-fA-F]{40}$') {
+                throw "GitHub comparison returned an invalid final commit SHA."
+              }
+              if ($compareHeadText.ToLowerInvariant() -cne $mainCommit) {
+                throw "GitHub comparison head does not match the protected main reference."
+              }
+            }
+            default {
+              throw "GitHub comparison status '$comparisonStatus' does not prove release ancestry."
+            }
+          }
+          $localTagRef = "refs/tags/$env:RELEASE_TAG"
+
+          # Windows PowerShell 5 promotes native stderr to an ErrorRecord when
+          # ErrorActionPreference is Stop.  Capture each Git command under a
+          # temporary Continue policy, preserve its exit code immediately, and
+          # restore the fail-closed policy before validating the result.
+          function Invoke-ReleaseGitCapture {
+            param(
+              [Parameter(Mandatory = $true)]
+              [string[]] $Arguments
+            )
+
+            $capturedExit = -1
+            $capturedLines = @()
+            $savedErrorActionPreference = $ErrorActionPreference
+            try {
+              $ErrorActionPreference = "Continue"
+              $capturedLines = @(& git @Arguments 2>$null)
+              $capturedExit = $LASTEXITCODE
+            }
+            finally {
+              $ErrorActionPreference = $savedErrorActionPreference
+            }
+            return [PSCustomObject] @{
+              ExitCode = [int] $capturedExit
+              Lines = [object[]] @($capturedLines)
+            }
+          }
+
+          $localTagObjectResult = Invoke-ReleaseGitCapture -Arguments @(
+            "rev-parse",
+            "--verify",
+            $localTagRef
+          )
+          $localTagObjectOutput = @($localTagObjectResult.Lines)
+          if (
+            $localTagObjectResult.ExitCode -ne 0 -or
+            $localTagObjectOutput.Count -ne 1 -or
+            [string] $localTagObjectOutput[0] -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "Could not resolve the exact local release tag object."
+          }
+          $localTagObject = ([string] $localTagObjectOutput[0]).ToLowerInvariant()
+          if ($localTagObject -cne $tagObjectSha) {
+            throw "Local tag object does not match the GitHub tag object."
+          }
+
+          $localTagTypeResult = Invoke-ReleaseGitCapture -Arguments @(
+            "cat-file",
+            "-t",
+            $localTagObject
+          )
+          $localTagTypeOutput = @($localTagTypeResult.Lines)
+          if (
+            $localTagTypeResult.ExitCode -ne 0 -or
+            $localTagTypeOutput.Count -ne 1 -or
+            [string] $localTagTypeOutput[0] -cne "tag"
+          ) {
+            throw "The local release ref is not an annotated tag object."
+          }
+
+          $localTagPayloadResult = Invoke-ReleaseGitCapture -Arguments @(
+            "cat-file",
+            "-p",
+            $localTagObject
+          )
+          $localTagPayload = @($localTagPayloadResult.Lines)
+          if (
+            $localTagPayloadResult.ExitCode -ne 0 -or
+            $localTagPayload.Count -lt 4
+          ) {
+            throw "Could not read the local annotated tag payload."
+          }
+          if ([string] $localTagPayload[1] -cne "type commit") {
+            throw "Local annotated tag does not directly target a commit."
+          }
+          if ([string] $localTagPayload[0] -cne "object $releaseCommit") {
+            throw "Local annotated tag target does not match the verified GitHub tag."
+          }
+          if ([string] $localTagPayload[2] -cne "tag $env:RELEASE_TAG") {
+            throw "Local annotated tag name does not match the pushed ref."
+          }
+          $localCommit = ([string] $localTagPayload[0]).Substring(7).ToLowerInvariant()
+
+          $localHeadResult = Invoke-ReleaseGitCapture -Arguments @(
+            "rev-parse",
+            "--verify",
+            "HEAD^{commit}"
+          )
+          $localHeadOutput = @($localHeadResult.Lines)
+          if (
+            $localHeadResult.ExitCode -ne 0 -or
+            $localHeadOutput.Count -ne 1 -or
+            [string] $localHeadOutput[0] -notmatch '^[0-9a-fA-F]{40}$'
+          ) {
+            throw "Could not resolve the checked-out release commit."
+          }
+          $localHead = ([string] $localHeadOutput[0]).ToLowerInvariant()
+          if ($localHead -cne $releaseCommit) {
+            throw "Checked-out HEAD does not match the verified GitHub tag commit."
+          }
+
+          & .\scripts\verify_release_tag_identity.ps1 `
+            -Repository $env:EXPECTED_REPOSITORY `
+            -Tag $env:RELEASE_TAG `
+            -ExpectedTagObjectSha $tagObjectSha `
+            -ExpectedCommit $releaseCommit
+
+          $sourceContractJson = (python -c "import json; from app_info import DEFAULT_RELEASE_VERSION_CONTRACT; print(json.dumps(DEFAULT_RELEASE_VERSION_CONTRACT, separators=(',', ':')))").Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $sourceContractJson) {
+            throw "Could not resolve the source release-version contract."
+          }
+          $sourceContract = $sourceContractJson | ConvertFrom-Json
+          $sourceVersion = [string] $sourceContract.version
+          $sourceWindowsVersion = [string] $sourceContract.windows_version_numeric
+          if (
+            $sourceVersion -cne $version -or
+            -not $sourceWindowsVersion
+          ) {
+            throw "Tag version '$version' does not match source version '$sourceVersion'."
+          }
+          python -c "import sys; expected=(3,12,7); assert sys.version_info[:3] == expected, sys.version"
+          if ($LASTEXITCODE -ne 0) {
+            throw "The exact release Python version is unavailable."
+          }
+
+          # A previous release makes the run non-repeatable.  A 404 is the only
+          # acceptable API failure; authentication and network errors fail closed.
+          $existingRelease = $null
+          try {
+            $releaseUri = "$env:GITHUB_API_URL/repos/$env:EXPECTED_REPOSITORY/releases/tags/$escapedTag"
+            $existingRelease = Invoke-RestMethod -Method Get -Uri $releaseUri -Headers $headers
+          }
+          catch {
+            $statusCode = if ($_.Exception.Response) {
+              [int] $_.Exception.Response.StatusCode
+            }
+            else {
+              0
+            }
+            if ($statusCode -ne 404) {
+              throw
+            }
+          }
+          if ($existingRelease) {
+            throw "A GitHub Release already exists for $env:RELEASE_TAG; refusing to replace it."
+          }
+
+          "release_version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_windows_version=$sourceWindowsVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_commit=$releaseCommit" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "tag_object_sha=$tagObjectSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "is_prerelease=$($isPrerelease.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Confirm the release tests passed on this commit
+        shell: pwsh
+        env:
+          TESTED_COMMIT: ${{ needs.test-windows.outputs.release_commit }}
+          RELEASE_COMMIT: ${{ steps.release.outputs.release_commit }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          if (-not $env:TESTED_COMMIT -or $env:TESTED_COMMIT -cne $env:RELEASE_COMMIT) {
+            throw "The release tests ran on '$($env:TESTED_COMMIT)', not on the commit being built ($($env:RELEASE_COMMIT))."
+          }
+
+      - name: Install pinned Inno Setup
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $installerPath = Join-Path $env:RUNNER_TEMP "innosetup-$env:INNO_SETUP_VERSION-$env:GITHUB_RUN_ATTEMPT.exe"
+          try {
+            Invoke-WebRequest `
+              -Uri $env:INNO_SETUP_URL `
+              -OutFile $installerPath `
+              -Headers @{ "User-Agent" = "Tesseract-release" }
+            $installer = Get-Item -LiteralPath $installerPath
+            if ($installer.Length -ne [int64] $env:INNO_SETUP_SIZE) {
+              throw "Inno Setup installer size mismatch."
+            }
+            $installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($installerHash -cne $env:INNO_SETUP_SHA256) {
+              throw "Inno Setup installer SHA-256 mismatch."
+            }
+            $installProcess = Start-Process `
+              -FilePath $installerPath `
+              -ArgumentList @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-") `
+              -WindowStyle Hidden `
+              -Wait `
+              -PassThru
+            if ($installProcess.ExitCode -notin @(0, 1641, 3010)) {
+              throw "Pinned Inno Setup installation failed with exit code $($installProcess.ExitCode)."
+            }
+          }
+          finally {
+            Remove-Item -LiteralPath $installerPath -Force -ErrorAction SilentlyContinue
+          }
+          # Official Inno Setup 6.7.1 binaries report a placeholder PE
+          # ProductVersion (0.0.0.0).  Bind the already hash-pinned installer
+          # to its machine-wide uninstall registration instead.
+          $innoUninstallKey = "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 6_is1"
+          $innoRegistration = Get-ItemProperty -LiteralPath $innoUninstallKey -ErrorAction Stop
+          if ([string] $innoRegistration.DisplayVersion -cne $env:INNO_SETUP_VERSION) {
+            throw "Expected registered Inno Setup $env:INNO_SETUP_VERSION, got $($innoRegistration.DisplayVersion)."
+          }
+          $expectedInnoRoot = "${env:ProgramFiles(x86)}\Inno Setup 6"
+          $registeredInnoRoot = ([string] $innoRegistration.InstallLocation).TrimEnd('\')
+          if ($registeredInnoRoot -cne $expectedInnoRoot) {
+            throw "Pinned Inno Setup registered an unexpected install location: $registeredInnoRoot"
+          }
+          $iscc = Join-Path $registeredInnoRoot "ISCC.exe"
+          if (-not (Test-Path -LiteralPath $iscc -PathType Leaf)) {
+            throw "Pinned Inno Setup compiler was not installed."
+          }
+          "ISCC_PATH=$iscc" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      # Shell flavor toolchain: Node.js for the web UI (ui/), Rust for the
+      # Tauri shell (shell/), and the two pinned license tools the release
+      # license/SBOM gate runs (scripts/shell_release_licenses.py cargo-inputs).
+      - name: Set up exact release Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install exact release Rust toolchain and license tools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          rustup toolchain install $env:RUST_VERSION --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { throw "rustup toolchain install failed." }
+          rustup default $env:RUST_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "rustup default failed." }
+          $rustc = (rustc --version | Out-String).Trim()
+          if ($rustc -notmatch "^rustc $([regex]::Escape($env:RUST_VERSION)) ") {
+            throw "Expected rustc $env:RUST_VERSION, got: $rustc"
+          }
+          $toolRoot = Join-Path $env:RUNNER_TEMP "cargo-license-tools"
+          cargo install --locked --root $toolRoot "cargo-deny@$env:CARGO_DENY_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw "cargo-deny install failed." }
+          cargo install --locked --root $toolRoot --features cli "cargo-about@$env:CARGO_ABOUT_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw "cargo-about install failed." }
+          (Join-Path $toolRoot "bin") | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Build unsigned-by-policy release artifacts
         shell: pwsh
         env:
@@ -468,7 +923,9 @@ jobs:
             -Version $env:RELEASE_VERSION `
             -ExpectedGitCommit $env:RELEASE_COMMIT `
             -Repository $env:EXPECTED_REPOSITORY `
-            -WorkflowRunId $env:GITHUB_RUN_ID
+            -WorkflowRunId $env:GITHUB_RUN_ID `
+            -SkipTests `
+            -TestsPassedInJob
 
       - name: Verify build metadata and unsigned manifest
         shell: pwsh

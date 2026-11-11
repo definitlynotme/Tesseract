@@ -3,6 +3,8 @@
     check-key <private-key.pem>     the key opens with the password in
                                     TESSERACT_RELEASE_SIGNING_PASSWORD and its
                                     public half is the first key in app_info
+    check-public-key <public.txt>   the public half saved next to the key file
+                                    is the first key in app_info (no password)
     install-public-key <public.txt> put that public key into app_info.py as the
                                     only update-signing key (before the first
                                     public release only)
@@ -52,6 +54,23 @@ def check_key(private_key_path: Path) -> int:
     return 0
 
 
+def check_public_key(public_key_path: Path) -> int:
+    import app_info
+    from app_update_signing import decode_public_key, public_key_id
+
+    public_key = public_key_path.read_text(encoding="ascii").strip()
+    key_id = public_key_id(decode_public_key(public_key))
+    ring = tuple(app_info.APP_UPDATE_SIGNING_PUBLIC_KEYS)
+    if not ring or ring[0] != app_info.APP_UPDATE_SIGNING_PUBLIC_KEY:
+        print("app_info.py: the signing key must be the first key of the key ring.")
+        return 2
+    if public_key != app_info.APP_UPDATE_SIGNING_PUBLIC_KEY:
+        print(f"The saved public key ({key_id}) does not match the public key built into app_info.py.")
+        return 3
+    print(f"Update-signing key matches app_info.py ({key_id}).")
+    return 0
+
+
 def install_public_key(public_key_path: Path) -> int:
     from app_update_signing import decode_public_key, public_key_id
 
@@ -96,6 +115,8 @@ def verify_live(download_dir: Path | None) -> int:
 def main(argv: list[str]) -> int:
     if len(argv) >= 2 and argv[0] == "check-key":
         return check_key(Path(argv[1]))
+    if len(argv) >= 2 and argv[0] == "check-public-key":
+        return check_public_key(Path(argv[1]))
     if len(argv) >= 2 and argv[0] == "install-public-key":
         return install_public_key(Path(argv[1]))
     if argv and argv[0] == "verify-live":

@@ -1,2 +1,6 @@
-cache/
+# Download and repin staging stays local; the pinned bootstrapper itself is
+# committed (a tagged build must not depend on Microsoft's republished file).
+# "cache/*" (not "cache/") so the negation below can re-include the file.
+cache/*
 *.exe
+!cache/MicrosoftEdgeWebview2Setup.exe

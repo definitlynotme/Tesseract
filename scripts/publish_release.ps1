@@ -18,13 +18,22 @@ param(
     # The version tag is already on GitHub but its build failed and no release
     # (not even a draft) uses it: delete it there and in the public clone, and
     # tag a new commit of the current source instead. Never touches a release.
-    [switch] $MoveUnreleasedTag
+    [switch] $MoveUnreleasedTag,
+    # Answer yes to every confirmation (publish, immutable releases, re-running
+    # failed jobs up to twice), so the run needs no typing. It stops instead of
+    # asking when untracked files would be published, gh needs a new login, no
+    # ssh-agent holds the SSH signing key, or the update-key password is needed.
+    [switch] $Yes,
+    # Ask for the update-key password and store the release secrets again even
+    # when the release environment already holds them.
+    [switch] $RenewSecrets
 )
 
 # One-click public release (RELEASING.md):
 #   1. read-only checks: committed tree, GitHub login and scopes, SSH signing
 #      key, update-signing key, repository state, tag not yet used;
-#   2. one confirmation;
+#   2. one confirmation (-Yes answers it; with Windows' ssh-agent holding the
+#      SSH key and the release secrets already stored, nothing is typed);
 #   3. set up what is missing (repository, `release` environment, secrets),
 #      then scripts\push_to_github.ps1 -Release (audit, signed commit, signed tag, push);
 #   4. watch the "Release Windows" workflow, then download the published
@@ -35,6 +44,10 @@ $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 Set-Location $RepoRoot
+# Invoke-Tool starts processes through .NET, which uses the process directory,
+# not Set-Location: without this its git and python calls would run wherever
+# the script was started from.
+[Environment]::CurrentDirectory = $RepoRoot
 $PasswordEnv = "TESSERACT_RELEASE_SIGNING_PASSWORD"
 
 function Write-Step([string] $Text) { Write-Host ""; Write-Host "== $Text" -ForegroundColor Cyan }
@@ -131,6 +144,7 @@ function Enable-ImmutableReleases {
 }
 
 function Confirm-Yes([string] $Question) {
+    if ($Yes) { Write-Host "$Question [y/N] y (-Yes)"; return $true }
     $answer = Read-Host "$Question [y/N]"
     return ($answer -match '^(y|yes)$')
 }
@@ -140,6 +154,30 @@ function Read-Secret([string] $Prompt) {
     $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
     try { return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer) }
     finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($pointer) }
+}
+
+# When both update-key secrets of the release environment were stored after the
+# key file last changed: the earlier of the two times (UTC); otherwise $null.
+function Get-KeySecretsStoredAt {
+    $listed = Invoke-Tool "gh" @("api", "repos/$Repository/environments/release/secrets", "--paginate",
+        "--jq", '.secrets[] | .name + " " + .updated_at')
+    if ($listed.Code -ne 0) { return $null }
+    $stored = @{}
+    foreach ($line in @($listed.Out -split "\r?\n" | Where-Object { $_ })) {
+        $name, $when = $line -split " ", 2
+        $parsed = [DateTimeOffset]::MinValue
+        if ([DateTimeOffset]::TryParse($when, [Globalization.CultureInfo]::InvariantCulture,
+                [Globalization.DateTimeStyles]::AssumeUniversal, [ref] $parsed)) {
+            $stored[$name] = $parsed.UtcDateTime
+        }
+    }
+    $keyChanged = (Get-Item -LiteralPath $SigningKey).LastWriteTimeUtc
+    $earliest = $null
+    foreach ($name in @("TESSERACT_UPDATE_PRIVATE_KEY_B64", "TESSERACT_UPDATE_KEY_PASSWORD")) {
+        if (-not $stored.ContainsKey($name) -or $stored[$name] -le $keyChanged) { return $null }
+        if ($null -eq $earliest -or $stored[$name] -lt $earliest) { $earliest = $stored[$name] }
+    }
+    return $earliest
 }
 
 foreach ($tool in @("git", "gh")) {
@@ -173,6 +211,7 @@ $untracked = Invoke-Tool "git" @("ls-files", "-o", "--exclude-standard")
 if ($untracked.Out) {
     Write-Todo "These untracked files are not ignored, so they would be published:"
     $untracked.Out -split "\r?\n" | ForEach-Object { Write-Host "       $_" }
+    if ($Yes) { Stop-Publish "-Yes never publishes untracked files. Commit, delete or ignore them, then run again." }
     if (-not (Confirm-Yes "Publish them too?")) { Stop-Publish "Commit, delete or ignore them, then run again." }
 }
 $head = (Invoke-Tool "git" @("rev-parse", "--short", "HEAD")).Out
@@ -197,6 +236,7 @@ if ($current -and $current[0] -ne $owner) {
 if (-not $current -or $current[0] -ne $owner) {
     if ($current) { Write-Todo "gh is logged in as $($current[0]), but the release goes to $owner." }
     else { Write-Todo "gh is not logged in (or the token expired)." }
+    if ($Yes) { Stop-Publish "Logging in to GitHub needs you; run once without -Yes (or gh auth login as $owner)." }
     Write-Host "       The login page opens in your default browser, which must be signed in to GitHub as ${owner}."
     Write-Host "       If it shows another account, sign out there first (or open the link in a private window)."
     Read-Host "   Press Enter to log in as $owner" | Out-Null
@@ -214,6 +254,7 @@ $scopeLine = ($headers.Out -split "\r?\n" | Where-Object { $_ -match '^X-Oauth-S
 $granted = @(($scopeLine -replace '^X-Oauth-Scopes:\s*', '') -split ',\s*' | Where-Object { $_ })
 $missingScopes = @("workflow", "admin:ssh_signing_key") | Where-Object { $granted -notcontains $_ }
 if ($missingScopes) {
+    if ($Yes) { Stop-Publish "The gh token lacks $($missingScopes -join ', '); adding scopes needs you, so run once without -Yes." }
     Write-Todo "Adding token scopes: $($missingScopes -join ', ')"
     & gh auth refresh -h github.com -s ($missingScopes -join ",")
     if ($LASTEXITCODE -ne 0) { Stop-Publish "gh auth refresh failed." }
@@ -232,6 +273,28 @@ if ($signingKeys.Code -ne 0) { Stop-Publish "Cannot list SSH signing keys: $($si
 $addSshKey = -not (($signingKeys.Out -split "\r?\n") -contains $sshPublic)
 if ($addSshKey) { Write-Todo "register $SshSigningKey.pub on GitHub as a signing key"; $actions.Add("Register the SSH public key as a GitHub signing key") }
 else { Write-Ok "registered on GitHub" }
+# Signing asks for nothing while Windows' ssh-agent holds the key
+# (push_to_github.ps1). A first publication (no public clone yet) signs through
+# Git's own agent and asks for the passphrase once.
+$windowsSshAdd = Join-Path $env:SystemRoot "System32\OpenSSH\ssh-add.exe"
+$windowsSshKeygen = Join-Path $env:SystemRoot "System32\OpenSSH\ssh-keygen.exe"
+$agentHoldsKey = $false
+$agentService = Get-Service -Name "ssh-agent" -ErrorAction SilentlyContinue
+if ($agentService -and $agentService.Status -eq "Running" -and
+    (Test-Path -LiteralPath $windowsSshAdd -PathType Leaf) -and (Test-Path -LiteralPath $windowsSshKeygen -PathType Leaf)) {
+    $fingerprint = @((Invoke-Tool $windowsSshKeygen @("-lf", "$SshSigningKey.pub")).Out -split '\s+')
+    $agentSocket = $env:SSH_AUTH_SOCK
+    Remove-Item Env:SSH_AUTH_SOCK -ErrorAction SilentlyContinue
+    try { $agentKeys = Invoke-Tool $windowsSshAdd @("-l") }
+    finally { if ($agentSocket) { $env:SSH_AUTH_SOCK = $agentSocket } }
+    $agentHoldsKey = ($fingerprint.Count -ge 2 -and $fingerprint[1] -like "SHA256:*" -and $agentKeys.Code -eq 0 -and
+        $agentKeys.Out -match [regex]::Escape($fingerprint[1]))
+}
+$firstPublication = -not (Test-Path -LiteralPath (Join-Path $PublicDir ".git"))
+$signingAsksPassphrase = $firstPublication -or -not $agentHoldsKey
+if (-not $signingAsksPassphrase) { Write-Ok "held by Windows' ssh-agent, so signing asks for no passphrase" }
+elseif ($firstPublication) { Write-Todo "the first publication asks for the passphrase of $SshSigningKey once" }
+else { Write-Todo "the push asks for the passphrase of $SshSigningKey once (to skip that, load the key once: $windowsSshAdd $SshSigningKey)" }
 
 Write-Step "Repository"
 $repoName = $Repository.Split("/")[1]
@@ -308,6 +371,7 @@ if ($hazardRemotes) {
 #   "verify" - the release is already published: only the live update check is left.
 $resumeMode = $null
 $moveTag = $false
+$runningRuns = @()
 # Releases that use the tag, drafts included (the list shows drafts to the owner).
 function Get-TagReleaseCount {
     $listed = Invoke-Tool "gh" @("api", "repos/$Repository/releases", "--paginate",
@@ -329,6 +393,15 @@ if ($tagOnGitHub) {
         }
         $moveTag = $true
         Write-Todo "$tag is on GitHub without any release; it is moved to a new commit of the current source"
+        # Moving the tag under a running build makes GitHub lose that runner at its next
+        # hourly token renewal ("lost communication"): stop such runs first.
+        $listedRuns = Invoke-Tool "gh" @("run", "list", "--repo", $Repository, "--workflow", "release-windows.yml", "--limit", "20",
+            "--json", "databaseId,headBranch,status", "--jq", ".[] | select(.headBranch == `"$tag`" and .status != `"completed`") | .databaseId")
+        if ($listedRuns.Code -ne 0) { Stop-Publish "Cannot list the release runs of $tag`: $($listedRuns.Err)" }
+        $runningRuns = @($listedRuns.Out -split "\r?\n" | Where-Object { $_ })
+        if ($runningRuns.Count -gt 0) {
+            Write-Todo "release run $($runningRuns -join ', ') of the old $tag is still running; it is cancelled before the tag moves"
+        }
     }
     else {
         $resumeMode = "watch"
@@ -364,6 +437,10 @@ if ($resumeMode) {
     else { $actions.Add("Check the live update of the published $tag") }
 }
 else {
+if ($Yes -and $signingAsksPassphrase) {
+    Stop-Publish ("Signing the public commit would ask for the passphrase of $SshSigningKey, and -Yes asks nothing. " +
+        $(if ($firstPublication) { "Run the first publication without -Yes." } else { "Load the key once ($windowsSshAdd $SshSigningKey), then run again." }))
+}
 Write-Step "Update-signing key (the app installs only releases signed with it)"
 $latestRelease = Invoke-Tool "gh" @("api", "repos/$Repository/releases/latest", "--jq", ".tag_name")
 $hasPublishedRelease = ($latestRelease.Code -eq 0 -and $latestRelease.Out)
@@ -371,26 +448,55 @@ $hasPublishedRelease = ($latestRelease.Code -eq 0 -and $latestRelease.Out)
 # leave with it; installed copies read the public repository only.
 if (-not $repoExists -or $archiveRepo) { $hasPublishedRelease = $false }
 $generateKey = $false
+$reuseKeySecrets = $false
 if (Test-Path -LiteralPath $SigningKey -PathType Leaf) {
-    $password = Read-Secret "Password of $SigningKey"
-    [Environment]::SetEnvironmentVariable($PasswordEnv, $password, "Process")
-    $check = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "check-key", $SigningKey)
-    if ($check.Code -ne 0) { Stop-Publish "$($check.Out) $($check.Err)" }
-    Write-Ok $check.Out
+    # Nothing to type when the release environment already holds this key and
+    # its password: both secrets stored after the key file last changed (they
+    # are only ever stored after check-key passed), and the public half saved
+    # with the key is still the one app_info.py trusts.
+    $publicKeyFile = "$SigningKey.public.txt"
+    $storedAt = $null
+    if ($repoExists -and -not $archiveRepo -and -not $RenewSecrets -and (Test-Path -LiteralPath $publicKeyFile -PathType Leaf)) {
+        $storedAt = Get-KeySecretsStoredAt
+    }
+    if ($storedAt) {
+        $check = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "check-public-key", $publicKeyFile)
+        if ($check.Code -ne 0) { Stop-Publish "$($check.Out) $($check.Err) (-RenewSecrets checks the key with its password instead)" }
+        $reuseKeySecrets = $true
+        Write-Ok $check.Out
+        Write-Ok (("the release environment holds this key and its checked password (stored {0:yyyy-MM-dd HH:mm} UTC); " +
+            "no password needed (-RenewSecrets stores them again)") -f $storedAt)
+    }
+    elseif ($Yes) {
+        Stop-Publish ("The release environment does not hold this update-signing key yet (or the key file changed since), " +
+            "so its password is needed; run once without -Yes.")
+    }
+    else {
+        $password = Read-Secret "Password of $SigningKey"
+        [Environment]::SetEnvironmentVariable($PasswordEnv, $password, "Process")
+        $check = Invoke-Tool $python @("-B", "scripts\publish_release_helper.py", "check-key", $SigningKey)
+        if ($check.Code -ne 0) { Stop-Publish "$($check.Out) $($check.Err)" }
+        Write-Ok $check.Out
+    }
 }
 else {
     if ($hasPublishedRelease) {
         Stop-Publish ("No update-signing key at $SigningKey, and $($latestRelease.Out) is already published. Installed copies " +
             "trust only the old key: restore that key file (or pass -SigningKey) instead of making a new one.")
     }
+    if ($Yes) { Stop-Publish "No update-signing key at $SigningKey; making one needs a new password, so run once without -Yes." }
     Write-Todo "no update-signing key at $SigningKey"
     Write-Host "       Nothing is published yet, so a new key can replace the one in app_info.py safely."
     $generateKey = $true
     $actions.Add("Generate a new update-signing key, put its public key into app_info.py and commit that")
 }
 
+if ($moveTag -and $runningRuns.Count -gt 0) { $actions.Add("Cancel the still running release run $($runningRuns -join ', ') of the old $tag") }
 if ($moveTag) { $actions.Add("Delete the unreleased tag $tag on GitHub and in $PublicDir (no release uses it)") }
-$actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and its 3 secrets")
+if ($reuseKeySecrets) {
+    $actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and refresh its deny-list secret (the update-key secrets stay as stored)")
+}
+else { $actions.Add("Set up the 'release' environment (tags v* only$(if ($RequireApproval) { ', your approval' })) and its 3 secrets") }
 $actions.Add("Audit, commit and sign the public tree in $PublicDir, tag $tag, push main and $tag")
 }
 if ($enableImmutable) {
@@ -410,7 +516,7 @@ if ($DryRun) {
     Write-Host "Dry run: preparing and auditing the public commit locally (no tag, no push)..."
     if ($generateKey) { Write-Todo "the real run makes the signing key first; this preview still uses the old app_info.py" }
     & (Join-Path $PSScriptRoot "push_to_github.ps1") -NoPush -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `
-        -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir
+        -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir -NoPrompt:$Yes
     Write-Host ""
     Write-Host "Dry run finished: checks passed and the public tree passed the audit. Run again without -DryRun to publish." -ForegroundColor Green
     exit 0
@@ -516,20 +622,32 @@ if (-not (($policies.Out -split "\r?\n") -contains "tag:v*")) {
     }
 }
 Write-Ok "environment 'release' (tags v* only$(if ($RequireApproval) { ', needs your approval' }))"
-$secrets = [ordered]@{
-    TESSERACT_UPDATE_PRIVATE_KEY_B64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($SigningKey))
-    TESSERACT_UPDATE_KEY_PASSWORD    = $password
-    PUBLIC_RELEASE_PRIVATE_DENYLIST  = [IO.File]::ReadAllText($DenyFile)
+$secrets = [ordered]@{}
+if (-not $reuseKeySecrets) {
+    $secrets["TESSERACT_UPDATE_PRIVATE_KEY_B64"] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($SigningKey))
+    $secrets["TESSERACT_UPDATE_KEY_PASSWORD"] = $password
 }
+$secrets["PUBLIC_RELEASE_PRIVATE_DENYLIST"] = [IO.File]::ReadAllText($DenyFile)
 foreach ($name in $secrets.Keys) {
     $set = Invoke-Tool "gh" @("secret", "set", $name, "--env", "release", "--repo", $Repository) $secrets[$name]
     if ($set.Code -ne 0) { Stop-Publish "Setting secret $name failed: $($set.Err)" }
     Write-Ok "secret $name"
 }
+if ($reuseKeySecrets) { Write-Ok "secrets TESSERACT_UPDATE_PRIVATE_KEY_B64 and TESSERACT_UPDATE_KEY_PASSWORD kept as stored" }
 $secrets = $null
 
 if ($moveTag) {
     Write-Step "Move the unreleased tag $tag"
+    foreach ($oldRun in $runningRuns) {
+        [void] (Invoke-Tool "gh" @("run", "cancel", $oldRun, "--repo", $Repository))
+        $stopBy = (Get-Date).AddMinutes(5)
+        do {
+            Start-Sleep -Seconds 5
+            $runState = Invoke-Tool "gh" @("run", "view", $oldRun, "--repo", $Repository, "--json", "status", "--jq", ".status")
+        } while ($runState.Out -ne "completed" -and (Get-Date) -lt $stopBy)
+        if ($runState.Out -ne "completed") { Stop-Publish "Release run $oldRun did not stop; cancel it on github.com, then run again." }
+        Write-Ok "release run $oldRun of the old $tag has stopped"
+    }
     # Look again right before deleting: still no release or draft uses the tag.
     if ((Get-TagReleaseCount) -ne 0) { Stop-Publish "A release (or draft) for $tag appeared meanwhile; nothing is deleted." }
     $deleted = Invoke-Tool "git" @("-C", $PublicDir, "push", $remoteUrl, ":refs/tags/$tag")
@@ -549,7 +667,7 @@ if ($moveTag) {
 
 Write-Step "Publish source and tag"
 & (Join-Path $PSScriptRoot "push_to_github.ps1") -Release -RemoteUrl $remoteUrl -GitHubLogin $login -GitHubId $userId `
-    -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir
+    -SshSigningKey $SshSigningKey -DenyFile $DenyFile -PublicDir $PublicDir -NoPrompt:$Yes
 }
 
 # A resumed run still needs the setting before its publish job starts.
@@ -613,10 +731,28 @@ if ($resumeMode -ne "verify") {
         # runner; re-running only the failed jobs is the normal remedy. Nothing is
         # published until the last job succeeds.
         Write-Todo "the release workflow ended with '$conclusion': https://github.com/$Repository/actions/runs/$runId"
+        # Never re-run once the publish job made a release or draft for the tag: the
+        # workflow forbids retrying that stage, and every attempt would add a draft.
+        $releasesNow = Get-TagReleaseCount
+        if ($releasesNow -ne 0) {
+            Stop-Publish ("A release or draft for $tag exists (count $releasesNow; -1 = unreadable), so the failed jobs are not " +
+                "re-run. Look at https://github.com/$Repository/releases first; if $tag is published, run this script " +
+                "again without -MoveUnreleasedTag and it only checks the live release.")
+        }
         if (-not (Confirm-Yes "Re-run the failed jobs (attempt $rerun of 2)?")) { break }
         $again = Invoke-Tool "gh" @("run", "rerun", $runId, "--repo", $Repository, "--failed")
-        if ($again.Code -ne 0) { Stop-Publish "gh run rerun failed: $($again.Err)" }
-        Start-Sleep -Seconds 20
+        if ($again.Code -ne 0) {
+            # The request may have reached GitHub although its answer was lost.
+            $state = Invoke-Tool "gh" @("run", "view", $runId, "--repo", $Repository, "--json", "status", "--jq", ".status")
+            if ($state.Code -ne 0 -or $state.Out -eq "completed") { Stop-Publish "gh run rerun failed: $($again.Err)" }
+            Write-Host "   the re-run started although GitHub's answer was lost ($($state.Out))"
+        }
+        # Follow the re-run only once it shows up, or the old attempt's result counts twice.
+        for ($wait = 0; $wait -lt 12; $wait++) {
+            Start-Sleep -Seconds 10
+            $state = Invoke-Tool "gh" @("run", "view", $runId, "--repo", $Repository, "--json", "status", "--jq", ".status")
+            if ($state.Code -eq 0 -and $state.Out -ne "completed") { break }
+        }
         $conclusion = Wait-ReleaseRun $runId
     }
     if ($conclusion -eq "unknown") {

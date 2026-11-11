@@ -14,7 +14,14 @@ param(
     # install it into the isolated validation directory. Official builds refuse it.
     [switch] $SkipInstallerAcceptance,
     # Rebuild the web UI, shell and sidecar from scratch (.build/p6-*). Official builds always do.
-    [switch] $CleanShellBuild
+    [switch] $CleanShellBuild,
+    # Official two-job release only. A GitHub-hosted runner of this repository is
+    # lost at exactly 60 minutes into a job, so the release workflow runs setup plus
+    # every test in one job (-TestsOnly, stops after the tests) and the build in a
+    # second job that starts only after the first passed on the same commit
+    # (-SkipTests -TestsPassedInJob, which records the tests as passed).
+    [switch] $TestsOnly,
+    [switch] $TestsPassedInJob
 )
 
 # Release flavor: Tauri shell (Tesseract.exe) + web UI + PyInstaller sidecar
@@ -720,7 +727,7 @@ if ($OfficialRelease) {
     }
     if (
         $SkipDependencyInstall -or
-        $SkipTests -or
+        ($SkipTests -and -not $TestsPassedInJob) -or
         $SkipInstaller -or
         $SkipPackagedSmoke -or
         $SkipMihomoDownload -or
@@ -735,6 +742,17 @@ if ($OfficialRelease) {
     if ($env:MIHOMO_DOWNLOAD_URL) {
         throw "Official releases forbid custom Mihomo download URLs."
     }
+}
+# The two-job split exists only inside the official workflow: -TestsPassedInJob
+# vouches for a test job of the same workflow run, so it must never appear elsewhere.
+if (($TestsOnly -or $TestsPassedInJob) -and -not $OfficialRelease) {
+    throw "-TestsOnly and -TestsPassedInJob belong to the official two-job release workflow."
+}
+if ($TestsOnly -and ($SkipTests -or $TestsPassedInJob)) {
+    throw "-TestsOnly runs every test; it cannot be combined with -SkipTests or -TestsPassedInJob."
+}
+if ($TestsPassedInJob -and -not $SkipTests) {
+    throw "-TestsPassedInJob is only meaningful together with -SkipTests."
 }
 
 $EffectiveRepository = if ($OfficialRelease) {
@@ -1072,8 +1090,10 @@ Invoke-Native "source smoke test" $ReleasePython @(
 )
 $SourceSmokeStatus = "passed"
 
-$FullTestStatus = if ($SkipTests) { "skipped-partial" } else { "not_run" }
-$MihomoConfigStatus = if ($SkipTests) { "skipped-partial" } else { "not_run" }
+# -TestsPassedInJob: the workflow's test-windows job ran exactly these tests on this
+# commit and passed (build-windows needs it and re-checks the commit).
+$FullTestStatus = if ($TestsPassedInJob) { "passed" } elseif ($SkipTests) { "skipped-partial" } else { "not_run" }
+$MihomoConfigStatus = if ($TestsPassedInJob) { "passed" } elseif ($SkipTests) { "skipped-partial" } else { "not_run" }
 if (-not $SkipTests) {
     Invoke-Native "Mihomo configuration validation" $ReleasePython @(
         "-m", "pytest", "-q", "tests/test_mihomo_generated_config.py"
@@ -1083,6 +1103,10 @@ if (-not $SkipTests) {
     # Keep release verification scoped to the source test suite.
     Invoke-Native "pytest" $ReleasePython @("-m", "pytest", "-q", "tests")
     $FullTestStatus = "passed"
+}
+if ($TestsOnly) {
+    Write-Host "Release tests passed for $Version (source smoke, Mihomo configuration, full pytest); the build job builds the artifacts."
+    exit 0
 }
 
 # Web UI (ui/build.mjs) + Tauri shell (cargo --release --locked --offline,
