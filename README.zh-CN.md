@@ -11,7 +11,7 @@ Tesseract 是一款 Windows 桌面代理客户端，内核是
 
 ## 下载
 
-在 [Releases](https://github.com/definitlynotme/Tessract/releases) 下载最新版本：
+在 [Releases](https://github.com/definitlynotme/Tesseract/releases) 下载最新版本：
 
 | 文件 | 说明 |
 |---|---|

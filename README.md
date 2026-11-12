@@ -14,7 +14,7 @@ working — then back up when it recovers.
 ## Download
 
 Get the latest build from
-[Releases](https://github.com/definitlynotme/Tessract/releases):
+[Releases](https://github.com/definitlynotme/Tesseract/releases):
 
 | File | What it is |
 |---|---|
