@@ -16,6 +16,7 @@
 //   frame.js      the in-page title bar's window buttons (#wc): host_window{action}; host:window
 //                 {maximized} picks the maximize or restore glyph (11-05)
 //   update.js     the new-version banner (once per version) and the "update finished" notice
+//                 (after the launch; with the update's notes it offers them in their sheet)
 // T.shellc (the page API): registerDraft(fn), presence, errorText(err), commandError(err),
 // run(cmd, args) -> Promise (T.rt.call with the generic error banner), openFolder(kind),
 // listStale(topic, key), reload(topic, key) (-> T.rt.requestResync, never rejects), unsaved(), diag().
@@ -38,6 +39,8 @@ import { createUpdateNotice } from './update.js';
 
 const DIAG_MAX = 100;
 export const READY_FRAME_FALLBACK_MS = 100;
+// after the launch cover left: a beat for the revealed page before a deferred notice grows in
+export const AFTER_LAUNCH_SETTLE_MS = 600;
 // The page invokes the shell registers (PROTOCOL section 13 host:caps.invokes, the ten names;
 // 11-05 host_window: the window buttons of the in-page title bar; the debug build's dev_quit is
 // not for pages). host() refuses any other name before it reaches
@@ -172,10 +175,24 @@ export function installShellc(T, opts = {}) {
   const dirtyCount = () => (T.ui && T.ui.saveBar && typeof T.ui.saveBar.dirtyCount === 'function' ? T.ui.saveBar.dirtyCount() : 0);
   const quit = createQuit({ host, dirtyCount, drafts });
   const language = createLanguage({ store: S, on: T.on, i18n: T.i18n });
+  // the "update finished" pill waits for the launch cover to leave and the app to settle (the mark
+  // has landed on the sidebar), so it grows out of the top bar of a still page; its "更新说明"
+  // (0.1.1) opens the same plain-text notes sheet as 配置 · 应用, grown out of that button
+  const afterLaunchQueue = [];
+  const afterLaunch = fn => {
+    if (!launch || launch.phase === 'gone') fn();
+    else afterLaunchQueue.push(fn);
+  };
+  function openNotes({ version, notes, from }) {
+    if (typeof T.sheet !== 'function') return;
+    const body = typeof T.h === 'function' ? T.h('div', { class: 'set-notes-text', translate: 'no' }, notes) : notes;
+    T.sheet({ from, title: t('settings.app.update.notes_title', { version }), width: 520, content: body,
+      actions: [{ label: t('settings.action.close'), ghost: true }] });
+  }
   const update = createUpdateNotice({
     notify: o => T.notify(o), dismiss: id => T.dismiss(id), t, can, call,
     confirm: o => (typeof T.confirm === 'function' ? T.confirm(o) : Promise.resolve(false)), go, storage,
-    commandError: err => banners.commandError(err), onScreen,
+    commandError: err => banners.commandError(err), onScreen, later: afterLaunch, openNotes,
   });
 
   // ---- connections and the ready signal ---------------------------------------------------
@@ -198,7 +215,10 @@ export function installShellc(T, opts = {}) {
     settle: (T.motion && T.motion.SP && T.motion.SP.settle) || undefined,
     // (never during createLaunch: the launch shows from a timer or an rt event, after `ready` exists)
     onShown: () => ready.check(),
-    onGone: () => note({ kind: 'launch_gone' }),
+    onGone: () => {
+      note({ kind: 'launch_gone' });
+      if (afterLaunchQueue.length) setTimeout(() => afterLaunchQueue.splice(0).forEach(fn => fn()), AFTER_LAUNCH_SETTLE_MS);
+    },
   }) : null;
   const ready = createReady({
     host,

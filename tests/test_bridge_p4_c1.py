@@ -650,14 +650,45 @@ def test_update_completed_reports_previous_and_current_once(tmp_path):
     app_update_state.record_pending_update(path, _downloaded_update())
     owner = UpdateOwner(path, tmp_path / "updates", current_version="0.2.0")
     assert owner.snapshot()["data"]["previous_version"] is None
+    assert owner.snapshot()["data"]["installed_notes"] is None
     assert owner.load_completed_update() == "0.1.0"
     data = owner.snapshot()["data"]
     assert (data["current_version"], data["previous_version"]) == ("0.2.0", "0.1.0")
+    # 0.1.1: the notes the receipt saved before the installer ran ("what's new")
+    assert data["installed_notes"] == "Fixed privacy leaks.\n\nSee the release page for details."
+    assert data["notes"] is None
     assert protocol.validate_topic_payload("update.state", data) == []
     assert owner.take_state() is not None
     again = UpdateOwner(path, tmp_path / "updates", current_version="0.2.0")
     assert again.load_completed_update() is None                    # once-only
     assert again.snapshot()["data"]["previous_version"] is None
+    assert again.snapshot()["data"]["installed_notes"] is None
+
+
+@pytest.mark.parametrize("saved, shown", [
+    # GitHub's generated notes of a release without pull requests: no window
+    ("**Full Changelog**: https://github.com/o/r/compare/v0.1.0...v0.1.1", None),
+    ("Full Changelog: https://github.com/o/r/commits/v0.1.1", None),
+    ("", None),
+    # sanitized like Update.notes: the scheme goes, the text stays plain
+    ("- Fixed imports\n\n**Full Changelog**: https://github.com/o/r/compare/a...b",
+     "- Fixed imports\n\n**Full Changelog**: github.com/o/r/compare/a...b"),
+    # a node URI in the notes drops them (never sent)
+    ("- see vless://uuid@host:443", None),
+])
+def test_update_completed_installed_notes_are_plain_and_meaningful(tmp_path, saved, shown):
+    import app_update_state
+    from bridge_update import UpdateOwner
+    from tests.test_app_update_state import _downloaded_update
+    downloaded = _downloaded_update()
+    downloaded.update.release_notes = saved
+    path = app_update_state.update_state_path(tmp_path)
+    app_update_state.record_pending_update(path, downloaded)
+    owner = UpdateOwner(path, tmp_path / "updates", current_version="0.2.0")
+    assert owner.load_completed_update() == "0.1.0"
+    data = owner.snapshot()["data"]
+    assert data["installed_notes"] == shown
+    assert protocol.validate_topic_payload("update.state", data) == []
 
 
 def test_update_not_yet_installed_or_unreadable_state_has_no_previous(tmp_path):

@@ -26,7 +26,7 @@ pub const MISSING_HRESULT: i32 = 0x8007_0002u32 as i32;
 /// Offline-installer link of the missing-runtime dialog. It goes through `host.openUrl`'s whitelist
 /// (PROTOCOL §13 item 5), which has no Microsoft host, so it is the project's release page (the
 /// repository of `app_info.APP_REPOSITORY_URL`); see the T-P3-07 report, "需要 Claude 裁定".
-pub const RUNTIME_HELP_URL: &str = "https://github.com/definitlynotme/Tessract/releases/latest";
+pub const RUNTIME_HELP_URL: &str = "https://github.com/definitlynotme/Tesseract/releases/latest";
 /// §2.2.1 step 6: the longest the window stays cloaked waiting for `host_ready`.
 pub const READY_TIMEOUT: Duration = Duration::from_millis(1500);
 /// §7.9: the bounded wait for `BrowserProcessExited` at shell exit. The work order suggests about

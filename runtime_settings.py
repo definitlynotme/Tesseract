@@ -5,7 +5,7 @@ from os import PathLike
 from typing import Any
 from urllib.parse import urlsplit
 
-from config_utils import coerce_float, coerce_positive_int
+from config_utils import coerce_bool, coerce_float, coerce_positive_int
 from tier3_defaults import (
     DEFAULT_TIER3_STARTUP_EXPORT_CANDIDATE_LIMIT,
     DEFAULT_TIER3_STARTUP_VALIDATION_CONCURRENCY,
@@ -94,6 +94,22 @@ def geo_update_block(config: dict[str, Any] | None) -> dict[str, Any]:
 
 def egress_proxy_block(config: dict[str, Any] | None) -> dict[str, Any]:
     return _dict_value(config or {}, "egress_proxy")
+
+
+def direct_fetch_without_route_allowed(config: dict[str, Any] | None) -> bool:
+    """Whether a download with no routed path may go out directly.
+
+    Applies only when there is no explicit egress proxy and no Mihomo Core
+    running: a first run, or a subscription refreshed while the service is
+    stopped.  Without it those downloads fail, which leaves a new install with
+    no nodes and no GeoData.  ``egress_proxy.direct_when_no_route: false``
+    restores the proxy-only behaviour.
+    """
+
+    return coerce_bool(
+        egress_proxy_block(config).get("direct_when_no_route", True),
+        True,
+    )
 
 
 def subscription_server_block(config: dict[str, Any] | None) -> dict[str, Any]:

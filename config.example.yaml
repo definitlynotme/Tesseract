@@ -228,6 +228,11 @@ egress_proxy:
   password: ''
   use_for:
     collection: true
+  # With no explicit proxy above and no Mihomo core running (a first run, or
+  # the service stopped), your own Sentinel/Gateway subscriptions and the
+  # GeoData files download directly instead of failing. Bastion Layer sources
+  # never do. Set false to keep every remote download proxy-only.
+  direct_when_no_route: true
 alerts:
   log_file: data/monitor.log
   level: INFO

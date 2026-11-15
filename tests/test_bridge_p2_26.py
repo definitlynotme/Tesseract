@@ -308,10 +308,10 @@ def test_update_dto_schema_and_detached_publication(setup_owner):
         updater.info = info
         dto = owner.check()
         # T-P4-C1 #7: optional v1 additions current_version / previous_version;
-        # T-P4-C2 #10: notes / enabled / last_check_at_ms.
+        # T-P4-C2 #10: notes / enabled / last_check_at_ms; 0.1.1: installed_notes.
         assert set(dto) == {"state", "version", "update_available", "installable", "error",
                             "current_version", "previous_version",
-                            "notes", "enabled", "last_check_at_ms"}
+                            "notes", "enabled", "last_check_at_ms", "installed_notes"}
         assert protocol.validate_topic_payload("update.state", dto) == []
         assert adapt_result("app.update.check", dto)[0] is True
         assert owner.take_state()["data"] == dto

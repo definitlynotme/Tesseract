@@ -19,7 +19,7 @@ def _downloaded_update(*, verified: bool = True):
     update = SimpleNamespace(
         current_version="0.1.0",
         latest_version="0.2.0",
-        release_url="https://github.com/definitlynotme/Tessract/releases/tag/v0.2.0",
+        release_url="https://github.com/definitlynotme/Tesseract/releases/tag/v0.2.0",
         release_notes="Fixed privacy leaks.\n\nSee the release page for details.",
     )
     return SimpleNamespace(

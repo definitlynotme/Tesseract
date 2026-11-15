@@ -13,6 +13,10 @@
 //
 // Update.previous_version (C1 item 7, shown as soon as the field is there): a one-time success
 // notice "updated from {previous} to {current}", remembered per current version the same way.
+// The notice waits for the launch cover to leave and the app to settle (port later). With
+// Update.installed_notes (0.1.1: the notes the update saved before it installed) the pill offers
+// "更新说明", and the notes sheet grows out of that button (port openNotes; the same plain-text
+// sheet as 配置 · 应用, R-09) while the pill leaves.
 //
 // A banner that left the screen in any way (closed, "View update", installing, T.dismiss) is
 // not shown again for its version: a language switch rewords it only while it is on screen.
@@ -20,7 +24,8 @@
 // Ports: notify(o), dismiss(id), t(id, params), can(cmd), call(cmd, args) -> Promise,
 // confirm(o) -> Promise<bool> (T.confirm), go(page, params), storage ({getItem, setItem}) or
 // null, commandError(err), onScreen(id) -> bool (T.notices.banners.has(id); default: always
-// true).
+// true), later(fn) (runs fn once the launch has left; default: at once), openNotes({version,
+// notes, from}) or null (no notes action).
 
 export const STORAGE_KEY = 'tesseract.shellc.update';
 export const REMEMBER = 16;
@@ -33,7 +38,7 @@ function readStore(storage) {
   } catch (e) { return null; }
 }
 
-export function createUpdateNotice({ notify, dismiss, t, can = () => false, call, confirm, go, storage = null, commandError = () => {}, onScreen = () => true }) {
+export function createUpdateNotice({ notify, dismiss, t, can = () => false, call, confirm, go, storage = null, commandError = () => {}, onScreen = () => true, later = fn => fn(), openNotes = null }) {
   const session = { announced: new Set(), done: new Set() };
   let shownFor = null;
   // the banner left the screen (its "View update" action has no keep, a timeout, T.dismiss): forget it
@@ -100,8 +105,13 @@ export function createUpdateNotice({ notify, dismiss, t, can = () => false, call
       const cur = typeof d.current_version === 'string' && d.current_version ? d.current_version : null;
       if (prev && cur && !remembered('done', cur)) {
         remember('done', cur);
+        // (plain, untrusted text: the sheet shows it as text, never parsed)
+        const notes = typeof d.installed_notes === 'string' && d.installed_notes.trim() ? d.installed_notes : null;
+        const actions = notes && typeof openNotes === 'function'
+          ? [{ label: t('settings.app.update.notes'), labelId: 'settings.app.update.notes', run: b => openNotes({ version: cur, notes, from: b }) }]
+          : undefined;
         // (sticky: a catalog message, relabelled in place on a language switch)
-        notify({ kind: 'success', sticky: true, message: t('shell.update.done', { previous: prev, current: cur }), messageId: 'shell.update.done', messageParams: { previous: prev, current: cur } });
+        later(() => notify({ kind: 'success', sticky: true, message: t('shell.update.done', { previous: prev, current: cur }), messageId: 'shell.update.done', messageParams: { previous: prev, current: cur }, actions }));
       }
     },
     relocalize() { if (settle() && shownFor.build) notify(shownFor.build()); },

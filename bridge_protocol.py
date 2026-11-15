@@ -414,7 +414,9 @@ V1_DTOS = {
                "version": "str?", "update_available": "bool", "installable": "bool", "error": "Error?",
                "current_version?": "str?", "previous_version?": "str?",
                # T-P4-C2 #10 (settings R-09): notes is plain, untrusted text.
-               "notes?": "text?", "enabled?": "bool", "last_check_at_ms?": "uint?"},
+               "notes?": "text?", "enabled?": "bool", "last_check_at_ms?": "uint?",
+               # 0.1.1: the just-completed update's notes (plain, untrusted text).
+               "installed_notes?": "text?"},
     # T-P4-C2 #13 (G38): one physical node; indexes into the accepted nodes.
     "ImportGroup": {"key": "str", "label?": "str", "row_indexes": "[uint]"},
     "Recovery": {"proxy": "not_needed|restored|not_owned|permission_required|failed|unknown",
@@ -578,6 +580,9 @@ def _schema(value: Any, spec: Any, path: str, errors: list[str]) -> None:
                 # T-P4-C1 #7: "update completed" needs the running version too.
                 if value.get("previous_version") is not None and not _string(value.get("current_version")):
                     errors.append(f"invariant:{path}.previous_version")
+                # 0.1.1: notes of a completed update only with that update.
+                if value.get("installed_notes") is not None and value.get("previous_version") is None:
+                    errors.append(f"invariant:{path}.installed_notes")
             if spec == "Source" and isinstance(value, dict) and isinstance(value.get("hint"), str):
                 # T-P4-C1 (U4) review fix: only the sidecar's mask shape goes on
                 # the wire, so a generator bug can never send a source value.

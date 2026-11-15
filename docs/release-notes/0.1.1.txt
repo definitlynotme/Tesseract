@@ -1,0 +1,23 @@
+修复：全新安装后无法导入节点、服务无法启动
+
+- 首次运行时（没有设置出口代理，Mihomo 核心也没在运行），你自己的 Sentinel / Gateway 订阅和 GeoData 规则数据现在会直接下载，不再报"没有可用路径"并卡在启动失败。核心启动后，流量照旧经由核心转发。
+- Bastion 层的公共来源仍然只走代理，不受影响。
+- 想让所有远程下载继续只走代理，可以在 config.local.yaml 里把 egress_proxy.direct_when_no_route 设为 false。
+- GeoData 相关的启动失败现在显示本地化提示，不再是英文原文。
+- 链接和更新检查改用新的仓库地址 definitlynotme/Tesseract。
+
+新增：更新后查看更新内容
+
+- 更新完成后，「已从 0.1.0 升级到 0.1.1」的提示里会有「更新说明」按钮，点开即可查看本次更新的内容（就是这份说明）。
+
+Fixed: a fresh install could not import nodes or start
+
+- On a first run (no egress proxy set and no Mihomo core running), your own Sentinel/Gateway subscriptions and the GeoData files now download directly instead of failing with "No route". Once the core runs, traffic goes through it as before.
+- Bastion Layer sources still use a proxy route only.
+- To keep every remote download proxy-only, set egress_proxy.direct_when_no_route to false in config.local.yaml.
+- GeoData start failures now show a translated message instead of raw English.
+- Links and update checks now use the renamed repository definitlynotme/Tesseract.
+
+New: see what changed after an update
+
+- After an update, the "Updated from 0.1.0 to 0.1.1." notice has a "Release notes" button that opens what changed in this version (these notes).

@@ -240,6 +240,10 @@ def test_cleanup_and_superseded_lifecycle_evidence():
     ("Required GeoData is missing and the GeoData updater is disabled: private", "geodata_missing"),
     ("Required GeoData is missing before Mihomo startup; preflight download requires an explicit egress proxy: private", "geodata_needs_route"),
     ("Required GeoData is still missing after explicit-proxy preflight: private", "geodata_download_failed"),
+    ("Required GeoData is missing before Mihomo startup; preflight download requires an explicit egress proxy or a running Bastion Layer pool: private", "geodata_needs_route"),
+    ("GeoData preflight through the direct connection failed: private", "geodata_download_failed"),
+    ("GeoData preflight through the Bastion Layer pool failed: private", "geodata_download_failed"),
+    ("Required GeoData is still missing after direct connection preflight: private", "geodata_download_failed"),
     ("TUN mode requires running Tesseract as Administrator (WinTun driver)", "admin_required"),
     ("source_supply_no_egress: exhausted", "source_supply_no_egress"),
 ])

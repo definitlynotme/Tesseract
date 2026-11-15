@@ -440,3 +440,38 @@ test('update finished: previous_version shows a one-time notice per current vers
   again.u.state(done);
   assert.equal(again.toasts.length, 0, 'not again after a reload');
 });
+
+test('update finished with its notes (0.1.1): after the launch, the pill offers 更新说明; the sheet grows out of that button', () => {
+  const objs = [], opened = [], waiting = [];
+  const u = createUpdateNotice({
+    notify: o => objs.push(o), dismiss: () => {}, t: (id, p) => (p ? `${id}${JSON.stringify(p)}` : id),
+    call: () => Promise.resolve({}), confirm: () => Promise.resolve(true), go: () => {}, storage: storage(),
+    later: fn => waiting.push(fn), openNotes: o => opened.push(o),
+  });
+  const notes = '新功能\n- 首次运行无需代理即可导入订阅\n\n<img src=x onerror=alert(1)>';
+  u.state({ state: 'idle', version: null, update_available: false, installable: false, error: null,
+    current_version: '1.1.0', previous_version: '1.0.0', installed_notes: notes });
+  assert.equal(objs.length, 0, 'nothing under the launch cover');
+  waiting.splice(0).forEach(fn => fn());
+  assert.equal(objs.length, 1);
+  const o = objs[0];
+  assert.equal(o.kind, 'success'); assert.equal(o.sticky, true); assert.equal(o.messageId, 'shell.update.done');
+  assert.deepEqual(o.actions.map(a => [a.labelId, !!a.keep]), [['settings.app.update.notes', false]]);
+  const button = { tag: 'button' };
+  o.actions[0].run(button);
+  assert.deepEqual(opened, [{ version: '1.1.0', notes, from: button }], 'the notes go to the sheet as text');
+});
+
+test('update finished: no notes action without notes, blank notes or a sheet', () => {
+  for (const [notes, openNotes] of [[null, o => o], ['   ', o => o], ['- fixed', null]]) {
+    const objs = [];
+    const u = createUpdateNotice({
+      notify: o => objs.push(o), dismiss: () => {}, t: id => id, call: () => Promise.resolve({}),
+      confirm: () => Promise.resolve(true), go: () => {}, storage: storage(), openNotes,
+    });
+    u.state({ state: 'idle', version: null, update_available: false, installable: false, error: null,
+      current_version: '1.1.0', previous_version: '1.0.0', installed_notes: notes });
+    assert.equal(objs.length, 1, 'the notice itself, at once without a later port');
+    assert.equal(objs[0].actions, undefined);
+  }
+});

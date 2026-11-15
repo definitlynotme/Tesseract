@@ -153,7 +153,12 @@ from geodata_runtime import (
     runtime_config_text_uses_geodata,
     runtime_config_uses_geodata,
 )
-from geo_updater import ASSET_FILENAMES, GeoDownloadPolicy, GeoUpdater
+from geo_updater import (
+    ASSET_FILENAMES,
+    DIRECT_EGRESS as GEO_DIRECT_EGRESS,
+    GeoDownloadPolicy,
+    GeoUpdater,
+)
 from import_service import ImportService
 from latency_policy_view import (
     apply_latency_policy_config_payload,
@@ -176,6 +181,7 @@ from runtime_settings import (
     default_probe_timeout_ms,
     default_probe_url,
     default_probe_urls,
+    direct_fetch_without_route_allowed,
     egress_proxy_block,
     geo_update_block,
     killswitch_block,
@@ -1557,7 +1563,9 @@ class DesktopRuntime:
                 self.logger,
                 operation_coordinator=self.subscription_operation_coordinator,
                 collection_settings_provider=(
-                    lambda _config: self._manager_collection_settings()
+                    lambda _config: self._manager_collection_settings(
+                        direct_without_route=True,
+                    )
                 ),
             )
         )
@@ -6007,6 +6015,12 @@ class DesktopRuntime:
                 if rotating_proxy is not None:
                     geo_proxy = rotating_proxy
                     download_policy = GeoDownloadPolicy()
+            elif self._geodata_direct_download_allowed():
+                # No route exists at all: no explicit proxy and no Core, so
+                # no Bastion pool either.  Failing here left a first run with
+                # no Core to fetch subscriptions through, and no GeoData ever.
+                geo_proxy = dict(GEO_DIRECT_EGRESS)
+                route_label = "direct connection"
         if geo_proxy is None:
             raise RuntimeError(
                 "Required GeoData is missing before Mihomo startup; preflight download "
@@ -6057,6 +6071,18 @@ class DesktopRuntime:
         self._geodata_preflight_retries = 0
         if errors:
             self.logger.info("GeoData preflight completed with non-blocking optional errors: %s", ", ".join(map(str, errors.keys())))
+
+    def _geodata_direct_download_allowed(self) -> bool:
+        """Whether the pre-start GeoData download may go out directly.
+
+        Only with no Mihomo Core running: a running Core is a route, and its
+        own GeoData path (explicit proxy or Bastion pool) decides instead.
+        """
+
+        runner = self.core_runner
+        if runner is not None and runner.is_running():
+            return False
+        return direct_fetch_without_route_allowed(self.config)
 
     def _bootstrap_geodata_rules_deferred(self) -> bool:
         """Whether the bootstrap Core must start without GEOIP/GEOSITE rules.
@@ -52594,9 +52620,25 @@ class DesktopRuntime:
             str(request_id or ""),
         )
 
-    def _manager_collection_settings(self) -> dict[str, Any]:
+    def _manager_collection_settings(
+        self,
+        *,
+        direct_without_route: bool = False,
+    ) -> dict[str, Any]:
+        """Collection transport for application-layer previews and discovery.
+
+        ``direct_without_route`` is for the user's own subscription URLs: the
+        Manager then allows a direct fetch while no route exists at all.
+        """
+
         manager = self.manager
         provider = getattr(manager, "_collection_settings", None) if manager else None
+        if direct_without_route:
+            provider = (
+                getattr(manager, "_subscription_collection_settings", None)
+                if manager
+                else None
+            ) or provider
         if not callable(provider):
             raise RuntimeError(
                 "validated source transport is unavailable until Manager starts"
@@ -52604,6 +52646,10 @@ class DesktopRuntime:
         settings = provider()
         if not isinstance(settings, dict):
             raise RuntimeError("Manager returned invalid collection settings")
+        direct_allowed = bool(
+            direct_without_route
+            and settings.get("require_remote_source_route") is False
+        )
         sanitized = dict(settings)
         # Application-layer preview/discovery must never receive a raw
         # explicit upstream. That credential is compiled only inside the
@@ -52620,7 +52666,10 @@ class DesktopRuntime:
             if runtime_proxy_url:
                 sanitized["runtime_source_fetch_proxy_url"] = runtime_proxy_url
                 sanitized["runtime_source_fetch_proxy_first"] = True
-        sanitized["require_remote_source_route"] = True
+        # Any route found here wins over the no-route direct fetch.
+        sanitized["require_remote_source_route"] = not (
+            direct_allowed and not runtime_proxy_url
+        )
         return sanitized
 
     def cancel_subscription_diagnosis(self, request_id: str) -> bool:

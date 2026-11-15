@@ -10,7 +10,7 @@ build = "build.rs"
 [package.metadata.tauri-winres]
 OriginalFilename = "Tesseract.exe"
 InternalName = "Tesseract"
-Comments = "https://github.com/definitlynotme/Tessract"
+Comments = "https://github.com/definitlynotme/Tesseract"
 
 [features]
 # T-P6-06: the distribution build (scripts/build_shell_preview.py, later the release script):

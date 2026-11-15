@@ -4,7 +4,7 @@ import re
 import sys
 from pathlib import Path
 
-APP_RELEASE_BASE_VERSION = "0.1.0"
+APP_RELEASE_BASE_VERSION = "0.1.1"
 APP_RELEASE_CANDIDATE_NUMBER: int | None = None
 DEFAULT_APP_VERSION = (
     f"{APP_RELEASE_BASE_VERSION}-rc.{APP_RELEASE_CANDIDATE_NUMBER}"
@@ -76,9 +76,9 @@ APP_AUTHOR = "Tesseract contributors"
 APP_ID = "com.tesseract.proxy-app"
 APP_WINDOWS_APP_ID = "Tesseract.ProxyApp"
 APP_EXECUTABLE = "Tesseract.exe"
-APP_REPOSITORY_URL = "https://github.com/definitlynotme/Tessract"
+APP_REPOSITORY_URL = "https://github.com/definitlynotme/Tesseract"
 APP_RELEASES_URL = f"{APP_REPOSITORY_URL}/releases"
-APP_UPDATE_API_URL = "https://api.github.com/repos/definitlynotme/Tessract/releases/latest"
+APP_UPDATE_API_URL = "https://api.github.com/repos/definitlynotme/Tesseract/releases/latest"
 # Base64 of the project's raw 32-byte Ed25519 public key. The encrypted PKCS#8
 # private key is kept outside the repository and is used only by the protected
 # release-signing environment.

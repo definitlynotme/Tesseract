@@ -333,7 +333,7 @@ function Scenario-Main {
         (Expect-Error "host.openUrl" "{url: 'https://github.com:8443/'}" "not_allowed"),
         (Expect-Error "host.openUrl" "{url: 'https://example.com/'}" "not_allowed"))
     if ((Visible-Dialog) -ne [IntPtr]::Zero) { throw "a refused link opened a dialog" }
-    $Id = Rt "host.openUrl" "{url: 'https://github.com/definitlynotme/Tessract/releases'}"
+    $Id = Rt "host.openUrl" "{url: 'https://github.com/definitlynotme/Tesseract/releases'}"
     Wait-Until { (Visible-Dialog) -ne [IntPtr]::Zero } "open-url question" 10
     [void][P3Host]::PostMessageW((Visible-Dialog), $WM_CLOSE, [IntPtr]::Zero, [IntPtr]::Zero)
     $R = Res $Id

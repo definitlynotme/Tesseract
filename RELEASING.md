@@ -5,7 +5,7 @@ Maintainer notes. 面向维护者。
 ## 两个仓库 / Two repositories
 
 - **私有工作仓库**（本目录）：日常开发，历史里有个人身份信息，**永远不推送**。
-- **公开仓库**（默认 `..\Tessract-public`，远端 `https://github.com/definitlynotme/Tessract`）：
+- **公开仓库**（默认 `..\Tessract-public`，远端 `https://github.com/definitlynotme/Tesseract`）：
   历史里只有以 `Tesseract contributors <283048617+definitlynotme@users.noreply.github.com>`
   身份、用 SSH 密钥签名的提交。`scripts/push_to_github.ps1` 把私有仓库里未被忽略的文件树
   复制过去、做匿名/密钥审计、签名提交，再推送。第一次运行时由
@@ -22,7 +22,7 @@ Maintainer notes. 面向维护者。
 3. **私有黑名单**：`%USERPROFILE%\.tesseract-release\public-denylist.txt`，每行一个绝不能
    出现在公开仓库或发布文件里的值（真实姓名、个人邮箱、本机用户名、私人域名……，至少 4 个
    字符）。它必须在仓库外面。
-4. **GitHub 仓库设置**（`definitlynotme/Tessract` → Settings）：
+4. **GitHub 仓库设置**（`definitlynotme/Tesseract` → Settings）：
    - Environments 里新建 `release`，加上需要审批的保护规则；
    - 在该环境里添加 secrets：
      - `TESSERACT_UPDATE_PRIVATE_KEY_B64`、`TESSERACT_UPDATE_KEY_PASSWORD`：更新签名私钥，

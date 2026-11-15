@@ -93,6 +93,41 @@ class GeoUpdaterTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "host-default direct access is disabled"):
                 updater._opener()
 
+    def test_direct_egress_bypasses_the_host_proxy_settings_too(self) -> None:
+        import urllib.request
+
+        from geo_updater import DIRECT_EGRESS
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            updater = GeoUpdater(
+                config={"enabled": True},
+                work_dir=Path(temp_dir) / "mihomo",
+                metadata_path=Path(temp_dir) / "geo-metadata.json",
+                egress_proxy=dict(DIRECT_EGRESS),
+                logger=logging.getLogger("test-geo-direct"),
+            )
+
+            def proxy_handlers(opener) -> list:
+                return [
+                    handler
+                    for handler in opener.handlers
+                    if isinstance(handler, urllib.request.ProxyHandler)
+                ]
+
+            with patch.dict(
+                "os.environ",
+                {"HTTPS_PROXY": "http://host-proxy.invalid:1", "HTTP_PROXY": "http://host-proxy.invalid:1"},
+            ):
+                host_default = urllib.request.build_opener()
+                opener = updater._opener()
+
+            # The default opener would go through the host's proxy ...
+            self.assertTrue(
+                any("https" in handler.proxies for handler in proxy_handlers(host_default))
+            )
+            # ... the direct one has no proxy handler at all.
+            self.assertEqual(proxy_handlers(opener), [])
+
     def test_update_downloads_and_records_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             tmp = Path(temp_dir)

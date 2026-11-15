@@ -5,8 +5,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createLaunch, LAUNCH_AFTER_HELLO_MS, LAUNCH_LIMIT_MS, LAUNCH_MIN_SHOWN_MS, LAUNCH_SETTLE_MS, LAUNCH_SHOW_FALLBACK_MS } from '../../src/shellc/launch.js';
-import { installShellc } from '../../src/shellc/index.js';
-import { boot, E1, evt, flush, hello, svc } from './rt_helpers.mjs';
+import { AFTER_LAUNCH_SETTLE_MS, installShellc } from '../../src/shellc/index.js';
+import { boot, E1, evt, flush, hello, P1_TOPICS, svc } from './rt_helpers.mjs';
 
 // ---- a fake DOM: just what launch.js touches ------------------------------------------------
 function node(tag, rect = { left: 0, top: 0, width: 0, height: 0 }) {
@@ -250,6 +250,47 @@ test('installShellc launch: the shell replay without state reveals (host_ready) 
   assert.equal(d.app.inert, false);
   assert.equal(hosts().filter(n => n === 'host_ready').length, 1, 'host_ready stays once per page load');
   assert.ok(sc.diag().some(e => e.kind === 'launch_gone'));
+});
+
+test('installShellc launch: the "update finished" pill (with 更新说明) waits for the cover to leave and the page to settle', async () => {
+  const b = boot({ scenario: { steps: [], allow_host: ['host_notify_ready', 'host_set_page', 'host_ready'] } });
+  const { T, fake } = b;
+  const d = fakeDoc();
+  T.router = { current: null };
+  T.go = id => { T.router.current = id; T.emit('page:change', { id, from: null, params: {} }); return true; };
+  T.t = id => id;
+  T.i18n = { lang: 'zh_CN', set: l => Promise.resolve(l) };
+  T.motion = { reduced: true, SP: { settle: { easing: 'linear', duration: 460 } } };
+  const notices = [], sheets = [];
+  T.notify = o => { notices.push(o); return { dismiss() {} }; };
+  T.sheet = o => { sheets.push(o); return {}; };
+  T.h = (tag, attrs, text) => ({ tag, attrs, text });
+  const w = { requestAnimationFrame: fn => { fn(); return 1; }, getComputedStyle: () => ({ fill: 'none' }) };
+  const doc = Object.assign(d.doc, { hidden: false, visibilityState: 'visible', addEventListener: () => {} });
+  installShellc(T, { win: w, doc, storage: null, launch: true });
+  await flush();
+  T.go('overview');
+  fake.deliver({ t: 'rt:reset', epoch: '', reason: 'runtime_gone' });
+  fake.deliver({ t: 'rt:replayed', epoch: '' });
+  fake.deliver({ t: 'rt:reset', epoch: E1, reason: 'runtime_gone' });
+  fake.deliver(hello({ topics: [...P1_TOPICS, 'update.state'] }));
+  fake.deliver(evt('update.state', 1, 'snapshot', { state: 'idle', version: null, update_available: false, installable: false, error: null,
+    current_version: '0.1.1', previous_version: '0.1.0', installed_notes: '修复\n- 首次运行无需代理即可导入订阅' }));
+  await flush();
+  assert.ok(d.cover(), 'still starting');
+  assert.equal(notices.length, 0, 'nothing grows under the launch cover');
+  fake.deliver(evt('service.state', 1, 'snapshot', svc({ phase: 'stopped' })));
+  assert.equal(d.cover(), null);
+  assert.equal(notices.length, 0, 'the revealed page settles first');
+  await new Promise(r => setTimeout(r, AFTER_LAUNCH_SETTLE_MS + 50));
+  assert.equal(notices.length, 1);
+  assert.equal(notices[0].messageId, 'shell.update.done');
+  const from = { tag: 'button' };
+  notices[0].actions[0].run(from);
+  assert.equal(sheets.length, 1);
+  assert.equal(sheets[0].from, from, 'the sheet grows out of the pill\'s button');
+  assert.equal(sheets[0].title, 'settings.app.update.notes_title');
+  assert.deepEqual(sheets[0].content, { tag: 'div', attrs: { class: 'set-notes-text', translate: 'no' }, text: '修复\n- 首次运行无需代理即可导入订阅' });
 });
 
 test('installShellc without launch (design target default): no cover, host_ready still waits for state', async () => {

@@ -489,12 +489,12 @@ pub fn response(request: &Request, result: Result<Value, Fail>) -> Value {
         // Allowed host: the user declines, then accepts.
         assert_eq!(r.host.run(&request(OPEN_URL, json!({"url":"https://t.me/BotFather"}))), Ok(json!({"opened":false})));
         r.desktop.confirm.store(true, Ordering::SeqCst);
-        for url in ["https://github.com/definitlynotme/Tessract/releases", "https://GitHub.com:443/x", "https://docs.github.com/a", "https://ntfy.sh/app", "https://pushover.net/"] {
+        for url in ["https://github.com/definitlynotme/Tesseract/releases", "https://GitHub.com:443/x", "https://docs.github.com/a", "https://ntfy.sh/app", "https://pushover.net/"] {
             assert_eq!(r.host.run(&request(OPEN_URL, json!({"url":url}))), Ok(json!({"opened":true})), "{url}");
         }
         let calls = r.desktop.calls.lock().unwrap().clone();
         assert_eq!(calls[0], "confirm t.me owner=20816", "only the host is shown; the main window owns the box");
-        assert_eq!(calls[1], "confirm github.com owner=20816"); assert_eq!(calls[2], "url https://github.com/definitlynotme/Tessract/releases");
+        assert_eq!(calls[1], "confirm github.com owner=20816"); assert_eq!(calls[2], "url https://github.com/definitlynotme/Tesseract/releases");
         assert_eq!(calls[4], "url https://github.com/x", "default port and case normalised");
         // Review S6/S7: one native box at a time; a second openUrl (or a save dialog) meanwhile is a conflict.
         r.desktop.hold_confirm.store(true, Ordering::SeqCst); r.desktop.calls.lock().unwrap().clear();

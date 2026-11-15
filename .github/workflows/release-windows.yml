@@ -1714,15 +1714,35 @@ jobs:
               throw "Generated changelog contains a reserved Tesseract app-notes marker."
             }
 
-            # Only the generated changelog belongs between these markers.  The
-            # updater extracts this section for its explanation window; the
+            # The updater extracts the section between these markers for its
+            # explanation window, and installed copies save it when they
+            # download the update, so it must be final when the release is
+            # published.  A committed plain-text file for this version is that
+            # section; without one the generated changelog is.  The
             # installation/signature policy remains visible on GitHub only.
+            $appNotes = $changelog.Trim()
+            $pageChangelog = @()
+            $appNotesPath = "docs/release-notes/$env:RELEASE_VERSION.txt"
+            if (Test-Path -LiteralPath $appNotesPath -PathType Leaf) {
+              $appNotes = ([IO.File]::ReadAllText(
+                (Resolve-Path -LiteralPath $appNotesPath).Path,
+                [Text.UTF8Encoding]::new($false)
+              ) -replace "`r`n?", "`n").Trim()
+              if ([string]::IsNullOrWhiteSpace($appNotes)) {
+                throw "$appNotesPath is empty; refusing to publish ambiguous app notes."
+              }
+              if ($appNotes.Contains($appNotesStart) -or $appNotes.Contains($appNotesEnd)) {
+                throw "$appNotesPath contains a reserved Tesseract app-notes marker."
+              }
+              $pageChangelog = @($changelog.Trim(), "")
+            }
             $releaseBody = @(
               $appNotesStart,
-              $changelog.Trim(),
+              $appNotes,
               "",
               $appNotesEnd,
-              "",
+              ""
+            ) + $pageChangelog + @(
               "## Installation and signature verification",
               "",
               "> [!WARNING]",

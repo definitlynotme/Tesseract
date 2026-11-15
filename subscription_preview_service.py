@@ -318,6 +318,11 @@ class SubscriptionPreviewService:
         config: dict[str, Any],
     ) -> tuple[list[Node], Any]:
         origin = "tier3a" if tier == "tier3" else tier
+        settings = self._effective_collection_settings(config)
+        if tier == "tier3":
+            # The no-route direct fetch is for the user's own primary-layer
+            # subscriptions; Bastion Layer sources keep a routed transport.
+            settings["require_remote_source_route"] = True
         nodes, report = await self._collector(
             source_entries=[
                 {
@@ -329,7 +334,7 @@ class SubscriptionPreviewService:
             ],
             tier=tier,
             logger=self.logger,
-            settings=self._effective_collection_settings(config),
+            settings=settings,
             cancel_event=cancel_event,
         )
         if cancel_event.is_set() or not nodes:

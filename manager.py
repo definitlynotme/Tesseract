@@ -46,6 +46,7 @@ from collector import (
     collect_nodes_from_sources_with_report,
     load_snapshot,
     load_yaml,
+    proxy_url_from_config,
     save_snapshot,
     source_fetch_error_should_try_runtime_proxy,
     source_entries_from_config,
@@ -282,6 +283,7 @@ from runtime_settings import (
     as_config_list,
     client_config_block,
     client_dns_block,
+    direct_fetch_without_route_allowed,
     egress_proxy_block,
     node_test_concurrency_from_testing,
     node_test_tcp_timeout_seconds,
@@ -6433,6 +6435,39 @@ class ProxyTierManager:
             # proxy.  require_remote_source_route makes this fail closed.
             settings.pop("egress_proxy", None)
         return settings
+
+    def _subscription_collection_settings(self) -> dict[str, Any]:
+        """Collection settings for the user's own Sentinel/Gateway subscriptions.
+
+        The same transport as ``_collection_settings`` while any route exists.
+        With no explicit proxy and no Core at all (a first run, or a refresh
+        while the service is stopped) the URL is fetched directly instead of
+        failing: these subscriptions are what a first Core is built from, so
+        a proxy-only rule left a new install with no way to get any node.
+        Bastion Layer sources keep their Core-only transport.
+        """
+
+        settings = self._collection_settings()
+        if self._direct_subscription_fetch_without_route(settings):
+            settings["require_remote_source_route"] = False
+            log_raw_diagnostic(
+                self.logger,
+                "info",
+                "No proxy route and no Mihomo core: fetching the subscription directly",
+            )
+        return settings
+
+    def _direct_subscription_fetch_without_route(
+        self,
+        settings: dict[str, Any],
+    ) -> bool:
+        if not direct_fetch_without_route_allowed(self.config):
+            return False
+        if settings.get("runtime_source_fetch_proxy_url"):
+            return False
+        if proxy_url_from_config(settings.get("egress_proxy"), purpose="collection"):
+            return False
+        return not self._tier3_live_runtime_truth_fields().get("core_process_running")
 
     def _tier_interval(self, tier_id: str) -> int:
         return coerce_positive_int(
@@ -14331,12 +14366,17 @@ class ProxyTierManager:
             for url in urls
         ]
         try:
+            settings = (
+                self._collection_settings()
+                if tier == "tier3"
+                else self._subscription_collection_settings()
+            )
             return self._run_async(
                 collect_nodes_from_sources(
                     source_entries=source_entries,
                     tier=tier,
                     logger=self.logger,
-                    settings=self._collection_settings(),
+                    settings=settings,
                     cancel_event=effective_cancel_event,
                 ),
                 cancel_event=effective_cancel_event,

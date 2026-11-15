@@ -508,7 +508,7 @@ VERSION_TEMPLATE = """VSVersionInfo(
           StringStruct("OriginalFilename", "tesseract-runtime.exe"),
           StringStruct("ProductName", "Tesseract"),
           StringStruct("ProductVersion", "{version}"),
-          StringStruct("Comments", "https://github.com/definitlynotme/Tessract"),
+          StringStruct("Comments", "https://github.com/definitlynotme/Tesseract"),
         ],
       )
     ]),

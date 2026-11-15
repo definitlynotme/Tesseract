@@ -48,14 +48,36 @@ def test_stable_source_pe_and_inno_fallback_versions_are_synchronized() -> None:
         ROOT / "packaging" / "windows" / "Tesseract-shell.iss"
     ).read_text(encoding="utf-8")
 
-    assert 'APP_RELEASE_BASE_VERSION = "0.1.0"' in app_info_source
+    assert 'APP_RELEASE_BASE_VERSION = "0.1.1"' in app_info_source
     assert "APP_RELEASE_CANDIDATE_NUMBER: int | None = None" in app_info_source
-    assert 'StringStruct("FileVersion", "0.1.0")' in pe_version
-    assert 'StringStruct("ProductVersion", "0.1.0")' in pe_version
-    assert "filevers=(0, 1, 0, 65535)" in pe_version
-    assert "prodvers=(0, 1, 0, 65535)" in pe_version
-    assert '#define AppVersion "0.1.0"' in installer
-    assert '#define AppVersionNumeric "0.1.0.65535"' in installer
+    assert 'StringStruct("FileVersion", "0.1.1")' in pe_version
+    assert 'StringStruct("ProductVersion", "0.1.1")' in pe_version
+    assert "filevers=(0, 1, 1, 65535)" in pe_version
+    assert "prodvers=(0, 1, 1, 65535)" in pe_version
+    assert '#define AppVersion "0.1.1"' in installer
+    assert '#define AppVersionNumeric "0.1.1.65535"' in installer
+
+
+def test_committed_release_notes_reach_the_update_window_unchanged() -> None:
+    # Installed copies save the in-app section when they download an update
+    # and show it as plain text: Markdown, a link with "@" or a non-web
+    # scheme would show literally or drop the notes, and nothing can be
+    # corrected after the release is published.
+    from app_updater import extract_app_release_notes
+    from bridge_update import plain_release_notes
+
+    notes_files = sorted((ROOT / "docs" / "release-notes").glob("*.txt"))
+    assert notes_files
+    for path in notes_files:
+        text = path.read_text(encoding="utf-8").replace("\r\n", "\n").strip()
+        body = (
+            "<!-- tesseract-app-notes:start -->\n"
+            f"{text}\n\n"
+            "<!-- tesseract-app-notes:end -->\n\n"
+            "## Installation and signature verification\n"
+        )
+        assert plain_release_notes(extract_app_release_notes(body)) == text, path.name
+        assert "**" not in text and "##" not in text and "://" not in text, path.name
 
 
 def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_loss() -> None:
@@ -87,7 +109,7 @@ def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_los
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath '{root_literal}'
 $Python = (Get-Command 'python' -ErrorAction Stop).Source
-$Version = '0.1.0'
+$Version = '0.1.1'
 {assignments}
 $Results = [ordered]@{{}}
 $Results.version = [string] (& $Python -c $VersionContractPython $Version)
@@ -122,14 +144,14 @@ $Results | ConvertTo-Json -Compress
     source = json.loads(payload["source"])
     repository = json.loads(payload["repository"])
     key_ids = json.loads(payload["keys"])
-    assert version["version"] == "0.1.0"
-    assert version["windows_version_numeric"] == "0.1.0.65535"
+    assert version["version"] == "0.1.1"
+    assert version["windows_version_numeric"] == "0.1.1.65535"
     assert source == version
     assert repository == {
-        "repository_url": "https://github.com/definitlynotme/Tessract",
-        "releases_url": "https://github.com/definitlynotme/Tessract/releases",
+        "repository_url": "https://github.com/definitlynotme/Tesseract",
+        "releases_url": "https://github.com/definitlynotme/Tesseract/releases",
         "update_api_url": (
-            "https://api.github.com/repos/definitlynotme/Tessract/releases/latest"
+            "https://api.github.com/repos/definitlynotme/Tesseract/releases/latest"
         ),
     }
     assert len(key_ids) >= 1
@@ -806,6 +828,12 @@ def test_release_workflow_pins_python_requires_honest_signing_and_rechecks_hashe
         "<!-- tesseract-app-notes:end -->"
     ) < workflow.index("## Installation and signature verification")
     assert "Generated changelog contains a reserved Tesseract app-notes marker" in workflow
+    # A committed notes file for the version is the in-app section; the
+    # generated changelog then stays on the release page, after the end marker.
+    assert '$appNotesPath = "docs/release-notes/$env:RELEASE_VERSION.txt"' in workflow
+    assert "$appNotesPath contains a reserved Tesseract app-notes marker." in workflow
+    assert "$appNotesPath is empty; refusing to publish ambiguous app notes." in workflow
+    assert workflow.index("$appNotesEnd,") < workflow.index(") + $pageChangelog + @(")
     assert '"--notes-file", $releaseBodyPath' in workflow
     assert '"--draft"' in workflow
     assert '"release", "edit", $env:RELEASE_TAG' in workflow
@@ -931,7 +959,7 @@ if ($errors.Count -ne 0) {
 
 
 _GITHUB_API_URL = "https://api.github.com"
-_GITHUB_REPOSITORY = "definitlynotme/Tessract"
+_GITHUB_REPOSITORY = "definitlynotme/Tesseract"
 _RELEASE_TAG = "v0.1.0"
 _TAG_OBJECT_SHA = "a" * 40
 _ANCESTOR_SHA = "1" * 40
@@ -1406,7 +1434,7 @@ def _run_cross_job_tag_identity_fixture(
             final_tag_object = current_tag_object
 
         api_root = "https://api.github.test"
-        repository_slug = "definitlynotme/Tessract"
+        repository_slug = "definitlynotme/Tesseract"
         tag_ref_uri = (
             f"{api_root}/repos/{repository_slug}/git/ref/tags/v0.1.0"
         )

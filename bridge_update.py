@@ -132,6 +132,25 @@ def plain_release_notes(text: Any) -> str | None:
     return notes
 
 
+# GitHub's generated notes for a release without pull requests: one link line,
+# nothing worth a "what's new" window (11-15: the v0.1.0 body was only this).
+_CHANGELOG_LINK_ONLY = re.compile(r"^\**\s*Full Changelog\s*\**\s*:\s*\S+$", re.IGNORECASE)
+
+
+def installed_release_notes(text: Any) -> str | None:
+    """``Update.installed_notes`` - the notes of the update this start completed.
+
+    The text the verified receipt saved before the installer ran, sanitized
+    exactly like ``Update.notes`` (``plain_release_notes``).  Notes that are
+    only GitHub's generated "Full Changelog" link are dropped (None): the page
+    then shows its short "updated" notice instead of an empty-looking window.
+    """
+    notes = plain_release_notes(text)
+    if notes is None or _CHANGELOG_LINK_ONLY.fullmatch(notes):
+        return None
+    return notes
+
+
 class UpdateOwner:
     """All checks share a flight; checks and download preparation cannot overlap.
 
@@ -184,6 +203,8 @@ class UpdateOwner:
         # T-P4-C1 #7 (G51): the version this sidecar replaced, when the app
         # was just updated to current_version (see load_completed_update).
         self._previous_version: str | None = None
+        # 0.1.1: the notes of that completed update, saved before it installed.
+        self._installed_notes: str | None = None
         # T-P4-C2 #10 (settings R-09): build switch and last finished check.
         self._update_enabled = bool(update_enabled)
         self._last_check_at_ms: int | None = None
@@ -199,6 +220,7 @@ class UpdateOwner:
             "previous_version": self._previous_version,
             "notes": plain_release_notes(self._info.release_notes)
             if self._info and self._info.update_available else None,
+            "installed_notes": self._installed_notes,
             "enabled": self._update_enabled,
             "last_check_at_ms": self._last_check_at_ms,
         }
@@ -232,7 +254,8 @@ class UpdateOwner:
 
         Disk I/O (the update state file), outside the owner lock. A verified
         receipt whose target this running version reached yields
-        ``previous_version`` for the whole sidecar epoch and is marked shown
+        ``previous_version`` (and the receipt's saved notes as
+        ``installed_notes``) for the whole sidecar epoch and is marked shown
         (once-only, the same record Qt's completed-update notice consumes), so
         the next start does not report it again. Any read/write failure leaves
         ``previous_version`` null. Returns the previous version or None.
@@ -247,8 +270,10 @@ class UpdateOwner:
             _LOG.warning("Completed-update record unreadable: %s", type(exc).__name__)
             return None
         previous = app_updater.normalize_version(notice.previous_version) or None
+        notes = installed_release_notes(notice.release_notes) if previous else None
         with self._lock:
             self._previous_version = previous
+            self._installed_notes = notes
             self._dirty = True
         return previous
 

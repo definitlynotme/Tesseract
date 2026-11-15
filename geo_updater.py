@@ -50,6 +50,10 @@ _RAW_ONLY_LOG_EXTRA = {
     "is_key_event": False,
     "event_match_kind": "raw_only",
 }
+# Passed as ``egress_proxy`` to download without any proxy, the host's proxy
+# settings included.  Only the pre-start download uses it, and only while no
+# routed proxy exists at all (a first run with no explicit egress proxy).
+DIRECT_EGRESS: dict[str, Any] = {"direct": True}
 
 
 class GeoDownloadCancelled(RuntimeError):
@@ -409,6 +413,10 @@ class GeoUpdater:
     # ---------------------------------------------------------------- internals
 
     def _opener(self) -> urllib.request.OpenerDirector:
+        if self.egress_proxy and coerce_bool(self.egress_proxy.get("direct"), False):
+            # An empty ProxyHandler, not the default one, which would pick up
+            # the host's proxy settings.
+            return urllib.request.build_opener(urllib.request.ProxyHandler({}))
         if not self.egress_proxy or not coerce_bool(self.egress_proxy.get("enabled"), False):
             raise RuntimeError(
                 "GeoData refresh requires a routed proxy; host-default direct access is disabled"

@@ -90,9 +90,11 @@ def _compatibility(text):
         "Could not pre-warm fallback": "fallback_warmup_failed",
         "Could not pre-warm Bastion Layer": "fallback_warmup_failed",
         "Required GeoData is missing and the GeoData updater is disabled: ": "geodata_missing",
-        "Required GeoData is missing before Mihomo startup; preflight download requires an explicit egress proxy: ": "geodata_needs_route",
-        "GeoData preflight through the explicit egress proxy failed: ": "geodata_download_failed",
-        "Required GeoData is still missing after explicit-proxy preflight: ": "geodata_download_failed",
+        # The route named after these prefixes varies (explicit egress proxy,
+        # Bastion Layer pool, direct connection), so match up to it only.
+        "Required GeoData is missing before Mihomo startup; preflight download requires ": "geodata_needs_route",
+        "GeoData preflight through the ": "geodata_download_failed",
+        "Required GeoData is still missing after ": "geodata_download_failed",
     }
     for prefix, reason in prefixes.items():
         if text.startswith(prefix):

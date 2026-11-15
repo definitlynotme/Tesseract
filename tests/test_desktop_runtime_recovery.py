@@ -5122,6 +5122,36 @@ proxies:
             self.assertEqual(settings["runtime_source_fetch_proxy_url"], "http://127.0.0.1:18081")
             self.assertTrue(settings["require_remote_source_route"])
 
+    def test_subscription_preview_settings_go_direct_only_without_any_route(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runtime, _calls = self._supply_provider_runtime(temp_dir)
+            runtime.manager = SimpleNamespace(
+                _collection_settings=lambda: {"require_remote_source_route": True},
+                _subscription_collection_settings=lambda: {
+                    "require_remote_source_route": False,
+                },
+            )
+            runtime._runtime_source_fetch_proxy_provider = (  # type: ignore[method-assign]
+                lambda _phase: None
+            )
+
+            direct = runtime._manager_collection_settings(direct_without_route=True)
+            self.assertFalse(direct["require_remote_source_route"])
+            # Tier3 discovery asks without the flag and stays routed.
+            self.assertTrue(
+                runtime._manager_collection_settings()["require_remote_source_route"]
+            )
+
+            # A bootstrap route found here wins over the direct fetch.
+            runtime._runtime_source_fetch_proxy_provider = (  # type: ignore[method-assign]
+                lambda phase: "http://127.0.0.1:18081" if phase == "bootstrap" else None
+            )
+            routed = runtime._manager_collection_settings(direct_without_route=True)
+            self.assertTrue(routed["require_remote_source_route"])
+            self.assertEqual(
+                routed["runtime_source_fetch_proxy_url"], "http://127.0.0.1:18081"
+            )
+
     def test_runtime_source_transport_is_stable_within_runtime_generation(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -6348,6 +6378,42 @@ proxies:
             runtime.manager.collect_alive = True
             runtime.manager.refresh_tier3()
             with self.assertRaisesRegex(RuntimeError, "explicit egress proxy"):
+                runtime._ensure_geodata_ready_for_core_start(runtime_config)
+            self.assertEqual(runtime.geo_updater.update_calls, 0)
+
+    def test_first_run_geodata_downloads_directly_with_no_route_at_all(self) -> None:
+        from geo_updater import DIRECT_EGRESS
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runtime, runtime_config, _transport = self._bootstrap_pool_runtime(
+                Path(temp_dir), pool_alive=False
+            )
+            # No explicit proxy and no Core: no Bastion pool can exist either.
+            runtime.core_runner = None
+
+            runtime._ensure_geodata_ready_for_core_start(runtime_config)
+
+            self.assertEqual(runtime.geo_updater.update_calls, 1)
+            self.assertEqual(
+                runtime.geo_updater.reconfigure_calls[0]["egress_proxy"],
+                DIRECT_EGRESS,
+            )
+            options = runtime.geo_updater.update_options[0]
+            self.assertIsNone(options["policy"])
+            self.assertEqual(options["assets"], ["geoip", "geosite"])
+            # The direct route does not outlive the preflight.
+            self.assertEqual(runtime.geo_updater.reconfigure_calls[-1]["egress_proxy"], {})
+            self.assertEqual(runtime._missing_geodata_assets(), [])
+
+    def test_first_run_geodata_direct_download_can_be_turned_off(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runtime, runtime_config, _transport = self._bootstrap_pool_runtime(
+                Path(temp_dir), pool_alive=False
+            )
+            runtime.core_runner = None
+            runtime.config["egress_proxy"] = {"direct_when_no_route": False}
+
+            with self.assertRaisesRegex(RuntimeError, "running Bastion Layer pool"):
                 runtime._ensure_geodata_ready_for_core_start(runtime_config)
             self.assertEqual(runtime.geo_updater.update_calls, 0)
 
@@ -9099,24 +9165,56 @@ proxies:
             )
             self.assertEqual(runtime._missing_geodata_assets(), [])
 
-    def test_missing_geodata_without_explicit_proxy_blocks_before_core_launch(self) -> None:
+    def _no_route_formal_start_runtime(self, temp_path: Path):
+        backend = MemoryProxyBackend(ProxySettings(enabled=False, server="", override=""))
+        runtime = self._runtime(temp_path, backend)
+        work_dir = temp_path / "data" / "mihomo"
+        runtime.config["client"]["mihomo_work_dir"] = str(work_dir)
+        runtime.config["geo_update"] = {"enabled": True}
+        runtime.geo_updater = FakeGeoUpdater(work_dir)
+        runtime_config = temp_path / "mihomo-runtime.yaml"
+        runtime_config.write_text(
+            "rules:\n- GEOSITE,category-ads-all,REJECT\n- GEOIP,US,GENERAL,no-resolve\n",
+            encoding="utf-8",
+        )
+        runtime.manager = FakeTier3Manager()
+        runtime.write_mihomo_runtime_config = lambda: runtime_config
+        runner = FakeLifecycleCoreRunner()
+        runtime.core_runner = runner
+        return runtime, runner
+
+    def test_missing_geodata_without_any_route_downloads_directly_before_core_launch(self) -> None:
+        # A new install: no explicit proxy, no Core, no Bastion pool.  This
+        # used to fail here, leaving no Core to fetch the subscriptions with.
+        from geo_updater import DIRECT_EGRESS
+
+        class LaunchReached(Exception):
+            pass
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
-            backend = MemoryProxyBackend(ProxySettings(enabled=False, server="", override=""))
-            runtime = self._runtime(temp_path, backend)
-            work_dir = temp_path / "data" / "mihomo"
-            runtime.config["client"]["mihomo_work_dir"] = str(work_dir)
-            runtime.config["geo_update"] = {"enabled": True}
-            runtime.geo_updater = FakeGeoUpdater(work_dir)
-            runtime_config = temp_path / "mihomo-runtime.yaml"
-            runtime_config.write_text(
-                "rules:\n- GEOSITE,category-ads-all,REJECT\n- GEOIP,US,GENERAL,no-resolve\n",
-                encoding="utf-8",
+            runtime, runner = self._no_route_formal_start_runtime(Path(temp_dir))
+            downloads_at_launch: list[int] = []
+
+            def start() -> None:
+                downloads_at_launch.append(runtime.geo_updater.update_calls)
+                raise LaunchReached()
+
+            runner.start = start
+
+            with self.assertRaises(LaunchReached):
+                runtime._start_core_once()
+
+            self.assertEqual(downloads_at_launch, [1])
+            self.assertEqual(
+                runtime.geo_updater.reconfigure_calls[0]["egress_proxy"],
+                DIRECT_EGRESS,
             )
-            runtime.manager = FakeTier3Manager()
-            runtime.write_mihomo_runtime_config = lambda: runtime_config
-            runner = FakeLifecycleCoreRunner()
-            runtime.core_runner = runner
+            self.assertEqual(runtime._missing_geodata_assets(), [])
+
+    def test_missing_geodata_without_explicit_proxy_blocks_when_direct_is_off(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runtime, runner = self._no_route_formal_start_runtime(Path(temp_dir))
+            runtime.config["egress_proxy"] = {"direct_when_no_route": False}
 
             with self.assertRaisesRegex(RuntimeError, "explicit egress proxy"):
                 runtime._start_core_once()

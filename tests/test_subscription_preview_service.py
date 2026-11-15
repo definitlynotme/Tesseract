@@ -85,6 +85,33 @@ class SubscriptionPreviewServiceTests(unittest.TestCase):
         )
         self.assertNotIn("egress_proxy", observed_settings[0])
 
+    def test_no_route_direct_fetch_reaches_primary_previews_but_not_bastion(self) -> None:
+        observed: dict[str, bool] = {}
+
+        async def collector(**kwargs):
+            observed[kwargs["tier"]] = kwargs["settings"]["require_remote_source_route"]
+            return [], FakeCollectionReport()
+
+        config = preview_config()
+        config["tiers"]["tier3"]["subscription_urls"] = [SUBSCRIPTION_URL]
+        config["tiers"]["exit"]["subscription_urls"] = [SUBSCRIPTION_URL]
+        service = SubscriptionPreviewService(
+            config,
+            self.logger,
+            collector=collector,
+            collection_settings_provider=lambda _config: {
+                "require_remote_source_route": False,
+            },
+        )
+
+        for tier in ("tier2", "exit", "tier3"):
+            service.diagnose_subscription(
+                {"tier": tier, "kind": "subscription", "url": SUBSCRIPTION_URL},
+                f"direct-{tier}",
+            )
+
+        self.assertEqual(observed, {"tier2": False, "exit": False, "tier3": True})
+
     def test_diagnosis_is_temporary_sanitized_and_does_not_mutate_input(self) -> None:
         config = preview_config()
         collected = Node(

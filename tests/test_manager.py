@@ -2253,6 +2253,86 @@ class ManagerTests(unittest.TestCase):
                 "http://127.0.0.1:19094",
             )
 
+    def test_own_subscriptions_fetch_directly_only_while_no_route_exists(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manager = self._minimal_manager(
+                Path(temp_dir),
+                tier3_enabled=True,
+                client_config={"mihomo_mixed_port": 19094},
+            )
+            runtime_truth = {
+                "runtime_service_running": True,
+                "core_process_running": False,
+            }
+            manager.bind_runtime_generation(1, lambda: dict(runtime_truth))
+            manager.runtime_source_fetch_proxy_provider = lambda _phase: None
+
+            # A first run: no explicit proxy, no Core.
+            self.assertFalse(
+                manager._subscription_collection_settings()["require_remote_source_route"]
+            )
+            # Bastion Layer collection never inherits the direct fetch.
+            self.assertTrue(manager._collection_settings()["require_remote_source_route"])
+            self.assertTrue(
+                manager._tier3_collection_settings({})["require_remote_source_route"]
+            )
+
+            # Turned off by configuration.
+            manager.config["egress_proxy"] = {"direct_when_no_route": False}
+            self.assertTrue(
+                manager._subscription_collection_settings()["require_remote_source_route"]
+            )
+
+            # An explicit proxy is a route: it is used instead.
+            manager.config["egress_proxy"] = {
+                "enabled": True,
+                "server": "127.0.0.1",
+                "port": 7890,
+            }
+            explicit = manager._subscription_collection_settings()
+            self.assertTrue(explicit["require_remote_source_route"])
+            self.assertEqual(explicit["egress_proxy"]["port"], 7890)
+
+            # A running Core, verified or not, is a route too.
+            manager.config["egress_proxy"] = {}
+            runtime_truth["core_process_running"] = True
+            self.assertTrue(
+                manager._subscription_collection_settings()["require_remote_source_route"]
+            )
+            manager.runtime_source_fetch_proxy_provider = lambda phase: (
+                "http://127.0.0.1:19094" if phase == "core" else None
+            )
+            routed = manager._subscription_collection_settings()
+            self.assertTrue(routed["require_remote_source_route"])
+            self.assertEqual(
+                routed["runtime_source_fetch_proxy_url"],
+                "http://127.0.0.1:19094",
+            )
+
+    def test_remote_subscription_refresh_uses_direct_settings_except_bastion(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manager = self._minimal_manager(Path(temp_dir), tier3_enabled=True)
+            manager.bind_runtime_generation(
+                1,
+                lambda: {"runtime_service_running": True, "core_process_running": False},
+            )
+            manager.runtime_source_fetch_proxy_provider = lambda _phase: None
+            observed: dict[str, bool] = {}
+
+            async def record_settings(**kwargs):
+                observed[kwargs["tier"]] = kwargs["settings"]["require_remote_source_route"]
+                return []
+
+            with patch.object(manager_module, "collect_nodes_from_sources", record_settings):
+                for tier in ("tier2", "exit", "tier3"):
+                    manager._collect_remote_subscription_nodes(
+                        tier=tier,
+                        urls=[f"https://{tier}.example/sub"],
+                        failure_message="refresh failed",
+                    )
+
+            self.assertEqual(observed, {"tier2": False, "exit": False, "tier3": True})
+
     def test_tier3_validation_batch_size_tolerates_invalid_helper_concurrency(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             manager = self._minimal_manager(Path(temp_dir), tier3_enabled=True)

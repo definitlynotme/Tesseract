@@ -183,7 +183,7 @@ import { MODE_SWITCHES as SW_MODES, modeSwitchOn as swOn, modeAfterSwitch as nex
   /* the latency ceiling's default (latency_policy_view: the policy's default ceiling) */
   const LAT_DEF = 800;
   /* the releases page (app_info.APP_RELEASES_URL; host.openUrl allows github.com only) */
-  const RELEASES_URL = 'https://github.com/definitlynotme/Tessract/releases';
+  const RELEASES_URL = 'https://github.com/definitlynotme/Tesseract/releases';
   /* Geo data kinds, in the updater's order (Geo.items[].kind): settings.app.geo.kind.<kind> */
   const GEO_KINDS = ['geosite', 'geoip', 'mmdb', 'asn'];
   const GEO_NAME = { geosite: 'GeoSite', geoip: 'GeoIP', mmdb: 'MMDB', asn: 'ASN' };
