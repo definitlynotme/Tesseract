@@ -1,6 +1,6 @@
 {
   "name": "overview_start_collecting",
-  "desc": "T-P4-05a: 启动第 1 阶段 collecting：药丸 1/3、各层收集中、出口「服务启动中」。ASCII data only.",
+  "desc": "T-P4-05a: 启动第 1 阶段 collecting：Vanguard、Sentinel 有节点，药丸「加载节点」（不带步数）、出口「服务启动中」。ASCII data only.",
   "lang": "zh_CN",
   "steps": [
     {

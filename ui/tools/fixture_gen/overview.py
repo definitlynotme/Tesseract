@@ -250,7 +250,7 @@ def _(s):
     pass
 
 
-@scen('overview_start_collecting', '启动第 1 阶段 collecting：药丸 1/3、各层收集中、出口「服务启动中」')
+@scen('overview_start_collecting', '启动第 1 阶段 collecting：Vanguard、Sentinel 有节点，药丸「加载节点」（不带步数）、出口「服务启动中」')
 def _(s):
     s.f['service.state'] = svc('collecting', core=False)
     s.f['service.collect'] = collect('running')
@@ -258,7 +258,17 @@ def _(s):
     starting(s)
 
 
-@scen('overview_start_standby', '启动第 2 阶段 core_standby + validation_active：药丸 2/3「正在验证出口」，Vanguard 已完成首次检测')
+@scen('overview_start_collecting_bastion', '启动第 1 阶段 collecting：Vanguard、Sentinel 都没有节点，药丸「收集节点」（等 Bastion 收集公共节点，不带步数）')
+def _(s):
+    s.f['service.state'] = svc('collecting', core=False)
+    s.f['service.collect'] = collect('running')
+    s.f['exit.identity'] = {'current': idle(), 'previous': None}
+    s.f['tiers.summary'] = tiers(None, v=(0, 0), s=(0, 0))
+    s.nodes = {'vanguard': [], 'sentinel': []}
+    starting(s)
+
+
+@scen('overview_start_standby', '启动第 2 阶段 core_standby + validation_active：药丸「验证出口」（不带步数），Vanguard 已完成首次检测')
 def _(s):
     s.f['service.state'] = svc('core_standby', validating=True)
     s.f['service.collect'] = collect('running', running={'vanguard': 'complete'})

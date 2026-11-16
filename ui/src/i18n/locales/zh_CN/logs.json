@@ -188,8 +188,8 @@
     "_desc": "运行摘要条，服务运行中：time 为本次运行开始的时刻（hh:mm:ss），uptime 为已运行时长；<x> 包住的部分在窄窗口里隐藏"
   },
   "logs.run.meta.starting": {
-    "m": "正在启动 · {phase, select, collect {收集节点} verify {验证出口} other {就绪}} {step}/{total}",
-    "_desc": "运行摘要条，服务启动中：phase 为当前启动阶段（collect 收集节点、verify 验证出口、ready 就绪），step / total 为第几步、共几步"
+    "m": "正在启动 · {phase, select, load {加载节点} collect {收集节点} verify {验证出口} other {就绪}}",
+    "_desc": "运行摘要条，服务启动中：phase 为当前启动阶段（load 加载节点：Vanguard 或 Sentinel 有节点；collect 收集节点：两层都没有节点，等 Bastion 收集；verify 验证出口；ready 就绪）。不带步数"
   },
   "logs.run.meta.stopping": {
     "m": "{cancelling, select, yes {正在取消启动} other {正在停止服务}}",

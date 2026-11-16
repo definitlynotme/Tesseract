@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Réessayer",
   "overview.run.stop_failed": "Échec de l’arrêt",
   "overview.run.main_aria_retry": "Réessayer de démarrer le service",
+  "overview.phase.load.label": "Chargement des nœuds",
   "overview.phase.collect.label": "Collecte des nœuds",
   "overview.phase.verify.label": "Vérif. de la sortie",
   "overview.phase.ready.label": "Prêt",

@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {Paused. Click to resume} one {Paused with # new entry held. Click to resume} other {Paused with # new entries held. Click to resume}}",
   "logs.run.title": "{scope, select, current {Current run} other {Last run}}",
   "logs.run.meta.running": "<x>Started {time} · </x>Running for {uptime}",
-  "logs.run.meta.starting": "Starting · {phase, select, collect {Collecting nodes} verify {Verifying exit} other {Getting ready}} {step}/{total}",
+  "logs.run.meta.starting": "Starting · {phase, select, load {Loading nodes} collect {Collecting nodes} verify {Verifying exit} other {Getting ready}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {Canceling startup} other {Stopping service}}",
   "logs.run.meta.ended": "{start}–{end} · Ran for {duration}",
   "logs.run.meta.stopped": "Started {start} · Stopped",

@@ -38,6 +38,7 @@
    ========================================================================== */
 import * as C from './settings/changes.js';
 import { MODE_SWITCHES as SW_MODES, modeSwitchOn as swOn, modeAfterSwitch as nextMode } from '../data/static.js';
+import { releaseNotesFor } from '../i18n/release_notes.js';
 
 (function () {
   'use strict';
@@ -2745,6 +2746,8 @@ import { MODE_SWITCHES as SW_MODES, modeSwitchOn as swOn, modeAfterSwitch as nex
      enabled false → this build has no in-app update. B-30(a)(c)(d): the check time, the download
      percentage, the signed / size / date line are prototype-only. */
   const upd = () => (T.rt ? T.rt.topic('update.state').get() : null) || null;
+  // the page language, for notes with one section per language (i18n/release_notes.js)
+  const notesLang = () => (T.i18n && T.i18n.lang) || null;
   function paintUpd(animate) {
     if (!R.updSt) return;
     const u = upd();
@@ -2777,12 +2780,14 @@ import { MODE_SWITCHES as SW_MODES, modeSwitchOn as swOn, modeAfterSwitch as nex
     const check = R.root.querySelector('#set-upd-check');
     check.hidden = busy;
     check.disabled = st === 'disabled' || !can('app.update.check');
-    reveal([[R.updNotes, !!(u && typeof u.notes === 'string' && u.notes.trim() && st === 'available')], [R.updInstall, st === 'available' && !!u.installable && can('app.update.install')], [R.updPage, st === 'available' && !u.installable]], animate);
+    reveal([[R.updNotes, !!(u && st === 'available' && releaseNotesFor(u.notes, notesLang()))], [R.updInstall, st === 'available' && !!u.installable && can('app.update.install')], [R.updPage, (st === 'available' && !u.installable) || (st === 'failed' && !!u.update_available)]], animate);   // failed: the manual way out (11-16)
   }
-  /* 更新说明: the publisher's text (Update.notes), shown as plain text (never parsed: R-09) */
+  /* 更新说明: the publisher's text (Update.notes), shown as plain text (never parsed: R-09);
+     notes with one section per language show the page language's (i18n/release_notes.js) */
   function releaseNotes(from) {
-    const u = upd(); if (!u || !u.notes) return;
-    const body = el('div', { class: 'set-notes-text', translate: 'no' }, u.notes);
+    const u = upd(); const notes = u ? releaseNotesFor(u.notes, notesLang()) : null;
+    if (!notes) return;
+    const body = el('div', { class: 'set-notes-text', translate: 'no' }, notes);
     const actions = [{ label: t('settings.action.close'), ghost: true }];
     if (u.installable && can('app.update.install')) actions.push({ label: t('settings.app.update.install'), primary: true, run: () => setTimeout(() => install(R.updInstall), 60) });
     T.sheet({ from, title: t('settings.app.update.notes_title', { version: u.version || '' }), width: 520, content: body, actions });
@@ -2792,7 +2797,10 @@ import { MODE_SWITCHES as SW_MODES, modeSwitchOn as swOn, modeAfterSwitch as nex
     T.confirm({ title: t('settings.app.update.confirm.title', { version: u.version || '' }), message: t('settings.app.update.confirm.body_plain'), confirmLabel: t('settings.app.update.confirm.ok') }).then(ok => {
       if (!ok) return;
       // the sidecar verifies, the shell closes Tesseract and runs the installer (update.state follows)
-      T.ui.busy(btn, T.rt.call('app.update.install', {}).then(() => t('settings.app.update.installing')), { busy: t('settings.app.update.busy'), done: r => r, fail: e => errText(e), icon: 'download', busyIcon: 'download', stay: true, failHold: 4000 });
+      T.ui.busy(btn, T.rt.call('app.update.install', {}).then(() => t('settings.app.update.installing')), { busy: t('settings.app.update.busy'), done: r => r,
+        // short word only: the button sits in the row's auto column, and a full reason there squeezed
+        // the title column to one character per line (11-16); the reason is in .set-upd-st below the title
+        fail: () => t('core.busy.failed', { code: 'other' }), icon: 'download', busyIcon: 'download', stay: true, failHold: 4000 });
     });
   }
   /* host.* answers: a conflict + dialog_open (another native dialog open) and the other host reasons

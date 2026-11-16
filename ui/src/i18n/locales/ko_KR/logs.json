@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {일시 중지됨. 클릭하면 재개} other {일시 중지됨, 새 로그 #건 보관 중. 클릭하면 재개}}",
   "logs.run.title": "{scope, select, current {이번 실행} other {지난 실행}}",
   "logs.run.meta.running": "<x>{time} 시작 · </x>{uptime} 동안 실행 중",
-  "logs.run.meta.starting": "시작 중 · {phase, select, collect {노드 수집} verify {출구 확인} other {준비}} {step}/{total}",
+  "logs.run.meta.starting": "시작 중 · {phase, select, load {노드 불러오기} collect {노드 수집} verify {출구 확인} other {준비}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {시작 취소 중} other {서비스 중지 중}}",
   "logs.run.meta.ended": "{start}–{end} · {duration} 동안 실행됨",
   "logs.run.meta.stopped": "{start} 시작 · 중지됨",

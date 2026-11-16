@@ -599,9 +599,12 @@ const CASES = [
     expect: run(async page => {
       const r = await page.evaluate(() => {
         const n = document.querySelector('.ovl .set-notes-text');
-        return { text: n ? n.textContent : null, kids: n ? n.children.length : -1, install: !document.querySelector('#set-upd-install').hidden };
+        return { text: n ? n.textContent : null, kids: n ? n.children.length : -1, install: !document.querySelector('#set-upd-install').hidden, lang: window.T && window.T.i18n ? window.T.i18n.lang : null };
       });
-      return check([[r.text && r.text.includes('<img src=x') && r.kids === 0, `release notes as plain text: ${JSON.stringify(r)}`], [r.install, '立即更新 shown']]);
+      // one section per language (11-16): zh_CN its own, every other language the en_US one
+      const section = r.lang === 'zh_CN' ? 'ZH fixes:' : 'EN fixes:';
+      return check([[r.text && r.text.includes('<img src=x') && r.kids === 0, `release notes as plain text: ${JSON.stringify(r)}`], [r.install, '立即更新 shown'],
+        [!!r.text && r.text.startsWith(section) && !/ZH fixes:|EN fixes:/.test(r.text.slice(section.length)) && !r.text.includes('[en_US]') && !r.text.includes('[zh_CN]'), `the ${r.lang} section only: ${JSON.stringify(r.text)}`]]);
     }),
   },
   {

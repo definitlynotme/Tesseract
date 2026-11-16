@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Повтор",
   "overview.run.stop_failed": "Сбой остановки",
   "overview.run.main_aria_retry": "Повторить запуск службы",
+  "overview.phase.load.label": "Загрузка серверов",
   "overview.phase.collect.label": "Сбор серверов",
   "overview.phase.verify.label": "Проверка выхода",
   "overview.phase.ready.label": "Готовность",

@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {Приостановлено. Нажмите, чтобы продолжить} one {Приостановлено, сохранена # новая запись. Нажмите, чтобы продолжить} few {Приостановлено, сохранены # новые записи. Нажмите, чтобы продолжить} many {Приостановлено, сохранено # новых записей. Нажмите, чтобы продолжить} other {Приостановлено, сохранено # новой записи. Нажмите, чтобы продолжить}}",
   "logs.run.title": "{scope, select, current {Текущий сеанс} other {Прошлый сеанс}}",
   "logs.run.meta.running": "<x>Начало в {time} · </x>Работает уже {uptime}",
-  "logs.run.meta.starting": "Запуск · {phase, select, collect {Сбор серверов} verify {Проверка выхода} other {Подготовка}} {step}/{total}",
+  "logs.run.meta.starting": "Запуск · {phase, select, load {Загрузка серверов} collect {Сбор серверов} verify {Проверка выхода} other {Подготовка}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {Отмена запуска} other {Остановка службы}}",
   "logs.run.meta.ended": "{start}–{end} · Длительность {duration}",
   "logs.run.meta.stopped": "Начало в {start} · Остановлен",

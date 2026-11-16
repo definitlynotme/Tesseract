@@ -162,6 +162,30 @@ test('pillMode: connecting, start, starting / cancelling, failed, cleanup pendin
   assert.equal(P.pillMode({ run: 'stopped', stopFailed: true }), 'start');
 });
 
+test('startPhaseKey: phase 0 loads the imported tiers\' nodes; collect only when Vanguard and Sentinel are both empty (11-16)', () => {
+  const empty = { enabled: true, ok: 0, total: 0 };
+  // imported nodes in either tier: the start loads them
+  assert.equal(P.startPhaseKey(0, TIERS), 'load');
+  assert.equal(P.startPhaseKey(0, { ...TIERS, vanguard: empty }), 'load');
+  assert.equal(P.startPhaseKey(0, { ...TIERS, sentinel: empty }), 'load');
+  // a node count with none usable yet is still the user's own nodes
+  assert.equal(P.startPhaseKey(0, { ...TIERS, vanguard: { enabled: true, ok: 0, total: 4 }, sentinel: empty }), 'load');
+  // both empty, or the nodes sit in a switched-off tier: Bastion has to collect
+  assert.equal(P.startPhaseKey(0, { ...TIERS, vanguard: empty, sentinel: empty }), 'collect');
+  assert.equal(P.startPhaseKey(0, { ...TIERS, vanguard: { enabled: false, ok: 0, total: 3 }, sentinel: empty }), 'collect');
+  // tiers.summary unknown (no tiers object, or not both rows): never claims a collection
+  assert.equal(P.startPhaseKey(0, {}), 'load');
+  assert.equal(P.startPhaseKey(0, null), 'load');
+  assert.equal(P.startPhaseKey(0, { vanguard: empty }), 'load');
+  // later phases do not depend on the tiers; out-of-range phases clamp
+  for (const t of [TIERS, {}, { vanguard: empty, sentinel: empty }]) {
+    assert.equal(P.startPhaseKey(1, t), 'verify');
+    assert.equal(P.startPhaseKey(2, t), 'ready');
+  }
+  assert.equal(P.startPhaseKey(-1, TIERS), 'load');
+  assert.equal(P.startPhaseKey(7, TIERS), 'ready');
+});
+
 test('ksKind maps every projected kill switch word; anything else is unknown', () => {
   assert.deepEqual(['disabled', 'blocked', 'error', 'triggered', 'armed', 'inactive', null, 'x'].map(P.ksKind),
     ['off', 'blocked', 'error', 'triggered', 'armed', 'inactive', 'unknown', 'unknown']);

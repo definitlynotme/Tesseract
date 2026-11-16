@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {Pausado. Clique para retomar} one {Pausado, com # nova entrada guardada. Clique para retomar} many {Pausado, com # novas entradas guardadas. Clique para retomar} other {Pausado, com # novas entradas guardadas. Clique para retomar}}",
   "logs.run.title": "{scope, select, current {Execução atual} other {Última execução}}",
   "logs.run.meta.running": "<x>Iniciada às {time} · </x>Em execução há {uptime}",
-  "logs.run.meta.starting": "Iniciando · {phase, select, collect {Coletando nós} verify {Verificando a saída} other {Preparando}} {step}/{total}",
+  "logs.run.meta.starting": "Iniciando · {phase, select, load {Carregando nós} collect {Coletando nós} verify {Verificando a saída} other {Preparando}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {Cancelando a inicialização} other {Parando o serviço}}",
   "logs.run.meta.ended": "{start}–{end} · Duração: {duration}",
   "logs.run.meta.stopped": "Iniciada às {start} · Parada",

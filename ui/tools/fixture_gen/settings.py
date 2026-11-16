@@ -337,7 +337,7 @@ add("settings_lang_failed", "S-14: ui.language not saved (io): the choice rolls 
         error=err("io", "errors.settings.save_failed", "write_failed")))])
 # S-15 update states
 add("settings_update_available", "S-15: update.state available + installable + notes (plain text, untrusted): 发现新版本, 更新说明, 立即更新",
-    upd=update_state(state="available", version="1.1.0", update_available=True, installable=True, notes="Fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path", last_check_at_ms=T0 - 600000))
+    upd=update_state(state="available", version="1.1.0", update_available=True, installable=True, notes="[zh_CN]\nZH fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path\n\n[en_US]\nEN fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path", last_check_at_ms=T0 - 600000))
 add("settings_update_not_installable", "S-15: available but not installable: 无法在应用内安装 + 前往发布页 (host.openUrl)",
     upd=update_state(state="available", version="1.1.0", update_available=True, installable=False))
 add("settings_update_downloading", "S-15: downloading (no percentage: B-30(c))", upd=update_state(state="downloading", version="1.1.0", update_available=True, installable=True))

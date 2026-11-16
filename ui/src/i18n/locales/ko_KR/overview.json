@@ -26,6 +26,7 @@
   "overview.run.retry_link": "재시도",
   "overview.run.stop_failed": "중지 실패",
   "overview.run.main_aria_retry": "서비스 시작 재시도",
+  "overview.phase.load.label": "노드 불러오기",
   "overview.phase.collect.label": "노드 수집",
   "overview.phase.verify.label": "출구 검증",
   "overview.phase.ready.label": "준비",

@@ -46157,6 +46157,18 @@ class DesktopRuntime:
                 )
                 return None
 
+    def update_download_proxy_url(self) -> str | None:
+        """Loopback route of the running, verified formal Core for app-update
+        traffic (bridge_wiring.RoutedUpdater), or None.
+
+        Never starts a bootstrap Core and never hands out an explicit
+        upstream proxy; a failure here is "no Core route", not an error.
+        """
+        try:
+            return self._runtime_source_fetch_proxy_provider("core")
+        except Exception:
+            return None
+
     def _running_core_mixed_proxy_url(self) -> str:
         """Return only a verified formal route before any public request starts."""
         proxy_url = self._runtime_source_fetch_proxy_provider("core")

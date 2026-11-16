@@ -23,6 +23,7 @@
 import {
   currentNode, deckOrder, deckPill, deckStat, dotsOf, downReason, drawable, breaksOf, exitCard, firstTier, foldTick,
   gatewayRow, heroOf, ksKind, mixedListener, modeHint, modeOutcome, pillMode, poolCell, protoMix, readinessKind, routeLine,
+  startPhaseKey,
 } from '../rt/project_overview.js';
 import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
 
@@ -36,13 +37,13 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
 
   /* the three start phases are a front-end static definition (mapping_overview §5);
      their words are overview.phase.<key>.label (the pill says the phase; F-01: no second line
-     repeats it in the hero or on the deck). The fill jumps to a phase's level when
-     service.state reaches it and creeps on slowly inside the phase (B3, R9: a real phase can
-     last tens of seconds) */
-  const PHASES = ['collect', 'verify', 'ready'];
+     repeats it in the hero or on the deck). Phase 0 says load or collect by the tiers
+     (startPhaseKey: collect only when Vanguard and Sentinel are both empty), and the pill
+     carries no step count (user feedback 11-16: the fill already shows the progress). The fill
+     jumps to a phase's level when service.state reaches it and creeps on slowly inside the
+     phase (B3, R9: a real phase can last tens of seconds) */
   const FILL_AT = [0.12, 0.45, 0.88], FILL_TOP = [0.4, 0.82, 0.97], CREEP_MS = 40000;
-  const phaseKey = ph => PHASES[Math.max(0, Math.min(PHASES.length - 1, ph))];
-  const phaseLabel = ph => T.t(`overview.phase.${phaseKey(ph)}.label`);
+  const phaseLabel = ph => T.t(`overview.phase.${startPhaseKey(ph, tiersNow())}.label`);
   const phaseNow = () => Math.max(0, Number(S.get('phase')) || 0);
 
   /* ---- runtime data (T-P4-05a) ------------------------------------------------------------
@@ -557,7 +558,7 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
     const ph = phaseNow();
     switch (mode) {
       case 'start': return T.html`<span class="run-row center">${I('start', 17)}<span>${T.t('overview.run.start')}</span></span>`;
-      case 'starting': return T.html`<span class="run-row"><span class="run-read"><span class="spin"></span><span data-ph>${phaseLabel(ph)}</span><span class="run-step" data-st>${ph + 1}/3</span></span><span class="run-div"></span><span class="run-seg">${T.t('overview.run.cancel')}</span></span>`;
+      case 'starting': return T.html`<span class="run-row"><span class="run-read"><span class="spin"></span><span data-ph>${phaseLabel(ph)}</span></span><span class="run-div"></span><span class="run-seg">${T.t('overview.run.cancel')}</span></span>`;
       case 'ready': return T.html`<span class="run-row center">${I('check', 17)}<span>${T.t('overview.run.ready')}</span></span>`;
       case 'running': return T.html`<span class="run-row"><span class="run-read"><span class="sdot ${health()}"></span><span class="run-word">${T.t('overview.run.running')}</span><span class="run-up" data-up aria-live="off">${F.clock(upNow())}</span></span><span class="run-div"></span><span class="run-seg">${I('stop', 14)}<span>${T.t('overview.run.stop')}</span></span></span>`;
       case 'failed': return T.html`<span class="run-row"><span class="run-read"><span class="sdot err"></span><span class="run-err">${T.t('overview.run.failed')}</span></span><span class="run-div"></span><span class="run-seg">${I('restart', 14)}<span>${T.t('overview.run.retry')}</span></span></span>`;
@@ -597,7 +598,7 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
   function contentW(e) { const cs = getComputedStyle(e); return e.getBoundingClientRect().width - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - (parseFloat(cs.borderLeftWidth) || 0) - (parseFloat(cs.borderRightWidth) || 0); }
   /* T-P5-11 (ruling 2: interface words are read whole): while 重启服务 is away (the service is not
      running) its room in the control row goes to the pill, but only when the pill's row would cut
-     a word at its own width (de Knoten sammeln 1/3); where the words fit (zh_CN) the pill keeps its
+     a word at its own width (fr Chargement des nœuds); where the words fit (zh_CN) the pill keeps its
      width. Measured on the shown row in fractional pixels, again after a resize (layoutDeck) and a
      phase change (renderPhase). */
   function fitRun() {
@@ -789,15 +790,20 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
   }
   function renderPhase(animate) {
     if (runNow() !== 'starting' || pill.mode !== 'starting') return;
-    const ph = phaseNow();
+    relabelPhase(animate);
+    fillPhase(phaseNow(), animate);
+  }
+  /* the phase word alone (a tiers.summary mid-start can turn load into collect or back): the
+     fill is left where it is, and swapText rolls nothing while the word stays */
+  function relabelPhase(animate) {
+    if (runNow() !== 'starting' || pill.mode !== 'starting') return;
+    const word = phaseLabel(phaseNow());
     [R.base, R.over].forEach(l => {
       const row = l.querySelector('.run-row:not(.is-out)'); if (!row) return;
-      M.swapText(row.querySelector('[data-ph]'), phaseLabel(ph), { instant: !animate });
-      M.swapText(row.querySelector('[data-st]'), `${ph + 1}/3`, { instant: !animate });
+      M.swapText(row.querySelector('[data-ph]'), word, { instant: !animate });
       row._key = rowKey('starting');
     });
     fitRun();
-    fillPhase(ph, animate);
   }
   function tickUptime() {
     if (!visible || pill.mode !== 'running') return;       // hidden: resynced on enter()
@@ -1853,7 +1859,8 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
     life.sub('order', (v, prev) => reorderDeck(prev, vis()));
     // cancelling, a failure, the Core's cleanup: the pill's face changes without a run edge
     ['cancelling', 'core', 'failure', 'readiness'].forEach(k => life.sub(k, () => { renderRun(null, vis()); syncHero(vis()); syncDeck(vis()); syncExit(vis()); }));
-    life.on('rt:tiers', () => { syncHero(vis()); syncDeck(vis()); syncStrip(vis()); syncExit(vis()); });
+    // the tiers decide phase 0's word (load / collect): a summary that lands mid-start relabels the pill
+    life.on('rt:tiers', () => { relabelPhase(vis()); syncHero(vis()); syncDeck(vis()); syncStrip(vis()); syncExit(vis()); });
     life.on('rt:tier', () => { syncHero(vis()); syncDeck(vis()); syncStrip(vis()); syncExit(vis()); });
     life.on('rt:route', () => { syncHero(vis()); syncDeck(vis()); syncExit(vis()); });
     life.on('rt:gateway', () => { syncDeck(vis()); syncExit(vis()); });

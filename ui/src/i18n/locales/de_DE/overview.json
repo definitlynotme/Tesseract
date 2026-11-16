@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Wiederholen",
   "overview.run.stop_failed": "Stopp fehlgeschlagen",
   "overview.run.main_aria_retry": "Dienst erneut starten",
+  "overview.phase.load.label": "Knoten laden",
   "overview.phase.collect.label": "Knoten sammeln",
   "overview.phase.verify.label": "Ausgang prüfen",
   "overview.phase.ready.label": "Bereit",

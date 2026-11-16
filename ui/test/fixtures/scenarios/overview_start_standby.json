@@ -1,6 +1,6 @@
 {
   "name": "overview_start_standby",
-  "desc": "T-P4-05a: 启动第 2 阶段 core_standby + validation_active：药丸 2/3「正在验证出口」，Vanguard 已完成首次检测。ASCII data only.",
+  "desc": "T-P4-05a: 启动第 2 阶段 core_standby + validation_active：药丸「验证出口」（不带步数），Vanguard 已完成首次检测。ASCII data only.",
   "lang": "zh_CN",
   "steps": [
     {

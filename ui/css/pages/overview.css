@@ -152,10 +152,8 @@
 .run-read .sdot { width: 8px; height: 8px; transition: background-color .3s var(--ease-out); }
 /* secondary figures use a solid tone per layer (never opacity: the tint side must keep 4.5:1) */
 .run-up { font-size: var(--fs-13); font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
-.run-step { font-size: var(--fs-12); font-weight: var(--fw-regular); font-variant-numeric: tabular-nums; }
 .run-base .run-up { color: var(--c-ink-3); }
-.run-base .run-step { color: var(--c-accent-ink); }
-.run-over .run-up, .run-over .run-step { color: var(--c-on-accent-2); }
+.run-over .run-up { color: var(--c-on-accent-2); }
 .run-div { width: 1px; height: 16px; background: currentColor; opacity: .2; flex: none; }
 .run-seg { width: 78px; flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; }
 /* T-P5-11: wider when its words need it (overview.js fitRun sets --seg-w; de Wiederholen) */

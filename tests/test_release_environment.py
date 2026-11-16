@@ -48,14 +48,14 @@ def test_stable_source_pe_and_inno_fallback_versions_are_synchronized() -> None:
         ROOT / "packaging" / "windows" / "Tesseract-shell.iss"
     ).read_text(encoding="utf-8")
 
-    assert 'APP_RELEASE_BASE_VERSION = "0.1.1"' in app_info_source
+    assert 'APP_RELEASE_BASE_VERSION = "0.1.2"' in app_info_source
     assert "APP_RELEASE_CANDIDATE_NUMBER: int | None = None" in app_info_source
-    assert 'StringStruct("FileVersion", "0.1.1")' in pe_version
-    assert 'StringStruct("ProductVersion", "0.1.1")' in pe_version
-    assert "filevers=(0, 1, 1, 65535)" in pe_version
-    assert "prodvers=(0, 1, 1, 65535)" in pe_version
-    assert '#define AppVersion "0.1.1"' in installer
-    assert '#define AppVersionNumeric "0.1.1.65535"' in installer
+    assert 'StringStruct("FileVersion", "0.1.2")' in pe_version
+    assert 'StringStruct("ProductVersion", "0.1.2")' in pe_version
+    assert "filevers=(0, 1, 2, 65535)" in pe_version
+    assert "prodvers=(0, 1, 2, 65535)" in pe_version
+    assert '#define AppVersion "0.1.2"' in installer
+    assert '#define AppVersionNumeric "0.1.2.65535"' in installer
 
 
 def test_committed_release_notes_reach_the_update_window_unchanged() -> None:
@@ -78,6 +78,56 @@ def test_committed_release_notes_reach_the_update_window_unchanged() -> None:
         )
         assert plain_release_notes(extract_app_release_notes(body)) == text, path.name
         assert "**" not in text and "##" not in text and "://" not in text, path.name
+
+
+# ui/src/i18n/release_notes.js: a line that is only "[<lang>]" starts that
+# language's section; the page shows the section of its own language.
+_NOTES_LANGUAGE_MARKER = re.compile(r"^\[([a-z]{2}_[A-Z]{2})\]$")
+_APP_LANGUAGES = {"zh_CN", "en_US", "ja_JP", "ko_KR", "fr_FR", "de_DE", "es_ES", "pt_BR", "ru_RU"}
+
+
+def _notes_sections(text: str) -> list[tuple[str, str]]:
+    sections: list[tuple[str, list[str]]] = []
+    for line in text.replace("\r\n", "\n").split("\n"):
+        marker = _NOTES_LANGUAGE_MARKER.fullmatch(line.strip())
+        if marker:
+            sections.append((marker.group(1), []))
+        elif sections:
+            sections[-1][1].append(line)
+    return [(lang, "\n".join(lines).strip()) for lang, lines in sections]
+
+
+def test_committed_release_notes_language_sections_are_complete() -> None:
+    # Notes with language sections must cover the two languages every other
+    # language falls back to (English, then the first section), each once and
+    # with text, and name only languages the app has.
+    for path in sorted((ROOT / "docs" / "release-notes").glob("*.txt")):
+        sections = _notes_sections(path.read_text(encoding="utf-8"))
+        if not sections:
+            continue
+        langs = [lang for lang, _ in sections]
+        assert len(langs) == len(set(langs)), path.name
+        assert set(langs) <= _APP_LANGUAGES, path.name
+        assert {"zh_CN", "en_US"} <= set(langs), path.name
+        assert all(body for _, body in sections), path.name
+
+
+def test_language_sectioned_notes_reach_the_update_window_unchanged() -> None:
+    from app_updater import extract_app_release_notes
+    from bridge_update import installed_release_notes, plain_release_notes
+
+    text = (
+        "[zh_CN]\n修复：首次运行\n\n- 订阅现在会直接下载。\n\n"
+        "[en_US]\nFixed: a first run\n\n- Subscriptions now download directly."
+    )
+    body = (
+        "<!-- tesseract-app-notes:start -->\n"
+        f"{text}\n\n"
+        "<!-- tesseract-app-notes:end -->\n"
+    )
+    assert plain_release_notes(extract_app_release_notes(body)) == text
+    assert installed_release_notes(text) == text
+    assert [lang for lang, _ in _notes_sections(text)] == ["zh_CN", "en_US"]
 
 
 def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_loss() -> None:
@@ -109,7 +159,7 @@ def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_los
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath '{root_literal}'
 $Python = (Get-Command 'python' -ErrorAction Stop).Source
-$Version = '0.1.1'
+$Version = '0.1.2'
 {assignments}
 $Results = [ordered]@{{}}
 $Results.version = [string] (& $Python -c $VersionContractPython $Version)
@@ -144,8 +194,8 @@ $Results | ConvertTo-Json -Compress
     source = json.loads(payload["source"])
     repository = json.loads(payload["repository"])
     key_ids = json.loads(payload["keys"])
-    assert version["version"] == "0.1.1"
-    assert version["windows_version_numeric"] == "0.1.1.65535"
+    assert version["version"] == "0.1.2"
+    assert version["windows_version_numeric"] == "0.1.2.65535"
     assert source == version
     assert repository == {
         "repository_url": "https://github.com/definitlynotme/Tesseract",

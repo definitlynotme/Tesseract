@@ -61,13 +61,14 @@ test('every message id the page names exists; every overview.* id is used', () =
   const demoSrc = readFileSync(new URL('../../src/design/demo.js', import.meta.url), 'utf8');
   literal.push(...[...demoSrc.matchAll(/['"`]((?:overview)\.demo\.[a-z0-9_]+)/g)].map(m => m[1]));
   // ids built at run time: the phase words (F-01: the label only; the pill says the phase and
-  // nothing repeats it), the traffic direction words (F-03: no tier role words any more)
+  // nothing repeats it; 11-16: phase 0 is load or collect, startPhaseKey), the traffic direction
+  // words (F-03: no tier role words any more)
   const built = [
-    ...['collect', 'verify', 'ready'].map(k => `overview.phase.${k}.label`),
+    ...['load', 'collect', 'verify', 'ready'].map(k => `overview.phase.${k}.label`),
     'overview.traffic.down', 'overview.traffic.up',
   ];
   assert.doesNotMatch(SRC, /tier\.\$\{[^}]+\}\.role|ov-role|dc-role/, 'F-03: no role word');
-  assert.match(SRC, /`overview\.phase\.\$\{phaseKey\(ph\)\}\.label`/);
+  assert.match(SRC, /`overview\.phase\.\$\{startPhaseKey\(ph, tiersNow\(\)\)\}\.label`/);
   assert.doesNotMatch(SRC, /overview\.phase\.[a-z_${}()]*\.hint/, 'F-01: no phase hint');
   assert.match(SRC, /`overview\.traffic\.\$\{k\}`/);
   const used = new Set([...literal, ...built]);
@@ -227,6 +228,20 @@ const F01_GONE = {
   starting0: START_GONE('正在收集节点…'),
   starting1: START_GONE('正在验证出口…'),
 };
+/* user feedback 11-16: the starting pill carries no step count (the prototype's 1/3 and 2/3 beside
+   the phase, once per pill layer), and phase 0 says 加载节点 while Vanguard or Sentinel has nodes
+   (the design data has both): 收集节点 is only for both empty (startPhaseKey) */
+const STEP_GONE = { starting0: [[12, 'span', '1/3'], [12, 'span', '1/3']], starting1: [[12, 'span', '2/3'], [12, 'span', '2/3']] };
+const withoutSteps = (rows, state) => {
+  const out = rows.slice();
+  for (const g of STEP_GONE[state] || []) {
+    const i = out.findIndex(r => r[0] === g[0] && r[1] === g[1] && r[2] === g[2]);
+    assert.ok(i >= 0, `STEP_GONE ${state}: ${JSON.stringify(g)} is not in the prototype tree`);
+    out.splice(i, 1);
+  }
+  return out;
+};
+const DATA_LOAD = [{ from: '收集节点', to: '加载节点', why: '11-16: phase 0 with imported nodes loads them (overview.phase.load.label)' }];
 // F-03 (user 10-28): the role words beside the tier names (自建 · 订阅 · 应急 · 固定出口) are gone: their
 // rows leave the prototype tree, and a name + role in an accessible name or a tip keeps the name
 const ROLES = ['自建', '订阅', '应急', '固定出口'];
@@ -270,7 +285,7 @@ test('regression: running, stopped and starting show the prototype text and tips
     assert.deepEqual(states.running.tips, tipsNoRole(f01Tips(BEFORE.running.tips)), 'running: data-tips');
     for (const k of ['stopped', 'starting0', 'starting1']) {
       if (k === 'stopped') sameTree(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), states[k].tree, k, [...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1]);
-      else sameTree(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), withoutAdded(states[k].tree, STARTING_ADDED), k, [...DATA_05A, ...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1]);
+      else sameTree(withoutSteps(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), k), withoutAdded(states[k].tree, STARTING_ADDED), k, [...DATA_05A, ...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1, ...(k === 'starting0' ? DATA_LOAD : [])]);
       assert.deepEqual(tipsOf(states[k].tips, k === 'stopped'), tipsNoRole(f01Tips(tipsOf(BEFORE[k].tips, false))), `${k}: data-tips`);
     }
     // the walk passes every state of the page (fallback, kill switch, gated mode, confirmation,

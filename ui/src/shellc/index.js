@@ -36,6 +36,7 @@ import { createPresence } from './presence.js';
 import { createQuit, drafts, registerDraft } from './quit.js';
 import { createReady } from './ready.js';
 import { createUpdateNotice } from './update.js';
+import { releaseNotesFor } from '../i18n/release_notes.js';
 
 const DIAG_MAX = 100;
 export const READY_FRAME_FALLBACK_MS = 100;
@@ -183,8 +184,11 @@ export function installShellc(T, opts = {}) {
     if (!launch || launch.phase === 'gone') fn();
     else afterLaunchQueue.push(fn);
   };
-  function openNotes({ version, notes, from }) {
+  // (notes with one section per language: the page language's, read when the sheet opens)
+  function openNotes({ version, notes: all, from }) {
     if (typeof T.sheet !== 'function') return;
+    const notes = releaseNotesFor(all, (T.i18n && T.i18n.lang) || null);
+    if (!notes) return;
     const body = typeof T.h === 'function' ? T.h('div', { class: 'set-notes-text', translate: 'no' }, notes) : notes;
     T.sheet({ from, title: t('settings.app.update.notes_title', { version }), width: 520, content: body,
       actions: [{ label: t('settings.action.close'), ghost: true }] });

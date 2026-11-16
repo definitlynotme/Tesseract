@@ -275,7 +275,7 @@ test('installShellc launch: the "update finished" pill (with 更新说明) waits
   fake.deliver({ t: 'rt:reset', epoch: E1, reason: 'runtime_gone' });
   fake.deliver(hello({ topics: [...P1_TOPICS, 'update.state'] }));
   fake.deliver(evt('update.state', 1, 'snapshot', { state: 'idle', version: null, update_available: false, installable: false, error: null,
-    current_version: '0.1.1', previous_version: '0.1.0', installed_notes: '修复\n- 首次运行无需代理即可导入订阅' }));
+    current_version: '0.1.1', previous_version: '0.1.0', installed_notes: '[zh_CN]\n修复\n- 首次运行无需代理即可导入订阅\n\n[en_US]\nFixed\n- Subscriptions import on a first run' }));
   await flush();
   assert.ok(d.cover(), 'still starting');
   assert.equal(notices.length, 0, 'nothing grows under the launch cover');
@@ -291,6 +291,10 @@ test('installShellc launch: the "update finished" pill (with 更新说明) waits
   assert.equal(sheets[0].from, from, 'the sheet grows out of the pill\'s button');
   assert.equal(sheets[0].title, 'settings.app.update.notes_title');
   assert.deepEqual(sheets[0].content, { tag: 'div', attrs: { class: 'set-notes-text', translate: 'no' }, text: '修复\n- 首次运行无需代理即可导入订阅' });
+  // the page language's section, read each time the sheet opens (11-16)
+  T.i18n.lang = 'en_US';
+  notices[0].actions[0].run(from);
+  assert.equal(sheets[1].content.text, 'Fixed\n- Subscriptions import on a first run');
 });
 
 test('installShellc without launch (design target default): no cover, host_ready still waits for state', async () => {

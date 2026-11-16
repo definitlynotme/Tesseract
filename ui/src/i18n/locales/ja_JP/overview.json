@@ -26,6 +26,7 @@
   "overview.run.retry_link": "再試行",
   "overview.run.stop_failed": "停止失敗",
   "overview.run.main_aria_retry": "サービスの起動を再試行",
+  "overview.phase.load.label": "ノード読み込み",
   "overview.phase.collect.label": "ノード収集",
   "overview.phase.verify.label": "出口検証",
   "overview.phase.ready.label": "準備完了",

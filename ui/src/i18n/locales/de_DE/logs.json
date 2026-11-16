@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {Pausiert. Zum Fortsetzen klicken} one {Pausiert, # neuer Eintrag zurückgehalten. Zum Fortsetzen klicken} other {Pausiert, # neue Einträge zurückgehalten. Zum Fortsetzen klicken}}",
   "logs.run.title": "{scope, select, current {Aktueller Lauf} other {Letzter Lauf}}",
   "logs.run.meta.running": "<x>Gestartet um {time} · </x>Läuft seit {uptime}",
-  "logs.run.meta.starting": "Startet · {phase, select, collect {Knoten sammeln} verify {Ausgang prüfen} other {Abschluss}} {step}/{total}",
+  "logs.run.meta.starting": "Startet · {phase, select, load {Knoten laden} collect {Knoten sammeln} verify {Ausgang prüfen} other {Abschluss}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {Start wird abgebrochen} other {Dienst wird gestoppt}}",
   "logs.run.meta.ended": "{start}–{end} · Laufzeit {duration}",
   "logs.run.meta.stopped": "Gestartet um {start} · Gestoppt",

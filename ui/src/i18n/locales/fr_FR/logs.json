@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {En pause. Cliquez pour reprendre} one {En pause, # nouvelle entrée conservée. Cliquez pour reprendre} many {En pause, # de nouvelles entrées conservées. Cliquez pour reprendre} other {En pause, # nouvelles entrées conservées. Cliquez pour reprendre}}",
   "logs.run.title": "{scope, select, current {Exécution actuelle} other {Dernière exécution}}",
   "logs.run.meta.running": "<x>Démarrée à {time} · </x>En cours depuis {uptime}",
-  "logs.run.meta.starting": "Démarrage · {phase, select, collect {Collecte des nœuds} verify {Vérification de la sortie} other {Finalisation}} {step}/{total}",
+  "logs.run.meta.starting": "Démarrage · {phase, select, load {Chargement des nœuds} collect {Collecte des nœuds} verify {Vérification de la sortie} other {Finalisation}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {Annulation du démarrage} other {Arrêt du service}}",
   "logs.run.meta.ended": "{start}–{end} · Durée : {duration}",
   "logs.run.meta.stopped": "Démarrée à {start} · Arrêtée",

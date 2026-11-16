@@ -344,10 +344,12 @@ class Wiring:
         import bridge_update
         scope_dir = getattr(getattr(self.session, "scope", None), "data_dir", None)
         data_dir = Path(scope_dir) if scope_dir is not None else Path(self.runtime.app_paths.data_dir)
-        kwargs = {}
+        kwargs: dict[str, Any] = {}
         if self.scope_kind != "default":
             # Development/audit scopes never reach the release endpoint.
             kwargs["updater"] = IsolatedUpdater()
+        else:
+            kwargs["updater"] = RoutedUpdater(self._update_core_proxy_url)
         owner = bridge_update.UpdateOwner(app_update_state.update_state_path(data_dir),
                                           data_dir / "updates", **kwargs)
         bridge_update.register(self.session, owner)
@@ -355,6 +357,11 @@ class Wiring:
         self.topics |= {"update.state", "update.prepareExit"}
         if self.scope_kind == "default":
             owner.on_ready()
+
+    def _update_core_proxy_url(self) -> str | None:
+        """The running Core's loopback route for release traffic, or None."""
+        provider = getattr(getattr(self.session, "runtime", None), "update_download_proxy_url", None)
+        return provider() if callable(provider) else None
 
     def _alerts_desktop(self) -> None:
         import bridge_alerts_desktop
@@ -1002,6 +1009,53 @@ class IsolatedUpdater:
     def download_update(self, info: Any, download_dir: Any) -> Any:
         import app_updater
         raise app_updater.AppUpdateError("update downloads are disabled in an isolated scope")
+
+
+class RoutedUpdater:
+    """Updater of the default scope: release traffic takes Tesseract's own route.
+
+    Every request tries, in order, the running Core's loopback mixed port
+    (``core_proxy_url``; None while no verified formal Core runs), the host
+    proxy settings as they are at that moment, and a direct connection
+    (app_updater.network_routes). Up to 0.1.1 the module-level updater used
+    urllib's global ``urlopen``, which keeps the proxy settings of the
+    sidecar's first request -- taken before any Core is up -- so every
+    release download went out directly and, where GitHub's release-asset
+    hosts are blocked, the check succeeded while every install failed.
+    """
+
+    def __init__(self, core_proxy_url: Callable[[], str | None]) -> None:
+        self._core_proxy_url = core_proxy_url
+
+    def _routes(self) -> list[Any]:
+        import app_updater
+        try:
+            core = self._core_proxy_url()
+        except Exception:  # No Core route is the neutral answer, never a failure.
+            core = None
+        return app_updater.network_routes(core)
+
+    def _opener(self) -> Any:
+        # Each source (github.com, then the GitHub mirrors) over each route.
+        import app_updater
+        return app_updater.SourcedOpener(app_updater.RoutedOpener(self._routes))
+
+    def check_latest_update(self, *, current_version: str) -> Any:
+        """The signed manifest first (no API rate limit, mirrored), the API second."""
+        import app_updater
+        opener = self._opener()
+        try:
+            return app_updater.check_latest_release(current_version=current_version, opener=opener)
+        except app_updater.AppUpdateError as manifest_failure:
+            try:
+                return app_updater.check_latest_update(current_version=current_version, opener=opener)
+            except app_updater.AppUpdateError as api_failure:
+                # bridge.log's failure_summary shows both through the cause chain.
+                raise api_failure from manifest_failure
+
+    def download_update(self, info: Any, download_dir: Any) -> Any:
+        import app_updater
+        return app_updater.download_update(info, download_dir, opener=self._opener())
 
 
 _LANGUAGES = frozenset(("zh_CN", "en_US", "ja_JP", "ko_KR", "fr_FR", "de_DE",

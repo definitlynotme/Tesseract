@@ -115,6 +115,24 @@ export function pillMode({ run, cancelling, core, failure, stopFailed }) {
   return 'connecting';
 }
 
+/**
+ * The word of a start phase (store `phase`, 0..2): load · collect · verify · ready.
+ * Phase 0 (startup_phase collecting: the Core is not up yet) is the same backend phase with
+ * or without imported nodes, so its word follows the tiers (user feedback 11-16): with nodes
+ * in Vanguard or Sentinel (enabled, total > 0) the start loads them; only with both empty
+ * does it wait for Bastion to collect public nodes. tiers is the store's `tiers` ({} while
+ * tiers.summary is unknown, which reads as load: collect is said only when known).
+ */
+export function startPhaseKey(phase, tiers) {
+  const ph = Math.max(0, Math.min(2, num(phase)));
+  if (ph === 1) return 'verify';
+  if (ph === 2) return 'ready';
+  const t = tiers || {};
+  const known = ['vanguard', 'sentinel'].every(k => t[k] && typeof t[k] === 'object');
+  const own = ['vanguard', 'sentinel'].some(k => t[k] && t[k].enabled && num(t[k].total) > 0);
+  return known && !own ? 'collect' : 'load';
+}
+
 /** The kill switch word for the hero's suffix and the strip (projected killswitch state, J). */
 export function ksKind(killswitch) {
   switch (killswitch) {

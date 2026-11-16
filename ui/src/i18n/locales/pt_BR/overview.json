@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Repetir",
   "overview.run.stop_failed": "Falha ao parar",
   "overview.run.main_aria_retry": "Tentar iniciar o serviço novamente",
+  "overview.phase.load.label": "Carregando nós",
   "overview.phase.collect.label": "Coletando nós",
   "overview.phase.verify.label": "Verificando saída",
   "overview.phase.ready.label": "Pronto",

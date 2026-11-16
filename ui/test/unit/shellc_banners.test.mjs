@@ -462,8 +462,8 @@ test('update finished with its notes (0.1.1): after the launch, the pill offers 
   assert.deepEqual(opened, [{ version: '1.1.0', notes, from: button }], 'the notes go to the sheet as text');
 });
 
-test('update finished: no notes action without notes, blank notes or a sheet', () => {
-  for (const [notes, openNotes] of [[null, o => o], ['   ', o => o], ['- fixed', null]]) {
+test('update finished: no notes action without notes, blank notes, empty language sections or a sheet', () => {
+  for (const [notes, openNotes] of [[null, o => o], ['   ', o => o], ['[zh_CN]\n\n[en_US]\n', o => o], ['- fixed', null]]) {
     const objs = [];
     const u = createUpdateNotice({
       notify: o => objs.push(o), dismiss: () => {}, t: id => id, call: () => Promise.resolve({}),

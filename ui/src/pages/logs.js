@@ -44,6 +44,7 @@
 import { cached as intlCached } from '../i18n/intl.js';
 import { createLogBuffer, createLiveGate, attachBuffer, fetchSeed, dtoOf, CAP, FEED_TOPIC, TAIL_QUERY } from './logs/buffer.js';
 import { exportLogs, revealExport } from './logs/export.js';
+import { startPhaseKey } from '../rt/project_overview.js';
 
 (function () {
   'use strict';
@@ -1358,7 +1359,9 @@ import { exportLogs, revealExport } from './logs/export.js';
     return { e, w };
   }
   const wideOnly = kids => { const s = document.createElement('span'); s.className = 'wide-only'; s.append(kids); return s; };
-  const PHASES = ['collect', 'verify', 'ready'];     // startup phases by index (store `phase`)
+  // the startup phase by store `phase` (0..2): phase 0 says load or collect by the tiers, the
+  // same word as the overview's run pill (startPhaseKey); no step count (user feedback 11-16)
+  const tiersKnown = () => (T.rt && T.rt.topic ? T.rt.topic('tiers.summary').get() !== undefined : false);
   function syncRun(animate) {
     const run = S.get('run'), cr = curRun(), up = S.get('uptime') || 0;
     const scope = runScope();
@@ -1368,7 +1371,7 @@ import { exportLogs, revealExport } from './logs/export.js';
     const start = cr.start != null ? cr.start : Date.now() - up * 1000;
     let m, rich = null;
     if (run === 'running') { rich = ['logs.run.meta.running', { time: hms(start), uptime: F.uptime(up) }]; m = t(...rich); }
-    else if (run === 'starting') { const ph = Math.max(0, S.get('phase') || 0); m = t('logs.run.meta.starting', { phase: PHASES[ph] || 'ready', step: ph + 1, total: PHASES.length }); }
+    else if (run === 'starting') { const ph = Math.max(0, S.get('phase') || 0); m = t('logs.run.meta.starting', { phase: startPhaseKey(ph, tiersKnown() ? S.get('tiers') : null) }); }
     else if (run === 'stopping') m = t('logs.run.meta.stopping', { cancelling: S.get('cancelling') ? 'yes' : 'no' });
     // a failed start says why (service.state.runtime.failure, the same reason as the overview's)
     else if (run === 'failed') { const f = S.get('failure'); m = f ? t('logs.run.meta.failed_reason', { reason: T.rt.errorText(f) }) : t('logs.run.meta.failed'); }
@@ -2360,6 +2363,8 @@ import { exportLogs, revealExport } from './logs/export.js';
     // gate's render after it shows writes them once (liveRender: syncRun + syncFoot)
     const shownOr = fn => { if (!visible) return; if (winHidden()) gate.note(); else fn(); };
     life.on('rt:phase', () => shownOr(() => syncRun(true)));
+    // the tiers decide phase 0's word (load / collect): only a start reads them
+    life.on('rt:tiers', () => { if (S.get('run') === 'starting') shownOr(() => syncRun(true)); });
     life.on('rt:restart', () => shownOr(syncFoot));
     life.on('rt:stale', () => shownOr(() => syncRun(false)));
     life.sub('failure', () => shownOr(() => syncRun(true)));

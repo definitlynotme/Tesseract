@@ -45,7 +45,9 @@ EXIT_START_SECONDS = 30.0
 # installer path (argv[1:]); the shell launches installer_path with these.
 INSTALLER_ARGS = ("/SILENT", "/SUPPRESSMSGBOXES", "/CLOSEAPPLICATIONS",
                   "/RESTARTAPPLICATIONS", "/NORESTART")
-_LOG = logging.getLogger(__name__)
+# A child of the bridge.log logger (bridge_main), like bridge_shutdown's: under
+# its module name nothing of the update owner ever reached bridge.log.
+_LOG = logging.getLogger("tesseract.bridge.update")
 
 
 class HandoffPublisher(Protocol):
@@ -373,6 +375,7 @@ class UpdateOwner:
         except Exception as exc:
             code = "timeout" if isinstance(exc, TimeoutError) else "io" if isinstance(
                 exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
+            _LOG.warning("update check failed: code=%s %s", code, app_updater.failure_summary(exc))
             with self._lock:
                 self._last_check_at_ms = self._wall_ms()
                 self._transition("failed", code)
@@ -424,9 +427,12 @@ class UpdateOwner:
             return {"verified": True, "handoff_pending": True, "receipt_ref": receipt_ref}
         except _HandoffUnpublished as exc:
             # The receipt stays valid; state is verified with the io error.
+            _LOG.warning("update hand-off unpublished: %s", app_updater.failure_summary(exc))
             raise JobFailure("io") from exc.__cause__
         except Exception as exc:
             code = "io" if isinstance(exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
+            # Before 0.1.2 nothing recorded why an install failed (11-16 reports).
+            _LOG.warning("update install failed: code=%s %s", code, app_updater.failure_summary(exc))
             with self._lock:
                 self._transition("failed", code)
             raise JobFailure(code) from exc

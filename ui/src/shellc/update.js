@@ -27,6 +27,8 @@
 // true), later(fn) (runs fn once the launch has left; default: at once), openNotes({version,
 // notes, from}) or null (no notes action).
 
+import { releaseNotesFor } from '../i18n/release_notes.js';
+
 export const STORAGE_KEY = 'tesseract.shellc.update';
 export const REMEMBER = 16;
 
@@ -106,7 +108,8 @@ export function createUpdateNotice({ notify, dismiss, t, can = () => false, call
       if (prev && cur && !remembered('done', cur)) {
         remember('done', cur);
         // (plain, untrusted text: the sheet shows it as text, never parsed)
-        const notes = typeof d.installed_notes === 'string' && d.installed_notes.trim() ? d.installed_notes : null;
+        // (openNotes picks the page language's section when it opens; only markers: no notes)
+        const notes = typeof d.installed_notes === 'string' && releaseNotesFor(d.installed_notes, null) ? d.installed_notes : null;
         const actions = notes && typeof openNotes === 'function'
           ? [{ label: t('settings.app.update.notes'), labelId: 'settings.app.update.notes', run: b => openNotes({ version: cur, notes, from: b }) }]
           : undefined;

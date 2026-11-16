@@ -231,12 +231,16 @@ const CASES = [
     ['empty', '#ov-deck > .dcard[data-tier="vanguard"] [data-node]'], ['empty', '#ov-deck-meta'], ['id', '#ov-scope', 'overview.traffic.cumulative'], ['cls', '#ov-chart', 'is-paused', true]],
   { also: () => (document.getElementById('ov-name').textContent.trim() === T.t('overview.hero.state', { state: 'stopped' }) ? [] : ['the hero says 未启动']) }),
   // (F-01: the pill says the phase; the hero and the front card do not repeat it; the protocol
-  // total is a dash until the Core has loaded the configuration)
+  // total is a dash until the Core has loaded the configuration. 11-16: the pill carries no step
+  // count, and phase 0 says 加载节点 while Vanguard or Sentinel has nodes, 收集节点 only when both
+  // are empty)
   C('overview_start_collecting', [RUN('starting'), PILL('starting'), ['id', '#ov-name', 'overview.hero.state'], ['empty', '#ov-hint'], ['shown', '#ov-dot', false],
-    ['has', '#run .run-base .run-step', '1/3'], ['idin', '#run .run-base .run-row:not(.is-out)', 'overview.phase.collect.label'], ['id', '#ov-deck > .dcard[data-tier="vanguard"] [data-stat]', 'overview.deck.stat.collecting'],
+    ['not', '#run .run-base .run-row:not(.is-out)', '/3'], ['idin', '#run .run-base .run-row:not(.is-out)', 'overview.phase.load.label'], ['noid', '#run .run-base .run-row:not(.is-out) [data-ph]', 'overview.phase.collect.label'], ['id', '#ov-deck > .dcard[data-tier="vanguard"] [data-stat]', 'overview.deck.stat.collecting'],
     ['empty', '#ov-deck > .dcard.is-front [data-node]'], ['cls', '#ov-deck', 'is-bare', true], ['shown', frontPill, true], ['shown', '#ov-deck > .dcard.is-front [data-node]', false], ['shown', '#ov-exit .idle-msg', false], ['id', '#ov-prov', 'overview.exit.prov.idle'], ['id', '#ov-pool-n', 'overview.pool.value'], ['empty', '#ov-pool-hint'],
     ['id', '#ov-proto-total', 'overview.deck.stat.unknown'], ['cls', '#ov-chart', 'is-paused', true]]),
-  C('overview_start_standby', [RUN('starting'), ['empty', '#ov-hint'], ['has', '#run .run-base .run-step', '2/3'], ['idin', '#run .run-base .run-row:not(.is-out)', 'overview.phase.verify.label'],
+  C('overview_start_collecting_bastion', [RUN('starting'), PILL('starting'), ['not', '#run .run-base .run-row:not(.is-out)', '/3'],
+    ['idin', '#run .run-base .run-row:not(.is-out)', 'overview.phase.collect.label'], ['noid', '#run .run-base .run-row:not(.is-out) [data-ph]', 'overview.phase.load.label']]),
+  C('overview_start_standby', [RUN('starting'), ['empty', '#ov-hint'], ['not', '#run .run-base .run-row:not(.is-out)', '/3'], ['idin', '#run .run-base .run-row:not(.is-out)', 'overview.phase.verify.label'],
     ['id', '#ov-deck > .dcard[data-tier="vanguard"] [data-stat]', 'overview.deck.stat.usable'], ['id', '#ov-deck > .dcard[data-tier="sentinel"] [data-stat]', 'overview.deck.stat.collecting'],
     ['id', '#ov-gate-stat', 'overview.gate.stat.verifying'], ['shown', '#ov-refresh', true]]),
   C('overview_ready_validating', [RUN('running'), PILL('running'), ['id', '#ov-hint', 'overview.hero.hint.validating'], ['cls', '#ov-dot', 'busy', true], ['has', '#ov-name', 'Vanguard']]),

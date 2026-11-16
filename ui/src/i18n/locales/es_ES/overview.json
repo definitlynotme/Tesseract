@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Reintentar",
   "overview.run.stop_failed": "Error al detener",
   "overview.run.main_aria_retry": "Reintentar el inicio del servicio",
+  "overview.phase.load.label": "Cargando nodos",
   "overview.phase.collect.label": "Recopilando nodos",
   "overview.phase.verify.label": "Verificando salida",
   "overview.phase.ready.label": "Listo",

@@ -46,7 +46,7 @@
   "logs.follow.aria_paused": "{n, plural, =0 {一時停止中。クリックで再開} other {一時停止中。新しいログ # 件を保持しています。クリックで再開}}",
   "logs.run.title": "{scope, select, current {今回の実行} other {前回の実行}}",
   "logs.run.meta.running": "<x>{time} 開始 · </x>{uptime} 経過",
-  "logs.run.meta.starting": "起動中 · {phase, select, collect {ノードを収集} verify {出口を検証} other {最終準備}} {step}/{total}",
+  "logs.run.meta.starting": "起動中 · {phase, select, load {ノードを読み込み} collect {ノードを収集} verify {出口を検証} other {最終準備}}",
   "logs.run.meta.stopping": "{cancelling, select, yes {起動をキャンセルしています} other {サービスを停止しています}}",
   "logs.run.meta.ended": "{start}–{end} · 実行時間 {duration}",
   "logs.run.meta.stopped": "{start} 開始 · 停止",

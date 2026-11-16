@@ -239,7 +239,7 @@
           "error": null,
           "current_version": "1.0.0",
           "previous_version": null,
-          "notes": "Fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path",
+          "notes": "[zh_CN]\nZH fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path\n\n[en_US]\nEN fixes:\n- <b>bold?</b> <img src=x onerror=window.__pwned=1>\n- example.org/path",
           "last_check_at_ms": 1789999400000
         }
       }

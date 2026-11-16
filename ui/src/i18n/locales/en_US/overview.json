@@ -26,6 +26,7 @@
   "overview.run.retry_link": "Retry",
   "overview.run.stop_failed": "Stop failed",
   "overview.run.main_aria_retry": "Retry starting the service",
+  "overview.phase.load.label": "Loading nodes",
   "overview.phase.collect.label": "Collecting nodes",
   "overview.phase.verify.label": "Verifying exit",
   "overview.phase.ready.label": "Ready",
