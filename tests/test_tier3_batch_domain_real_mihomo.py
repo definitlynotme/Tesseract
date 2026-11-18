@@ -37,6 +37,21 @@ def _wait_until(predicate, timeout: float) -> None:
     raise AssertionError("condition did not become true")
 
 
+def _wait_for_pass_commits(lock, terminals, commits, timeout: float = 10.0) -> None:
+    """Wait for the commit of every PASS terminal seen so far.
+
+    The actor publishes a PASS terminal before it queues the admission, so
+    the last commits can still be running when the last terminal arrives.
+    """
+
+    def settled() -> bool:
+        with lock:
+            passed = sum(kind is Tier3TerminalKind.PASS for kind in terminals.values())
+            return len(commits) >= passed
+
+    _wait_until(settled, timeout)
+
+
 def test_batch_backend_attributes_every_pass_to_its_own_candidate(monkeypatch, tmp_path) -> None:
     with BatchFixture() as fixture:
         dns_port = fixture.start_nxdomain_dns()
@@ -113,6 +128,7 @@ def test_batch_backend_attributes_every_pass_to_its_own_candidate(monkeypatch, t
                 assert all(record.verdict == 204 for record in records), records
             for candidate in dead:
                 assert terminals[candidate.identity] is not Tier3TerminalKind.PASS, terminals
+            _wait_for_pass_commits(lock, terminals, commits)
             assert sorted(commits) == sorted(candidate.identity for candidate in live)
             assert fixture.dns_queries == [], "no destination may be resolved locally"
             metrics = domain.supervisor.batch_metrics()
@@ -179,6 +195,7 @@ def _run_domain(monkeypatch, tmp_path, nodes, *, slots, workers, probe_url, dns_
         for node in nodes:
             assert domain.submit(node, {"configured_source_count": 1})
         assert finished.wait(timeout), {"terminals": terminals, "metrics": domain.supervisor.batch_metrics()}
+        _wait_for_pass_commits(lock, terminals, commits)
         return terminals, commits, domain.supervisor.batch_metrics()
     finally:
         assert domain.stop(timeout_seconds=6.0) == "STOPPED"

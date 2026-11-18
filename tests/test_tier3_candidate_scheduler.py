@@ -2265,6 +2265,52 @@ def test_cold_l2_training_report_fields_come_from_the_lock_free_memo() -> None:
     scheduler.release_outstanding()
 
 
+def test_release_outstanding_ends_the_reporting_memo() -> None:
+    # The owner reads its closing report after release_outstanding(), through
+    # the same quick_metrics(max_age_seconds=0.25) as the progress loop. A
+    # memo taken before the session's last commits must not reach it: the
+    # release-workflow runs reported 22 of 25 net-new commits that way.
+    scheduler = Tier3CandidateScheduler(unknown_exploration_ratio=0.0)
+    scheduler.set_credit_envelope(16, handoff_window=16, tcp_execution_limit=16)
+    scheduler.enqueue(
+        candidate("late-commit"),
+        None,
+        arm_key="late-commit",
+        source_root="root",
+        family="opaque-family",
+        coarse_key="late-commit",
+        feature_key=feature(family="opaque-family"),
+    )
+    reservation = scheduler.reserve_handoffs(1)[0]
+    scheduler.commit_handoff(reservation)
+    scheduler.on_tcp_outcome(reservation.ticket, responsive=True)
+    scheduler.on_terminal(
+        reservation.ticket,
+        passed=True,
+        outcome="pass",
+        busy_worker_ms=200,
+        stage="fast_probe",
+    )
+    net_new_key = f"visibility_{reservation.ticket.visibility_class}_net_new_total"
+    before = scheduler.quick_metrics(max_age_seconds=60.0)
+    assert before[net_new_key] == 0
+    assert before["active_ticket_count"] == 1
+
+    scheduler.on_commit_complete(reservation.ticket, net_new=True)
+    # While the session runs, a reporter may still get the older memo.
+    assert scheduler.quick_metrics(max_age_seconds=60.0) == before
+
+    scheduler.release_outstanding()
+    closing = scheduler.quick_metrics(max_age_seconds=60.0)
+    assert closing[net_new_key] == 1
+    assert closing["active_ticket_count"] == 0
+    exact = scheduler.quick_metrics()
+    assert (closing[net_new_key], closing["active_ticket_count"]) == (
+        exact[net_new_key],
+        exact["active_ticket_count"],
+    )
+
+
 def test_production_leaf_uses_guarded_two_net_new_proven_50() -> None:
     scheduler = Tier3CandidateScheduler(unknown_exploration_ratio=0.0)
     scheduler.set_credit_envelope(16, handoff_window=16, tcp_execution_limit=16)

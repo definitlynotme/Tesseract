@@ -438,6 +438,10 @@ def test_validation_domain_commits_through_the_batch_backend() -> None:
             "actor": domain.snapshot().actor,
         }
         assert terminals.count(Tier3TerminalKind.PASS) == total
+        # The actor publishes a PASS terminal before it queues the admission,
+        # so the last commits can still be running when the last terminal is
+        # observed (19 of 24 on a release-workflow runner).
+        _wait_until(lambda: len(commits) >= total, timeout=10.0)
         assert len(commits) == total
         metrics = domain.supervisor.batch_metrics()
         assert metrics["groups"] == 2

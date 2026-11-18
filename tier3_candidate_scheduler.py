@@ -10493,6 +10493,8 @@ class Tier3CandidateScheduler:
         """Release every non-terminal ticket during a sealed expansion."""
 
         with self._lock:
+            # Everything reported after this point is the closing report.
+            self._quick_metrics_memo = None
             states = list(self._tickets.values())
             for state in states:
                 self._resolve_replay_leaf_discovery_unlocked(
@@ -10651,6 +10653,10 @@ class Tier3CandidateScheduler:
         wave overhead from 47 ms to 1203 ms and starved the UI thread on
         2026-09-20.  A caller that only reports may accept a slightly older
         snapshot; passing 0 (the default) keeps the exact behaviour.
+
+        The memo never outlives ``release_outstanding()``: the owner builds
+        the session's closing report after it, with the same max age, so a
+        memo from before the last commits would otherwise become final.
         """
 
         if max_age_seconds > 0.0:
@@ -10662,8 +10668,10 @@ class Tier3CandidateScheduler:
                 return dict(cached[1])
         with self._lock:
             metrics = self.quick_metrics_unlocked()
-        if max_age_seconds > 0.0:
-            self._quick_metrics_memo = (time.monotonic(), dict(metrics))
+            if max_age_seconds > 0.0:
+                # Stored under the lock, so a scan that started before a
+                # release cannot land after the release cleared the memo.
+                self._quick_metrics_memo = (time.monotonic(), dict(metrics))
         return metrics
 
     def supply_snapshot(self) -> Tier3CandidateSupplySnapshot:
