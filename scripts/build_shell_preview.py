@@ -339,7 +339,8 @@ def preflight() -> dict:
                            capture_output=True, text=True)
     gate(probe.returncode == 0, "PyInstaller is not installed in .venv (nothing is installed by this script)")
     facts["pyinstaller"] = probe.stdout.strip()
-    for name in ("bin/mihomo.exe", "bin/wintun.dll", "release/sbom.cdx.json", "LICENSE", "THIRD_PARTY_NOTICES.md",
+    for name in ("bin/mihomo.exe", "bin/wintun.dll", "bin/geodata/geoip.dat", "bin/geodata/geosite.dat",
+                 "bin/geodata/PROVENANCE.json", "release/sbom.cdx.json", "LICENSE", "THIRD_PARTY_NOTICES.md",
                  "app_version.txt", "static/app_icon.ico"):
         gate((REPO / name).is_file(), f"missing build input {name}")
     gate(any((REPO / "build" / "third-party-licenses").rglob("*")), "missing build/third-party-licenses")
@@ -596,7 +597,8 @@ def gate_sidecar(bundle: Path, contract: dict) -> dict:
              for m in manifests), "sidecar identity does not match tesseract-runtime.exe")
     undeclared = sorted(set(sidecar_source_files()) - set(manifests[0]["components"]))
     gate(not undeclared, f"closure files missing from the identity components: {undeclared}")
-    for resource in ("bin/mihomo.exe", "bin/wintun.dll", "sbom.cdx.json", "app_version.txt", "LICENSE",
+    for resource in ("bin/mihomo.exe", "bin/wintun.dll", "bin/geodata/geoip.dat", "bin/geodata/geosite.dat",
+                     "bin/geodata/PROVENANCE.json", "sbom.cdx.json", "app_version.txt", "LICENSE",
                      "THIRD_PARTY_NOTICES.md"):
         gate((internal / resource).is_file(), f"missing _internal/{resource}")
     for directory in ("locales", "static", "third-party-licenses"):
@@ -924,6 +926,7 @@ def assemble(shell: dict, sidecar: dict, contract: dict, frontend: dict, app: Pa
         shutil.copy2(REPO / name, staging / name)
     required = ["Tesseract.exe", "tesseract-runtime.exe", "tier3_build_id.json", "LICENSE", "THIRD_PARTY_NOTICES.md",
                 "_internal/python312.dll", "_internal/bin/mihomo.exe", "_internal/bin/wintun.dll",
+                "_internal/bin/geodata/geoip.dat", "_internal/bin/geodata/geosite.dat",
                 "_internal/app_version.txt", "_internal/sbom.cdx.json", "_internal/tier3_build_id.json"]
     for name in required:
         gate((staging / name).is_file(), f"assembled dist lacks {name}")

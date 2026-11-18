@@ -162,6 +162,23 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
 
+## GeoData (geoip.dat and geosite.dat)
+
+The package includes `geoip.dat` and `geosite.dat` from MetaCubeX
+meta-rules-dat, used unmodified by Mihomo for GEOIP and GEOSITE rules. They are
+copied into Mihomo's data directory on first start and refreshed from the same
+upstream afterwards. The repository is published under GPL-3.0; its build
+scripts and the lists it compiles are available from it. The exact files in
+this package (download URL, SHA-256, size, fetch time) are recorded in
+`_internal/bin/geodata/PROVENANCE.json`.
+
+- meta-rules-dat: https://github.com/MetaCubeX/meta-rules-dat
+- The IP data is compiled as in Loyalsoldier/v2ray-rules-dat and includes
+  GeoLite2 data created by MaxMind, available from https://www.maxmind.com.
+  https://github.com/Loyalsoldier/v2ray-rules-dat
+- The domain lists build on v2fly domain-list-community (MIT License).
+  https://github.com/v2fly/domain-list-community
+
 ## Babel and Unicode CLDR
 
 Tesseract uses Babel 2.18.0 to display country names in the selected interface language. Babel is distributed under the BSD 3-Clause License and includes locale data derived from the Unicode Common Locale Data Repository (CLDR).

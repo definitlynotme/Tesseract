@@ -4,8 +4,10 @@ from pathlib import Path
 
 from geodata_runtime import (
     CoreStartupTimeoutPlan,
+    bundled_geodata_dir,
     core_startup_timeout_plan,
     missing_geodata_assets,
+    seed_bundled_geodata,
     runtime_config_text_uses_geodata,
     runtime_config_uses_geodata,
 )
@@ -48,6 +50,70 @@ class GeoDataRuntimeTests(unittest.TestCase):
 
             (work_dir / "custom-geosite.dat").write_bytes(b"geosite")
             self.assertEqual(missing_geodata_assets(work_dir, asset_filenames=asset_filenames), [])
+
+    def test_seed_bundled_geodata_fills_every_missing_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            bundle = bundled_geodata_dir(root / "resources")
+            bundle.mkdir(parents=True)
+            (bundle / "geoip.dat").write_bytes(b"bundled-geoip")
+            (bundle / "geosite.dat").write_bytes(b"bundled-geosite")
+            work_dir = root / "data" / "mihomo"
+
+            self.assertEqual(seed_bundled_geodata(work_dir, bundle), ["geoip", "geosite"])
+
+            self.assertEqual((work_dir / "geoip.dat").read_bytes(), b"bundled-geoip")
+            self.assertEqual((work_dir / "geosite.dat").read_bytes(), b"bundled-geosite")
+            self.assertEqual(missing_geodata_assets(work_dir), [])
+            self.assertEqual(sorted(path.name for path in work_dir.iterdir()), ["geoip.dat", "geosite.dat"])
+            # Nothing left to fill on the next call.
+            self.assertEqual(seed_bundled_geodata(work_dir, bundle), [])
+
+    def test_seed_bundled_geodata_never_replaces_existing_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            bundle = root / "bundle"
+            bundle.mkdir()
+            (bundle / "geoip.dat").write_bytes(b"bundled-geoip")
+            (bundle / "geosite.dat").write_bytes(b"bundled-geosite")
+            work_dir = root / "work"
+            work_dir.mkdir()
+            (work_dir / "GeoIP.dat").write_bytes(b"refreshed-geoip")
+
+            self.assertEqual(seed_bundled_geodata(work_dir, bundle), ["geosite"])
+
+            self.assertEqual((work_dir / "GeoIP.dat").read_bytes(), b"refreshed-geoip")
+            self.assertEqual((work_dir / "geosite.dat").read_bytes(), b"bundled-geosite")
+
+    def test_seed_bundled_geodata_uses_injected_target_names(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            bundle = root / "bundle"
+            bundle.mkdir()
+            (bundle / "geoip.dat").write_bytes(b"bundled-geoip")
+            (bundle / "geosite.dat").write_bytes(b"bundled-geosite")
+            work_dir = root / "work"
+            names = {"geoip": "custom-geoip.dat", "geosite": "custom-geosite.dat"}
+
+            self.assertEqual(
+                seed_bundled_geodata(work_dir, bundle, asset_filenames=names),
+                ["geoip", "geosite"],
+            )
+            self.assertEqual((work_dir / "custom-geoip.dat").read_bytes(), b"bundled-geoip")
+            self.assertEqual(missing_geodata_assets(work_dir, asset_filenames=names), [])
+
+    def test_seed_bundled_geodata_without_bundle_leaves_files_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            bundle = root / "bundle"
+            bundle.mkdir()
+            (bundle / "geosite.dat").write_bytes(b"bundled-geosite")
+            work_dir = root / "work"
+
+            self.assertEqual(seed_bundled_geodata(work_dir, root / "absent"), [])
+            self.assertFalse(work_dir.exists())
+            self.assertEqual(seed_bundled_geodata(work_dir, bundle), ["geosite"])
+            self.assertEqual(missing_geodata_assets(work_dir), ["geoip"])
 
     def test_core_startup_timeout_keeps_base_without_geodata_or_missing_assets(self) -> None:
         self.assertEqual(

@@ -36,6 +36,7 @@ release/
 
 # Downloaded third-party runtime binary
 bin/mihomo.exe
+bin/geodata/
 
 # Sensitive local configuration
 config.yaml

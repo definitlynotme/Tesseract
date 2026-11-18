@@ -9,6 +9,8 @@ param(
     [switch] $SkipInstaller,
     [switch] $SkipPackagedSmoke,
     [switch] $SkipMihomoDownload,
+    # Use bin\geodata as it is instead of fetching it. Official builds refuse it.
+    [switch] $SkipGeoDataDownload,
     [switch] $RequireSigning,
     # Local builds without an elevated shell: compile the installer but do not
     # install it into the isolated validation directory. Official builds refuse it.
@@ -734,6 +736,7 @@ if ($OfficialRelease) {
         $SkipInstaller -or
         $SkipPackagedSmoke -or
         $SkipMihomoDownload -or
+        $SkipGeoDataDownload -or
         $RequireSigning -or
         $SkipInstallerAcceptance
     ) {
@@ -925,6 +928,23 @@ if ((Get-Sha256 $WintunPath) -ne $ExpectedWintunSha256) {
 $MihomoVersionText = (& $MihomoPath -v | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or $MihomoVersionText -notmatch "\bv?1\.19\.27\b") {
     throw "Expected Mihomo 1.19.27, got: $MihomoVersionText"
+}
+
+# GeoData ships in the package so a first start needs no download before Mihomo
+# loads GEOIP/GEOSITE rules. Upstream rebuilds it daily under one moving tag, so
+# each file is verified against the checksum published with it and recorded in
+# bin\geodata\PROVENANCE.json, which ships too. Official builds always refetch.
+if (-not $SkipGeoDataDownload) {
+    $GeoDataArgs = @((Resolve-RepoPath "scripts\download_geodata.py"))
+    if ($OfficialRelease) {
+        $GeoDataArgs += "--force"
+    }
+    Invoke-Native "GeoData download" $ReleasePython $GeoDataArgs
+}
+foreach ($GeoDataFile in @("geoip.dat", "geosite.dat", "PROVENANCE.json")) {
+    if (-not (Test-Path -LiteralPath (Resolve-RepoPath "bin\geodata\$GeoDataFile") -PathType Leaf)) {
+        throw "Bundled GeoData is missing: bin\geodata\$GeoDataFile"
+    }
 }
 
 $IsccPath = $null

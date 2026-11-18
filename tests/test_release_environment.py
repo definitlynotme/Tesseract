@@ -48,14 +48,14 @@ def test_stable_source_pe_and_inno_fallback_versions_are_synchronized() -> None:
         ROOT / "packaging" / "windows" / "Tesseract-shell.iss"
     ).read_text(encoding="utf-8")
 
-    assert 'APP_RELEASE_BASE_VERSION = "0.1.2"' in app_info_source
+    assert 'APP_RELEASE_BASE_VERSION = "0.1.3"' in app_info_source
     assert "APP_RELEASE_CANDIDATE_NUMBER: int | None = None" in app_info_source
-    assert 'StringStruct("FileVersion", "0.1.2")' in pe_version
-    assert 'StringStruct("ProductVersion", "0.1.2")' in pe_version
-    assert "filevers=(0, 1, 2, 65535)" in pe_version
-    assert "prodvers=(0, 1, 2, 65535)" in pe_version
-    assert '#define AppVersion "0.1.2"' in installer
-    assert '#define AppVersionNumeric "0.1.2.65535"' in installer
+    assert 'StringStruct("FileVersion", "0.1.3")' in pe_version
+    assert 'StringStruct("ProductVersion", "0.1.3")' in pe_version
+    assert "filevers=(0, 1, 3, 65535)" in pe_version
+    assert "prodvers=(0, 1, 3, 65535)" in pe_version
+    assert '#define AppVersion "0.1.3"' in installer
+    assert '#define AppVersionNumeric "0.1.3.65535"' in installer
 
 
 def test_committed_release_notes_reach_the_update_window_unchanged() -> None:
@@ -159,7 +159,7 @@ def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_los
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath '{root_literal}'
 $Python = (Get-Command 'python' -ErrorAction Stop).Source
-$Version = '0.1.2'
+$Version = '0.1.3'
 {assignments}
 $Results = [ordered]@{{}}
 $Results.version = [string] (& $Python -c $VersionContractPython $Version)
@@ -194,8 +194,8 @@ $Results | ConvertTo-Json -Compress
     source = json.loads(payload["source"])
     repository = json.loads(payload["repository"])
     key_ids = json.loads(payload["keys"])
-    assert version["version"] == "0.1.2"
-    assert version["windows_version_numeric"] == "0.1.2.65535"
+    assert version["version"] == "0.1.3"
+    assert version["windows_version_numeric"] == "0.1.3.65535"
     assert source == version
     assert repository == {
         "repository_url": "https://github.com/definitlynotme/Tesseract",

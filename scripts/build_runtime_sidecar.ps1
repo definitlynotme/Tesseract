@@ -98,7 +98,8 @@ assert all(m['declared_executable_sha256'] == m['executable_sha256'] == sha
 # The identity components cover the whole closure, so "current" means it.
 undeclared = sorted(set(sidecar_source_files()) - set(manifests[0]['components']))
 assert not undeclared, f'Closure files missing from the identity components: {undeclared}'
-for resource in ('bin/mihomo.exe', 'bin/wintun.dll', 'sbom.cdx.json'):
+for resource in ('bin/mihomo.exe', 'bin/wintun.dll', 'bin/geodata/geoip.dat',
+                 'bin/geodata/geosite.dat', 'bin/geodata/PROVENANCE.json', 'sbom.cdx.json'):
     assert (bundle / '_internal' / resource).is_file(), resource
 
 def size(directory):

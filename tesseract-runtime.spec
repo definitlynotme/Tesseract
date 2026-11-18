@@ -44,6 +44,11 @@ datas = [
         ("release/sbom.cdx.json", "."),
         ("bin/mihomo.exe", "bin"),
         ("bin/wintun.dll", "bin"),
+        # Seeds Mihomo's work dir on first start (geodata_runtime.seed_bundled_geodata);
+        # fetched and verified by scripts/download_geodata.py.
+        ("bin/geodata/geoip.dat", "bin/geodata"),
+        ("bin/geodata/geosite.dat", "bin/geodata"),
+        ("bin/geodata/PROVENANCE.json", "bin/geodata"),
     )
 ]
 for path in license_files:

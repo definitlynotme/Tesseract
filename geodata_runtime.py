@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -47,6 +49,52 @@ def missing_geodata_assets(
         if not any((work_dir / filename).exists() for filename in filenames):
             missing.append(key)
     return missing
+
+
+def bundled_geodata_dir(resource_root: Path) -> Path:
+    """Where the package keeps its GeoData (``_internal/bin/geodata`` when frozen)."""
+
+    return Path(resource_root) / "bin" / "geodata"
+
+
+def seed_bundled_geodata(
+    work_dir: Path,
+    bundle_dir: Path,
+    *,
+    asset_filenames: Mapping[str, str] | None = None,
+) -> list[str]:
+    """Copy the packaged GeoData into ``work_dir`` where a file is missing.
+
+    Only fills gaps: a file already in ``work_dir`` (downloaded, refreshed or
+    placed by the user) is never replaced, so the GeoUpdater stays the only
+    thing that changes GeoData once it exists.  Each copy lands atomically.
+    Returns the keys that were seeded; failures leave that key missing so the
+    caller's download path takes over, exactly as without a bundle.
+    """
+
+    work_dir = Path(work_dir)
+    bundle_dir = Path(bundle_dir)
+    asset_filenames = DEFAULT_ASSET_FILENAMES if asset_filenames is None else asset_filenames
+    seeded: list[str] = []
+    for key in missing_geodata_assets(work_dir, asset_filenames=asset_filenames):
+        filename = asset_filenames.get(key, DEFAULT_ASSET_FILENAMES[key])
+        source = bundle_dir / DEFAULT_ASSET_FILENAMES[key]
+        if not source.is_file():
+            continue
+        target = work_dir / filename
+        temp = work_dir / f".{filename}.seed.tmp"
+        try:
+            work_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, temp)
+            os.replace(temp, target)
+        except OSError:
+            try:
+                temp.unlink()
+            except OSError:
+                pass
+            continue
+        seeded.append(key)
+    return seeded
 
 
 def _coerce_float(value: Any, default: float) -> float:

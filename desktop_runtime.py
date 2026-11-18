@@ -148,10 +148,12 @@ from tier3_provider_health import (
 from tier3_start_recovery import Tier3StartRecoveryAction, tier3_start_recovery_plan
 from subscription_server_config import subscription_server_matches, subscription_server_runtime_config
 from geodata_runtime import (
+    bundled_geodata_dir,
     core_startup_timeout_plan,
     missing_geodata_assets,
     runtime_config_text_uses_geodata,
     runtime_config_uses_geodata,
+    seed_bundled_geodata,
 )
 from geo_updater import (
     ASSET_FILENAMES,
@@ -6232,6 +6234,19 @@ class DesktopRuntime:
 
     def _missing_geodata_assets(self) -> list[str]:
         work_dir = self._resolve_path(mihomo_client_paths(self._client_config()).work_dir)
+        # The package carries GeoData: a gap is filled from it before anything
+        # decides to download, defer GEOIP/GEOSITE rules or wait longer for
+        # the Core.  Files already in work_dir are never touched.
+        seeded = seed_bundled_geodata(
+            work_dir,
+            bundled_geodata_dir(self.resource_root),
+            asset_filenames=ASSET_FILENAMES,
+        )
+        if seeded:
+            self.logger.info(
+                "Installed packaged GeoData into the Mihomo work dir: %s",
+                ", ".join(seeded),
+            )
         return missing_geodata_assets(work_dir, asset_filenames=ASSET_FILENAMES)
 
     def _primary_layers_configured(self) -> bool:

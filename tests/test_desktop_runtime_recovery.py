@@ -6304,6 +6304,43 @@ proxies:
             (work_dir / "geosite.dat").write_bytes(b"geosite")
             self.assertFalse(runtime._bootstrap_geodata_rules_deferred())
 
+    def test_first_run_uses_packaged_geodata_instead_of_downloading(self) -> None:
+        # The package carries GeoData: a first run copies it into the work
+        # dir, so the bootstrap keeps its GEOIP/GEOSITE rules and the
+        # pre-start download never runs.
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            backend = MemoryProxyBackend(
+                ProxySettings(enabled=False, server="", override="")
+            )
+            runtime = self._runtime(temp_path, backend)
+            work_dir = temp_path / "data" / "mihomo"
+            runtime.config["client"]["mihomo_work_dir"] = str(work_dir)
+            bundle = temp_path / "bin" / "geodata"
+            bundle.mkdir(parents=True)
+            (bundle / "geoip.dat").write_bytes(b"packaged-geoip")
+            (bundle / "geosite.dat").write_bytes(b"packaged-geosite")
+
+            class NoDownload:
+                def __getattr__(self, name):
+                    raise AssertionError(f"GeoUpdater.{name} used despite packaged GeoData")
+
+            runtime.geo_updater = NoDownload()
+            runtime_config = temp_path / "runtime.yaml"
+            runtime_config.write_text("rules:\n- GEOIP,CN,DIRECT,no-resolve\n", encoding="utf-8")
+
+            self.assertFalse(runtime._bootstrap_geodata_rules_deferred())
+            runtime._ensure_geodata_ready_for_core_start(runtime_config)
+
+            self.assertEqual(runtime._missing_geodata_assets(), [])
+            self.assertEqual((work_dir / "geoip.dat").read_bytes(), b"packaged-geoip")
+            self.assertEqual((work_dir / "geosite.dat").read_bytes(), b"packaged-geosite")
+
+            # A refreshed file is never put back to the packaged copy.
+            (work_dir / "geoip.dat").write_bytes(b"refreshed-geoip")
+            self.assertEqual(runtime._missing_geodata_assets(), [])
+            self.assertEqual((work_dir / "geoip.dat").read_bytes(), b"refreshed-geoip")
+
     def _bootstrap_pool_runtime(self, temp_path: Path, *, pool_alive: bool):
         from runtime_source_transport import (
             RuntimeSourceListenerPorts,
