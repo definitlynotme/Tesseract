@@ -126,7 +126,6 @@ async function settingsExpect({ page, lang }, extra) {
   return { problems, metrics: { texts: r.texts.length, attrs: r.attrs.length } };
 }
 
-const openDrawer = id => [{ eval: ch => document.querySelector(`.set-ch[data-ch="${ch}"]`).click(), arg: id }, { page_ms: 600 }];
 const SECTIONS = ['set-conn', 'set-route', 'set-dns', 'set-nodes', 'set-safety', 'set-alerts', 'set-app'];
 
 const CASES = [
@@ -155,46 +154,16 @@ const CASES = [
       return p;
     }),
   },
-  {
-    name: 'settings_i18n_drawer_telegram',
-    scenario: RUNNING,
-    page: 'settings',
-    actions: [...openDrawer('telegram')],
-    expect: ctx => settingsExpect(ctx, async page => ((await page.evaluate(() => !!document.querySelector('.ovl .drawer .set-ch-tabs'))) ? [] : ['the Telegram drawer (tabs) is not open'])),
-  },
-  {
-    name: 'settings_i18n_drawer_telegram_manual',
-    scenario: RUNNING,
-    page: 'settings',
-    actions: [...openDrawer('telegram'), { click: '.ovl .drawer .set-ch-tabs .tab[data-v="manual"]' }, { page_ms: 600 },
-      { click: '.ovl .drawer .set-adv-t' }, { page_ms: 600 }],
-    expect: ctx => settingsExpect(ctx, async page => ((await page.evaluate(() => !!document.querySelector('.ovl .drawer .set-adv:not([hidden])'))) ? [] : ['the advanced block is not open'])),
-  },
-  {
-    name: 'settings_i18n_drawer_twilio',
-    scenario: RUNNING,
-    page: 'settings',
-    // (T-P4-05e) the tiles carry the backend's type ids (alerts.catalog): Twilio is sms_twilio
-    actions: [...openDrawer('sms_twilio'), { click: '.ovl .drawer .set-adv-t' }, { page_ms: 600 }],
-    expect: ctx => settingsExpect(ctx),
-  },
+  /* The 10-30 alert redesign removed the channel tiles and their drawers from 配置, so the cases
+     that opened them (Telegram's quick and manual setup, Twilio's advanced block, Telegram's
+     failed test) went with them. */
   {
     name: 'settings_i18n_stopped',
     scenario: STOPPED,
     page: 'settings',
     expect: ctx => settingsExpect(ctx),
   },
-  // the demo's failures (design target): Telegram's expired token fails its test (the button's
-  // failure word is a catalog message, the provider's reason a translate="no" data node), and the
-  // first rule-data update fails one set (its reason in the status label's <x> slot)
-  {
-    name: 'settings_i18n_test_fail',
-    scenario: RUNNING,
-    page: 'settings',
-    actions: [...openDrawer('telegram'),
-      { eval: () => document.querySelector('.ovl .drawer .ovl-foot .btn:not(.btn-primary):not(.btn-danger-soft)').click() }, { page_ms: 1600 }],
-    expect: ctx => settingsExpect(ctx, async page => ((await page.evaluate(() => !!document.querySelector('.ovl .drawer .ovl-foot .btn.is-fail'))) ? [] : ['the test button shows no failure'])),
-  },
+  // the first rule-data update fails one set (its reason in the status label's <x> slot)
   {
     name: 'settings_i18n_geo_fail',
     scenario: RUNNING,

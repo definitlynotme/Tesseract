@@ -21,7 +21,6 @@
   "tiers.bx.title": "Bastion ist nicht aktiv",
   "tiers.cell.aria": "{name}{has_word, select, yes {, {word}} other {}}{has_count, select, yes {, {ok} von {total} verfügbar} ok_only {, {ok} verfügbar} other {}}",
   "tiers.cell.count_aria": "{ok} von {total} verfügbar",
-  "tiers.cell.slot.collecting": "Sammelt…",
   "tiers.cell.slot.filling": "Wird aufgefüllt",
   "tiers.cell.slot.missing": "Ausgang fehlt",
   "tiers.cell.slot.nodes": "{n, plural, one {# Knoten} other {# Knoten}}",

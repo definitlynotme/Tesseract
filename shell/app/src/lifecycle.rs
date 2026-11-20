@@ -26,6 +26,12 @@ pub enum QuitReason {
     Update,
     /// Windows session end (WM_QUERYENDSESSION / WM_ENDSESSION): `app.sessionEnd`, never `app.quit`.
     SessionEnd,
+    /// 11-20: an installer's Restart Manager close (WM_ENDSESSION with ENDSESSION_CLOSEAPP and
+    /// no logoff, `endsession::closes_app_only`). Windows ends nothing and the session goes on, so
+    /// it is an ordinary quit: `app.quit{reason:user}`, the full exit recovery, the 20 s prompt,
+    /// the browser-exit wait. No page is asked: the installer waits for the app to go, and
+    /// Tesseract Setup opens it again afterwards.
+    InstallerClose,
     /// The sidecar exited by itself with 0 or 74 outside a quit: the shell follows it out.
     SidecarExit,
     /// T-P3-07: the WebView2 browser process was lost and the window could not be recreated; the
@@ -37,7 +43,7 @@ impl QuitReason {
         match self {
             Self::Tray=>"tray", Self::WindowWithoutTray=>"window_without_tray", Self::Dev=>"dev", Self::Acceptance=>"acceptance",
             Self::HostGone=>"host_gone", Self::Update=>"update", Self::SessionEnd=>"session_end", Self::SidecarExit=>"sidecar_exit",
-            Self::WebViewLost=>"webview_lost",
+            Self::WebViewLost=>"webview_lost", Self::InstallerClose=>"installer_close",
         }
     }
     /// PROTOCOL §10 `app.quit.reason`: user | update | shell_lost.
@@ -315,6 +321,23 @@ impl Machine {
         self.progress(now);
         vec![Action::Log("session_end_cancelled_stall_armed".into())]
     }
+    /// WM_ENDSESSION(TRUE) of an installer's close ([`QuitReason::InstallerClose`]): an ordinary
+    /// quit that asks no page. A user quit still asking the page (or showing the unsaved-changes
+    /// prompt) goes out now: the installer is waiting, and that prompt's late answer is ignored,
+    /// as at a logoff. A quit already sent (the tray's, an update's, a session end), the install
+    /// step of an update, or a shell that is done just go on.
+    pub fn installer_close(&mut self, now: Instant) -> Vec<Action> {
+        match self.phase {
+            Phase::Running => self.request(QuitReason::InstallerClose, now, false),
+            Phase::Confirming{..} | Phase::Prompting{..} => {
+                let mut out = vec![Action::Log(format!("installer_close_during_quit_{}", self.reason.unwrap_or(QuitReason::Tray).code()))];
+                self.reason = Some(QuitReason::InstallerClose);
+                self.send_quit(now, &mut out);
+                out
+            },
+            _ => vec![Action::Log("installer_close_already_quitting".into())],
+        }
+    }
 }
 
 /// Quit progress: every sidecar frame except pure samples. `pong` only proves the read loop
@@ -392,6 +415,7 @@ impl Lifecycle {
     pub fn installing(&self) -> bool { self.machine().installing() }
     pub fn running(&self) -> bool { self.machine().phase == Phase::Running }
     pub fn session_end_cancelled(self: &Arc<Self>) { let a = self.machine().session_end_cancelled(Instant::now()); self.run(a); }
+    pub fn installer_close(self: &Arc<Self>) { let a = self.machine().installer_close(Instant::now()); self.run(a); }
     pub fn begin_session_end(self: &Arc<Self>) -> bool {
         let (send, actions) = self.machine().begin_session_end(Instant::now());
         self.run(actions); send
@@ -588,6 +612,78 @@ impl Lifecycle {
         // Not our session end (tray quit already running, or finished): nothing changes.
         let mut m = live(); m.request(QuitReason::Tray, t(0), false);
         assert!(m.session_end_cancelled(t(1)).is_empty());
+    }
+    #[test] fn an_installer_close_is_an_ordinary_quit_that_asks_no_page() {
+        // 11-20: Tesseract Setup's Restart Manager close. Windows ends nothing afterwards, so the
+        // shell quits as from the tray, minus the page question: app.quit, never app.sessionEnd.
+        let t = clock(); let mut m = live();
+        assert_eq!(m.installer_close(t(0)), vec![Action::Log("quit_requested_installer_close".into()), Action::MarkQuitting,
+            Action::Log("quit_confirm_not_needed".into()), Action::Log("quit_send_installer_close".into())]);
+        assert_eq!(m.take_send(), Some(QuitReason::InstallerClose), "app.quit goes to the worker");
+        assert_eq!(QuitReason::InstallerClose.wire(), "user", "the sidecar's ordinary exit recovery");
+        assert!(m.session_end_needed(), "a later logoff still sends app.sessionEnd (no bye yet)");
+        // The 20 s prompt is armed from the start, as for a tray quit.
+        assert!(m.tick(t(19_999)).is_empty());
+        assert_eq!(m.tick(t(20_000)).last(), Some(&Action::PromptStall));
+        assert_eq!(m.stall_answer(false, t(21_000)), vec![Action::Log("quit_stall_continue".into())]);
+        // bye, then the sidecar's exit: the shell leaves with its code.
+        m.bye(t(22_000));
+        assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Exit(0)));
+        assert!(m.finished() && m.reason() == Some(QuitReason::InstallerClose));
+        assert!(m.installer_close(t(23_000)) == vec![Action::Log("installer_close_already_quitting".into())], "a second window's message");
+    }
+    #[test] fn an_installer_close_does_not_wait_for_the_page() {
+        // The user's tray quit is still asking the page: the installer close sends app.quit now.
+        let t = clock(); let mut m = live();
+        m.request(QuitReason::Tray, t(0), true);
+        assert_eq!(m.installer_close(t(100)), vec![Action::Log("installer_close_during_quit_tray".into()), Action::Log("quit_send_installer_close".into())]);
+        assert_eq!(m.take_send(), Some(QuitReason::InstallerClose));
+        assert_eq!(m.page_reply(1, 2, t(200)), Err("not_confirming"), "a late page answer prompts nothing");
+        assert!(m.tick(t(20_100)).last() == Some(&Action::PromptStall), "the 20 s clock started with the send");
+        // The unsaved-changes prompt is open: the same, and its late "No" cancels nothing.
+        let mut m = live();
+        m.request(QuitReason::Tray, t(0), true); m.page_reply(1, 3, t(10)).unwrap();
+        assert!(matches!(m.phase, Phase::Prompting { count: 3 }));
+        assert_eq!(m.installer_close(t(20)).last(), Some(&Action::Log("quit_send_installer_close".into())));
+        assert_eq!(m.take_send(), Some(QuitReason::InstallerClose));
+        assert!(m.unsaved_answer(false, t(30)).is_empty() && m.quitting());
+        // No sidecar at all: the shell leaves at once with 0, as from the tray.
+        let mut m = live(); m.set_sidecar(Sidecar::Down);
+        assert_eq!(m.installer_close(t(0)).last(), Some(&Action::Exit(0)));
+    }
+    #[test] fn an_installer_close_leaves_running_quits_as_they_are() {
+        let t = clock(); let already = || vec![Action::Log("installer_close_already_quitting".into())];
+        // A tray quit already sent: nothing new goes out and its stall clock runs on.
+        let mut m = live(); m.request(QuitReason::Tray, t(0), false); assert_eq!(m.take_send(), Some(QuitReason::Tray));
+        assert_eq!(m.installer_close(t(5_000)), already());
+        assert!(m.take_send().is_none() && m.reason() == Some(QuitReason::Tray));
+        assert_eq!(m.tick(t(20_000)).last(), Some(&Action::PromptStall), "the clock was not restarted");
+        // The update quit: unchanged before and during its install step.
+        let mut m = live(); m.request(QuitReason::Update, t(0), false); assert_eq!(m.take_send(), Some(QuitReason::Update));
+        assert_eq!(m.installer_close(t(1)), already());
+        assert_eq!(m.reason(), Some(QuitReason::Update));
+        m.bye(t(2)); assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Install));
+        assert_eq!(m.installer_close(t(3)), already());
+        assert!(m.installing());
+        assert_eq!(m.install_finished(true).last(), Some(&Action::Exit(0)));
+        // A logoff or shutdown in flight keeps its fast path: no app.quit, no stall prompt.
+        let mut m = live(); assert!(m.begin_session_end(t(0)).0);
+        assert_eq!(m.installer_close(t(1)), already());
+        assert!(m.take_send().is_none() && m.tick(t(60_000)).is_empty());
+        // A shell that is done.
+        let mut m = live(); m.request(QuitReason::Tray, t(0), false); m.take_send(); m.bye(t(1)); let _ = m.sidecar_exited(0);
+        assert!(m.finished());
+        assert_eq!(m.installer_close(t(2)), already());
+    }
+    #[test] fn a_session_end_during_an_installer_close_still_runs_rt2() {
+        // Windows Update may close apps through Restart Manager and then restart: the shutdown
+        // that follows still gets app.sessionEnd, its app.quit having no bye yet.
+        let t = clock(); let mut m = live();
+        m.installer_close(t(0)); assert_eq!(m.take_send(), Some(QuitReason::InstallerClose));
+        let (send, a) = m.begin_session_end(t(10));
+        assert!(send, "app.sessionEnd goes out as well");
+        assert_eq!(a, vec![Action::Log("session_end_during_quit_installer_close".into())]);
+        assert!(m.tick(t(60_000)).is_empty(), "no stall prompt while Windows ends the session");
     }
     #[test] fn update_quit_installs_instead_of_exiting_and_failure_resumes() {
         let t = clock(); let mut m = live();

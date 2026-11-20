@@ -21,7 +21,6 @@
   "tiers.bx.title": "Bastion отключён",
   "tiers.cell.aria": "{name}{has_word, select, yes {, {word}} other {}}{has_count, select, yes {, доступно {ok} из {total}} ok_only {, доступно {ok}} other {}}",
   "tiers.cell.count_aria": "Доступно {ok} из {total}",
-  "tiers.cell.slot.collecting": "Сбор…",
   "tiers.cell.slot.filling": "Пополнение",
   "tiers.cell.slot.missing": "Выход отсутствует",
   "tiers.cell.slot.nodes": "{n, plural, one {# сервер} few {# сервера} many {# серверов} other {# сервера}}",

@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "Für diesen Vorgang sind Administratorrechte erforderlich. Führen Sie Tesseract als Administrator aus oder verwenden Sie nur den System-Proxy.",
-  "errors.alerts.delivery_failed": "Die Desktop-Benachrichtigung konnte nicht zugestellt werden. Prüfen Sie die Benachrichtigungseinstellungen von Windows und versuchen Sie es dann erneut.",
   "errors.alerts.receipt_persist_pending": "Die Desktop-Benachrichtigung wurde angezeigt, aber ihr Zustelleintrag wird noch gespeichert und ist noch nicht bestätigt. Sie müssen nichts tun; der Benachrichtigungsverlauf wird nach dem Speichern automatisch aktualisiert.",
   "errors.autostart.development_mode": "In einer Entwicklungsversion lässt sich „Mit Windows starten“ nicht einrichten. Richten Sie es in einer installierten Version von Tesseract ein.",
   "errors.autostart.read_failed": "Die Einstellung „Mit Windows starten“ kann nicht gelesen werden. Prüfen Sie die Zugriffsrechte auf die Registrierung und versuchen Sie es dann erneut.",

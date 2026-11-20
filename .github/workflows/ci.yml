@@ -1,0 +1,328 @@
+name: CI
+
+# The non-Python suites, on every pull request and on main: the Tauri shell (shell/app), the
+# setup window (shell/setup) and the web UI (ui/). Until this workflow only the release ran any
+# tests, and only pytest: the shell's reply to the update hand-off broke every in-app update from
+# 0.1.0 to 0.1.3 and no suite that could have caught it ever ran. Each suite is its own job, so one
+# failure does not hide another; the last job, "CI", fails unless every suite passed and is the one
+# check a branch rule needs. Callable (workflow_call) so a release can run the same suites.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The release toolchain (release-windows.yml).
+  PYTHON_VERSION: "3.12.7"
+  NODE_VERSION: "24.14.1"
+  RUST_VERSION: "1.96.0"
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: always
+  # The UI's browser tests run in the runner's Chrome; without Chrome they fail instead of
+  # skipping (ui/test/unit/chrome_required.test.mjs).
+  TESSERACT_UI_REQUIRE_CHROME: "1"
+
+jobs:
+  shell:
+    name: Shell (shell/app)
+    runs-on: windows-2022
+    timeout-minutes: 60
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}\.build\p6-target
+    steps:
+      - name: Check out
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      # The shell's tests talk to Python stand-in sidecars (shell/app/**/*_fixture.py) that run
+      # every frame the shell sends through the real sidecar's ingress check
+      # (shell/app/src/fixture_contract.py: bridge_protocol, bridge_main), from the repository
+      # .venv, as the shell's own source mode does.
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-windows.lock.txt
+      - name: Create the repository venv (hash-locked dependencies)
+        run: |
+          python -m venv .venv
+          if ($LASTEXITCODE -ne 0) { throw "venv creation failed" }
+          .venv\Scripts\python.exe -m pip install --disable-pip-version-check --no-deps --require-hashes --only-binary=:all: -r requirements-windows.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw "locked dependency install failed" }
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install the locked UI packages
+        run: npm --prefix ui ci --ignore-scripts --no-audit --no-fund
+
+      - name: Install Rust ${{ env.RUST_VERSION }}
+        run: |
+          rustup toolchain install $env:RUST_VERSION --profile minimal --no-self-update
+          if ($LASTEXITCODE -ne 0) { throw "rustup toolchain install failed" }
+          rustup default $env:RUST_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "rustup default failed" }
+
+      # build.rs reads two generated, untracked inputs: app_version.txt (the release version,
+      # as scripts/build_windows.ps1 writes it) and shell/app/ui (the UI's app target).
+      - name: Write app_version.txt
+        run: |
+          $version = (.venv\Scripts\python.exe -B -c "import app_info; print(app_info.DEFAULT_APP_VERSION)" | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $version) { throw "Unable to read the version from app_info.py" }
+          [IO.File]::WriteAllText("app_version.txt", "$version`n", [Text.Encoding]::ASCII)
+          "app_version.txt: $version"
+      - name: Build the UI into shell/app/ui
+        run: ./scripts/shell_copy_ui.ps1
+
+      - name: Restore the Cargo cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            .build/p6-target
+          key: shell-${{ runner.os }}-rust-${{ env.RUST_VERSION }}-${{ hashFiles('shell/Cargo.lock') }}
+      - name: Fetch the locked crates
+        run: cargo fetch --locked --manifest-path shell/Cargo.toml
+
+      # shell/README.md, unit test order: bridge_host's binaries first (a scheduler test runs
+      # echo_sidecar.exe), then the app's tests without and with the distribution feature.
+      - name: Build bridge_host
+        id: bridge_host
+        working-directory: shell
+        run: cargo build --offline --locked -p bridge_host --bins
+      - name: Test the shell (development build)
+        working-directory: shell
+        run: cargo test --offline --locked --manifest-path app/Cargo.toml
+      - name: Test the shell (distribution build)
+        if: ${{ !cancelled() && steps.bridge_host.outcome == 'success' }}
+        working-directory: shell
+        run: cargo test --offline --locked --manifest-path app/Cargo.toml --features distribution
+
+  setup-window:
+    name: Setup window (shell/setup)
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Check out
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Rust ${{ env.RUST_VERSION }} with Clippy
+        run: |
+          rustup toolchain install $env:RUST_VERSION --profile minimal --component clippy --no-self-update
+          if ($LASTEXITCODE -ne 0) { throw "rustup toolchain install failed" }
+          rustup default $env:RUST_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "rustup default failed" }
+      # build.rs reads app_version.txt (the version the window shows) and static/app_icon.ico.
+      - name: Write app_version.txt
+        run: |
+          $version = (python -B -c "import app_info; print(app_info.DEFAULT_APP_VERSION)" | Out-String).Trim()
+          if ($LASTEXITCODE -ne 0 -or -not $version) { throw "Unable to read the version from app_info.py" }
+          [IO.File]::WriteAllText("app_version.txt", "$version`n", [Text.Encoding]::ASCII)
+          "app_version.txt: $version"
+      # The window embeds the app's own fonts (src/assets.rs: ui/fonts/*.woff2). They are not
+      # sources: every UI build copies them from the locked packages (ui/build/fonts.mjs), as the
+      # release's app build does before it builds this window. A fresh checkout has none.
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install the locked UI packages
+        run: npm --prefix ui ci --ignore-scripts --no-audit --no-fund
+      - name: Copy the UI fonts the window embeds (ui/fonts)
+        run: node ui/build.mjs --target app --out "$env:RUNNER_TEMP\ui-app"
+
+      - name: Restore the Cargo cache
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            shell/setup/target
+          key: setup-${{ runner.os }}-rust-${{ env.RUST_VERSION }}-${{ hashFiles('shell/setup/Cargo.lock') }}
+      - name: Fetch the locked crates
+        working-directory: shell/setup
+        run: cargo fetch --locked
+
+      # Two tests depend on the machine: explorer_starts_a_program_as_the_desktop_user returns
+      # early (passes without running) when no desktop Explorer owns a shell window, and
+      # restart_manager_sees_a_running_image_and_nothing_else asks the real Restart Manager. Say
+      # which one this runner is, so a pass is never mistaken for coverage it did not have.
+      - name: Report this runner's desktop
+        run: |
+          Add-Type -Namespace CiProbe -Name User32 -MemberDefinition @'
+          [DllImport("user32.dll")] public static extern System.IntPtr GetShellWindow();
+          [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(System.IntPtr hWnd, out uint processId);
+          '@
+          $session = (Get-Process -Id $PID).SessionId
+          $explorers = @(Get-Process explorer -ErrorAction SilentlyContinue | Where-Object SessionId -eq $session)
+          $shell = [CiProbe.User32]::GetShellWindow()
+          if ($shell -eq [IntPtr]::Zero) {
+            "::warning title=Setup window::No desktop shell window in session ${session}: explorer_starts_a_program_as_the_desktop_user returns early here, so the Explorer route is not exercised on this runner."
+          } else {
+            [uint32] $owner = 0
+            [void] [CiProbe.User32]::GetWindowThreadProcessId($shell, [ref] $owner)
+            "Session $session has a desktop shell window (Explorer pid $owner; $($explorers.Count) explorer.exe in this session): the Explorer route test runs for real."
+          }
+      # --show-output: the Explorer route test prints "explorer pid N; the started program's
+      # parent M" when it really ran.
+      - name: Test the setup window
+        working-directory: shell/setup
+        run: cargo test --offline --locked -- --show-output
+      # -D warnings: Clippy only reports lints otherwise, and the crate is clean today.
+      - name: Clippy
+        if: ${{ !cancelled() }}
+        working-directory: shell/setup
+        run: cargo clippy --offline --locked --all-targets -- -D warnings
+
+  ui-unit:
+    name: UI unit tests (ui/test/unit)
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Check out
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      # Several tests run the Python contract tools (validate_ui_fixtures.py, bridge_catalog)
+      # from the repository .venv.
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-windows.lock.txt
+      - name: Create the repository venv (hash-locked dependencies)
+        run: |
+          python -m venv .venv
+          if ($LASTEXITCODE -ne 0) { throw "venv creation failed" }
+          .venv\Scripts\python.exe -m pip install --disable-pip-version-check --no-deps --require-hashes --only-binary=:all: -r requirements-windows.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw "locked dependency install failed" }
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install the locked UI packages
+        run: npm --prefix ui ci --ignore-scripts --no-audit --no-fund
+      - name: Report Chrome
+        run: (Get-Item "C:\Program Files\Google\Chrome\Application\chrome.exe").VersionInfo.ProductVersion
+      - name: Run the unit tests
+        working-directory: ui
+        run: node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=tap --test-reporter-destination="$env:RUNNER_TEMP\ui-unit.tap" test/unit/
+      # node --test counts a skip as a pass: only the tests registered in ui/tools/unit_skips.mjs
+      # (ui/README.md §2) may skip.
+      - name: Check that only registered tests skipped
+        if: ${{ !cancelled() }}
+        run: node ui/tools/unit_skips.mjs "$env:RUNNER_TEMP\ui-unit.tap"
+
+  ui-render:
+    name: UI render cases (ui/test/render)
+    runs-on: windows-2022
+    timeout-minutes: 45
+    steps:
+      - name: Check out
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install the locked UI packages
+        run: npm --prefix ui ci --ignore-scripts --no-audit --no-fund
+      - name: Report Chrome
+        run: (Get-Item "C:\Program Files\Google\Chrome\Application\chrome.exe").VersionInfo.ProductVersion
+      # ui/README.md §1: the matrix renders the design target built with the pseudo language and
+      # the id trace.
+      - name: Build the UI
+        run: npm --prefix ui run build -- --pseudo --i18n-trace
+      - name: Check the render framework
+        run: node ui/test/render/run.mjs --self-test
+      - name: Render every case (zh_CN and pseudo, 1060x700 and 1280x800)
+        run: node ui/test/render/run.mjs --run ci --out "$env:RUNNER_TEMP\render" --jobs 3
+      - name: Keep the evidence of a failed render
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: render-evidence
+          path: ${{ runner.temp }}/render/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  ui-gates:
+    name: UI gates and i18n (ui/tools/check.mjs)
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements-windows.lock.txt
+      - name: Create the repository venv (hash-locked dependencies)
+        run: |
+          python -m venv .venv
+          if ($LASTEXITCODE -ne 0) { throw "venv creation failed" }
+          .venv\Scripts\python.exe -m pip install --disable-pip-version-check --no-deps --require-hashes --only-binary=:all: -r requirements-windows.lock.txt
+          if ($LASTEXITCODE -ne 0) { throw "locked dependency install failed" }
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install the locked UI packages
+        run: npm --prefix ui ci --ignore-scripts --no-audit --no-fund
+      # ui/README.md §3: build.mjs --check, scan.mjs, gen_rt_spec.py --check,
+      # validate_ui_fixtures.py (every scenario through bridge_protocol) and the i18n gate,
+      # i18n_check.mjs --level p4.
+      - name: Run the UI gates
+        run: node ui/tools/check.mjs
+
+  ci:
+    name: CI
+    if: ${{ always() }}
+    needs: [shell, setup-window, ui-unit, ui-render, ui-gates]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Every suite passed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$RESULTS" | jq -e 'all(.[]; .result == "success")' > /dev/null

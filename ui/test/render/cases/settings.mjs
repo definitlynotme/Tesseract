@@ -233,13 +233,8 @@ const LANG_NOT_SWITCHED = (() => {
   const sc = scenario('settings_save_not_applied');
   return withHandlers(sc, 'settings_save_lang_not_switched', ['settings.apply'], [notAppliedAnswer(sc, [{ section: 'ui', saved: true, applied: false, effect: 'none', error: APPLY_ERR('language_sync_failed') }])]);
 })();
-// ② a section whose delivery records stayed (delivery_records_delete_failed): the bar says so and
-// promises no restart. (The page's save is a switch that needs no Core, as in NO_RETRY; the answer's
-// reason is what is under test, the alert drawer's own delete flow is alerts.mjs's)
-const RECORDS_NOT_DELETED = (() => {
-  const sc = scenario('settings_save_not_applied');
-  return withHandlers(sc, 'settings_save_records_not_deleted', ['settings.apply'], [notAppliedAnswer(sc, [{ section: 'network', saved: true, applied: false, effect: 'none', error: APPLY_ERR('delivery_records_delete_failed') }])]);
-})();
+// ② (a section whose delivery records stayed, delivery_records_delete_failed: gone with the alert
+// channels and their delivery records in the 10-30 alert redesign; no sidecar sends that reason)
 /* 修复第 1 轮: the ui section saved but its preferences not applied (preferences_apply_failed): the
    language was sent with it, yet reopening the window is not the remedy; the bar gives the reason */
 const UI_PREFS_NOT_APPLIED = (() => {
@@ -305,7 +300,8 @@ const REVISIT = (() => {
   const sc = scenario('settings_save_pending');
   const snap2 = snapshotAnswer(sc, 9, () => {});
   snap2.reply[0].data.pending = { intent_id: 'intent-7', config_rev: 9, generation: 4, state: 'failed', effect: 'restart', error: { code: 'io', message_key: 'errors.settings.apply_failed', params: {} } };
-  return withHandlers(sc, 'settings_revisit_foreign_intent', [], [snap2, ...['autostart.state', 'app.info', 'geo.status', 'alerts.catalog'].map(c => cloneJ(handlerOf(sc, c)))]);
+  // (alerts.catalog left the protocol with the 10-30 alert redesign: no handler to copy)
+  return withHandlers(sc, 'settings_revisit_foreign_intent', [], [snap2, ...['autostart.state', 'app.info', 'geo.status'].map(c => cloneJ(handlerOf(sc, c)))]);
 })();
 /* ⑦ (05d §9-3): Geo 已禁用 learnt from a refused geo.update is forgotten on a configuration change
    made elsewhere (config.changed rev > base) and on a new generation */
@@ -614,6 +610,29 @@ const CASES = [
       return check([[r.page && !r.install, `release page instead of install: ${JSON.stringify(r)}`]]);
     }),
   },
+  {
+    // 11-18: a hand-off that did not happen (verified + error) is no dead end: the line says the
+    // install did not start, 立即更新 retries and 前往发布页 is the manual way out
+    name: 'settings_update_stranded', scenario: 'settings_update_stranded',
+    // (the row into view for the screenshot; a {focus} landing re-reads the queries: one visit here)
+    actions: [{ eval: () => { document.querySelector('#set-upd-st').scrollIntoView({ block: 'center' }); } }, { page_ms: 600 }],
+    expect: run(async page => {
+      const r = await page.evaluate(() => {
+        const st = document.querySelector('#set-upd-st');
+        const foot = document.querySelector('.foot-upd');
+        return { err: st.classList.contains('is-err'), ok: st.classList.contains('is-ok'), text: st.textContent,
+          install: !document.querySelector('#set-upd-install').hidden, page: !document.querySelector('#set-upd-page').hidden,
+          check: !document.querySelector('#set-upd-check').hidden,
+          foot: foot ? foot.textContent : null, footFound: !!foot && foot.classList.contains('is-found'), footBusy: !!foot && foot.classList.contains('is-busy') };
+      });
+      const [w, found] = await words(page, [['settings.app.update.state.handoff_failed'], ['shell.foot.update.label', { state: 'found', version: '1.1.0' }]]);
+      return check([[r.err && !r.ok && r.text.includes(w), `the hand-off failure line: ${JSON.stringify(r)}`],
+        // (检查更新 stays hidden: two buttons, so the title column keeps its width in every language)
+        [r.install && r.page && !r.check, `retry and release page shown, check hidden: ${JSON.stringify(r)}`],
+        // the sidebar footer offers the version again, never 更新已就绪 (busy) for good
+        [r.footFound && !r.footBusy && !!r.foot && r.foot.includes(found), `footer: ${JSON.stringify(r)}`]]);
+    }),
+  },
   ...[['downloading', () => !document.querySelector('#set-upd-prog').hidden && document.querySelector('#set-upd-check').hidden],
     ['handoff', () => document.querySelector('#set-upd-check').hidden],
     ['failed', () => document.querySelector('#set-upd-st').classList.contains('is-err')],
@@ -823,16 +842,6 @@ const CASES = [
     }),
   },
   {
-    name: 'settings_save_records_not_deleted', scenario: RECORDS_NOT_DELETED, actions: [...click('.switch[data-k="egress"]'), ...save],
-    expect: run(async page => {
-      const s = await state(page);
-      const [want, old] = await page.evaluate(() => [window.T.t('settings.save.not_applied_saved', { reason: window.T.t('settings.save.not_applied_reason.delivery_records') }), window.T.t('errors.settings.apply_failed')]);
-      const tip = await rowTip(page, 'set-egress-row'), why = await page.evaluate(() => window.T.t('settings.save.not_applied_reason.delivery_records'));
-      return check([[s.bar && s.bar.eff === want && !s.bar.eff.includes(old), `the bar's sentence: ${s.bar && s.bar.eff}`], [s.bar && !s.bar.saveShown, 'no 重试应用'],
-        [tip === why, `the row's tip (修复第 1 轮): ${tip}`]]);
-    }),
-  },
-  {
     // 修复第 1 轮: the language sent, the ui section's preferences not applied: no 重新打开窗口
     name: 'settings_save_ui_prefs_not_applied', scenario: UI_PREFS_NOT_APPLIED, actions: [...pickLang(1), ...save],
     expect: run(async page => {
@@ -973,15 +982,17 @@ const CASES = [
       return check([[mid.disabled && mid.err === 1, `disabled after the refusal: ${JSON.stringify(mid)}`], [!now.disabled && now.err === 0, `offered again in the new generation: ${JSON.stringify(now)}`]]);
     }),
   },
-  // 待用户认可表第 11 行 (T-P4-H4): 提醒区「查看全部」 goes to the logs page filtered to 运行告警, every
-  // level and run (logs.mjs logs_enter_category checks what the logs page does with it)
+  // 待用户认可表第 11 行 (T-P4-H4): 提醒区「查看提醒记录」 (#set-n-history; since the 10-30 alert
+  // redesign it stands where the alert history's 「查看全部」 #set-recent-all was) goes to the logs
+  // page filtered to 运行告警, every level and run (logs.mjs logs_enter_category checks what the logs
+  // page does with it)
   {
     // (T-P5-13: the nine languages; the target and its params do not depend on the language)
     name: 'settings_recent_all_category', scenario: 'settings_page_running', langs: LANGS9,
-    actions: [{ eval: () => { const go = T.go; window.__goArgs = null; T.go = (p, a) => { window.__goArgs = [p, a]; return false; }; try { document.querySelector('#set-recent-all').click(); } finally { T.go = go; } } }],
+    actions: [{ eval: () => { const go = T.go; window.__goArgs = null; T.go = (p, a) => { window.__goArgs = [p, a]; return false; }; try { document.querySelector('#set-n-history').click(); } finally { T.go = go; } } }],
     expect: run(async page => {
       const g = await page.evaluate(() => window.__goArgs);
-      return check([[!!g && g[0] === 'logs' && JSON.stringify(g[1]) === '{"category":"alert","level":"all","runOnly":false}', `查看全部: ${JSON.stringify(g)}`]]);
+      return check([[!!g && g[0] === 'logs' && JSON.stringify(g[1]) === '{"category":"alert","level":"all","runOnly":false}', `查看提醒记录: ${JSON.stringify(g)}`]]);
     }),
   },
   // ⑧ a source row's buttons are named by kind and number, no state word (a draft is not 已设置)
@@ -1095,12 +1106,12 @@ const CASES = [
     name: 'settings_features', scenario: 'settings_features',
     expect: run(async page => {
       const r = await page.evaluate(() => ({ build: (window.__TESSERACT_DESIGN__.build.h_features || []).slice(),
-        last: !!document.querySelector('.set-src-last'),
-        paused: !document.querySelector('#set-alertsPaused-row').hidden }));
+        last: !!document.querySelector('.set-src-last') }));
       // (B-28, the compatibility rules' 恢复默认, went with the purged stage: 11-01; B-24's 打开日志目录
-      // with the 数据目录 row: 11-04)
-      const on = ['B-07', 'B-31'].every(n => r.build.includes(n));
-      return check([[r.last === on && r.paused === on, `B controls ${on ? 'missing' : 'shown'} (build ${r.build.length} names): ${JSON.stringify(r)}`]]);
+      // with the 数据目录 row: 11-04; B-31's pause-all switch with the 10-30 alert redesign, whose
+      // notices master switch replaced it: feature_registry.js no_control)
+      const on = ['B-07'].every(n => r.build.includes(n));
+      return check([[r.last === on, `B controls ${on ? 'missing' : 'shown'} (build ${r.build.length} names): ${JSON.stringify(r)}`]]);
     }),
   },
 ];

@@ -3,10 +3,6 @@
     "m": "这个操作需要管理员权限。以管理员身份运行 Tesseract，或只使用系统代理。",
     "_desc": "通用错误（code = admin_required）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"
   },
-  "errors.alerts.delivery_failed": {
-    "m": "桌面通知没能送达。检查 Windows 的通知设置后再试。",
-    "_desc": "提醒：桌面通知送达失败（bridge_alerts_desktop）"
-  },
   "errors.alerts.receipt_persist_pending": {
     "m": "桌面通知已经显示，但送达记录还在写入，暂时没有确认。不需要操作，写完后告警历史会自动更新。",
     "_desc": "桌面通知送达回执（alerts.desktopDelivered，code timeout，reason receipt_persist_pending）：写盘超过 30 秒；外壳通常只记日志，诊断或日志里可能显示"

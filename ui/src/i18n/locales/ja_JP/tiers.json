@@ -21,7 +21,6 @@
   "tiers.bx.title": "Bastion は無効です",
   "tiers.cell.aria": "{name}{has_word, select, yes {、{word}} other {}}{has_count, select, yes {、{ok}/{total} 利用可能} ok_only {、{ok} 利用可能} other {}}",
   "tiers.cell.count_aria": "{ok}/{total} 利用可能",
-  "tiers.cell.slot.collecting": "収集中…",
   "tiers.cell.slot.filling": "補充中",
   "tiers.cell.slot.missing": "出口が欠落",
   "tiers.cell.slot.nodes": "{n, plural, other {# ノード}}",

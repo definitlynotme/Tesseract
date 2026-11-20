@@ -293,8 +293,8 @@ Python 仅执行已登记的精确命令/查询；未登记、页面调用外壳
 | `ui.presence` | sampling / shell | res / none | `{"visible":"bool","focused":"bool","page":"overview&#124;nodes&#124;settings&#124;logs&#124;alerts&#124;about&#124;none"}` | `{"recorded":"bool"}` | validation |
 | `app.quit` | control / shell | job / none | `{"reason?":"user&#124;update&#124;shell_lost"}` | `{"startup_phase":"str","shutdown_exit_code":"uint?","cleanup_pending":"bool"}` | lifecycle_busy io |
 | `shell.saveGrant` | control / shell | res / none | `{"ref":"str","purpose":"bundle&#124;filtered","expires_at_ms":"uint","format":"zip&#124;json&#124;text&#124;csv","handle_id":"uint","for_owner?":"str"}` | `{"registered":"bool"}` | not_allowed conflict |
-| `update.exitResponse` | control / shell | res / none | `{"handoff_id":"str","accepted":"bool","reason_code":"str?"}` | `{"recorded":"bool"}` | conflict |
-| `update.installResult` | control / shell | res / none | `{"receipt_ref":"str","launched":"bool","reason_code":"str?"}` | `{"recorded":"bool"}` | conflict io |
+| `update.exitResponse` | control / shell | res / none | `{"handoff_id":"str","accepted":"bool","reason_code?":"str?"}`；外壳始终发送 `reason_code`（接受时为 null），侧车也接受缺省（见 §17 11-18） | `{"recorded":"bool"}` | conflict |
+| `update.installResult` | control / shell | res / none | `{"receipt_ref":"str","launched":"bool","reason_code?":"str?"}` | `{"recorded":"bool"}` | conflict io |
 | `app.sessionEnd` | control / shell | res / none | `{"reason":"logoff&#124;shutdown","budget_ms":"uint"}` | `{"writes_revoked":"bool","recovery":"Recovery","workers_pending":"bool"}` | io timeout |
 | `host.saveFile` | shell / page | res / dialog | `{"purpose":"bundle&#124;filtered","format":"zip&#124;json&#124;text&#124;csv"}` | `{"cancelled":"bool","ref":"str?"}` | io |
 | `host.openFolder` | shell / page | res / none | `{"kind":"config&#124;data&#124;logs&#124;exports"}` | `{"opened":"bool"}` | io not_allowed |
@@ -422,7 +422,7 @@ alerts.desktop 仅壳消费，delivery_id 关联真实待投递记录、事件�
 
 ### 注销快路径、presence、语言
 
-收到 Windows 会话结束消息后外壳立即发 app.sessionEnd{reason=logoff|shutdown,budget_ms}，不依赖 WebView、不排普通 app.quit。RT-2 必须有独立紧急执行机会，不能与长锁阻塞的完整 stop 共用唯一 worker。先撤权写端、再紧急恢复；相对剩余预算由后端用自身 monotonic 建原始 deadline，不跨边界传绝对值或重新授预算。超时域保留 unknown，writes_revoked=false 不能伪报成功；最终清理沿 shutdown/bye 报告。真实注销/恢复验收在 P7 专用环境。
+收到 Windows 会话结束消息后外壳立即发 app.sessionEnd{reason=logoff|shutdown,budget_ms}，不依赖 WebView、不排普通 app.quit。安装程序经 Restart Manager 关闭应用（ENDSESSION_CLOSEAPP，无 ENDSESSION_LOGOFF、无 ENDSESSION_CRITICAL）不是会话结束：Windows 之后不结束进程，从 0.1.4 起外壳发普通 app.quit{reason=user}，侧车走完整退出恢复（0.1.0–0.1.3 的外壳仍按会话结束发 app.sessionEnd）。RT-2 必须有独立紧急执行机会，不能与长锁阻塞的完整 stop 共用唯一 worker。先撤权写端、再紧急恢复；相对剩余预算由后端用自身 monotonic 建原始 deadline，不跨边界传绝对值或重新授预算。超时域保留 unknown，writes_revoked=false 不能伪报成功；最终清理沿 shutdown/bye 报告。真实注销/恢复验收在 P7 专用环境。
 
 ui.presence 仅外壳按实际 visible/focused 发，页面只提供路由页 ID；状态变化和重连发完整值。出口自动查询保留总览可见、ready、绑定稳定的旧规则，不能新增必须 focused 条件。
 
@@ -592,6 +592,8 @@ fixtures/valid 保留 P1；fixtures/v1/valid 各命令有请求与结果、各 j
 ## 17. 作废项、改名项与兼容边界
 
 T-P2-27（Claude 10-05 裁定）：仅壳主题 `update.prepareExit` 的 data 增加 `installer_path`、`sha256`、`args`（形状与不变量见 §11 该行），供外壳在侧车真实退出后自行复核字节并启动安装器；§13 中 `prepareExit{…}` 的字段列举以 §11 为准。页面永远看不到该主题；现有敏感值扫描不拒普通 Windows 绝对路径，因此未增加私密例外位置。修复第 1 轮（Claude 10-05）：回到 §13 原设计——`update.exitResponse` accepted=true 只记录接管并立即回 `{recorded:true}`，侧车不提交、不请求也不等待退出，由外壳收到该回复后自己发 `app.quit{reason:update}`；侧车只读观察退出是否开始，接管后 30 秒内未开始退出则撤销接管回到 verified（error.code=lifecycle_busy），收据保留。同时收紧该主题不变量：installer_path 仅盘符形式绝对路径，args 每项须为 `/[A-Z][A-Z0-9_]{0,31}` 开关。
+
+11-18（更新交接修复）：0.1.0–0.1.3 的外壳在 accepted=true 时省略了 `reason_code`，而当时此键必填，侧车入口校验以 `missing:args.reason_code` 拒收每一次接受，交接从未走到 `app.quit{reason:update}`，没有一次应用内更新启动过安装器。现在外壳始终发送 `reason_code`（接受时为 null）；`update.exitResponse` 与 `update.installResult` 的 `reason_code` 改为可省略，作为兜底。外壳测试用的替身侧车（`shell/app/src/fixture_contract.py`）对收到的每一帧执行与侧车相同的入口校验，外壳测试在出现违规帧时失败。已安装的 0.1.0–0.1.3 仍按旧代码交接，必须手动安装一次修复版。
 
 T-P2-31b（集成二）：`hello.caps` 改为 v1 已接线全集（§3）；`alerts.desktopDelivered` 的执行域在规格表中改为 control 并删除执行器覆盖表，业务码增加 `timeout`（写盘超时答复）；`shell.saveGrant.args` 增加可选 `for_owner`；`alerts.test.args` 增加可选 `target_id`、`secrets`（SecretEdit，含 keep）；`alerts.desktop` 增加可选 `force`（外壳兼容一版 `desktop-test-` 前缀）；校验失败但 `id` 可信的请求回结构化 error（§10）；§13 新增「外壳—页面合同」，§13 的 prepareExit 字段与 §11 同步；§14 端口冲突改为方案 a；§15 补来源批量四点保证、启动中视为运行中、受控写入推进持久 rev。修复第 1 轮：§13 承载增加即时拒绝 `frame_too_large`（请求帧加信封余量超过单帧上限）与写端兜底；saveGrant 的信封 owner 为 `shell`，for_owner 已撤销时答 `not_allowed`；§10 区分信封枚举（`invalid_enum`）与参数形状（`invalid_type`）；§12 alerts.test{target_id} 改动端点时不得沿用已保存秘密（`alerts_test_endpoint_changed`）。
 

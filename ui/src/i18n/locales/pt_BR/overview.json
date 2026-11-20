@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "Nó atual desconhecido · saída pelo Gateway",
   "overview.deck.node.untested": "Não testado",
   "overview.deck.stat.bastion_off": "Desativado",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, one {Até # nó} many {Até # de nós} other {Até # nós}}",
   "overview.deck.stat.collecting": "Coletando…",
   "overview.deck.stat.bastion_filling": "Reabastecendo · {n, number} disponíveis",
   "overview.deck.stat.bastion_low": "{n, number} disponíveis · {min, plural, one {abaixo do mínimo de #} many {abaixo do mínimo de #} other {abaixo do mínimo de #}}",

@@ -39,6 +39,15 @@ _LOG = logging.getLogger("tesseract.bridge.shutdown")
 OWNER_CLOSE_EXTRA_SECONDS = 3.5
 # Once RT-2 started, the owner helper gets at most this long (Windows logoff).
 SESSION_END_OWNER_GRACE = 0.5
+# Step 4's budget for a session that drives finish_quit in short slices (the recovery functions'
+# default, as RT-1's). Without `exit_recovery_seconds` the recovery thread gets what is left of
+# the finish_quit call that starts it, a caller that passes one long deadline keeps that contract.
+# 11-19: BridgeSession.run calls finish_quit(deadline_seconds=.1) on every loop turn, so recovery
+# had under 100 ms minus the owners' close; a kill switch's rule deletes or a slow firewall
+# inventory reported unknown/deadline_exceeded in the bye. A normal quit only logs that, but the
+# shell refuses an update install on it (update.rs network_not_recovered). The recovery never
+# writes after its own deadline either way, and the bye still waits for its report.
+EXIT_RECOVERY_SECONDS = 2.0
 
 
 def unknown_recovery() -> dict[str, dict[str, Any]]:
@@ -66,6 +75,7 @@ class ShutdownCoordinator:
         close_owners: Callable[[float], bool] | None = None,
         on_phase: Callable[..., Any] | None = None,
         owner_close_seconds: float = 4.0,
+        exit_recovery_seconds: float | None = None,
         monotonic: Callable[[], float] = time.monotonic,
         wall_ms: Callable[[], int] = lambda: time.time_ns() // 1_000_000,
     ) -> None:
@@ -84,6 +94,7 @@ class ShutdownCoordinator:
         self.close_owners = close_owners
         self.on_phase = on_phase
         self.owner_close_seconds = float(owner_close_seconds)
+        self.exit_recovery_seconds = None if exit_recovery_seconds is None else float(exit_recovery_seconds)
         self._owners_thread: threading.Thread | None = None
         self._owners_done = threading.Event()
         self._owners_started_at: float | None = None
@@ -333,9 +344,11 @@ class ShutdownCoordinator:
             return False
         if self._recovery_thread is None:
             self._phase("recovering")
+            # A sliced caller's own budget (EXIT_RECOVERY_SECONDS), else this call's remainder.
+            budget = (self.exit_recovery_seconds if self.exit_recovery_seconds is not None
+                      else max(0.0, deadline - self.monotonic()))
             self._recovery_thread = threading.Thread(
-                target=self._run_recovery,
-                args=(max(0.0, deadline - self.monotonic()),),
+                target=self._run_recovery, args=(budget,),
                 name="bridge-network-recovery", daemon=True)
             self._recovery_thread.start()
         if not self._recovery_done.wait(max(0.0, deadline - self.monotonic())):

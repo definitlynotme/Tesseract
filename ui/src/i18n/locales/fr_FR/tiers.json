@@ -21,7 +21,6 @@
   "tiers.bx.title": "Bastion désactivé",
   "tiers.cell.aria": "{name}{has_word, select, yes {, {word}} other {}}{has_count, select, yes {, disponibles : {ok} sur {total}} ok_only {, disponibles : {ok}} other {}}",
   "tiers.cell.count_aria": "Disponibles : {ok} sur {total}",
-  "tiers.cell.slot.collecting": "Collecte…",
   "tiers.cell.slot.filling": "Remplissage",
   "tiers.cell.slot.missing": "Sortie manquante",
   "tiers.cell.slot.nodes": "{n, plural, one {# nœud} many {# de nœuds} other {# nœuds}}",

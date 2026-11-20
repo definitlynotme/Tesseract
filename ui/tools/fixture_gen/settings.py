@@ -4,8 +4,9 @@ Run: .venv/Scripts/python.exe -B ui/tools/fixture_gen/settings.py [<ui dir>]
 Every scenario: the shell's rt:reset + a v1 hello (page commands and queries the settings page
 uses; ui.language NOT declared: the shell does not forward it, so a language save waits 3 s and
 says to reopen the window, critique B3) + the runtime topics the page reads + on_invoke answers
-for the queries the page sends on enter (config.snapshot, autostart.state, app.info, geo.status,
-alerts.catalog). Data is ASCII except the sidecar's masked source hint (the bullet).
+for the queries the page sends on enter (config.snapshot, autostart.state, app.info, geo.status;
+alerts.catalog left the protocol with the 10-30 alert redesign). Data is ASCII except the sidecar's
+masked source hint (the bullet).
 """
 # Collected into ui/tools/fixture_gen/ by T-P4-12 (第八波裁定 05a-§11.5); usage and state: ui/README.md.
 import copy
@@ -36,7 +37,7 @@ def evt(topic, data, kind="snapshot", rev=1, **kw):
     return base_frame(t="evt", topic=topic, rev=rev, kind=kind, data=data, **kw)
 
 
-COMMANDS = ["alerts.catalog", "app.info", "app.update.check", "app.update.install", "autostart.state",
+COMMANDS = ["app.info", "app.update.check", "app.update.install", "autostart.state",
             "config.snapshot", "geo.status", "geo.update", "mode.set", "service.restart",
             "service.start", "service.stop", "settings.apply"]
 TOPICS = ["bastion.pool", "bastion.sources", "config.changed", "core.info", "geo.status", "jobs",
@@ -101,7 +102,9 @@ def snapshot_values(**over):
         "latency": {"primary_gateway_max_latency_ms": 800},
         "sources": [{"id": "src-gh-1", "kind": "github_repos", "display": "GitHub", "enabled": True, "hint": "e\u2022\u2022\u2022/f\u2022\u2022\u2022"},
                     {"id": "src-sub-1", "kind": "subscription_urls", "display": "Subscription", "enabled": True}],
-        "alerts": {"channels": []},
+        # 10-30 alert redesign: the sidecar projects alerts.notify only (bridge_settings /
+        # bridge_runtime_access: alert_policy.notify_settings, here of an empty alerts section)
+        "alerts": {"notify": {"enabled": True, "events": ["connection", "tier_fallback", "update"], "sound": True}},
         "ui": {"language": "zh_CN", "overview_auto_exit_lookup": True, "start_in_tray_on_autostart": False},
         "autostart": {"enabled": True},
         "killswitch": {"enabled": True, "allow_lan": True, "allow_dns": True, "dns_whitelist": ["192.0.2.53"],
@@ -228,7 +231,6 @@ def scenario(name, desc, *, run="running", values=None, secret_fields=None, read
                                                             "listeners": [{"kind": "mixed", "host": "127.0.0.1", "port": 7890, "available": True},
                                                                           {"kind": "subscription", "host": "127.0.0.1", "port": 25500, "available": True}]})]))
         steps.append(on("geo.status", reply=[res("geo.status", geo_status or geo())]))
-        steps.append(on("alerts.catalog", reply=[res("alerts.catalog", {"channels": [], "event_groups": [], "scopes": [], "acl": {}})]))
     steps += list(extra_steps)
     return {"name": name, "desc": desc, "lang": "zh_CN", "steps": steps}
 
@@ -342,6 +344,10 @@ add("settings_update_not_installable", "S-15: available but not installable: 无
     upd=update_state(state="available", version="1.1.0", update_available=True, installable=False))
 add("settings_update_downloading", "S-15: downloading (no percentage: B-30(c))", upd=update_state(state="downloading", version="1.1.0", update_available=True, installable=True))
 add("settings_update_handoff", "S-15: handoff: 正在关闭 Tesseract 并安装", upd=update_state(state="handoff", version="1.1.0", update_available=True, installable=True))
+# 11-18: the sidecar's hand-off expired (the shell never took it over): verified + error timeout.
+# Before, verified hid every button: 安装包已就绪 and no way on (0.1.0-0.1.3 always ended here).
+add("settings_update_stranded", "S-15 / 11-18: verified with an error (hand-off expired): 安装没有开始 + 立即更新 (retry) + 前往发布页",
+    upd=update_state(state="verified", version="1.1.0", update_available=True, installable=True, error=err("timeout", "errors.update.operation_failed")))
 add("settings_update_failed", "S-15: failed with a reason", upd=update_state(state="failed", error=err("io", "errors.update.operation_failed", "download_failed")))
 add("settings_update_disabled", "S-15: this build has no in-app update (enabled=false)", upd=update_state(enabled=False))
 add("settings_update_updated", "S-15: just updated (previous_version): 已更新到", upd=update_state(previous_version="0.9.0"))

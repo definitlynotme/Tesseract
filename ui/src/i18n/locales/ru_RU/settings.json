@@ -351,6 +351,7 @@
   "settings.app.update.state.downloading_plain": "Скачивание {version}…",
   "settings.app.update.state.failed_plain": "Не удалось проверить или установить обновления: {reason}",
   "settings.app.update.state.found_plain": "<x>Доступна новая версия {version}</x>",
+  "settings.app.update.state.handoff_failed": "Установка не началась.",
   "settings.app.update.state.latest_plain": "Установлена последняя версия",
   "settings.app.update.state.unknown": "Статус обновления неизвестен",
   "settings.app.update.state.verifying_done": "Установщик готов",

@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "Esta operación requiere permisos de administrador. Ejecuta Tesseract como administrador o usa solo el proxy del sistema.",
-  "errors.alerts.delivery_failed": "No se ha podido entregar la notificación de escritorio. Revisa la configuración de notificaciones de Windows y vuelve a intentarlo.",
   "errors.alerts.receipt_persist_pending": "La notificación de escritorio se ha mostrado, pero su registro de entrega aún se está guardando y todavía no está confirmado. No tienes que hacer nada: el historial de alertas se actualizará automáticamente cuando termine de guardarse.",
   "errors.autostart.development_mode": "No se puede configurar «Iniciar con Windows» en una versión de desarrollo. Hazlo desde una instalación oficial de Tesseract.",
   "errors.autostart.read_failed": "No se puede leer la configuración de «Iniciar con Windows». Comprueba los permisos de acceso al registro y vuelve a intentarlo.",

@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "この操作には管理者権限が必要です。Tesseract を管理者として実行するか、システムプロキシだけを使ってください。",
-  "errors.alerts.delivery_failed": "デスクトップ通知を届けられませんでした。Windows の通知設定を確認してから、もう一度お試しください。",
   "errors.alerts.receipt_persist_pending": "デスクトップ通知は表示されましたが、配信記録を書き込み中のため、まだ確認できていません。操作は不要です。書き込みが終わるとアラート履歴が自動的に更新されます。",
   "errors.autostart.development_mode": "開発版では自動起動を設定できません。正式にインストールした Tesseract で設定してください。",
   "errors.autostart.read_failed": "自動起動の設定を読み取れません。レジストリへのアクセス権限を確認してから、もう一度お試しください。",

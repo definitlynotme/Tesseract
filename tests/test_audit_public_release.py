@@ -630,3 +630,23 @@ def test_high_confidence_token_rule_does_not_require_private_value() -> None:
     )
 
     assert any(finding.rule == "github-classic-token" for finding in report.findings)
+
+
+def test_the_tracked_tree_passes_the_public_detectors() -> None:
+    """11-20: user-profile paths in the setup crate's tests (one-letter user names) tripped the
+    publish audit's local-user-path rule. push_to_github runs it on every publish and the sign job
+    runs it again, so a finding there stops the release; this runs the same detectors over the
+    tracked tree (everything but the private deny list, which lives outside the repository)."""
+    from scripts.audit_public_release import audit_tracked_tree
+
+    report = AuditReport()
+    audit_tracked_tree(
+        REPO_ROOT,
+        deny_values=(),
+        report=report,
+        allowed_local_users=frozenset(),
+        limits=AuditLimits(),
+    )
+
+    assert report.tracked_files > 1000
+    assert [(f.rule, f.source_kind, f.location_id) for f in report.findings] == []

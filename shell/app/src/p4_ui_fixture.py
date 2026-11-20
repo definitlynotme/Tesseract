@@ -73,6 +73,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO))
 import bridge_transport
 from bridge_transport import PipeTransport
+import fixture_contract  # page and shell frames meet the real sidecar's ingress check
 
 # This fixture bypasses outgoing DTO validation in its own process only.
 bridge_transport.protocol.encode_frame = lambda frame: json.dumps(frame).encode() + b'\n'
@@ -488,9 +489,8 @@ def run_control(spec):
 send(dict(t='hello', proto=1, app_version='0.1.0', runtime_pid=os.getpid(), lang=config['values']['ui'].get('language', LANG),
           scope={'kind': 'custom', 'id': args.scope or 'p4-ui-fixture'},
           caps={'commands': COMMANDS, 'topics': TOPICS, 'features': []}, network_recovery=RECOVERY))
-assert pipe.receive(5)['t'] == 'hello_ack'
-subscribe = pipe.receive(5)
-assert subscribe['t'] == 'subscribe'
+fixture_contract.handshake(pipe.receive(5), 'hello_ack', state, epoch)
+subscribe = fixture_contract.handshake(pipe.receive(5), 'subscribe', state, epoch)
 record({'t': 'subscribe', 'topics': subscribe.get('topics'), 'at_ms': now_ms()})
 send(dict(t='subscribed', id=subscribe['id'], topics=subscribe['topics']))
 seed()
@@ -528,6 +528,11 @@ try:
             push_logs(max(1, stream['per_s'] // 10), 'fixture stream')
         frame = pipe.receive(.05)
         if not frame:
+            continue
+        verdict = fixture_contract.check(frame, state, epoch)
+        if verdict is not None:  # refused as the real sidecar refuses it: never handled, never recorded
+            if verdict:
+                send(verdict)
             continue
         if frame.get('t') == 'ping':
             send(dict(t='pong', n=frame['n']))

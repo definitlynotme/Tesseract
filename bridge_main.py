@@ -568,7 +568,7 @@ class BridgeSession:
         from bridge_publish import Publisher, SamplingWorker
         from bridge_logs import LogCollector
         from bridge_traffic import TrafficCollector
-        from bridge_shutdown import ShutdownCoordinator
+        from bridge_shutdown import EXIT_RECOVERY_SECONDS, ShutdownCoordinator
         # Stop is serialized with the entire start/restart, but its intent stays
         # on the independent control worker, so it can preempt a long start.
         access = self.access
@@ -601,6 +601,8 @@ class BridgeSession:
             close_diagnostics=self.close_diagnostics,
             drain_publications=self.drain_publications,
             close_owners=self.close_owners, on_phase=self.shutdown_phase,
+            # run() drives finish_quit in .1 s slices: recovery needs its own budget (11-19)
+            exit_recovery_seconds=EXIT_RECOVERY_SECONDS,
             exit_process=lambda code: (finish_audit(), setattr(self, "exit_code", code)))
         self.shutdown.session_end.allowed = bool(getattr(self.scope, "may_take_over_host_network", False))
         self.register_command("app.sessionEnd", self.shutdown.session_end.handle)

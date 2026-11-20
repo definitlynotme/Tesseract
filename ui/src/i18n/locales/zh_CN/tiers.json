@@ -87,10 +87,6 @@
     "m": "{ok}/{total} 可用",
     "_desc": "层级格子计数（滚动数字）的读屏名称：可用节点数/节点总数"
   },
-  "tiers.cell.slot.collecting": {
-    "m": "收集中…",
-    "_desc": "层级格子第二行：服务启动中、这个层级还在收集节点；空间紧"
-  },
   "tiers.cell.slot.filling": {
     "m": "正在补充",
     "_desc": "Bastion 格子第二行：应急池正在补充可用节点；空间紧"

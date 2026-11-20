@@ -206,6 +206,12 @@ class Session {
     return out;
   }
   fixtureLaunches() { return existsSync(this.state) ? readdirSync(this.state).filter(n => /^launch-\d+$/.test(n)).length : 0; }
+  // frames the stand-in refused because the real sidecar would (shell/app/src/fixture_contract.py);
+  // never recorded in requests-*.jsonl, so a flow cannot mistake one for a delivered request
+  contractViolations() {
+    const file = join(this.state, 'contract-violations.jsonl');
+    return existsSync(file) ? readFileSync(file, 'utf8').split('\n').filter(l => l.trim()) : [];
+  }
 
   // ---- native window actions (native.py), always on this shell's own windows
   native(action, extra = []) {

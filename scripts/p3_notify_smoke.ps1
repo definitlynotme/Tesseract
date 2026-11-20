@@ -330,6 +330,9 @@ try {
     # process_watch gives this scope's msedgewebview2 20 s after the shell exits (decision P3-06 item 6, T-P3-H).
     if ($Inventory.webview_grace_used) { $S.checks.webview_late_exit_s = $Inventory.last_exit_after_root_s }
     $S.checks.no_residue = $true
+    # 11-18: the stand-in refuses what the real sidecar refuses (shell/app/src/fixture_contract.py)
+    $Refused = Join-Path $script:State "contract-violations.jsonl"
+    if (Test-Path -LiteralPath $Refused) { throw "the real sidecar refuses frames the shell sent: $((Get-Content -LiteralPath $Refused -TotalCount 5) -join ' | ')" }
     $Passed = $true
 } catch {
     $Failure = $_.Exception.Message

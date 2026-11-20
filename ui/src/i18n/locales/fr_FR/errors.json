@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "Cette action nécessite des droits d’administrateur. Exécutez Tesseract en tant qu’administrateur ou utilisez uniquement le proxy système.",
-  "errors.alerts.delivery_failed": "La notification de bureau n’a pas pu être remise. Vérifiez les paramètres de notification de Windows, puis réessayez.",
   "errors.alerts.receipt_persist_pending": "La notification de bureau a été affichée, mais sa confirmation de remise est encore en cours d’enregistrement. Aucune action n’est nécessaire : l’historique des alertes se mettra à jour automatiquement une fois l’enregistrement terminé.",
   "errors.autostart.development_mode": "Le démarrage avec Windows ne peut pas être configuré depuis une version de développement. Utilisez une version installée de Tesseract.",
   "errors.autostart.read_failed": "Impossible de lire le réglage de démarrage avec Windows. Vérifiez les droits d’accès au registre, puis réessayez.",

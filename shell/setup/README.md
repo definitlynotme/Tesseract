@@ -9,6 +9,63 @@ Inno's, unchanged.
 - **Hand-over**: any command-line switch (`/VERYSILENT`, `/DIR=…`, the in-app updater's
   `/SILENT …`) or a machine without the WebView2 runtime runs the embedded Inno package as it is,
   with its own wizard or silently, and returns its exit code.
+- **The command line** (`sys::params`, 11-19) is split the way Inno splits it: a double quote
+  toggles quoting and a backslash is literal. So `/DIR="C:\Program Files\Tesseract\"
+  /VERYSILENT` means here what it means to Inno, where the C runtime's rules would read `\"` as a
+  quote and swallow `/VERYSILENT`. A line that escapes a quote the C runtime's way (`\"` before a
+  non-blank: PowerShell 7.3+, .NET's ArgumentList, Python's subprocess) is split by those rules,
+  as 0.1.0–0.1.3 split every line. Each switch is passed on unchanged.
+- **A running Tesseract** (`src/rm.rs`, 11-19): closed before the Inno package runs, by the
+  window's own install and by a hand-over that installs silently (`/SILENT` or `/VERYSILENT`,
+  without `/?` or `/HELP`, and without `/NOCLOSEAPPLICATIONS` unless `/CLOSEAPPLICATIONS`
+  overrides it, as in Inno). A wizard keeps Inno's own Preparing page. The folder is `/DIR=` when
+  given, else the existing install; a `/DIR=expand:…` (Inno's constants, only Inno can expand
+  them) also means the existing install. Inno's own Restart Manager pass cannot close it: the
+  windowless sidecar is `RmUnknownApp`, so Inno aborts and rolls back (exit 5). Restart Manager
+  is given `<dir>\Tesseract.exe` alone and asks the shell politely (WM_QUERYENDSESSION /
+  WM_ENDSESSION with ENDSESSION_CLOSEAPP: the sidecar restores the proxy and firewall and exits).
+  The window then waits until no `.exe`/`.dll` under `<dir>` is in use. Never forced, and never cut short: the sidecar leaves a moment after the
+  shell, and Inno must not start before it has. When Restart Manager cannot ask the shell at all
+  (it runs elevated and this window does not, it is already leaving and has no window, or
+  another session's copy is in the list), the wait is 5 s (`rm::UNASKED_WAIT`), except for a
+  shell that is already quitting (the default scope's `Local\TesseractShellQuitting` is set) and
+  the in-app updater's run, which wait the full 30 s. If something still uses the folder, the
+  window's own install installs nothing and fails with `running` (the shell itself is still here:
+  quit it from the tray) or `busy` (it went, but another program keeps one of the folder's modules
+  loaded: the page names the program). Restart Manager counts loaded modules and running images,
+  not plain open handles, which Inno overwrites in place, and reports no session for the
+  windowless sidecar (asked with ProcessIdToSessionId then).
+- **How the shell takes that close** (`shell/app/src/endsession.rs`, 11-20): from 0.1.4 the shell
+  quits as it does from the tray, minus the unsaved-changes question: `app.quit`, the sidecar's
+  full exit recovery, the 20 s stall prompt, the bounded wait for the WebView2 browser to exit
+  (so the reopened app finds the user data folder free), then a normal exit. Restart Manager
+  sends every top-level window WM_QUERYENDSESSION, WM_ENDSESSION and then WM_CLOSE, and
+  `RmShutdown` returns once the process has exited, or after 30 s with `ERROR_FAIL_SHUTDOWN`
+  (it never kills; seen 11-20). The window's own 30 s wait starts after that. Shells 0.1.0–0.1.3
+  take it as a shutdown (`app.sessionEnd`, 4 s budget, no browser wait) and then die in tao's
+  panic (`panic_runner.rs_371` in shell.log); this window handles both the same way.
+- **Never left without the app** (11-19): the Tesseract this session was running before the
+  window closed it opens again after the window's own install, good or not, and after a silent
+  install that did not finish, or a good one unless `/NORESTARTAPPLICATIONS` (Inno's own
+  `RestartApplications=yes`). One that was not running, or that the user was already quitting,
+  is not started. The in-app updater's run (`/RESTARTAPPLICATIONS`) quit the app itself and
+  started this window with the app's token (and in the app's job, if any), so after it the
+  hand-over opens it with that token whenever it is not running (the `[Run]` relaunch after a
+  good install is). Running means a process of this session whose image is
+  `<dir>\Tesseract.exe`: Restart Manager also lists other users' copies. Never in a service's
+  session (0). What the window closed starts (`routes` in `main.rs`) with this window's token only
+  when that is the copy's own (same account, same elevation), and then never inside a launcher's
+  job, which would wait for the app (Start-Process -Wait) or end it with the job and skip its
+  network restore: outside it with `CREATE_BREAKAWAY_FROM_JOB`. Otherwise, or when the job does
+  not allow breaking away, it starts through Explorer (`IShellDispatch2::ShellExecute`, at most
+  10 s) as the signed-in user, which fits a copy that ran unelevated (and any copy where UAC is
+  off). A copy that ran elevated, closed by SYSTEM or another account, stays closed: never
+  started as the wrong account or unelevated. 打开 on the done page also starts through Explorer
+  from an elevated window.
+- **Logs**: the window's own install and the in-app updater's run (unless it passes `/LOG`) log to
+  `%TEMP%\Tesseract-Setup-<unix seconds>.log` and `%TEMP%\Tesseract-Update-<unix seconds>.log`,
+  when %TEMP% is on a local fixed disk: the elevated Inno does not see this logon's network,
+  SUBST or mapped drives, and stops when it cannot create its log.
 - **Progress**: the window passes `/TSPROGRESS=<hwnd>` of a message-only window;
   `packaging/windows/setup_progress.iss` posts stage and permille to it.
 - **Elevation**: only the Inno package is elevated (`runas`); this window runs as the user, so
@@ -46,6 +103,10 @@ cargo build --release --locked --offline
 
 `target\release\tesseract-setup.exe` is then the file users download (about 1.1 MB on top of the
 package). Its own workspace and Cargo.lock (a pruned copy of `shell/Cargo.lock`, same versions).
+
+`cargo test --offline --locked` and `cargo clippy --offline --locked --all-targets -- -D warnings`
+run for every pull request (`.github/workflows/ci.yml`). `explorer_starts_a_program_as_the_desktop_user`
+returns early where no desktop Explorer owns a shell window; the CI log says whether the runner had one.
 
 ## Test without touching a real install
 

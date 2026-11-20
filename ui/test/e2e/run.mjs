@@ -42,6 +42,10 @@ async function runOne(a) {
     const f = await load(a.flow);
     s = await openSession({ port: a.port, pid: a.pid, data: a.data, evidence: a.evidence, real, python: a.python });
     await f.run(s, launch, real);
+    // 11-18: the stand-in refuses what the real sidecar refuses; any refusal fails the launch
+    // (0.1.0-0.1.3 passed every flow while the real sidecar refused the update acceptance)
+    const refused = s.contractViolations();
+    if (refused.length) throw new Failure(`the real sidecar refuses frames this launch sent: ${refused.slice(0, 5).join(' | ')}`);
     result.passed = true;
   } catch (e) {
     result.error = e instanceof Failure ? e.message : (e && e.stack) || String(e);

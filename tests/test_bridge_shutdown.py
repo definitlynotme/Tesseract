@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from bridge_main import read_loop
 from bridge_jobs import JobEventRecorder, JobExecutor
 from bridge_runtime_access import RuntimeAccess
-from bridge_shutdown import ShutdownCoordinator
+from bridge_shutdown import EXIT_RECOVERY_SECONDS, ShutdownCoordinator
 
 
 class Gate:
@@ -489,3 +489,55 @@ def test_stop_rejected_intent_never_calls_stop():
     assert shutdown.executor.wait(ack.op, .01) is None
     assert not any(name == "stop" for name, _ in runtime.calls)
     shutdown.executor.shutdown(time.monotonic() + 1)
+
+
+def test_exit_recovery_gets_its_own_budget_not_the_slice_remainder():
+    """11-19: production drives finish_quit(deadline_seconds=.1) on every loop turn
+    (BridgeSession.run). The recovery thread used to get what was left of the slice that
+    started it, under 100 ms minus the owners' close, so real recovery work reported
+    unknown/deadline_exceeded in the bye, and the shell refused an update install on it
+    (network_not_recovered). It now runs on its own budget, whatever the slice."""
+    budgets = []
+    runtime = Runtime()
+    events = []
+    executor = JobExecutor(JobEventRecorder(), epoch="test-epoch", normal_workers=2, normal_queue=2)
+
+    def recover(remaining):
+        budgets.append(remaining)
+        time.sleep(.15)  # real recovery work: longer than any one finish_quit slice
+        return Report(Gate()) if remaining >= .15 else Report(Gate(), state="unknown")
+
+    def close_owners(remaining):
+        time.sleep(.09)  # an owner that takes most of a slice (a node diagnostic closing)
+        return True
+
+    shutdown = ShutdownCoordinator(
+        executor, RuntimeAccess(runtime), lease=SimpleNamespace(close=lambda: events.append("lease")),
+        startup_recovery=Report(Gate()), recover_network=recover,
+        send=lambda frame: (events.append(frame), "complete")[1],
+        exit_process=lambda code: events.append(("exit", code)), close_owners=close_owners,
+        exit_recovery_seconds=EXIT_RECOVERY_SECONDS)  # as BridgeSession wires it
+    try:
+        ack = shutdown.request_quit()
+        assert shutdown.executor.wait(ack.op, 1)["state"] == "done"
+        deadline = time.monotonic() + 10
+        while not shutdown.finish_quit(deadline_seconds=.1):  # exactly as BridgeSession.run
+            assert time.monotonic() < deadline, "quit never finished"
+        assert len(budgets) == 1 and budgets[0] >= 1.9, budgets
+        [bye] = [item for item in events if isinstance(item, dict) and item.get("t") == "bye"]
+        assert bye["network_recovery"]["proxy"]["state"] == "restored", bye
+        assert bye["network_recovery"]["firewall"]["state"] == "restored", bye
+        assert events[-1] == ("exit", 0)
+    finally:
+        shutdown.executor.shutdown(time.monotonic() + 1)
+
+
+def test_bridge_session_gives_exit_recovery_its_own_budget():
+    """The production coordinator is built in BridgeSession.connect, which needs a live runtime;
+    pin the one keyword that keeps its sliced finish_quit from starving the recovery (11-19)."""
+    import inspect
+
+    import bridge_main
+    source = inspect.getsource(bridge_main.BridgeSession.connect)
+    assert "exit_recovery_seconds=EXIT_RECOVERY_SECONDS" in source
+    assert EXIT_RECOVERY_SECONDS >= 2.0

@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string[]] $Scenarios = @("tray-quit","sidecar-kill","session-end","quit-no-bye","quit-stall-force","prehello"))
+param([string[]] $Scenarios = @("tray-quit","sidecar-kill","session-end","installer-close","quit-no-bye","quit-stall-force","prehello"))
 # T-P3-04 exit smoke, custom scope only (P3-02 guard):
 #  tray-quit     tray Quit -> page host:confirmQuit answered with 0 -> app.quit -> bye; the shell
 #                exits with the sidecar's exit code and leaves no process behind.
@@ -7,6 +7,11 @@ param([string[]] $Scenarios = @("tray-quit","sidecar-kill","session-end","quit-n
 #                dev page, shell.log records; then tray Quit (page silent -> 3 s timeout) exits 0.
 #  session-end   a helper (this script) sends WM_QUERYENDSESSION + WM_ENDSESSION(logoff) to the main
 #                window -> app.sessionEnd is sent and answered; both processes exit.
+#  installer-close  (11-20) Restart Manager closes the shell as Tesseract Setup does (RmShutdown
+#                without RmForceShutdown; by pid here, so no other copy is touched): the query,
+#                WM_ENDSESSION(ENDSESSION_CLOSEAPP) and WM_CLOSE reach every top-level window ->
+#                an ordinary quit (app.quit, never app.sessionEnd), the tray icon removed, the
+#                browser-exit wait, shell_exit_0, no panic; RmShutdown returns once it has exited.
 #  quit-no-bye   (fix round 1, M1) the sidecar is suspended, tray Quit, then the script terminates it
 #                with code 3 before any bye: the shell process itself must exit 3, not 0.
 #  quit-stall-force  (S8) the sidecar is suspended, tray Quit; after 20 s without progress the
@@ -79,6 +84,26 @@ public static class P3Exit {
             uint owner; GetWindowThreadProcessId(after, out owner);
             if (owner == pid) return after;
         }
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 4)] struct RmProcess { public uint Pid; public long Started; }
+    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)] static extern int RmStartSession(out uint session, int flags, StringBuilder key);
+    [DllImport("rstrtmgr.dll")] static extern int RmEndSession(uint session);
+    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)] static extern int RmRegisterResources(uint session, uint files, string[] names, uint apps, RmProcess[] processes, uint services, string[] serviceNames);
+    [DllImport("rstrtmgr.dll")] static extern int RmShutdown(uint session, uint flags, IntPtr callback);
+    [DllImport("kernel32.dll")] static extern bool GetProcessTimes(IntPtr process, out long created, out long exited, out long kernel, out long user);
+    // Tesseract Setup's polite close (shell/setup/src/rm.rs: RmShutdown without RmForceShutdown),
+    // registered by process so only the scoped test shell is asked. RmShutdown's result.
+    public static int RmClose(uint pid, IntPtr process) {
+        long created, exited, kernel, user;
+        if (!GetProcessTimes(process, out created, out exited, out kernel, out user)) return -1;
+        uint session; StringBuilder key = new StringBuilder(33);
+        int rc = RmStartSession(out session, 0, key);
+        if (rc != 0) return rc;
+        try {
+            RmProcess[] apps = { new RmProcess { Pid = pid, Started = created } };
+            rc = RmRegisterResources(session, 0, null, 1, apps, 0, null);
+            return rc != 0 ? rc : RmShutdown(session, 0, IntPtr.Zero);
+        } finally { RmEndSession(session); }
     }
     // SMTO_ABORTIFHUNG; returns the window procedure's result, or -1 on timeout/failure.
     public static long Send(IntPtr hwnd, uint msg, long w, long l, uint ms) {
@@ -322,6 +347,21 @@ function Run-SessionEnd($S) {
     if (Log-Has "quit_sent") { throw "a session end must not send app.quit" }
     $S.checks.recovery = Log-Value 'session_end_result .*(proxy=\S+ firewall=\S+)'
 }
+function Run-InstallerClose($S) {
+    Start-Shell $S @()
+    $Started = [DateTime]::UtcNow
+    $S.checks.rmshutdown_rc = [P3Exit]::RmClose([uint32]$S.pid, $S.shell_handle)
+    $S.checks.rmshutdown_ms = [int]([DateTime]::UtcNow - $Started).TotalMilliseconds
+    # 0: the shell exited within Restart Manager's 30 s (351 ERROR_FAIL_SHUTDOWN: it did not).
+    if ($S.checks.rmshutdown_rc -ne 0) { throw "RmShutdown returned $($S.checks.rmshutdown_rc) after $($S.checks.rmshutdown_ms) ms" }
+    Finish-Shell $S
+    Expect-Log $S @("session_end_query reason=shutdown closeapp=true","installer_close_query","installer_close window=main","installer_close window=event_loop",
+        "quit_requested_installer_close","quit_confirm_not_needed","quit_send_installer_close","installer_close_already_quitting","quit_sent reason=user",
+        "bye exit_code=","quit_bye_received","quit_exit_0","tray_icon_removed","webview_browser_exit_wait result=","shell_exit_0")
+    foreach ($Code in @("session_end_requested","session_end_sent","panic_")) { if (Log-Has $Code) { throw "an installer close must not log $Code" } }
+    $S.checks.browser_wait = Log-Value 'webview_browser_exit_wait result=(\w+)'
+    if (@("exited","timeout") -notcontains $S.checks.browser_wait) { throw "browser-exit wait: $($S.checks.browser_wait)" }
+}
 # A top-level dialog (#32770) of the scoped shell process, or zero.
 function Shell-Dialog($S) { return [P3Exit]::Find("#32770", [NullString]::Value, [uint32]$S.pid) }
 function Wait-Dialog($S, [int] $Seconds) {
@@ -452,6 +492,7 @@ while ($Queue.Count -gt 0) {
             "tray-quit" { Run-TrayQuit $S }
             "sidecar-kill" { Run-SidecarKill $S }
             "session-end" { Run-SessionEnd $S }
+            "installer-close" { Run-InstallerClose $S }
             "quit-no-bye" { Run-QuitNoBye $S }
             "quit-stall-force" { Run-QuitStallForce $S }
             "prehello" { Run-PreHello $S }

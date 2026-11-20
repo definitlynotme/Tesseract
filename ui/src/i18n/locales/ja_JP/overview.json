@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "現在のノード不明 · Gateway 出口から送出",
   "overview.deck.node.untested": "未測定",
   "overview.deck.stat.bastion_off": "無効",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, other {最大 # ノード}}",
   "overview.deck.stat.collecting": "収集中…",
   "overview.deck.stat.bastion_filling": "補充中 · {n, number} 利用可能",
   "overview.deck.stat.bastion_low": "{n, number} 利用可能 · {min, plural, other {最低 # 未満}}",

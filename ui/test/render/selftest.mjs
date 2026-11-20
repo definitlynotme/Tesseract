@@ -368,10 +368,12 @@ export async function selfTest(o) {
 
     // ---- catalog_ellipsis_real (T-P5-13, the real settings page) -------------------------------
     await tryBlock('catalog_ellipsis_real', async () => {
+      // (the 11-04 settings cleanup's section names are short enough for the old one-line index
+      // column, 156 px at 1060: the plant narrows it to 64 px, so the one-line labels are cut again)
       const cell = await openCell(browser, { distDir, scenario: loadScenario('settings_page_running'), lang: 'en_US', size: '1060x700', page: 'settings' });
       const at = c => c.truncations.filter(x => /set-toc-l/.test(x.selector)).map(x => `${x.selector} ${x.by} ${x.id}`);
       const before = await cell.page.evaluate(cellChecksInPage, { pseudo: false });
-      await cell.page.evaluate(() => { const s = new CSSStyleSheet(); s.replaceSync('.set { grid-template-columns: var(--set-side) minmax(0, 1fr) !important; } .set-toc .toc-a { height: 30px !important; white-space: nowrap !important; } .set-toc-l { overflow: hidden !important; text-overflow: ellipsis !important; }'); document.adoptedStyleSheets = [...document.adoptedStyleSheets, s]; });
+      await cell.page.evaluate(() => { const s = new CSSStyleSheet(); s.replaceSync('.set { grid-template-columns: 64px minmax(0, 1fr) !important; } .set-toc .toc-a { height: 30px !important; white-space: nowrap !important; } .set-toc-l { overflow: hidden !important; text-overflow: ellipsis !important; }'); document.adoptedStyleSheets = [...document.adoptedStyleSheets, s]; });
       const planted = await cell.page.evaluate(cellChecksInPage, { pseudo: false });
       await cell.context.close();
       const ok = at(before).length === 0 && at(planted).some(x => /set-toc-l[^ ]* ellipsis settings\.sec\./.test(x));

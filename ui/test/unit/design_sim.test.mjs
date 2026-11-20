@@ -206,8 +206,10 @@ test('sim 120 s (start, collect, ready, fallback, recover, stop, with logs): eve
   for (const topic of ['service.state', 'route.published', 'tiers.summary', 'service.collect', 'tier.transition', 'traffic.tick', 'traffic.history',
     'network.mode', 'killswitch.state', 'bastion.pool', 'exit.identity', 'protocols.mix', 'gateway.current', 'core.info', 'update.state', 'jobs',
     'nodes.list', 'subscriptions.list', 'config.items', 'bastion.sources', 'logs.batch', 'logs.feed', 'geo.status', 'alerts.history',
-    'alerts.delivery', 'alerts.onboarding', 'hello', 'ack']) assert.ok(types.has(topic), topic);
+    'hello', 'ack']) assert.ok(types.has(topic), topic);
   for (const shellOnly of ['ui.language', 'alerts.desktop', 'shutdown', 'update.prepareExit']) assert.ok(!types.has(shellOnly), shellOnly);
+  // 10-30 alert redesign: these left the protocol; the simulator no longer publishes them
+  for (const gone of ['alerts.delivery', 'alerts.onboarding']) assert.ok(!types.has(gone), gone);
   const patches = frames.flatMap(f => (f.t === 'batch' ? f.items : [f])).filter(f => f.kind === 'patch');
   assert.ok(patches.length > 0, 'list topics send patches after their snapshot');
   const r = validate(frames);
@@ -462,8 +464,6 @@ test('queries: answers in the §11 / §16 shapes', withTimers(async () => {
   assert.equal(info.version, '0.1.0');
   assert.ok(info.caps.includes('service.start') && info.caps.includes('logs.tail'));
   assert.ok(info.listeners.some(l => l.kind === 'mixed' && l.port === 7890 && l.available === true));
-  const cat = await q('alerts.catalog');
-  assert.ok(cat.channels.length > 3 && Array.isArray(cat.event_groups) && Array.isArray(cat.scopes) && cat.acl.plaintext_storage === true);
   const specs = await q('import.specs');
   assert.ok(specs.protocols.length > 3 && specs.protocols.every(p => p.label_id && Array.isArray(p.fields)));
   const tail = await q('logs.tail', { n: 4000 });
@@ -481,9 +481,8 @@ test('queries: answers in the §11 / §16 shapes', withTimers(async () => {
   assert.equal((await query(T, 'nodes.detail', { node_id: 'zz' })).e.code, 'validation');
   assert.deepEqual(await q('autostart.state'), { supported: true, enabled: false, target: 'none', mismatch: false, error: null });
   assert.equal((await q('geo.status')).running, false);
-  const del = await q('alerts.deliveries', { limit: 1 });
-  assert.equal(del.items.length, 1);
-  assert.equal(del.next_cursor, null);
+  // 10-30 alert redesign: alerts.catalog and alerts.deliveries left the protocol
+  for (const gone of ['alerts.catalog', 'alerts.deliveries']) assert.equal((await query(T, gone, {})).ok, false, gone);
   const r = validate(globalThis.__designFrames);
   assert.equal(r.status, 0, r.out);
 }));
@@ -504,11 +503,13 @@ test('T.sim.init() is idempotent; ?lang rewrites hello.lang; the replayed log ta
   assert.equal(bad.store.get('lang'), 'zh_CN');
 }));
 
-test('design/catalog.json matches bridge_catalog (alerts.catalog, import.specs)', () => {
+// (the alerts half, the answer of the removed alerts.catalog, has no Python source any more:
+// bridge_catalog.build_alert_channels left with the 10-30 alert redesign; nothing serves it)
+test('design/catalog.json matches bridge_catalog (import.specs)', () => {
   const r = python(['-c', [
     'import json, sys, bridge_catalog as c',
     `doc = json.load(open(${JSON.stringify(join(UI, 'src', 'design', 'catalog.json'))}, encoding="utf-8"))`,
-    'ok = doc["alerts"] == c.build_alert_channels() and doc["import"] == c.build_import_specs()',
+    'ok = doc["import"] == c.build_import_specs()',
     'print("in sync" if ok else "drift")',
     'sys.exit(0 if ok else 1)'].join('\n')]);
   assert.equal(r.status, 0, (r.stdout || '') + (r.stderr || ''));

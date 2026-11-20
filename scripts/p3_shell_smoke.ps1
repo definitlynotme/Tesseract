@@ -969,6 +969,9 @@ if ($Scenarios -contains "c3") {
         $Inventory = Get-Content -LiteralPath (Join-Path $Box.box "process-inventory.json") -Raw | ConvertFrom-Json
         if (-not $Inventory.passed -or $Inventory.active_processes -ne 0) { throw "owned process residual detected" }
         $Checks.inventory_total_processes = $Inventory.total_processes
+        # 11-18: the stand-in refuses what the real sidecar refuses (shell/app/src/fixture_contract.py)
+        $Refused = Join-Path $FixtureState "contract-violations.jsonl"
+        if (Test-Path -LiteralPath $Refused) { throw "the real sidecar refuses frames the shell sent: $((Get-Content -LiteralPath $Refused -TotalCount 5) -join ' | ')" }
         $Passed = $true
     } catch {
         $Failure = $_.Exception.Message

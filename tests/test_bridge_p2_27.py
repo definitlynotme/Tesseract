@@ -434,6 +434,72 @@ def test_installer_launch_failure_after_restart_resolves_durable_receipt(env, tm
     assert fresh_publisher.frames[0]["receipt_ref"] == receipt_ref
 
 
+def test_an_epoch_after_a_failed_launch_keeps_saying_so_until_the_user_checks(env):
+    """11-20: the automatic check would turn failed (检查或安装更新失败, 前往发布页) into a plain
+    verified, which reads 安装包已就绪 ✓ with a busy 更新已就绪 although nothing is installing."""
+    owner, updater, _, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    now = [500.0]
+    fresh = UpdateOwner(owner.state_path, owner.download_dir, current_version="1.0.0",
+                        updater=updater, clock=lambda: now[0])
+    fresh.attach_handoff(FakePublisher(), FakeExitPort())
+    fresh.on_ready()
+    assert fresh.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
+    now[0] += 6
+    checks = updater.checks
+    assert not fresh.poll_auto_check(lambda work: pytest.fail("no automatic check after a failed launch"))
+    assert not fresh.poll_auto_check(lambda work: pytest.fail("and none later in this epoch"))
+    data = dto(fresh)
+    assert (data["state"], data["error"]["code"], updater.checks) == ("failed", "io", checks)
+    # 检查更新 brings the kept installer back, and 立即更新 hands it off again without a download.
+    downloads = updater.downloads
+    assert fresh.check()["state"] == "verified"
+    assert fresh.install()["receipt_ref"] == receipt_ref and updater.downloads == downloads
+
+
+def test_a_failed_launch_reported_after_the_check_was_queued_still_skips_it(env):
+    """The second review (11-20): the skip is asked again when the worker runs the check."""
+    owner, updater, _, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    now = [500.0]
+    fresh = UpdateOwner(owner.state_path, owner.download_dir, current_version="1.0.0",
+                        updater=updater, clock=lambda: now[0])
+    fresh.attach_handoff(FakePublisher(), FakeExitPort())
+    fresh.on_ready()
+    now[0] += 6
+    work = []
+    assert fresh.poll_auto_check(lambda callback: work.append(callback) or True)  # queued first
+    assert fresh.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
+    checks = updater.checks
+    work.pop()()  # the worker runs the queued check now
+    data = dto(fresh)
+    assert (data["state"], data["error"]["code"], updater.checks) == ("failed", "io", checks)
+
+
+def test_the_automatic_check_decides_where_it_opens_its_flight(env):
+    """The third review (11-20): the skip is decided in the critical section that opens the flight."""
+    owner, updater, _, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    fresh = UpdateOwner(owner.state_path, owner.download_dir, current_version="1.0.0", updater=updater)
+    fresh.attach_handoff(FakePublisher(), FakeExitPort())
+    assert fresh.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
+    checks = updater.checks
+    assert fresh.check(automatic=True) is None and updater.checks == checks
+    assert dto(fresh)["state"] == "failed"
+    # the user's own check is never skipped
+    assert fresh.check()["state"] == "verified" and updater.checks == checks + 1
+
+
+def test_an_epoch_without_a_failed_launch_still_checks_automatically(env):
+    owner, updater, _, _, now = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    owner.on_ready()
+    assert owner.install_result(receipt_ref, True, None) == {"recorded": True}  # launched: no failure
+    now[0] += 6
+    work = []
+    assert owner.poll_auto_check(lambda callback: work.append(callback) or True) and len(work) == 1
+
+
 def test_install_result_unknown_or_unreadable_receipt(env, monkeypatch):
     owner, *_ = env
     receipt_ref = installed(owner)["receipt_ref"]
@@ -727,3 +793,235 @@ def test_real_coordinator_exit_response_is_recorded_not_runtime_gone(env, quit_a
         assert updater.downloads == 1
     finally:
         executor.shutdown(monotonic() + 2)
+
+
+# ---- 11-18: the shell's own frames through the real ingress -------------------
+# Every test above hands update.exitResponse straight to the executor, with
+# reason_code=None. The shell built its acceptance without the key, and
+# BridgeSession.dispatch refused that frame before any handler ran
+# (missing:args.reason_code). So 0.1.0-0.1.3 never reached app.quit{reason:update}
+# while all of these tests passed. The tests below go through dispatch, frame by
+# frame, exactly as shell/app/src/update.rs (request_frame, response) builds them.
+
+from bridge_main import BridgeSession
+
+
+class _WirePipe:
+    def __init__(self):
+        self.sent = []
+
+    def send(self, frame):
+        assert protocol.validate_frame(frame) == [], frame
+        self.sent.append(deepcopy(frame))
+        return "complete"
+
+    def poll_write(self):
+        return "complete"
+
+
+@pytest.fixture
+def wire(env):
+    owner, updater, publisher, _, _ = env
+    gate = SimpleNamespace(require_idle=lambda: None)
+    session = BridgeSession(None, SimpleNamespace(gate=gate), None, "epoch-1118",
+                            runtime_factory=lambda *_: SimpleNamespace())
+    session.transport = _WirePipe()
+    session.publisher = SimpleNamespace(pending_write=False, next_tick=monotonic() + 100, tick=lambda: None)
+    session.shutdown = SimpleNamespace(quitting=False)
+    owner._wall_ms = monotonic_wall
+    # As bridge_wiring wires it: the four commands on the session's own executor.
+    module.register(session, owner, publisher=publisher)
+    yield session, owner, publisher
+    session._ingress_stop.set()
+    for worker in session._ingress_threads:
+        worker.join(1)
+    session.executor.shutdown(monotonic() + 2)
+
+
+def _shell_request(session, ident, cmd, args):
+    """update.rs request_frame, stamped like main.rs stamp()."""
+    return session.envelope("req", id=ident, cmd=cmd, args=args, req_id=f"shell-update-{ident}",
+                            owner="shell", **{"from": "shell"})
+
+
+def _reply(session, ident):
+    deadline = monotonic() + 3
+    while monotonic() < deadline:
+        session.pump()
+        for frame in session.transport.sent:
+            if frame.get("id") == ident and frame.get("t") in {"res", "error"}:
+                return frame
+    raise AssertionError(f"no reply to request {ident}: {session.transport.sent}")
+
+
+@pytest.mark.parametrize("args_of", [
+    # The fixed shell (update.rs response): reason_code is always there, null on an acceptance.
+    lambda handoff_id: {"handoff_id": handoff_id, "accepted": True, "reason_code": None},
+    # Exactly what 0.1.0-0.1.3 sent; the sidecar takes it too now (reason_code may be left out).
+    lambda handoff_id: {"handoff_id": handoff_id, "accepted": True},
+], ids=["shell_fixed", "shell_0.1.3"])
+def test_the_shells_acceptance_frame_is_recorded_through_dispatch(wire, args_of):
+    session, owner, publisher = wire
+    installed(owner)
+    handoff_id = publisher.frames[0]["handoff_id"]
+    frame = _shell_request(session, 41, "update.exitResponse", args_of(handoff_id))
+    assert protocol.validate_frame(frame) == []
+    session.dispatch(frame)
+    reply = _reply(session, 41)
+    assert (reply["t"], reply.get("ok"), reply.get("data")) == ("res", True, {"recorded": True}), reply
+    assert owner._handoff["responded"] is True  # the takeover is recorded: the shell may quit now
+    assert dto(owner)["state"] == "handoff"
+
+
+def test_the_shells_decline_and_install_result_frames_are_recorded_through_dispatch(wire):
+    session, owner, publisher = wire
+    installed(owner)
+    first = publisher.frames[0]
+    session.dispatch(_shell_request(session, 51, "update.exitResponse",
+                                    {"handoff_id": first["handoff_id"], "accepted": False, "reason_code": "hash_mismatch"}))
+    assert _reply(session, 51)["data"] == {"recorded": True}
+    assert dto(owner)["state"] == "verified" and dto(owner)["error"]["code"] == "cancelled"
+    # The kept receipt is handed off again; accepted, then the launch fails (update.rs take_failure).
+    owner.install()
+    second = publisher.frames[1]
+    assert second["receipt_ref"] == first["receipt_ref"]
+    session.dispatch(_shell_request(session, 52, "update.exitResponse",
+                                    {"handoff_id": second["handoff_id"], "accepted": True, "reason_code": None}))
+    assert _reply(session, 52)["data"] == {"recorded": True}
+    session.dispatch(_shell_request(session, 53, "update.installResult",
+                                    {"receipt_ref": second["receipt_ref"], "launched": False, "reason_code": "launch_failed"}))
+    assert _reply(session, 53)["data"] == {"recorded": True}
+    assert dto(owner)["state"] == "failed"
+
+
+def test_the_shells_update_quit_frame_is_valid():
+    # main.rs: app.quit is a P1 command, sent without req_id/owner.
+    frame = {"t": "req", "id": 9, "cmd": "app.quit", "args": {"reason": "update"}, "from": "shell",
+             "epoch": "e", "produced_at_ms": 1, "sent_at_ms": 1}
+    assert protocol.validate_frame(frame) == []
+
+
+# ---- 11-19: only the installed copy updates in the app -----------------------------
+
+def test_installed_copy_is_the_folder_the_installer_registered():
+    loc = lambda: "C:\\Program Files\\Tesseract\\"  # InstallLocation keeps Inno's trailing backslash
+    assert module.installed_copy(r"C:\Program Files\Tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+    assert module.installed_copy(r"c:\program files\tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+    # the portable zip: another folder, or no installed copy at all
+    assert not module.installed_copy(r"D:\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+    assert not module.installed_copy(r"D:\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=lambda: None)
+    # source runs keep the release's own answer
+    assert module.installed_copy(r"D:\src\bridge_main.py", frozen=False, install_location=lambda: None)
+
+
+def test_installed_copy_reads_the_verbatim_path_the_shell_starts_the_sidecar_with():
+    # 11-20: the shell starts the sidecar through fs::canonicalize (main.rs finish_options), so a
+    # frozen sys.executable is \\?\C:\... (seen in the 11-19 e2e trace of a real install). Compared
+    # as spelled, every installed copy looked portable and none offered 立即更新.
+    loc = lambda: "C:\\Program Files\\Tesseract\\"
+    assert module.installed_copy(r"\\?\C:\Program Files\Tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+    assert module.installed_copy(r"\\?\c:\PROGRAM FILES\Tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+    share = lambda: "\\\\nas\\apps\\Tesseract\\"
+    assert module.installed_copy(r"\\?\UNC\nas\apps\Tesseract\tesseract-runtime.exe", frozen=True, install_location=share)
+    # a portable copy stays portable under the verbatim spelling too
+    assert not module.installed_copy(r"\\?\D:\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=loc)
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows junctions")
+def test_installed_copy_knows_the_installed_folder_under_another_spelling(tmp_path):
+    import _winapi
+    real = tmp_path / "Tesseract"
+    real.mkdir()
+    link = tmp_path / "linked"
+    _winapi.CreateJunction(str(real), str(link))
+    try:
+        exe = str(link / "tesseract-runtime.exe")
+        registered = lambda: str(real) + "\\"
+        assert module.installed_copy(exe, frozen=True, install_location=registered)
+        assert module.installed_copy("\\\\?\\" + exe, frozen=True, install_location=registered)
+        # a registered folder that is gone: portable, not an error
+        assert not module.installed_copy(exe, frozen=True, install_location=lambda: str(tmp_path / "gone") + "\\")
+    finally:
+        os.rmdir(link)  # the junction only, never its target
+
+
+def test_installed_copy_never_stats_a_share_before_hello(monkeypatch):
+    # 11-20: installed_copy runs before hello; a stat of a share that is gone can outlast the shell's
+    # 10 s hello timeout, so another spelling is looked up by identity on local drives only.
+    monkeypatch.setattr(module.os.path, "samefile", lambda *a: pytest.fail("no stat of a remote folder"))
+    share = lambda: "\\\\nas\\apps\\Tesseract\\"
+    assert not module.installed_copy(r"D:\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=share)
+    # an installed copy on the share still matches by its spelling, with no stat at all
+    assert module.installed_copy(r"\\?\UNC\nas\apps\Tesseract\tesseract-runtime.exe", frozen=True, install_location=share)
+    assert module._drive_type("C:\\Program Files\\Tesseract\\") == 3 and module._drive_type(r"\\?\C:\x") == 3
+    assert module._drive_type("\\\\nas\\apps\\Tesseract\\") is None and module._drive_type(r"\\?\UNC\nas\apps") is None
+    assert module._mapped_share("C:") is None, "a local drive maps to no share"
+
+
+def test_installed_copy_on_a_mapped_network_drive_compares_by_its_share(monkeypatch):
+    # The third review (11-20): with InstallLocation Z:\Apps\Tesseract\ (Z: = \\nas\apps), canonicalize
+    # starts the sidecar as \\?\UNC\nas\apps\Apps\Tesseract\...; a remote drive is never stat'ed.
+    monkeypatch.setattr(module, "_drive_type", lambda path: 4 if path.upper().startswith("Z:") else 3)
+    monkeypatch.setattr(module, "_mapped_share", lambda drive: "\\\\nas\\apps" if drive.upper() == "Z:" else None)
+    monkeypatch.setattr(module.os.path, "samefile", lambda *a: pytest.fail("no stat of a remote folder"))
+    mapped = lambda: "Z:\\Apps\\Tesseract\\"
+    assert module.installed_copy(r"\\?\UNC\nas\apps\Apps\Tesseract\tesseract-runtime.exe", frozen=True, install_location=mapped)
+    assert module.installed_copy(r"Z:\Apps\Tesseract\tesseract-runtime.exe", frozen=True, install_location=mapped)
+    assert not module.installed_copy(r"\\?\UNC\nas\apps\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=mapped)
+    assert not module.installed_copy(r"D:\Tools\Tesseract\tesseract-runtime.exe", frozen=True, install_location=mapped)
+    # the drive is no longer mapped: portable, and still no stat
+    monkeypatch.setattr(module, "_mapped_share", lambda drive: None)
+    assert not module.installed_copy(r"\\?\UNC\nas\apps\Apps\Tesseract\tesseract-runtime.exe", frozen=True, install_location=mapped)
+    assert module._mapped_share_path("Z:\\x\\") is None
+
+
+def test_the_installed_copy_question_waits_for_the_first_check(tmp_path):
+    """The final review (11-20): installed_copy() may stat a folder, so it is never asked before
+    hello (wiring passes the function); the first check asks it once, on its worker."""
+    calls = []
+    first, second = tmp_path / "a", tmp_path / "b"
+    first.mkdir(), second.mkdir()
+    owner = UpdateOwner(state.update_state_path(first), first / "downloads", current_version="1.0.0",
+                        updater=FakeUpdater(), installed_copy=lambda: calls.append(1) or True)
+    assert calls == [] and dto(owner)["installable"] is False
+    owner.check()
+    assert calls == [1] and dto(owner)["installable"] is True
+    owner.check()
+    assert calls == [1], "asked once"
+    # a probe that fails answers portable and never fails the check
+    broken = UpdateOwner(state.update_state_path(second), second / "downloads", current_version="1.0.0",
+                         updater=FakeUpdater(), installed_copy=lambda: 1 / 0)
+    assert broken.check()["installable"] is False
+    # That the wiring hands over the function, unasked: test_app_update_routes.py
+    # test_the_wiring_never_asks_the_installed_copy_question_before_hello.
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows error modes")
+def test_the_identity_lookup_never_shows_a_no_disk_box(monkeypatch):
+    import ctypes
+    before = ctypes.windll.kernel32.GetThreadErrorMode()
+    with module._no_critical_error_box():
+        assert ctypes.windll.kernel32.GetThreadErrorMode() & 0x0001
+    assert ctypes.windll.kernel32.GetThreadErrorMode() == before
+    # installed_copy's own lookup runs inside it: a card reader without a card fails at once.
+    seen = []
+
+    def samefile(a, b):
+        seen.append(ctypes.windll.kernel32.GetThreadErrorMode() & 0x0001)
+        raise OSError("no media")
+    monkeypatch.setattr(module, "_drive_type", lambda path: 2)  # DRIVE_REMOVABLE
+    monkeypatch.setattr(module.os.path, "samefile", samefile)
+    assert not module.installed_copy(r"D:\x\tesseract-runtime.exe", frozen=True, install_location=lambda: "E:\\Tesseract\\")
+    assert seen == [1] and ctypes.windll.kernel32.GetThreadErrorMode() == before
+
+
+def test_a_portable_copy_offers_the_release_page_not_the_installer(tmp_path):
+    updater = FakeUpdater()
+    owner = UpdateOwner(state.update_state_path(tmp_path), tmp_path / "downloads", current_version="1.0.0",
+                        updater=updater, installed_copy=False)
+    owner.check()
+    data = dto(owner)
+    assert (data["update_available"], data["installable"]) == (True, False)
+    with pytest.raises(JobFailure) as caught:
+        owner.install()
+    assert caught.value.code == "not_allowed" and updater.downloads == 0

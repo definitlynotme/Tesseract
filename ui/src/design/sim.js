@@ -38,9 +38,11 @@
                   flight (UpdateOwner.check). geo / subscription / update jobs run on
                   their own timers; mode.set, gateway.select and a stored refresh move
                   the config rev and send config.changed (PROTOCOL §15)
-   Queries        config.snapshot, app.info, alerts.catalog, import.specs, logs.tail,
-                  logs.query, nodes.detail, autostart.state, geo.status,
-                  alerts.deliveries
+   Queries        config.snapshot, app.info, import.specs, logs.tail,
+                  logs.query, nodes.detail, autostart.state, geo.status
+                  (alerts.catalog / alerts.deliveries and the alerts.delivery /
+                  alerts.onboarding topics left the protocol with the 10-30 alert
+                  redesign: not served, not published)
    ========================================================================== */
 import CATALOG from './catalog.json' with { type: 'json' };
 import {
@@ -161,8 +163,6 @@ export function createDesignSim(T, { features = [] } = {}) {
     pub.state('update.state', F.update);
     pub.state('geo.status', { running: F.geo.running, updated_at_ms: F.geo.updated_at_ms, errors: F.geo.errors });
     pub.state('alerts.history', { items: F.alerts.items, last_seq: F.alerts.lastSeq });
-    pub.state('alerts.delivery', { items: F.alerts.deliveries });
-    pub.state('alerts.onboarding', { sessions: [] });
   }
   sync.key = null;
 
@@ -885,7 +885,6 @@ export function createDesignSim(T, { features = [] } = {}) {
     'config.snapshot': () => ({ rev: F.configRev, values: configValues(F, S.get('lang') || 'zh_CN'), secret_fields_set: SECRET_FIELDS_SET.slice(), read_errors: [], pending: null }),
     'app.info': () => ({ version: D.version, language: S.get('lang') || 'zh_CN', caps: CAPS.commands.slice(),
       listeners: LISTENERS.map(l => ({ ...l, available: F.run === 'running' ? true : null })) }),
-    'alerts.catalog': () => ({ ...JSON.parse(JSON.stringify(CATALOG.alerts)), acl: { plaintext_storage: true, access_state: 'no_known_failures', unconfirmed_count: 0 } }),
     'import.specs': () => JSON.parse(JSON.stringify(CATALOG.import)),
     'logs.tail': a => {
       const since = Number.isInteger(a.since_seq) ? a.since_seq : 0;
@@ -914,11 +913,6 @@ export function createDesignSim(T, { features = [] } = {}) {
     },
     'autostart.state': () => ({ supported: true, enabled: false, target: 'none', mismatch: false, error: null }),
     'geo.status': () => ({ running: F.geo.running, updated_at_ms: F.geo.updated_at_ms, errors: F.geo.errors.slice() }),
-    'alerts.deliveries': a => {
-      const limit = Math.max(1, Math.min(200, a.limit | 0 || 200));
-      const items = F.alerts.deliveries.filter(d => !a.channel_id || d.channel_id === a.channel_id).slice(0, limit);
-      return { items: JSON.parse(JSON.stringify(items)), next_cursor: null };
-    },
   };
 
   function cancel(p) {

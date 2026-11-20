@@ -351,6 +351,7 @@
   "settings.app.update.state.downloading_plain": "Téléchargement de {version}…",
   "settings.app.update.state.failed_plain": "Échec de la recherche ou de l’installation des mises à jour : {reason}",
   "settings.app.update.state.found_plain": "<x>Nouvelle version {version} disponible</x>",
+  "settings.app.update.state.handoff_failed": "L’installation n’a pas démarré.",
   "settings.app.update.state.latest_plain": "Vous avez la dernière version",
   "settings.app.update.state.unknown": "État des mises à jour inconnu",
   "settings.app.update.state.verifying_done": "Programme d’installation prêt",

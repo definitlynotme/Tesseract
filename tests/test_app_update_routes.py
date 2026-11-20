@@ -257,6 +257,26 @@ def test_a_transfer_that_keeps_failing_gives_up_after_the_attempts(tmp_path):
     assert not list(tmp_path.glob("*.download"))
 
 
+def test_the_wiring_never_asks_the_installed_copy_question_before_hello(tmp_path, monkeypatch):
+    """11-20: Wiring._update runs before hello, and installed_copy() reads the registry and may stat
+    a folder, so the wiring hands the owner the function and the first check asks it."""
+    registered, calls = [], []
+
+    def probe():
+        calls.append(1)
+        return True
+    session = SimpleNamespace(scope=SimpleNamespace(data_dir=tmp_path),
+                              runtime=SimpleNamespace(update_download_proxy_url=lambda: None))
+    monkeypatch.setattr(bridge_update, "register", lambda session, owner: registered.append(owner))
+    monkeypatch.setattr(bridge_update, "installed_copy", probe)
+    bridge_wiring.Wiring(session, scope_kind="default")._update()
+    assert calls == [] and registered[0]._installed_copy_probe is probe
+    # Other scopes never reach the release endpoint and keep the plain default.
+    registered.clear()
+    bridge_wiring.Wiring(session, scope_kind="custom")._update()
+    assert calls == [] and registered[0]._installed_copy_probe is None and registered[0]._installed_copy is True
+
+
 def test_the_default_scope_routes_release_traffic_through_the_core(tmp_path, monkeypatch, host_proxies):
     registered = []
     runtime = SimpleNamespace(update_download_proxy_url=lambda: "http://127.0.0.1:7890")

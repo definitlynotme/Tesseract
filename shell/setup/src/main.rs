@@ -12,6 +12,7 @@
 mod assets;
 mod payload;
 mod progress;
+mod rm;
 mod sys;
 
 use serde_json::{json, Value};
@@ -28,6 +29,8 @@ use wry::{NewWindowResponse, WebContext, WebViewBuilder, WebViewBuilderExtWindow
 const VERSION: &str = env!("SETUP_VERSION");
 const INSTALLED_BYTES: &str = env!("SETUP_INSTALLED_BYTES");
 const ORIGIN: &str = "http://setup.localhost/";
+/// SW_SHOWNORMAL, for a Tesseract opened again.
+const SW_NORMAL: i32 = 1;
 
 enum Ev {
     Ipc(String),
@@ -41,11 +44,12 @@ enum Ev {
 enum Phase { Ready, Working, Done, Failed }
 
 fn main() {
-    let mut args = std::env::args_os().skip(1);
+    // Split as Inno splits it (sys::params): the switches mean here what they mean to Inno.
+    let mut args = sys::params().into_iter();
     let mut payload_arg = None;
     let mut rest = Vec::new();
     while let Some(arg) = args.next() {
-        if arg == "--payload" { payload_arg = args.next().map(PathBuf::from); } else { rest.push(arg.to_string_lossy().into_owned()); }
+        if arg == "--payload" { payload_arg = args.next().map(PathBuf::from); } else { rest.push(arg); }
     }
     let Some(source) = payload::Source::locate(payload_arg) else {
         eprintln!("tesseract-setup: no installer embedded; pass --payload <Tesseract-Setup-…-win-x64.exe>");
@@ -59,13 +63,118 @@ fn main() {
 
 /// Runs the Inno package with our command line and returns its exit code.
 fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
-    let Ok(file) = payload::extract(source) else { return 1 };
-    let params = args.iter().map(|a| sys::quote(a)).collect::<Vec<_>>().join(" ");
-    match sys::run_and_wait(0, file.path(), &params, false) {
-        sys::Run::Exited(code) => code as i32,
-        sys::Run::Declined => 2,
-        sys::Run::Failed(_) => 1,
+    let existing = sys::existing_install().map(|e| e.dir);
+    let target = rm::target_dir(args, existing.as_deref());
+    // A running Tesseract would make Inno abort (rm.rs). Only a silent install closes it here: a
+    // wizard has Inno's own Preparing page, and /? installs nothing. /NOCLOSEAPPLICATIONS keeps it
+    // running. A shell already on its way out (the in-app updater's, or one the user quit) gets the
+    // full wait, also when the package then cannot even be extracted, and is not opened again for
+    // that (the updater's run opens its own below). One that cannot be asked (it runs elevated and
+    // this window does not) gets a short one: Inno then stops with nothing changed.
+    let mut closed = None;
+    if rm::silent_install(args) && !rm::keep_running(args) {
+        if let Some(dir) = &target {
+            let quitting = sys::shell_quitting();
+            let before = if quitting { None } else { rm::shell_here(dir) };
+            let unasked = if quitting || rm::restarts_app(args) { rm::WAIT } else { rm::UNASKED_WAIT };
+            let _ = rm::close_app(dir, rm::WAIT, unasked);
+            closed = before;
+        }
     }
+    let code = match payload::extract(source) {
+        Err(_) => 1,
+        Ok(file) => {
+            let mut params = args.iter().map(|a| sys::quote(a)).collect::<Vec<_>>();
+            // The in-app updater's run leaves a log behind, for when an update does not finish.
+            if rm::restarts_app(args) && !rm::logs_itself(args) {
+                if let Some(log) = temp_log("Tesseract-Update") { params.push(sys::quote(&format!("/LOG={}", log.display()))); }
+            }
+            match sys::run_and_wait(0, file.path(), &params.join(" "), false) {
+                sys::Run::Exited(code) => code as i32,
+                sys::Run::Declined => 2,
+                sys::Run::Failed(_) => 1,
+            }
+        },
+    };
+    // An install never leaves the user without Tesseract. The in-app updater (/RESTARTAPPLICATIONS
+    // is its switch) quit the app before this ran, and started this window with its own token:
+    // whenever the package ends without starting it again (UAC declined, aborted, rolled back, a
+    // failed relaunch), open the version installed now; after a good install the [Run] relaunch
+    // is already running. The Tesseract this window closed opens again after an install that did
+    // not finish, and after a good one too (Inno's own RestartApplications=yes), unless
+    // /NORESTARTAPPLICATIONS says it stays closed.
+    if let Some(dir) = &target {
+        if rm::restarts_app(args) { reopen(dir, Reopen::Own); }
+        else if let Some(shell) = closed.filter(|_| code != 0 || !rm::no_restart(args)) { reopen(dir, Reopen::Closed(shell)); }
+    }
+    code
+}
+
+/// How Tesseract is started again.
+enum Reopen {
+    /// With this window's token: the in-app updater's run, which the app itself started (and
+    /// whose job, if any, the app lived in too).
+    Own,
+    /// As the copy this window closed ran.
+    Closed(rm::Shell),
+}
+
+/// Opens `<dir>\Tesseract.exe` again, unless it already runs in this session (rm.rs), and never in
+/// a service's session, which has no desktop.
+fn reopen(dir: &Path, how: Reopen) {
+    let exe = dir.join("Tesseract.exe");
+    if !exe.is_file() || !sys::in_user_session() || rm::shell_running(dir) { return; }
+    let shell = match how {
+        Reopen::Own => { let _ = sys::open(&exe, Some(dir)); return; }
+        Reopen::Closed(shell) => shell,
+    };
+    // Test builds keep the sandbox scope in this window's environment.
+    if sys::test_key().is_some() { let _ = sys::open(&exe, Some(dir)); return; }
+    let own_user = sys::own_user();
+    for route in routes(&shell, own_user.as_deref(), sys::elevated(), sys::in_job(), sys::explorer_elevated()) {
+        let started = match route {
+            Route::Own => sys::open(&exe, Some(dir)),
+            Route::Breakaway => sys::open_breakaway(&exe, dir),
+            Route::Explorer => sys::open_as_desktop_user(&exe, "", dir, SW_NORMAL),
+        };
+        if started { return; }
+    }
+    // none fits: it stays closed, closed cleanly with its network restored
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Route {
+    /// This window's token, from here.
+    Own,
+    /// This window's token, outside its job.
+    Breakaway,
+    /// The signed-in user's, through Explorer: unelevated (elevated where UAC is off).
+    Explorer,
+}
+
+/// The ways to start the copy this window closed, in order. This window's token only when it is
+/// the copy's own (same account, same elevation), and never inside a launcher's job, which would
+/// wait for the app (Start-Process -Wait) or end it with the job and skip its network restore.
+/// Through Explorer only when its token fits: always for a copy that ran unelevated, for an
+/// elevated one only where Explorer is elevated too. A token this window cannot read belongs to a
+/// process above its integrity: elevated.
+fn routes(shell: &rm::Shell, own_user: Option<&[u8]>, own_elevated: bool, in_job: bool, explorer_elevated: Option<bool>) -> Vec<Route> {
+    let elevated = shell.elevated.unwrap_or(true);
+    let mut routes = Vec::new();
+    if shell.user.is_some() && shell.user.as_deref() == own_user && elevated == own_elevated {
+        routes.push(if in_job { Route::Breakaway } else { Route::Own });
+    }
+    if !elevated || explorer_elevated == Some(true) { routes.push(Route::Explorer); }
+    routes
+}
+
+/// A fresh log path for one run of the package, `%TEMP%\<prefix>-<unix seconds>.log`. None unless
+/// %TEMP% is a folder on a local disk: Inno stops when it cannot create its /LOG file, and its
+/// elevated instance does not see a network, SUBST or mapped drive of this logon.
+fn temp_log(prefix: &str) -> Option<PathBuf> {
+    let stamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+    let dir = std::env::temp_dir();
+    (dir.is_dir() && sys::local_disk(&dir)).then(|| dir.join(format!("{prefix}-{stamp}.log")))
 }
 
 /// What the page needs to draw its first screen. Read again on 重试.
@@ -110,21 +219,47 @@ fn install(proxy: EventLoopProxy<Ev>, source: &'static payload::Source, owner: i
             return;
         }
     };
-    let stamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
-    let log = std::env::temp_dir().join(format!("Tesseract-Setup-{stamp}.log"));
+    let log = temp_log("Tesseract-Setup");
     let mut params = vec![
         "/VERYSILENT".to_owned(), "/SUPPRESSMSGBOXES".into(), "/NORESTART".into(), "/NOCANCEL".into(), "/SP-".into(),
         "/CLOSEAPPLICATIONS".into(), "/NORESTARTAPPLICATIONS".into(),
-        format!("/LOG={}", log.display()),
         format!("/TSPROGRESS={progress_hwnd}"),
         format!("/MERGETASKS={}desktopicon", if desktop { "" } else { "!" }),
     ];
+    if let Some(log) = &log { params.push(format!("/LOG={}", log.display())); }
+    // Close a running Tesseract politely first: Inno's own pass cannot (rm.rs) and would roll back.
+    // This session's Tesseract, as it ran, opens again afterwards, whatever the outcome: the user
+    // had it running. One the user is already quitting gets the full wait and stays closed.
+    let target = dir.clone().or_else(|| sys::existing_install().map(|e| e.dir)).map(PathBuf::from);
+    let mut closed = None;
+    if let Some(target) = target.as_ref().filter(|t| rm::in_use(t)) {
+        let quitting = sys::shell_quitting();
+        let before = if quitting { None } else { rm::shell_here(target) };
+        send(&proxy, json!({"ev": "step", "step": "close"}));
+        match rm::close_app(target, rm::WAIT, if quitting { rm::WAIT } else { rm::UNASKED_WAIT }) {
+            rm::Closed::StillRunning(left) => {
+                // Either the shell itself is still here ("running": quit it from the tray), or it
+                // went (its network settings already restored) while another program keeps one of
+                // the folder's modules loaded ("busy", named): what was closed opens again.
+                let page = if rm::shell_running(target) {
+                    json!({"ev": "failed", "kind": "running"})
+                } else {
+                    if let Some(shell) = before { reopen(target, Reopen::Closed(shell)); }
+                    json!({"ev": "failed", "kind": "busy", "apps": rm::names(&left)})
+                };
+                let _ = proxy.send_event(Ev::Outcome(page, Phase::Failed));
+                return;
+            }
+            rm::Closed::Gone | rm::Closed::NothingRunning | rm::Closed::Unknown => closed = before,
+        }
+    }
     if let Some(dir) = dir { params.push(format!("/DIR={dir}")); }
     let params = params.iter().map(|a| sys::quote(a)).collect::<Vec<_>>().join(" ");
     send(&proxy, json!({"ev": "step", "step": "elevate"}));
     let outcome = sys::run_and_wait(owner, file.path(), &params, !sys::no_elevate());
     drop(file);
-    let log_shown = log.exists().then(|| log.display().to_string());
+    if let (Some(shell), Some(dir)) = (closed, target.as_ref()) { reopen(dir, Reopen::Closed(shell)); }
+    let log_shown = log.filter(|l| l.exists()).map(|l| l.display().to_string());
     let (page, phase) = match outcome {
         sys::Run::Exited(0) => {
             let dir = sys::existing_install().map(|e| e.dir);
@@ -256,7 +391,10 @@ fn run(source: payload::Source) {
                     "open" if phase == Phase::Done => {
                         if let Some(dir) = &app_dir {
                             let dir = PathBuf::from(dir);
-                            sys::open(&dir.join("Tesseract.exe"), Some(&dir));
+                            let exe = dir.join("Tesseract.exe");
+                            // as the signed-in user, also from a window started as administrator
+                            let desktop = sys::elevated() && sys::test_key().is_none() && sys::open_as_desktop_user(&exe, "", &dir, SW_NORMAL);
+                            if !desktop { sys::open(&exe, Some(&dir)); }
                         }
                         *flow = ControlFlow::Exit;
                     }
@@ -272,6 +410,31 @@ fn run(source: payload::Source) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn the_copy_this_window_closed_starts_with_its_own_kind_of_token() {
+        let user = |n: u8| Some(vec![1, 5, 0, 0, 0, 0, 0, 5, 21, n]);
+        let shell = |elevated: Option<bool>, user: Option<Vec<u8>>| rm::Shell { pid: 4, elevated, user };
+        let me = user(1);
+        let none: Vec<Route> = Vec::new();
+        // the page, started from the desktop: its own token, Explorer as a fallback
+        assert_eq!(routes(&shell(Some(false), me.clone()), me.as_deref(), false, false, Some(false)), [Route::Own, Route::Explorer]);
+        // an elevated console or Run as administrator, the user's unelevated copy: through Explorer
+        assert_eq!(routes(&shell(Some(false), me.clone()), me.as_deref(), true, false, Some(false)), [Route::Explorer]);
+        // an elevated console, an elevated (TUN, kill switch) copy: this token; inside
+        // Start-Process -Wait's job only by breaking away, never into the job
+        assert_eq!(routes(&shell(Some(true), me.clone()), me.as_deref(), true, false, Some(false)), [Route::Own]);
+        assert_eq!(routes(&shell(Some(true), me.clone()), me.as_deref(), true, true, Some(false)), [Route::Breakaway]);
+        // a launcher's job around an unelevated window: outside it, by breaking away or through Explorer
+        assert_eq!(routes(&shell(Some(false), me.clone()), me.as_deref(), false, true, Some(false)), [Route::Breakaway, Route::Explorer]);
+        // SYSTEM or another account in the user's session: never its own token
+        assert_eq!(routes(&shell(Some(true), me.clone()), user(18).as_deref(), true, false, Some(false)), none);
+        assert_eq!(routes(&shell(Some(false), me.clone()), user(18).as_deref(), true, false, Some(false)), [Route::Explorer]);
+        // a copy this window cannot read runs above it: elevated, so not through an unelevated Explorer
+        assert_eq!(routes(&shell(None, None), me.as_deref(), false, false, Some(false)), none);
+        // UAC off: everything is elevated, Explorer too
+        assert_eq!(routes(&shell(Some(true), me.clone()), me.as_deref(), true, false, Some(true)), [Route::Own, Route::Explorer]);
+    }
+
     #[test]
     fn picked_folder_gets_the_app_folder() {
         assert_eq!(install_dir_for(r"D:\Apps"), r"D:\Apps\Tesseract");

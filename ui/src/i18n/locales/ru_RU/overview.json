@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "Текущий сервер неизвестен · выход через Gateway",
   "overview.deck.node.untested": "Не проверен",
   "overview.deck.stat.bastion_off": "Отключён",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, one {До # сервера} few {До # серверов} many {До # серверов} other {До # сервера}}",
   "overview.deck.stat.collecting": "Идёт сбор…",
   "overview.deck.stat.bastion_filling": "Пополнение · доступно {n, number}",
   "overview.deck.stat.bastion_low": "доступно {n, number} · {min, plural, one {меньше минимума (#)} few {меньше минимума (#)} many {меньше минимума (#)} other {меньше минимума (#)}}",

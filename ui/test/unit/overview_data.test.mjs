@@ -225,8 +225,10 @@ test('deckStat: running, starting, stopped, unknown and off tiers', () => {
   assert.deepEqual(st('vanguard', { run: 'unknown' }).stat, { kind: 'unknown' });
   assert.deepEqual(st('vanguard', { summaryKnown: false }).stat, { kind: 'unknown' });
   assert.deepEqual(st('vanguard', { run: 'stopped' }).stat, { kind: 'nodes', total: 3 });
-  // starting: collecting until the tier is collected; the deck's front reads as usable
-  assert.deepEqual(st('vanguard', { run: 'starting', carrier: null }).stat, { kind: 'collecting' });
+  // starting: an imported tier's counts are known from the start (11-16: the start loads its
+  // nodes; only Bastion collects), so it never reads as collecting; the deck's front reads as usable
+  assert.deepEqual(st('vanguard', { run: 'starting', carrier: null }).stat, { kind: 'standby', ok: 2, total: 3 });
+  assert.deepEqual(st('vanguard', { run: 'starting', carrier: null, front: 'vanguard' }).stat, { kind: 'usable', ok: 2, total: 3 });
   assert.deepEqual(st('vanguard', { run: 'starting', carrier: null, front: 'vanguard', collected: { vanguard: true } }).stat, { kind: 'usable', ok: 2, total: 3 });
   assert.deepEqual(st('sentinel', { run: 'starting', carrier: null, front: 'vanguard', collected: { sentinel: true } }).stat, { kind: 'standby', ok: 1, total: 2 });
 });
@@ -243,9 +245,10 @@ test('deckStat: Bastion\'s denominator is capacity (D9; 5th wave 02b-6), never t
   assert.deepEqual(st({ tiers: { ...TIERS, bastion: { enabled: false } } }).stat, { kind: 'bastion_off' });
   assert.deepEqual(st({ bastionKnown: false }).stat, { kind: 'bastion_unknown' });
   assert.deepEqual(st({ bastion: { ok: 0, capacity: 0, min: 0 } }).stat, { kind: 'bastion_unknown' });
-  // stopped: no baseline (bastion.pool has none while stopped) -> unknown; a known capacity is shown
+  // stopped: no live numbers -> a dash (F-01: Bastion's pool without numbers says no sentence),
+  // whether or not a capacity is known
   assert.deepEqual(st({ run: 'stopped', bastionKnown: false }).stat, { kind: 'bastion_unknown' });
-  assert.deepEqual(st({ run: 'stopped' }).stat, { kind: 'bastion_capacity', capacity: 60 });
+  assert.deepEqual(st({ run: 'stopped' }).stat, { kind: 'bastion_unknown' });
   assert.deepEqual(st({ run: 'starting' }).stat, { kind: 'collecting' });
   assert.deepEqual(st({ run: 'starting', collected: { bastion: true } }).stat, { kind: 'bastion_after_ready' });
 });

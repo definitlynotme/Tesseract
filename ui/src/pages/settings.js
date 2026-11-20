@@ -2746,6 +2746,9 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
      enabled false → this build has no in-app update. B-30(a)(c)(d): the check time, the download
      percentage, the signed / size / date line are prototype-only. */
   const upd = () => (T.rt ? T.rt.topic('update.state').get() : null) || null;
+  // this page's own app.update.install: 'call' while it runs, 'sent' once it returned until
+  // update.state leaves verified (the handoff snapshot can trail the job's done edge) or 3 s pass
+  let updInstalling = false;
   // the page language, for notes with one section per language (i18n/release_notes.js)
   const notesLang = () => (T.i18n && T.i18n.lang) || null;
   function paintUpd(animate) {
@@ -2753,11 +2756,19 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     const u = upd();
     const st = !u ? 'none' : u.enabled === false ? 'disabled' : u.state === 'idle' && u.update_available ? 'available' : u.state;
     const ver = u && u.version ? u.version : '';
+    if (updInstalling === 'sent' && st !== 'verified') updInstalling = false;
+    // 11-18: verified with an error = the hand-off to the shell did not happen (no answer, declined,
+    // accepted but no exit): say so and offer the retry and the release page. Before, verified hid
+    // every button and the row read 安装包已就绪 for good.
+    const stranded = st === 'verified' && !!u.error;
+    const retrying = stranded && !!updInstalling;
     let n, kind = st;
     if (st === 'none') n = document.createTextNode(t('settings.app.update.state.unknown'));
     else if (st === 'disabled') n = document.createTextNode(t('settings.app.update.state.disabled'));
     else if (st === 'checking') n = T.html`<span class="spin"></span>${t('settings.app.update.state.checking')}`;
     else if (st === 'downloading') n = T.html`<span class="spin"></span>${t('settings.app.update.state.downloading_plain', { version: ver })}`;
+    else if (retrying) n = T.html`<span class="spin"></span>${t('settings.app.update.busy')}`;
+    else if (stranded) n = T.html`${I('error', 14)}${t('settings.app.update.state.handoff_failed')}`;
     else if (st === 'verified') n = T.html`${I('check', 14)}${t('settings.app.update.state.verifying_done')}`;
     else if (st === 'handoff') n = T.html`${I('check', 14)}${t('settings.app.update.state.ready')}`;
     else if (st === 'failed') n = T.html`${I('error', 14)}${t('settings.app.update.state.failed_plain', { reason: errText(u.error) || t('common.reason_unknown') })}`;
@@ -2768,11 +2779,13 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     else if (Number.isFinite(u.last_check_at_ms)) n = T.html`${I('check', 14)}${t('settings.app.update.state.latest', { manual: T.rt.feature('B-30a') ? 'no' : 'yes', when: dayTime(u.last_check_at_ms) })}`;
     else n = T.html`${I('check', 14)}${t('settings.app.update.state.latest_plain')}`;
     if (u && st === 'available' && Number.isFinite(u.last_check_at_ms)) n = T.html`${n} · ${t('settings.app.update.checked_at', { when: dayTime(u.last_check_at_ms) })}`;
-    R.updSt.classList.toggle('is-ok', st === 'idle' || st === 'verified' || st === 'handoff');
-    R.updSt.classList.toggle('is-err', st === 'failed');
+    R.updSt.classList.toggle('is-ok', st === 'idle' || (st === 'verified' && !stranded) || st === 'handoff');
+    R.updSt.classList.toggle('is-err', st === 'failed' || (stranded && !retrying));
     swapNode(R.updSt, n, { kind, instant: !animate || !visible });
     // B-30(d): signed · size · date (no contract field) only with the item
     R.updMeta.hidden = !(T.rt.feature('B-30d') && st === 'available');
+    // (verified keeps 检查更新 hidden: a check only keeps the same verified installer, and a third
+    // button squeezed the title column to a word per line in German at 1060 px, 11-18)
     const busy = st === 'downloading' || st === 'verified' || st === 'handoff';
     // B-30(c): a download percentage only with the item; otherwise an indeterminate bar
     reveal([[R.updProg, st === 'downloading']], animate);
@@ -2780,7 +2793,13 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     const check = R.root.querySelector('#set-upd-check');
     check.hidden = busy;
     check.disabled = st === 'disabled' || !can('app.update.check');
-    reveal([[R.updNotes, !!(u && st === 'available' && releaseNotesFor(u.notes, notesLang()))], [R.updInstall, st === 'available' && !!u.installable && can('app.update.install')], [R.updPage, (st === 'available' && !u.installable) || (st === 'failed' && !!u.update_available)]], animate);   // failed: the manual way out (11-16)
+    reveal([[R.updNotes, !!(u && st === 'available' && releaseNotesFor(u.notes, notesLang()))],
+      // verified: a kept, verified installer that 立即更新 hands off again (the sidecar re-hashes its
+      // receipt first); during this page's own call it keeps its busy face, then waits for the handoff
+      [R.updInstall, (st === 'available' || (st === 'verified' && updInstalling !== 'sent')) && !!u.installable && can('app.update.install')],
+      // the manual way out (11-16, 11-18): every failed state (a new epoch's failed+io after a failed
+      // launch carries update_available false) and every verified one outside this page's own call
+      [R.updPage, (st === 'available' && !u.installable) || st === 'failed' || (st === 'verified' && !updInstalling)]], animate);
   }
   /* 更新说明: the publisher's text (Update.notes), shown as plain text (never parsed: R-09);
      notes with one section per language show the page language's (i18n/release_notes.js) */
@@ -2796,11 +2815,19 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     const u = upd(); if (!u || !u.installable) return;
     T.confirm({ title: t('settings.app.update.confirm.title', { version: u.version || '' }), message: t('settings.app.update.confirm.body_plain'), confirmLabel: t('settings.app.update.confirm.ok') }).then(ok => {
       if (!ok) return;
+      updInstalling = 'call'; paintUpd(true);
+      const settle = sent => {
+        updInstalling = sent ? 'sent' : false; paintUpd(true);
+        if (sent) setTimeout(() => { if (updInstalling === 'sent') { updInstalling = false; paintUpd(true); } }, 3000);
+      };
       // the sidecar verifies, the shell closes Tesseract and runs the installer (update.state follows)
-      T.ui.busy(btn, T.rt.call('app.update.install', {}).then(() => t('settings.app.update.installing')), { busy: t('settings.app.update.busy'), done: r => r,
+      T.ui.busy(btn, T.rt.call('app.update.install', {}), { busy: t('settings.app.update.busy'),
+        // done: false — back to 立即更新 at once: the row says what happens next, and a hand-off that
+        // fails brings the button back for the retry, never frozen on ✓ 正在安装 (11-18)
+        done: false,
         // short word only: the button sits in the row's auto column, and a full reason there squeezed
         // the title column to one character per line (11-16); the reason is in .set-upd-st below the title
-        fail: () => t('core.busy.failed', { code: 'other' }), icon: 'download', busyIcon: 'download', stay: true, failHold: 4000 });
+        fail: () => t('core.busy.failed', { code: 'other' }), icon: 'download', busyIcon: 'download', failHold: 4000 }).then(() => settle(true), () => settle(false));
     });
   }
   /* host.* answers: a conflict + dialog_open (another native dialog open) and the other host reasons
@@ -2927,7 +2954,8 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
         if (!visible) return;
         wash(target);
         if (key === 'alerts') { const h = target.querySelector('.fsec-t'); if (h) h.focus({ preventScroll: true }); return; }
-        if (key === 'update') { const b = T.$$('#set-upd-install, #set-upd-page, #set-upd-check', target).find(isShown); if (b) T.router.land(b); return; }
+        // (by priority, not document order: 前往发布页 sits before 立即更新 in the row, 11-18)
+        if (key === 'update') { const b = ['#set-upd-install', '#set-upd-page', '#set-upd-check'].map(s => target.querySelector(s)).find(x => x && isShown(x)); if (b) T.router.land(b); return; }
         // arriving from the keyboard (a link, a banner action, the palette): focus lands on the row's control
         T.router.land(T.$$(ROW_CTL, target).find(isShown) || T.$$('button, input, [tabindex="0"]', target).find(isShown));
       });

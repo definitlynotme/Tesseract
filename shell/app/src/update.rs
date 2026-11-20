@@ -407,10 +407,12 @@ impl Update {
         self.state().failure.take().map(|(receipt_ref, reason)| json!({"receipt_ref":receipt_ref,"launched":false,"reason_code":reason}))
     }
 }
+/// `update.exitResponse` args. `reason_code` is always present (PROTOCOL §11/§13:
+/// `{handoff_id, accepted, reason_code}`, `"reason_code":"str?"` = required, nullable): null on
+/// an acceptance. 0.1.0–0.1.3 left it out of every acceptance, the sidecar refused the frame
+/// (`missing:args.reason_code`) and no in-app update ever reached the installer.
 pub fn response(handoff_id: &str, accepted: bool, reason: Option<&str>) -> Value {
-    let mut args = json!({"handoff_id":handoff_id,"accepted":accepted});
-    if let Some(reason) = reason { args["reason_code"] = json!(reason); }
-    args
+    json!({"handoff_id":handoff_id,"accepted":accepted,"reason_code":reason})
 }
 /// A shell-only command request (PROTOCOL §10: from=shell, owner shell).
 pub fn request_frame(id: u64, cmd: &str, args: Value) -> Value {
@@ -495,7 +497,7 @@ pub fn install_roots(shell_exe: &Path, sidecar: Option<&Path>, source_bin: Optio
         update.configure(data.to_owned(), vec![data.to_owned()], None);
         let (_, dto) = installer(data, bytes);
         assert!(update.on_prepare_exit(&dto, 1, true).is_none());
-        assert_eq!(wait_response(&update), json!({"handoff_id":"update-handoff-1","accepted":true}));
+        assert_eq!(wait_response(&update), json!({"handoff_id":"update-handoff-1","accepted":true,"reason_code":null}));
         assert!(update.on_response_reply("update-handoff-1", true), "a recorded acceptance starts app.quit{{reason:update}}");
         update
     }

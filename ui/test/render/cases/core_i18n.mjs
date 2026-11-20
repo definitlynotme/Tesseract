@@ -203,6 +203,16 @@ export const ALLOWED = [
     const cmd = rows.findIndex(r => r[1] === 'button' && r[3] === '搜索与命令（Ctrl+K）');
     return cmd < 0 ? rows : [...rows.slice(0, cmd), [1, 'button', '', label, '', ''], ...rows.slice(cmd)];
   } },
+  // the letter for users (11-05, src/letter/letter.js, DESIGN §6.22): the product name beside the
+  // mark is the letter's button (#letter-open), named with the unread mark until this edition of the
+  // letter was opened (never, in a fresh cell); the name itself sits one level deeper, inside it.
+  // The full command palette offers it too (打开给用户的信, before 本次运行的问题)
+  { why: '11-05: the product name opens the letter', apply: rows => {
+    const i = rows.findIndex(r => r[0] === 2 && r[1] === 'span' && r[2] === 'Tesseract');
+    const out = i < 0 ? rows : [...rows.slice(0, i), [2, 'button', '', 'Tesseract · 给用户的信 · 未读', '', ''], [3, 'span', 'Tesseract', '', '', ''], ...rows.slice(i + 1)];
+    const k = out.findIndex(r => r[0] === 3 && r[1] === 'button' && r[3] === '本次运行的问题');
+    return k < 0 ? out : [...out.slice(0, k), [3, 'button', '', '打开给用户的信', '', ''], [4, 'span', '打开给用户的信', '', '', ''], ...out.slice(k)];
+  } },
   // 配置整理 P1 (user 11-04): 网络模式 is 接管方式; the TUN mode is 虚拟网卡模式 (全局 meant TUN, not
   // Clash's global) and mixed is 系统代理 + 虚拟网卡: the mode notice and the palette's mode group say so
   { why: 'P1: 接管方式 wording', apply: rows => [

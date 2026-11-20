@@ -475,8 +475,11 @@ V1_COMMAND_SPECS = {
     "app.quit": ("control", "shell", "job", "none", {"reason?": "user|update|shell_lost"},
                  {"startup_phase": "str", "shutdown_exit_code": "uint?", "cleanup_pending": "bool"}, "lifecycle_busy io"),
     "shell.saveGrant": ("control", "shell", "res", "none", {"ref": "str", "purpose": "bundle|filtered", "expires_at_ms": "uint", "format": "zip|json|text|csv", "handle_id": "uint", "for_owner?": "str"}, {"registered": "bool"}, "not_allowed conflict"),
-    "update.exitResponse": ("control", "shell", "res", "none", {"handoff_id": "str", "accepted": "bool", "reason_code": "str?"}, {"recorded": "bool"}, "conflict"),
-    "update.installResult": ("control", "shell", "res", "none", {"receipt_ref": "str", "launched": "bool", "reason_code": "str?"}, {"recorded": "bool"}, "conflict io"),
+    # 11-18: reason_code may be left out (the shell sends null). 0.1.0-0.1.3 shells left it out
+    # of every acceptance and the then-required key refused each one: no in-app update ever
+    # reached the installer. A missing reason costs nothing; a refused hand-off strands users.
+    "update.exitResponse": ("control", "shell", "res", "none", {"handoff_id": "str", "accepted": "bool", "reason_code?": "str?"}, {"recorded": "bool"}, "conflict"),
+    "update.installResult": ("control", "shell", "res", "none", {"receipt_ref": "str", "launched": "bool", "reason_code?": "str?"}, {"recorded": "bool"}, "conflict io"),
     "app.sessionEnd": ("control", "shell", "res", "none", {"reason": "logoff|shutdown", "budget_ms": "uint"},
                        {"writes_revoked": "bool", "recovery": "Recovery", "workers_pending": "bool"}, "io timeout"),
     "host.saveFile": ("shell", "page", "res", "dialog", {"purpose": "bundle|filtered", "format": "zip|json|text|csv"}, {"cancelled": "bool", "ref": "str?"}, "io"),

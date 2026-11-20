@@ -458,6 +458,8 @@ test('update.state row: every v1 state maps to the footer state', () => {
   assert.equal(updateStateOf(u('checking')), 'checking');
   assert.equal(updateStateOf(u('downloading')), 'dl');
   assert.equal(updateStateOf(u('verified')), 'verify');
+  // 11-18: a hand-off that did not happen leaves verified + error; never 更新已就绪 for good
+  assert.equal(updateStateOf(u('verified', { update_available: true, installable: true, error: { code: 'timeout' } })), 'found');
   assert.equal(updateStateOf(u('handoff')), 'ready');
   assert.equal(updateStateOf(u('failed', { error: { code: 'io' } })), 'fail');
   assert.equal(updateStateOf(u('idle', { error: { code: 'io' } })), 'fail');

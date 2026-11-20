@@ -3061,6 +3061,7 @@ dependencies = [
  "bridge_host",
  "serde",
  "serde_json",
+ "tao",
  "tauri",
  "tauri-build",
  "webview2-com",

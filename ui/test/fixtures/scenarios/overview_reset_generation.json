@@ -899,7 +899,15 @@
                 }
               ],
               "alerts": {
-                "channels": []
+                "notify": {
+                  "enabled": true,
+                  "events": [
+                    "connection",
+                    "tier_fallback",
+                    "update"
+                  ],
+                  "sound": true
+                }
               },
               "ui": {
                 "language": "zh_CN",
@@ -1060,7 +1068,15 @@
                 }
               ],
               "alerts": {
-                "channels": []
+                "notify": {
+                  "enabled": true,
+                  "events": [
+                    "connection",
+                    "tier_fallback",
+                    "update"
+                  ],
+                  "sound": true
+                }
               },
               "ui": {
                 "language": "zh_CN",

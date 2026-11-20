@@ -350,6 +350,9 @@ class Wiring:
             kwargs["updater"] = IsolatedUpdater()
         else:
             kwargs["updater"] = RoutedUpdater(self._update_core_proxy_url)
+            # A portable copy cannot update itself in the app: the release page instead (11-19).
+            # Asked by the first check on its worker, never here before hello (11-20).
+            kwargs["installed_copy"] = bridge_update.installed_copy
         owner = bridge_update.UpdateOwner(app_update_state.update_state_path(data_dir),
                                           data_dir / "updates", **kwargs)
         bridge_update.register(self.session, owner)

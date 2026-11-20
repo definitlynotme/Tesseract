@@ -102,41 +102,39 @@ test('every literal id the page uses is in a zh_CN catalog; every dynamic family
   }
 });
 
+// QUARANTINE (10-30 alert redesign): the channel UI's words are still in the catalogs although no
+// page uses them: every alerts.* id outside the section's switches (alerts.notify.*) and the two
+// reason sets, and these settings.* ids. They leave the nine catalogs and frozen.json in one change
+// together with the channel catalog (catalog.alerts.*); until then they are not counted as unused,
+// and they must stay unused. Every other settings.* / alerts.* id is still checked.
+const RETIRED_SETTINGS_10_30 = ['settings.app.update.installing', 'settings.alert_level.all_desc', 'settings.save.alerts_later',
+  'settings.save.not_applied_reason.delivery_records'];
+const retired1030 = id => RETIRED_SETTINGS_10_30.includes(id) || (/^alerts\./.test(id) && !/^alerts\.(?:notify|test_reason|onboarding_reason)\./.test(id));
+
 test('every settings.* / alerts.* id is used by the page or reserved (05d / 05e)', () => {
   const used = id => literalIds.has(id) || dynamicPrefixes.some(p => id.startsWith(p));
   for (const id of RESERVED_SETTINGS) assert.ok(SETTINGS[id] && /预留/.test(SETTINGS[id]._desc), `reserved ${id}`);
   for (const c of TEST_REASONS) assert.ok(ALERTS[`alerts.test_reason.${c}`], c);
   for (const c of ONBOARDING_REASONS) assert.ok(ALERTS[`alerts.onboarding_reason.${c}`], c);
+  for (const id of RETIRED_SETTINGS_10_30) assert.ok(SETTINGS[id], `retired ${id} is still in the catalog (drop it from the list once pruned)`);
+  assert.deepEqual(Object.keys({ ...SETTINGS, ...ALERTS }).filter(id => retired1030(id) && used(id)), [], 'a retired id is used again: take it off the retired list');
   const reserved = id => RESERVED_SETTINGS.includes(id) || /^alerts\.(?:test_reason|onboarding_reason)\./.test(id);
-  const unused = Object.keys({ ...SETTINGS, ...ALERTS }).filter(id => !used(id) && !reserved(id));
+  const unused = Object.keys({ ...SETTINGS, ...ALERTS }).filter(id => !used(id) && !reserved(id) && !retired1030(id));
   assert.deepEqual(unused, []);
 });
 
-test('catalog.*: the bridge_catalog label ids of all 15 channel types and 11 protocols; this ticket\'s names', () => {
-  const chans = ['desktop', 'sound', 'telegram', 'whatsapp', 'slack', 'discord', 'teams', 'google_chat', 'ntfy', 'pushover', 'gotify',
-    'email_smtp', 'email_sendgrid', 'sms_twilio', 'generic_webhook'];
+// (10-30 alert redesign: the 15 channel types, their forms and alerts.catalog left with the channel
+// UI, so their catalog.alerts.* names are not checked here; they leave the catalogs with the retired
+// ids above. The protocols' names, from import.specs, stay.)
+test('catalog.*: the bridge_catalog label ids of all 11 protocols; this ticket\'s names', () => {
   const protos = ['vless_reality', 'vmess', 'trojan', 'ss', 'anytls', 'naive', 'socks5', 'hysteria2', 'tuic', 'wireguard', 'argo_xhttp'];
-  const types = ['WARNING', 'CRITICAL', 'EMERGENCY', 'RECOVERY', 'POOL_UPDATE', 'BACKUP_REMINDER', 'KILL_SWITCH_ON', 'KILL_SWITCH_OFF', 'KILL_SWITCH_DISABLED', 'KILL_SWITCH_OVERRIDE'];
-  const groups = ['vanguard_nodes', 'route_health', 'emergency_fallback', 'protection', 'backup'];
-  for (const c of chans) {
-    for (const f of ['', '.enabled', '.label', '.alert_types', '.event_groups', '.timeout', '.retries']) assert.ok(CATALOG[`catalog.alerts.${c}${f}`], `${c}${f}`);
-    for (const v of types) assert.ok(CATALOG[`catalog.alerts.${c}.alert_types.choice.${v}`], `${c} ${v}`);
-    for (const g of groups) assert.ok(CATALOG[`catalog.alerts.${c}.event_groups.choice.${g}`], `${c} ${g}`);
-  }
   for (const p of protos) {
     for (const f of ['', '.tier', '.name', '.server']) assert.ok(CATALOG[`catalog.${p}${f}`], `${p}${f}`);
   }
   assert.ok(CATALOG['catalog.notice.ss_none_unencrypted']);
   assert.ok(CATALOG['catalog.ss.method.choice.2022-blake3-aes-128-gcm']);
-  // names without a backend label_id: groups, severity presets, sound presets, scope templates
-  for (const g of ['built_in', 'chat', 'push', 'email', 'sms', 'generic']) assert.ok(CATALOG[`catalog.alerts.group.${g}`], g);
-  for (const p of ['urgent', 'abnormal_recovery', 'all']) { assert.ok(CATALOG[`catalog.alerts.preset.${p}`], p); assert.ok(CATALOG[`catalog.alerts.preset.${p}.desc`], p); }
-  for (const p of ['soft', 'standard', 'prominent']) assert.ok(CATALOG[`catalog.alerts.sound.preset.${p}`], p);
-  for (const s of ['all', 'key_events']) assert.ok(CATALOG[`catalog.alerts.scope.${s}`], s);
-  // (T-P4-05e) the page names each channel by the catalog's label_id (alerts.catalog); it has no
-  // table of its own: types, fields and groups come from the catalog (pages/settings/alerts_form.js)
+  // the page keeps no backend-key table of its own
   assert.doesNotMatch(SRC, /\bbk: '[a-z_]+'/);
-  assert.match(SRC, /labelId/);
   // the catalog coverage gate is hard from this ticket on (critique C7)
   const gates = JSON.parse(read('tools/i18n_gates.json'));
   assert.deepEqual(gates.catalog, { p4: 'hard', p7: 'hard' });
@@ -264,7 +262,9 @@ async function look(page, where) {
   return r;
 }
 
-test('pseudo (fixture mode, ASCII frames): all seven sections and the Telegram drawer show no CJK outside translate="no"', { skip }, async () => {
+// (10-30 alert redesign: the section's alert history and the channel drawers, Telegram's among them,
+// are gone; the history is the logs page's alert category now)
+test('pseudo (fixture mode, ASCII frames): all seven sections show no CJK outside translate="no"', { skip }, async () => {
   const cell = await fixturePage('pseudo');
   const { page } = cell;
   const ids = await page.evaluate(() => [...document.querySelectorAll('section[data-page="settings"] .fsec[id]')].map(s => s.id));
@@ -279,14 +279,6 @@ test('pseudo (fixture mode, ASCII frames): all seven sections and the Telegram d
   });
   assert.deepEqual(lang.names, ['简体中文', 'English', '日本語', '한국어', 'Français', 'Deutsch', 'Español', 'Português', 'Русский'], 'pseudo: the nine own names, not pseudo-localised');
   assert.deepEqual({ text: lang.text, translate: lang.translate, lang: lang.lang }, { text: '简体中文', translate: 'no', lang: 'zh-CN' });
-  // the data is there, under translate="no" (the demo's alert history)
-  const data = await page.evaluate(() => [...document.querySelectorAll('#set-recent [translate="no"]')].map(e => e.textContent).join(' | '));
-  assert.match(data, /Vanguard/);
-  await page.evaluate(() => document.querySelector('.set-ch[data-ch="telegram"]').click()); await run.runAction(page, { page_ms: 600 });
-  await look(page, 'telegram drawer (quick setup)');
-  await page.click('.ovl .drawer .set-ch-tabs .tab[data-v="manual"]'); await run.runAction(page, { page_ms: 600 });
-  await page.click('.ovl .drawer .set-adv-t'); await run.runAction(page, { page_ms: 600 });
-  await look(page, 'telegram drawer (manual, advanced)');
   assert.deepEqual(cell.errors, []);
   await cell.context.close();
 });
@@ -365,30 +357,26 @@ test('T.ui.select: option lang / translate on the menu labels and the shown valu
   await cell.context.close();
 });
 
-test('a language switch with drafts keeps the drafts, dirty marks, typed text, open drawer and scroll; back in zh_CN the page reads as before', { skip }, async () => {
+// (10-30 alert redesign: the channel drawer this test also kept open is gone with the channel UI;
+// a drawer across a language switch is left to a test on a drawer the page still has)
+test('a language switch with drafts keeps the drafts, dirty marks, typed text and scroll; back in zh_CN the page reads as before', { skip }, async () => {
   const cell = await fixturePage('zh_CN');
   const { page } = cell;
   await page.click('.switch[data-k="ipv6"]'); await run.runAction(page, { page_ms: 600 });
   await page.click('.switch[data-k="lan"]'); await run.runAction(page, { page_ms: 600 });
   await page.fill('#set-rule-in', 'example.org'); await run.runAction(page, { page_ms: 600 });
   await page.evaluate(() => { document.querySelector('#host').scrollTop = 1400; }); await run.runAction(page, { page_ms: 300 });
-  await page.evaluate(() => document.querySelector('.set-ch[data-ch="telegram"]').click()); await run.runAction(page, { page_ms: 600 });
-  await page.click('.ovl .drawer .set-ch-tabs .tab[data-v="manual"]'); await run.runAction(page, { page_ms: 600 });
-  await page.click('.ovl .drawer .set-adv-t'); await run.runAction(page, { page_ms: 600 });
   const s0 = await page.evaluate(cases.draftStateInPage);
   assert.equal(s0.switches.ipv6, 'true'); assert.equal(s0.switches.lan, 'true');
   assert.equal(s0.typed.rule, 'example.org');
   assert.ok(s0.dirty && s0.count >= 3, `dirty ${s0.dirty} count ${s0.count}`);
   assert.ok(s0.tocDots.includes('set-conn') && s0.tocDots.includes('set-route'), s0.tocDots.join(','));
-  assert.ok(s0.drawer && s0.drawer.adv, 'drawer open with the advanced block');
   assert.equal(s0.scroll, 1400);
   const tree0 = await page.evaluate(cases.settingsTreeInPage, SCOPE);
 
   await page.evaluate(() => T.i18n.set('pseudo')); await run.runAction(page, { page_ms: 800 });
   const s1 = await page.evaluate(cases.draftStateInPage);
   assert.deepEqual(s1, s0, 'pseudo: the state a language switch must keep');
-  const tab = await page.evaluate(() => (document.querySelector('.ovl .drawer .set-ch-tabs .tab[aria-selected="true"]') || {}).dataset);
-  assert.equal(tab && tab.v, 'manual');
   const r = await page.evaluate(cases.settingsTextInPage);
   assert.deepEqual(r.texts.filter(s => CJK.test(s)), [], 'pseudo: CJK left after the switch');
 
@@ -401,27 +389,21 @@ test('a language switch with drafts keeps the drafts, dirty marks, typed text, o
   await cell.context.close();
 });
 
-test('a language switch keeps an open inline edit (public source), text typed into a drawer field and the drawer\'s own scroll', { skip }, async () => {
+// (10-30 alert redesign: the ntfy drawer whose typed field and scroll this test also kept is gone
+// with the channel UI)
+test('a language switch keeps an open inline edit (public source) and the text typed into it', { skip }, async () => {
   const cell = await fixturePage('zh_CN');
   const { page } = cell;
   await page.evaluate(() => document.querySelector('#set-src-list .set-src-r [data-edit]').click()); await run.runAction(page, { page_ms: 600 });
   await page.evaluate(() => { const i = document.querySelector('#set-src-list .set-src-r.is-editing input'); i.value = 'https://edit.example/x'; i.dispatchEvent(new Event('input', { bubbles: true })); });
   await run.runAction(page, { page_ms: 600 });
-  await page.evaluate(() => document.querySelector('.set-ch[data-ch="ntfy"]').click()); await run.runAction(page, { page_ms: 700 });
-  await page.evaluate(() => {
-    const i = document.querySelector('.ovl .drawer [data-f] input'); i.value = 'typed-mid-switch'; i.dispatchEvent(new Event('input', { bubbles: true }));
-    document.querySelector('.ovl .drawer .ovl-body').scrollTop = 120;
-  });
-  await run.runAction(page, { page_ms: 600 });
   const state = () => page.evaluate(() => ({
     edit: (document.querySelector('#set-src-list .set-src-r.is-editing input') || {}).value || null,
-    field: (document.querySelector('.ovl .drawer [data-f] input') || {}).value || null,
-    scroll: (document.querySelector('.ovl .drawer .ovl-body') || {}).scrollTop || 0,
   }));
   const s0 = await state();
-  assert.equal(s0.edit, 'https://edit.example/x'); assert.equal(s0.field, 'typed-mid-switch'); assert.ok(s0.scroll > 0, `drawer scroll ${s0.scroll}`);
+  assert.equal(s0.edit, 'https://edit.example/x');
   await page.evaluate(() => T.i18n.set('pseudo')); await run.runAction(page, { page_ms: 800 });
-  assert.deepEqual(await state(), s0, 'pseudo: the same edit, field text and drawer scroll');
+  assert.deepEqual(await state(), s0, 'pseudo: the same edit and its text');
   assert.deepEqual(cell.errors, []);
   await cell.context.close();
 });
@@ -470,7 +452,11 @@ test('a language switch while the page is away (core rerender on the next T.go):
   await cell.context.close();
 });
 
-test('a drawer reopened by a language switch gives focus back to its opener (tile or in-use row) when it closes', { skip }, async () => {
+// QUARANTINE (registered in ui/README.md §2): written for the channel tiles and in-use rows, which
+// left with the 10-30 alert redesign; no opener of that kind is left on the page. To be rewritten
+// on a drawer the page still opens.
+const QUARANTINE_CHANNEL_DRAWER = 'quarantined: the channel tiles and in-use rows it opens drawers from left with the 10-30 alert redesign (ui/README.md §2)';
+test('a drawer reopened by a language switch gives focus back to its opener (tile or in-use row) when it closes', { skip: skip || QUARANTINE_CHANNEL_DRAWER }, async () => {
   const cell = await fixturePage('zh_CN');
   const { page } = cell;
   for (const [sel, lang] of [['.set-ch[data-ch="ntfy"]', 'pseudo'], ['.set-chrow[data-ch="telegram"]', 'zh_CN']]) {
@@ -525,15 +511,14 @@ for (const [lang, want] of Object.entries(CAP_EXPECT)) {
 //   * a Geo status overdue for an update: settings.app.geo.stale starts with {when} in these
 //     catalogs, and the running scenario's rule data is 8 days old (「vor 8 Tagen · …」 in the
 //     sentence of the catalog, 「Vor 8 Tagen · …」 shown); en_US starts with a digit (unchanged);
-//   * a delivery record's time in a channel's drawer (alerts.deliveries; alerts_a01_save_checks
-//     with its healthy record moved to today 11:00).
+//   * (a delivery record's time in a channel's drawer: gone with the channel UI, 10-30 alert
+//     redesign.)
 const STALE_EXPECT = {
-  en_US: { status: '8 days ago · Update overdue', cell: 'Today 11:00' },
-  de_DE: { status: 'Vor 8 Tagen · Aktualisierung überfällig', cell: 'Heute 11:00' },
+  en_US: { status: '8 days ago · Update overdue' },
+  de_DE: { status: 'Vor 8 Tagen · Aktualisierung überfällig' },
 };
-const DELIVERED_AT = 1789999410000; // alerts_a01_save_checks: the healthy record of telegram-main
 for (const [lang, want] of Object.entries(STALE_EXPECT)) {
-  test(`relative dates in ${lang}: an overdue Geo status and a delivery record's time are capitalised as shown alone`, { skip }, async () => {
+  test(`relative dates in ${lang}: an overdue Geo status is capitalised as shown alone`, { skip }, async () => {
     const stale = await fixturePage(lang);
     const g = await stale.page.evaluate(() => ({
       status: document.querySelector('#set-geo .set-geo-s').textContent.trim(),
@@ -543,21 +528,5 @@ for (const [lang, want] of Object.entries(STALE_EXPECT)) {
     assert.equal(g.inline.slice(1), g.status.slice(1), 'the rest is the catalog\'s sentence as written');
     assert.deepEqual(stale.errors, []);
     await stale.context.close();
-
-    const text = read('test/fixtures/scenarios/alerts_a01_save_checks.json');
-    assert.ok(text.includes(`"last_attempt_ms": ${DELIVERED_AT}`), 'the scenario still has the healthy record');
-    const scenario = JSON.parse(text.replaceAll(`"last_attempt_ms": ${DELIVERED_AT}`, `"last_attempt_ms": ${GEO_TODAY}`));
-    const cell = await run.openCell(browser, { distDir: join(dir, 'design'), scenario, lang, size: '1280x800', page: 'settings' });
-    const { page } = cell;
-    await page.evaluate(() => [...document.querySelectorAll('#set-ch-use .set-chrow')].find(r => r.dataset.id === 'telegram-main').click());
-    await run.runAction(page, { page_ms: 900 });
-    const d = await page.evaluate(() => ({
-      cells: [...document.querySelectorAll('.ovl .drawer .set-ch-log dt')].map(e => e.textContent.trim()),
-      inline: T.t('settings.time.today', { time: '11:00' }),
-    }));
-    assert.equal(d.inline, want.cell.charAt(0).toLocaleLowerCase(lang.replace('_', '-')) + want.cell.slice(1), 'the catalog writes the in-sentence form');
-    assert.ok(d.cells.includes(want.cell), `the delivery record of today shown alone: ${JSON.stringify(d.cells)}`);
-    assert.deepEqual(cell.errors, []);
-    await cell.context.close();
   });
 }

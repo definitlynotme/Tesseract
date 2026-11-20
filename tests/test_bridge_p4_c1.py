@@ -879,3 +879,20 @@ def test_rule_order_validation_takes_only_a_full_permutation():
                 ["Direct", "proxy", "reject"], "direct", None):
         result = validate_field("routing", "rule_order", bad)
         assert result["valid"] is False and result["errors"][0]["params"]["field"] == "routing.rule_order", bad
+
+
+def test_update_completed_past_the_receipt_target_shows_no_stale_notes(tmp_path):
+    """11-18: a receipt for 0.2.0 (its hand-off failed, as every 0.1.0-0.1.3 one did) and a
+    manual install of a later version: the start reports the update, never 0.2.0's notes."""
+    import app_update_state
+    from bridge_update import UpdateOwner
+    from tests.test_app_update_state import _downloaded_update
+    path = app_update_state.update_state_path(tmp_path)
+    app_update_state.record_pending_update(path, _downloaded_update())
+    owner = UpdateOwner(path, tmp_path / "updates", current_version="0.3.0")
+    assert owner.load_completed_update() == "0.1.0"
+    data = owner.snapshot()["data"]
+    assert (data["current_version"], data["previous_version"]) == ("0.3.0", "0.1.0")
+    assert data["installed_notes"] is None
+    assert protocol.validate_topic_payload("update.state", data) == []
+    assert UpdateOwner(path, tmp_path / "updates", current_version="0.3.0").load_completed_update() is None

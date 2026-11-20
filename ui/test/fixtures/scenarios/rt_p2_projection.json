@@ -22,12 +22,6 @@
     "lang": "zh_CN",
     "caps": {
      "commands": [
-      "alerts.catalog",
-      "alerts.deliveries",
-      "alerts.onboarding.cancel",
-      "alerts.onboarding.complete",
-      "alerts.onboarding.poll",
-      "alerts.onboarding.start",
       "alerts.test",
       "app.info",
       "app.update.check",
@@ -61,9 +55,7 @@
       "subscriptions.refresh"
      ],
      "topics": [
-      "alerts.delivery",
       "alerts.history",
-      "alerts.onboarding",
       "bastion.pool",
       "bastion.sources",
       "config.changed",

@@ -25,7 +25,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildTarget, writeOutput } from '../../build.mjs';
 import { isPending, scanCjkJs, scanInjectJs, scanStyleJs } from '../../tools/scan.mjs';
 import { diffTrees, fmtAllowances } from '../render/textree.mjs';
@@ -118,7 +118,8 @@ after(async () => {
 async function open({ scenario = null, lang = null } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, reducedMotion: 'reduce', locale: 'zh-CN', timezoneId: 'Asia/Shanghai', colorScheme: 'light' });
   await context.route('**/*', r => (r.request().url().startsWith('file:') ? r.continue() : r.abort()));
-  await context.addInitScript({ path: new URL('test/render/fixture_clock.js', UI).pathname.replace(/^\/([A-Za-z]:)/, '$1') });
+  // fileURLToPath, not URL.pathname: the pathname keeps %20 for a space in the checkout path
+  await context.addInitScript({ path: fileURLToPath(new URL('test/render/fixture_clock.js', UI)) });
   if (scenario) await context.addInitScript(json => { window.__TESSERACT_FIXTURE__ = json; }, readFileSync(new URL(`test/fixtures/scenarios/${scenario}.json`, UI), 'utf8'));
   const page = await context.newPage();
   const errors = [];
@@ -242,6 +243,20 @@ const withoutSteps = (rows, state) => {
   return out;
 };
 const DATA_LOAD = [{ from: '收集节点', to: '加载节点', why: '11-16: phase 0 with imported nodes loads them (overview.phase.load.label)' }];
+/* 11-16, the same rule on the deck (deckStat): Vanguard and Sentinel hold imported nodes whose
+   counts are known from the start, so their cards show the counts at once (the front card 可用, the
+   next 待命) where the prototype said 收集中…; only Bastion still collects. Each row is replaced
+   once, in order (it must be there) */
+const DECK_LOADED = { starting0: [[11, 'span', '收集中…', '2/2 可用'], [11, 'span', '收集中…', '4/5 · 待命']] };
+const withDeckLoaded = (rows, state) => {
+  const out = rows.slice();
+  for (const [depth, tag, from, to] of DECK_LOADED[state] || []) {
+    const i = out.findIndex(r => r[0] === depth && r[1] === tag && r[2] === from);
+    assert.ok(i >= 0, `DECK_LOADED ${state}: ${from} is not in the prototype tree`);
+    out[i] = [depth, tag, to, ...out[i].slice(3)];
+  }
+  return out;
+};
 // F-03 (user 10-28): the role words beside the tier names (自建 · 订阅 · 应急 · 固定出口) are gone: their
 // rows leave the prototype tree, and a name + role in an accessible name or a tip keeps the name
 const ROLES = ['自建', '订阅', '应急', '固定出口'];
@@ -285,7 +300,7 @@ test('regression: running, stopped and starting show the prototype text and tips
     assert.deepEqual(states.running.tips, tipsNoRole(f01Tips(BEFORE.running.tips)), 'running: data-tips');
     for (const k of ['stopped', 'starting0', 'starting1']) {
       if (k === 'stopped') sameTree(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), states[k].tree, k, [...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1]);
-      else sameTree(withoutSteps(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), k), withoutAdded(states[k].tree, STARTING_ADDED), k, [...DATA_05A, ...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1, ...(k === 'starting0' ? DATA_LOAD : [])]);
+      else sameTree(withDeckLoaded(withoutSteps(withoutP1(withoutF04(withoutRoles(withoutF01(BEFORE[k].tree, k)), k)), k), k), withoutAdded(states[k].tree, STARTING_ADDED), k, [...DATA_05A, ...DATA_05A_STOPPED, ...DATA_F04, ...DATA_P1, ...(k === 'starting0' ? DATA_LOAD : [])]);
       assert.deepEqual(tipsOf(states[k].tips, k === 'stopped'), tipsNoRole(f01Tips(tipsOf(BEFORE[k].tips, false))), `${k}: data-tips`);
     }
     // the walk passes every state of the page (fallback, kill switch, gated mode, confirmation,

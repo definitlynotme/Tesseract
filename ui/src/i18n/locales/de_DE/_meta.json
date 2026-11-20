@@ -3121,9 +3121,6 @@
   "errors.admin_required": {
     "src_hash": "9db26a9e02a3e191"
   },
-  "errors.alerts.delivery_failed": {
-    "src_hash": "af760139b555677d"
-  },
   "errors.alerts.receipt_persist_pending": {
     "src_hash": "cf5317e49d0ec2c8"
   },
@@ -4926,9 +4923,6 @@
   "overview.deck.stat.bastion_off": {
     "src_hash": "f95ea7f4c063eea7"
   },
-  "overview.deck.stat.bastion_capacity": {
-    "src_hash": "e19db3b4b710d709"
-  },
   "overview.deck.stat.collecting": {
     "src_hash": "b0ae4c34d1bf7821"
   },
@@ -6331,6 +6325,9 @@
   "settings.app.update.state.found_plain": {
     "src_hash": "49fe291fa3949f2b"
   },
+  "settings.app.update.state.handoff_failed": {
+    "src_hash": "9bc5246d126922cd"
+  },
   "settings.app.update.state.latest_plain": {
     "src_hash": "bc310480b4ce9236"
   },
@@ -6986,9 +6983,6 @@
   },
   "tiers.cell.count_aria": {
     "src_hash": "647c20b6405ce2e3"
-  },
-  "tiers.cell.slot.collecting": {
-    "src_hash": "b0ae4c34d1bf7821"
   },
   "tiers.cell.slot.filling": {
     "src_hash": "e31bf909458120cd"

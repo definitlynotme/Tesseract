@@ -39,7 +39,6 @@ for name, run in [("settings_i18n_running", "running"), ("settings_i18n_stopped"
         steps.append(G.on("autostart.state", reply=[G.res("autostart.state", {"supported": True, "enabled": True, "target": "shell", "mismatch": False, "error": None})]))
         steps.append(G.on("app.info", reply=[G.res("app.info", {"version": "1.0.0", "language": "zh_CN", "caps": [], "listeners": [{"kind": "mixed", "host": "127.0.0.1", "port": 7890, "available": True}]})]))
         steps.append(G.on("geo.status", reply=[G.res("geo.status", G.geo())]))
-    steps.append(G.on("alerts.catalog", reply=[G.res("alerts.catalog", {"channels": [], "event_groups": [], "scopes": [], "acl": {}})]))
     # the rule-data update of the geo_fail case: one kind failed (Geo.items), the reason by message_key
     if run == "running":
         steps.append(G.on("geo.update", reply=G.job("geo.update", "op-geo-1", 1, result={"triggered": True, "completed": False,

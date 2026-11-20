@@ -4,7 +4,7 @@ Tauri 2 外壳里的 Web 界面。设计规范见 `DESIGN.md`（约束性），�
 
 - 全部文件 LF 换行、UTF-8 无 BOM。
 - 依赖只用 `package-lock.json` 锁定的版本（esbuild、acorn、acorn-walk、@fontsource、playwright-core）。安装用 `npm --prefix ui ci --ignore-scripts`，首次需要联网，须经用户批准；之后任何依赖变更都要报 Claude 批准。
-- 渲染、性能、可访问性、端到端测试用本机 Chrome（`C:/Program Files/Google/Chrome/Application/chrome.exe`，可用 `TESSERACT_UI_CHROME` 改）。没有 Chrome 时浏览器单测会 skip，而 `node --test` 与 `check.mjs` 都不把 skip 判为失败；第八波裁定要求「skip 只能是已登记条目」，所以：设了 `TESSERACT_UI_REQUIRE_CHROME=1` 时，`test/unit/chrome_required.test.mjs` 在找不到 Chrome 时直接失败（P7 的发布 CI 必须装 Chrome 并设这个变量）；没设时这条只打印诊断，skip 列表要**人工核对**（看 `node --test` 输出的 skip 行，只能是下表登记的那一条）。
+- 渲染、性能、可访问性、端到端测试用本机 Chrome（`C:/Program Files/Google/Chrome/Application/chrome.exe`，可用 `TESSERACT_UI_CHROME` 改）。没有 Chrome 时浏览器单测会 skip，而 `node --test` 与 `check.mjs` 都不把 skip 判为失败；第八波裁定要求「skip 只能是已登记条目」，所以：设了 `TESSERACT_UI_REQUIRE_CHROME=1` 时，`test/unit/chrome_required.test.mjs` 在找不到 Chrome 时直接失败（`.github/workflows/ci.yml` 设了这个变量）；没设时这条只打印诊断。skip 列表由 `tools/unit_skips.mjs` 核对：它读 `node --test` 的 TAP 报告，出现未登记的 skip、登记的 skip 理由变了、或登记的条目不再 skip 都判失败（CI 每次都跑；本地做法见下表）。
 
 ## 1. 构建
 
@@ -21,7 +21,8 @@ Tauri 2 外壳里的 Web 界面。设计规范见 `DESIGN.md`（约束性），�
 
 | 命令 | 内容 |
 |---|---|
-| `node --test ui/test/unit/` | 单元测试（node:test）。skip 只允许已登记的条目：目前只有 `settings_i18n` 的「superseded by T-P4-05d」一条（人工核对；带 `TESSERACT_UI_REQUIRE_CHROME=1` 时缺 Chrome 直接失败，见开头） |
+| `node --test ui/test/unit/` | 单元测试（node:test）。skip 只允许 `tools/unit_skips.mjs` 登记的条目，目前两条，都在 `settings_i18n`：「superseded by T-P4-05d」；「quarantined: …」（抽屉经语言切换重开后把焦点还给打开它的磁贴或在用行：那些磁贴和行随 10-30 提醒重设计删除，待在页面现有的抽屉上重写）。带 `TESSERACT_UI_REQUIRE_CHROME=1` 时缺 Chrome 直接失败，见开头 |
+| `node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=tap --test-reporter-destination=unit.tap test/unit/`（在 `ui/` 下），再 `node ui/tools/unit_skips.mjs ui/unit.tap` | 同上，并核对 skip 只有登记的那些（CI 的做法） |
 | `node ui/test/render/run.mjs --self-test` | 渲染框架自检 |
 | `node ui/test/render/run.mjs --case smoke --leaks auto` | 冒烟格 |
 | `node ui/test/render/run.mjs [--leaks auto]` | 渲染矩阵全量：全部用例 × zh_CN + pseudo × 1060x700、1280x800。zh_CN 与 pseudo 格内截断判失败 |

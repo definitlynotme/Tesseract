@@ -21,7 +21,6 @@
   "tiers.bx.title": "Bastion 비활성",
   "tiers.cell.aria": "{name}{has_word, select, yes {, {word}} other {}}{has_count, select, yes {, {ok}/{total} 사용 가능} ok_only {, {ok} 사용 가능} other {}}",
   "tiers.cell.count_aria": "{ok}/{total} 사용 가능",
-  "tiers.cell.slot.collecting": "수집 중…",
   "tiers.cell.slot.filling": "보충 중",
   "tiers.cell.slot.missing": "출구 누락",
   "tiers.cell.slot.nodes": "{n, plural, other {노드 #개}}",

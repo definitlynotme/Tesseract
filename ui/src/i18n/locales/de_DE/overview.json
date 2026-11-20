@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "Aktueller Knoten unbekannt · Ausgang über Gateway",
   "overview.deck.node.untested": "Ungetestet",
   "overview.deck.stat.bastion_off": "Nicht aktiv",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, one {Bis zu # Knoten} other {Bis zu # Knoten}}",
   "overview.deck.stat.collecting": "Sammelt…",
   "overview.deck.stat.bastion_filling": "Wird aufgefüllt · {n, number} verfügbar",
   "overview.deck.stat.bastion_low": "{n, number} verfügbar · {min, plural, one {unter dem Minimum von #} other {unter dem Minimum von #}}",

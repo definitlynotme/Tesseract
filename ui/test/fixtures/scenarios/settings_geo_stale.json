@@ -22,7 +22,6 @@
         "lang": "zh_CN",
         "caps": {
           "commands": [
-            "alerts.catalog",
             "app.info",
             "app.update.check",
             "app.update.install",
@@ -535,7 +534,15 @@
                 }
               ],
               "alerts": {
-                "channels": []
+                "notify": {
+                  "enabled": true,
+                  "events": [
+                    "connection",
+                    "tier_fallback",
+                    "update"
+                  ],
+                  "sound": true
+                }
               },
               "ui": {
                 "language": "zh_CN",
@@ -650,30 +657,6 @@
             "running": false,
             "updated_at_ms": 1789856000000,
             "errors": []
-          }
-        }
-      ]
-    },
-    {
-      "on_invoke": {
-        "cmd": "alerts.catalog"
-      },
-      "reply": [
-        {
-          "epoch": "rt-fixture-e1",
-          "produced_at_ms": 1790000000000,
-          "sent_at_ms": 1790000000001,
-          "t": "res",
-          "id": 1,
-          "req_id": "$req_id",
-          "owner": "$owner",
-          "cmd": "alerts.catalog",
-          "ok": true,
-          "data": {
-            "channels": [],
-            "event_groups": [],
-            "scopes": [],
-            "acl": {}
           }
         }
       ]

@@ -351,6 +351,7 @@
   "settings.app.update.state.downloading_plain": "Descargando {version}…",
   "settings.app.update.state.failed_plain": "Error al buscar o instalar actualizaciones: {reason}",
   "settings.app.update.state.found_plain": "<x>Nueva versión {version} disponible</x>",
+  "settings.app.update.state.handoff_failed": "La instalación no se inició.",
   "settings.app.update.state.latest_plain": "Ya tienes la última versión",
   "settings.app.update.state.unknown": "Estado de actualización desconocido",
   "settings.app.update.state.verifying_done": "Instalador listo",

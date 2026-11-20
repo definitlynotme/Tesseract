@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "현재 노드 알 수 없음 · Gateway 출구 사용",
   "overview.deck.node.untested": "미측정",
   "overview.deck.stat.bastion_off": "비활성",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, other {최대 노드 #개}}",
   "overview.deck.stat.collecting": "수집 중…",
   "overview.deck.stat.bastion_filling": "보충 중 · {n, number} 사용 가능",
   "overview.deck.stat.bastion_low": "{n, number} 사용 가능 · {min, plural, other {최소 #개 미만}}",

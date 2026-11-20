@@ -671,11 +671,11 @@ const BADGE_HIDDEN = { page: 'logs', name: 'logs_hidden_30s_badge', langs: LANGS
     } };
 
 /* the whole path, T.go not replaced (T-P4-H4 修复第 1 轮): the window opens on the settings page,
-   提醒区「查看全部」 is clicked there, and the logs page's first visit (render, then enter with the
-   params) is the filtered one. (The button is hidden while the scenario has no recent alerts; a
-   click on it still runs its handler) */
+   提醒区「查看提醒记录」 (#set-n-history; since the 10-30 alert redesign it stands where the alert
+   history's 「查看全部」 #set-recent-all was) is clicked there, and the logs page's first visit
+   (render, then enter with the params) is the filtered one */
 const FROM_SETTINGS = { name: 'logs_enter_category_from_settings', page: 'settings', scenario: 'logs_i18n_running',
-  actions: [settleMs(), { eval: () => { window.__h4from = T.router.current; const b = document.querySelector('#set-recent-all'); window.__h4btn = !!b; if (b) b.click(); } }, settleMs(800),
+  actions: [settleMs(), { eval: () => { window.__h4from = T.router.current; const b = document.querySelector('#set-n-history'); window.__h4btn = !!b; if (b) b.click(); } }, settleMs(800),
     { eval: () => { window.__h4to = T.router.current; } }, ...RAW, filterState],
   expect: ctx => logsExpect(ctx, async page => {
     const nav = await page.evaluate(() => ({ from: window.__h4from, btn: window.__h4btn, to: window.__h4to })), p = [];

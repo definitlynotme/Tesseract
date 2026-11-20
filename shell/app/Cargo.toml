@@ -33,6 +33,12 @@ windows = { version = "0.61", features = ["Win32_UI_Shell", "Win32_UI_WindowsAnd
     # 10-30 notice cards (notice.rs): the monitor's DPI for placement, the notification sound.
     "Win32_UI_HiDpi", "Win32_Media_Audio"] }
 
+[dev-dependencies]
+# endsession.rs runs tao's own event loop (the version tauri-runtime-wry runs here) through an
+# installer's WM_ENDSESSION, to prove the guard against the real thing. tauri re-exports tao on
+# Android only. Features as tauri-runtime-wry's (it adds rwh_06), so nothing is built twice.
+tao = { version = "=0.35.3", default-features = false }
+
 [build-dependencies]
 tauri-build = { version = "=2.6.3", default-features = false, features = ["codegen"] }
 serde_json = "1"

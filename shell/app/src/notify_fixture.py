@@ -25,6 +25,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 import bridge_transport
 from bridge_transport import PipeTransport
+import fixture_contract  # every frame the shell sends meets the real sidecar's ingress check
 
 # This fixture bypasses outgoing DTO validation in its own process only.
 bridge_transport.protocol.encode_frame = lambda frame: json.dumps(frame).encode() + b'\n'
@@ -90,9 +91,8 @@ def bye():
 
 send(dict(t='hello', proto=1, runtime_pid=os.getpid(), lang=args.lang, scope={'kind': 'custom', 'id': args.scope},
           caps={'commands': COMMANDS, 'topics': TOPICS + SHELL_TOPICS, 'features': []}, network_recovery=RECOVERY))
-assert pipe.receive(5)['t'] == 'hello_ack'
-subscribe = pipe.receive(5)
-assert subscribe['t'] == 'subscribe'
+fixture_contract.handshake(pipe.receive(5), 'hello_ack', state, epoch)
+subscribe = fixture_contract.handshake(pipe.receive(5), 'subscribe', state, epoch)
 record(subscribe)
 send(dict(t='subscribed', id=subscribe['id'], topics=subscribe['topics']))
 send(dict(t='evt', topic='service.state', kind='snapshot', rev=1, data={'fixture': 1}))
@@ -113,6 +113,11 @@ try:
             path.replace(path.with_suffix('.sent'))
         frame = pipe.receive(.05)
         if not frame:
+            continue
+        verdict = fixture_contract.check(frame, state, epoch)
+        if verdict is not None:  # refused as the real sidecar refuses it: never handled, never recorded
+            if verdict:
+                send(verdict)
             continue
         if frame.get('t') == 'ping':
             send(dict(t='pong', n=frame['n']))

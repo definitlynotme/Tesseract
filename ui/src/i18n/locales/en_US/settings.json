@@ -351,6 +351,7 @@
   "settings.app.update.state.downloading_plain": "Downloading {version}…",
   "settings.app.update.state.failed_plain": "Couldn't check for or install updates: {reason}",
   "settings.app.update.state.found_plain": "<x>New version {version} available</x>",
+  "settings.app.update.state.handoff_failed": "The install didn't start.",
   "settings.app.update.state.latest_plain": "Up to date",
   "settings.app.update.state.unknown": "Update status unknown",
   "settings.app.update.state.verifying_done": "Installer ready",

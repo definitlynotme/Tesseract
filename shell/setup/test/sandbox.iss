@@ -38,9 +38,28 @@ Source: "{#Payload}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs cr
 [Icons]
 Name: "{app}\desktop\Tesseract"; Filename: "{app}\Tesseract.exe"; Tasks: desktopicon
 
+[Run]
+; As the release script: the in-app updater's run (/RESTARTAPPLICATIONS) starts the app again as
+; the original user; the window's own install and plain deployments do not.
+Filename: "{app}\Tesseract.exe"; Flags: nowait postinstall runasoriginaluser; Check: WizardSilent and CmdLineParamExists('/RESTARTAPPLICATIONS')
+
 #include "..\..\..\packaging\windows\setup_progress.iss"
 
 [Code]
+// The release script's switch check (packaging/windows/Tesseract-shell.iss).
+function CmdLineParamExists(const Value: String): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), Value) = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+end;
+
 // TESSERACT_SANDBOX_FAIL=prepare makes PrepareToInstall fail (exit code 7, nothing changed)
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin

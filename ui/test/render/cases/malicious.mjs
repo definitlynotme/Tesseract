@@ -131,9 +131,26 @@ const CASES = [
     }) },
   /* The 10-30 notice redesign removed the alert history list and the Telegram pairing drawer from
      配置, so their two cases (alert titles, the pairing QR) went with them. */
-  /* 外壳层: host:notify title / detail */
+  /* 外壳层: host:notify title / detail. F-05 (11-04): the notice card shows one banner at a time,
+     newest first, and its dots page between them: the newest error (m-script) is checked as shown,
+     then the card is paged to the ICU / bidi one (m-icu) and that one is checked as well */
   { name: 'malicious_shell', scenario: FX('malicious_shell'), page: 'overview',
-    expect: injectExpect([`${P.svg} ${P.icu}`, `${P.js} ${P.bidi} ${P.icu}`, P.script, P.img]) },
+    expect: injectExpect([P.script, P.img], async page => {
+      const paged = await page.evaluate(() => {
+        const dot = [...document.querySelectorAll('#notice-dots .ntc-dot')].find(b => (b.getAttribute('aria-label') || '').includes('__pwned=3'));
+        if (dot) dot.click();
+        return !!dot;
+      });
+      if (!paged) return ['no page of the notice card for the ICU / bidi banner (m-icu)'];
+      await page.evaluate(() => window.__fixtureClock.advance(600));
+      await page.waitForTimeout(200);
+      const s = await page.evaluate(pageInjectState);
+      const p = [];
+      if (s.pwned !== null) p.push(`after paging: window.__pwned = ${s.pwned}`);
+      if (s.jsLinks) p.push(`after paging: ${s.jsLinks} javascript: link(s)`);
+      for (const t of [`${P.svg} ${P.icu}`, `${P.js} ${P.bidi} ${P.icu}`]) if (!s.text.includes(t)) p.push(`not shown literally on its page of the card: ${JSON.stringify(t)}`);
+      return p;
+    }) },
   /* 31b-8: an oversize request rejected at once (frame_too_large) is said where it was started */
   { name: 'malicious_import_preview_too_large', scenario: FX('malicious_import_preview_too_large'), page: 'profiles',
     actions: [{ click: '.tiers-imp' }, ms(700), { fill: ['.tiers-imp-ta textarea', `vless://a@h.example.net:443#${'x'.repeat(64)}`] }, ms(600), { advance_ms: 20 }, ms(300)],

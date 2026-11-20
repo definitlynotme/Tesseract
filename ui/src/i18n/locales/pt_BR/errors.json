@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "Esta ação requer permissão de administrador. Execute o Tesseract como administrador ou use só o proxy do sistema.",
-  "errors.alerts.delivery_failed": "Não foi possível entregar a notificação da área de trabalho. Verifique as configurações de notificação do Windows e tente novamente.",
   "errors.alerts.receipt_persist_pending": "A notificação da área de trabalho foi exibida, mas o registro de entrega ainda está sendo gravado e não foi confirmado. Nenhuma ação é necessária; o histórico de alertas será atualizado automaticamente quando a gravação terminar.",
   "errors.autostart.development_mode": "Não é possível configurar a inicialização com o Windows em uma versão de desenvolvimento. Use uma versão instalada do Tesseract para configurá-la.",
   "errors.autostart.read_failed": "Não foi possível ler a configuração de inicialização com o Windows. Verifique as permissões de acesso ao Registro e tente novamente.",

@@ -5,7 +5,7 @@
 - 首次启动不再因 GeoData 下载缓慢或失败而受阻，也不再为此暂时跳过分流规则。
 - 已有的 GeoData 文件不会被覆盖。后台更新照常运行，会在有可用线路时把数据刷新到最新。
 - 内置文件来自 MetaCubeX meta-rules-dat，构建时用上游发布的 SHA-256 校验；来源、校验值与获取时间记录在安装目录的 _internal\bin\geodata\PROVENANCE.json 中。
-- 安装包因此增大约 20 MB。
+- 这些数据压缩率很高，安装包只增大约 2.5 MB；安装后，安装目录多占用约 21 MB。
 
 [en_US]
 Improved: GeoData comes with the installer
@@ -14,4 +14,4 @@ Improved: GeoData comes with the installer
 - A first start no longer waits on a slow or failing GeoData download, and no longer skips the routing rules for a while because of it.
 - GeoData files you already have are never replaced. The background updater still runs and refreshes the data once a route is available.
 - The bundled files come from MetaCubeX meta-rules-dat and are checked against the SHA-256 that upstream publishes; their source, checksum and fetch time are recorded in _internal\bin\geodata\PROVENANCE.json in the install folder.
-- The installer is about 20 MB larger as a result.
+- The data compresses well, so the installer grows by only about 2.5 MB; once installed, the install folder takes about 21 MB more.

@@ -1,6 +1,5 @@
 {
   "errors.admin_required": "This action requires administrator rights. Run Tesseract as administrator, or use the system proxy only.",
-  "errors.alerts.delivery_failed": "The desktop notification couldn't be delivered. Check your Windows notification settings, then try again.",
   "errors.alerts.receipt_persist_pending": "The desktop notification was shown, but its delivery record is still being saved and isn't confirmed yet. No action needed; alert history updates automatically once it's saved.",
   "errors.autostart.development_mode": "Start with Windows can't be set from a development build. Use an installed release of Tesseract to set it.",
   "errors.autostart.read_failed": "Can't read the Start with Windows setting. Check registry access permissions, then try again.",

@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "Nœud actuel inconnu · sortie via Gateway",
   "overview.deck.node.untested": "Non testé",
   "overview.deck.stat.bastion_off": "Désactivé",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, one {Jusqu’à # nœud} many {Jusqu’à # de nœuds} other {Jusqu’à # nœuds}}",
   "overview.deck.stat.collecting": "Collecte…",
   "overview.deck.stat.bastion_filling": "Remplissage · {n, number} disponibles",
   "overview.deck.stat.bastion_low": "{n, number} disponibles · {min, plural, one {sous le minimum de #} many {sous le minimum de #} other {sous le minimum de #}}",

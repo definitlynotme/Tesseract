@@ -9,7 +9,10 @@ update.installResult plus the query config.snapshot, then:
     resolves its path (GetFinalPathNameByHandleW), writes FIXTURE_BYTES through it, flushes and
     closes it, appends {"args", "path", "written"} to <state>/grants.jsonl and answers
     registered:true (<state>/refuse_grant present: closes the handle and answers not_allowed);
-  - update.exitResponse / update.installResult: res {recorded:true};
+  - every frame received first meets the real sidecar's ingress check (fixture_contract): a
+    refused one is answered and recorded as bridge_main would, never handled;
+  - update.exitResponse / update.installResult: res {recorded:true} (<state>/refuse_exit_response
+    present: every exitResponse is answered error conflict, like a sidecar whose hand-off expired);
   - config.snapshot: values.ui.start_in_tray_on_autostart = (<state>/tray exists);
   - app.quit: ack, a jobs edge, bye 0 (proxy/firewall not_needed), exit 0 (<state>/no_bye present:
     no bye for this one quit, the marker is consumed); app.sessionEnd: res, bye 0;
@@ -29,6 +32,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 import bridge_transport
 from bridge_transport import PipeTransport
+import fixture_contract  # every frame the shell sends meets the real sidecar's ingress check
 
 # This fixture bypasses outgoing DTO validation in its own process only.
 bridge_transport.protocol.encode_frame = lambda frame: json.dumps(frame).encode() + b'\n'
@@ -119,9 +123,8 @@ def bye():
 
 send(dict(t='hello', proto=1, runtime_pid=os.getpid(), lang='en_US', scope={'kind': 'custom', 'id': args.scope},
           caps={'commands': COMMANDS, 'topics': TOPICS + SHELL_TOPICS, 'features': []}, network_recovery=RECOVERY))
-assert pipe.receive(5)['t'] == 'hello_ack'
-subscribe = pipe.receive(5)
-assert subscribe['t'] == 'subscribe'
+fixture_contract.handshake(pipe.receive(5), 'hello_ack', state, epoch)
+subscribe = fixture_contract.handshake(pipe.receive(5), 'subscribe', state, epoch)
 record(subscribe)
 send(dict(t='subscribed', id=subscribe['id'], topics=subscribe['topics']))
 send(event('service.state', 'snapshot', {'fixture': launch}))
@@ -135,6 +138,11 @@ try:
             path.replace(path.with_suffix('.sent'))
         frame = pipe.receive(.05)
         if not frame:
+            continue
+        verdict = fixture_contract.check(frame, state, epoch)
+        if verdict is not None:  # refused as the real sidecar refuses it: never handled, never recorded
+            if verdict:
+                send(verdict)
             continue
         if frame.get('t') == 'ping':
             send(dict(t='pong', n=frame['n']))
@@ -152,6 +160,9 @@ try:
                 send(dict(envelope, data={'registered': True}))
             else:
                 send(dict(envelope, ok=False, error={'code': 'not_allowed', 'message_key': 'errors.bridge.not_allowed', 'params': {}}))
+        elif command == 'update.exitResponse' and (state / 'refuse_exit_response').exists():
+            # The sidecar's handler refusing a valid acceptance (its hand-off timed out meanwhile).
+            send(dict(envelope, ok=False, error={'code': 'conflict', 'message_key': 'errors.bridge.conflict', 'params': {}}))
         elif command in ('update.exitResponse', 'update.installResult'):
             send(dict(envelope, data={'recorded': True}))
         elif command == 'config.snapshot':

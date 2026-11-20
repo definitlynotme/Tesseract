@@ -31,20 +31,21 @@ export const TIER_IDS = ['vanguard', 'sentinel', 'bastion', 'gateway'];
 
 /* hello.caps (PROTOCOL §3, §10 页面白名单): every v1 page runtime command and query, and every
    topic a page can receive. host.* run in the shell (never in caps); the shell-only commands
-   and topics are not for pages. Unmapped commands answer not_allowed (design/sim.js). */
+   and topics are not for pages. Unmapped commands answer not_allowed (design/sim.js).
+   (10-30 alert redesign: alerts.onboarding.*, alerts.catalog, alerts.deliveries and the
+   alerts.delivery / alerts.onboarding topics left the protocol, so they are not announced.) */
 export const PAGE_COMMANDS = Object.freeze([
-  'alerts.onboarding.cancel', 'alerts.onboarding.complete', 'alerts.onboarding.poll', 'alerts.onboarding.start',
   'alerts.test', 'app.update.check', 'app.update.install', 'exit.verify', 'gateway.select', 'geo.update',
   'import.apply', 'import.preview', 'logs.exportBundle', 'logs.exportFiltered', 'logs.setMihomoLevel', 'mode.set',
   'nodes.cancelDiagnose', 'nodes.delete', 'nodes.diagnose', 'nodes.reveal', 'nodes.update', 'service.restart',
   'service.start', 'service.stop', 'settings.apply', 'settings.validate', 'subscriptions.refresh',
 ]);
 export const PAGE_QUERIES = Object.freeze([
-  'alerts.catalog', 'alerts.deliveries', 'app.info', 'autostart.state', 'config.snapshot', 'geo.status',
+  'app.info', 'autostart.state', 'config.snapshot', 'geo.status',
   'import.specs', 'logs.query', 'logs.tail', 'nodes.detail',
 ]);
 export const PAGE_TOPICS = Object.freeze([
-  'alerts.delivery', 'alerts.history', 'alerts.onboarding', 'bastion.pool', 'bastion.sources', 'config.changed',
+  'alerts.history', 'bastion.pool', 'bastion.sources', 'config.changed',
   'config.items', 'core.info', 'exit.identity', 'gateway.current', 'geo.status', 'jobs', 'killswitch.state',
   'logs.batch', 'logs.feed', 'network.mode', 'nodes.list', 'protocols.mix', 'route.published', 'service.collect',
   'service.state', 'subscriptions.list', 'tier.transition', 'tiers.summary', 'traffic.history', 'traffic.tick',
@@ -58,7 +59,7 @@ const ORDER = [
   'network.mode', 'killswitch.state', 'bastion.pool', 'bastion.sources', 'tiers.summary', 'nodes.list',
   'subscriptions.list', 'config.items', 'service.collect', 'route.published', 'core.info', 'gateway.current',
   'protocols.mix', 'exit.identity', 'traffic.history', 'traffic.tick', 'service.state', 'logs.feed', 'update.state',
-  'geo.status', 'alerts.history', 'alerts.delivery', 'alerts.onboarding',
+  'geo.status', 'alerts.history',
 ];
 const rank = topic => { const i = ORDER.indexOf(topic); return i < 0 ? ORDER.length : i; };
 const VOLATILE = new Set(['sampled_at_ms', 'observed_at_ms', 'updated_at_ms', 'snapshot_revision']);

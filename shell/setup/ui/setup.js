@@ -17,7 +17,7 @@ const HTML_LANG = { zh_CN: 'zh-CN', en_US: 'en', de_DE: 'de', es_ES: 'es', fr_FR
 let S = STRINGS.en_US;
 let facts = null;           // the host's init event
 let phase = 'ready';        // ready | working | done | failed
-let dir = '', desktop = false, act = null, shown = 0, stage = -1;
+let dir = '', desktop = false, act = null, shown = 0, stage = -1, closedFirst = false;
 
 const post = m => { if (window.ipc) window.ipc.postMessage(JSON.stringify(m)); else Sim.post(m); };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -160,6 +160,7 @@ function start() {
   setBody(`<div class="title">${esc(head)}</div><div class="sub"><span class="step" id="step"></span></div>`);
   footer([], []);
   stage = -1;
+  closedFirst = false;
   actProgress(0);
   swapText($('step'), esc(t('s_prepare')));
   post({ cmd: 'install', dir, desktop: facts.scene !== 'fresh' && facts.desktopExists ? true : desktop });
@@ -168,15 +169,18 @@ function start() {
 function onStep(step) {
   if (phase !== 'working') return;
   if (step === 'prepare') actProgress(.01);
+  // a running Tesseract is closed (politely) before the elevation prompt (rm.rs, 11-19)
+  if (step === 'close') { closedFirst = true; swapText($('step'), esc(t('s_close'))); }
   if (step === 'elevate') { actProgress(.02); swapText($('step'), esc(t('s_elevate'))); }
 }
 
-// stages from the .iss: 1 prepare (closes a running app), 2 files (permille), 3 after the files
+// stages from the .iss: 1 prepare (Inno closes a running app here, unless the window already
+// did), 2 files (permille), 3 after the files
 function onProgress(st, permille) {
   if (phase !== 'working') return;
   if (st !== stage) {
     stage = st;
-    const key = st === 1 ? (facts.running ? 's_close' : 's_prepare') : st === 2 ? 's_copy' : 's_links';
+    const key = st === 1 ? (facts.running && !closedFirst ? 's_close' : 's_prepare') : st === 2 ? 's_copy' : 's_links';
     swapText($('step'), esc(t(key)));
   }
   const p = st === 1 ? .03 : st === 2 ? .04 + .9 * (permille / 1000) : .96;
@@ -214,9 +218,12 @@ function onFailed(ev) {
     unchanged: () => t('e_unchanged'),
     rolledback: () => t('e_rolledback'),
     interrupted: () => t('e_interrupted'),
+    running: () => t('e_running'),
+    // Tesseract went, but another program keeps one of its files loaded (it has been reopened)
+    busy: () => t('e_busy', { apps: (ev.apps || []).join(', ') || '?' }),
   }[ev.kind] || (() => t('e_unknown', { code: ev.code }));
   // what the machine is left with, said only where it is known
-  const sub = ['disk', 'dir', 'extract', 'unchanged'].includes(ev.kind) ? t('sub_unchanged') : ev.kind === 'rolledback' ? t('sub_rolledback') : '';
+  const sub = ['disk', 'dir', 'extract', 'unchanged', 'running', 'busy'].includes(ev.kind) ? t('sub_unchanged') : ev.kind === 'rolledback' ? t('sub_rolledback') : '';
   setBody(`<div class="title is-err">${esc(t('e_title'))}</div>
     <div class="sub reason">${esc(reason())}</div>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}`);
   footer([], ev.log ? [ghostBtn(t('log'), () => post({ cmd: 'log' }))] : []);
@@ -294,7 +301,7 @@ window.__host = ev => {
 };
 
 // ---- a stand-in host for a plain browser (design review only; never runs in the product) ----
-// ?lang=zh_CN&scene=fresh|update|reinstall&running=1&fail=4|disk|decline
+// ?lang=zh_CN&scene=fresh|update|reinstall&running=1&fail=4|disk|decline|running|busy
 const Sim = (() => {
   const q = new URLSearchParams(location.search);
   const scene = q.get('scene') || 'fresh';
@@ -309,6 +316,11 @@ const Sim = (() => {
         const fail = q.get('fail');
         if (fail === 'disk') return say({ ev: 'failed', kind: 'disk', need: 312e6, free: 118e6, drive: 'C:' });
         say({ ev: 'step', step: 'prepare' });
+        // a running Tesseract is closed first (rm.rs); fail=running: it would not quit;
+        // fail=busy: it quit, another program still has one of its files loaded
+        if (q.get('running') === '1' || fail === 'running' || fail === 'busy') setTimeout(() => say({ ev: 'step', step: 'close' }), 150);
+        if (fail === 'running') return setTimeout(() => say({ ev: 'failed', kind: 'running' }), 1400);
+        if (fail === 'busy') return setTimeout(() => say({ ev: 'failed', kind: 'busy', apps: ['Backup Agent'] }), 1400);
         setTimeout(() => say({ ev: 'step', step: 'elevate' }), 300);
         if (fail === 'decline') return setTimeout(() => say({ ev: 'declined' }), 1400);
         let pm = 0;

@@ -1031,7 +1031,10 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
                                     match pending {
                                         Pending::Host(reply)=>{ let _=reply.send(Ok(frame)); },
                                         Pending::ExitResponse(handoff_id)=>{
-                                            if update.on_response_reply(&handoff_id,ok && frame["data"]["recorded"]==true) {
+                                            let recorded=ok && frame["data"]["recorded"]==true;
+                                            // 11-18: a refused acceptance left only `recorded=false` in shell.log, not why.
+                                            if !recorded { log_fields(&data,"update_exit_response_refused",&report_reply_fields(&frame)); }
+                                            if update.on_response_reply(&handoff_id,recorded) {
                                                 // Ruling P2-27: the shell sends app.quit{reason:update} itself.
                                                 if lifecycle.request_if_running(QuitReason::Update) { log_code(&data,"update_quit_requested"); } else { update.quit_refused(); }
                                             }
@@ -1343,6 +1346,8 @@ fn run() -> Result<i32,Box<dyn std::error::Error>> {
         let hwnd=windows::Win32::Foundation::HWND(window.hwnd()?.0);
         endsession::install(hwnd,endsession::Context::new(end_lifecycle,session_end,options.data.clone(),
             Box::new(move || end_feed.status().locale)));
+        // 11-20: an installer's close must neither end tao's event loop nor close its window.
+        endsession::guard_event_loop(&options.data);
         // T-P3-05: presence and notice routing read this window; the page hears host:visibility
         // (and a clicked balloon's host:navigate once the window is visible again).
         attach_window(application.handle(),&probe,hwnd);
@@ -1442,7 +1447,8 @@ fn run() -> Result<i32,Box<dyn std::error::Error>> {
             // BrowserProcessExited (bounded) so an immediate restart does not fail to create.
             // Not at logoff/shutdown: nothing restarts, and Windows ends the process anyway. Not
             // after an update hand-off either: the installer is already running and may have to
-            // replace this exe (fix round 1, A-S4 / B-S4).
+            // replace this exe (fix round 1, A-S4 / B-S4). An installer's Restart Manager close
+            // waits (11-20): it is no session end, and Setup opens the app again seconds later.
             let closed=window::close_controller();
             // The card window's WebView (same browser process) must go too, or the browser never exits.
             if notice::close_controller() { log_code(&data,"notice_controller_closed"); }
@@ -1626,7 +1632,7 @@ fn main() {
         let scope=bridge_host::scope::custom_id(&config.to_string_lossy(),&data.to_string_lossy()).unwrap();
         let mut child_args=vec!["-B".into(),repo().join(script).to_string_lossy().into_owned(),"--scope".into(),scope.clone()];
         child_args.extend(extra.iter().map(|s|s.to_string()));
-        if script.ends_with("lifecycle_fixture.py") || script.ends_with("notify_fixture.py") || script.ends_with("host_fixture.py") { child_args.extend(["--state".into(),state.to_string_lossy().into_owned()]); }
+        if script.ends_with("lifecycle_fixture.py") || script.ends_with("notify_fixture.py") || script.ends_with("host_fixture.py") || script.ends_with("frame_fixture.py") { child_args.extend(["--state".into(),state.to_string_lossy().into_owned()]); }
         let mut options=Options{config,data:data.clone(),exe:base_python(),child_args,dev_page:false,browser_args:String::new(),verify_port:None,timing,autostart:false,install_roots:vec![],
             scope_kind:"custom",scope_id:scope.clone()};
         tweak(&mut options,&state);
@@ -1655,7 +1661,29 @@ fn main() {
             fs::read_to_string(self.state.join(format!("frames-{launch}.jsonl"))).unwrap_or_default().lines().map(|l|serde_json::from_str(l).unwrap()).collect()
         }
         fn launches(&self)->usize { fs::read_dir(&self.state).map(|d|d.filter(|e|e.as_ref().unwrap().file_name().to_string_lossy().starts_with("launch-")).count()).unwrap_or(0) }
-        fn done(&self) { self.started.as_ref().unwrap().1.recv_timeout(Duration::from_secs(20)).unwrap(); }
+        fn done(&self) {
+            if self.started.as_ref().unwrap().1.recv_timeout(Duration::from_secs(20)).is_err() {
+                // A refused frame usually is why a session never ended: name it, not just the wait.
+                let violations=self.violations();
+                panic!("the worker did not finish within 20 s{}",if violations.is_empty() { String::new() } else { format!("; the real sidecar refuses frames the shell sent:\n{violations}") });
+            }
+        }
+        /// Frames the fixture refused because the real sidecar would (fixture_contract.py).
+        fn violations(&self)->String { fs::read_to_string(self.state.join("contract-violations.jsonl")).unwrap_or_default() }
+    }
+    /// Every frame the shell sent in a test must pass the real sidecar's ingress check: a refused
+    /// one passed the stand-ins unnoticed for 0.1.0–0.1.3 (the update acceptance). Checked when
+    /// the rig goes. A test that already failed (a `wait` timeout, say) gets the refusals printed,
+    /// since they are often why it failed and the temp root goes next (no second panic).
+    impl Drop for Rig {
+        fn drop(&mut self) {
+            let violations=self.violations();
+            if std::thread::panicking() {
+                if !violations.is_empty() { eprintln!("the real sidecar refuses frames this test made the shell send:\n{violations}"); }
+                return;
+            }
+            assert!(violations.is_empty(),"the real sidecar refuses frames this test made the shell send:\n{violations}");
+        }
     }
     const FAST:Timing=Timing{pong_timeout:Duration::from_secs(15),restart_delay:Duration::from_millis(50)};
 
@@ -1986,7 +2014,9 @@ fn main() {
         handoff(&rig,None);
         rig.done();
         let response=sent(&rig,1,"update.exitResponse");
-        assert_eq!(response[0]["args"],json!({"handoff_id":"update-handoff-1","accepted":true}));
+        // PROTOCOL §13: reason_code is always there, null on an acceptance (0.1.0–0.1.3 left it out
+        // and the real sidecar refused every acceptance: missing:args.reason_code).
+        assert_eq!(response[0]["args"],json!({"handoff_id":"update-handoff-1","accepted":true,"reason_code":null}));
         assert_eq!((response[0]["from"].as_str(),response[0]["owner"].as_str()),(Some("shell"),Some("shell")));
         let commands:Vec<String>=rig.received(1).iter().filter_map(|f|f["cmd"].as_str().map(String::from)).collect();
         assert_eq!(commands,["update.exitResponse","app.quit"],"the shell sends app.quit itself after the recorded acceptance");
@@ -2001,6 +2031,24 @@ fn main() {
             assert!(log.contains(code),"{code} missing in\n{log}");
         }
         assert!(rig.recorder.logs().contains("update_install_begin"));
+    }
+    /// 11-18: a refused acceptance names the sidecar's code in shell.log (0.1.0–0.1.3 logged only
+    /// `recorded=false`), starts no update quit and launches nothing; the app keeps running.
+    #[test] fn a_refused_acceptance_logs_the_code_and_starts_no_quit() {
+        let fake=Arc::new(update::tests::Fake::new());
+        let rig=rig_update_with(fake.clone(),false,|state| fs::write(state.join("refuse_exit_response"),b"1").unwrap());
+        rig.started.as_ref().unwrap();
+        handoff(&rig,None);
+        wait("refusal logged",10,|| rig.log().contains("update_exit_response_reply"));
+        let log=rig.log();
+        assert!(log.contains("update_exit_response_refused ok=false code=conflict"),"refusal code missing in\n{log}");
+        assert!(log.contains("update_exit_response_reply handoff=update-handoff-1 recorded=false"),"{log}");
+        std::thread::sleep(Duration::from_millis(300));
+        assert!(sent(&rig,1,"app.quit").is_empty() && !log.contains("update_quit_requested"),"no update quit after a refusal");
+        assert!(fake.launches.lock().unwrap().is_empty(),"nothing launched");
+        assert!(!rig.shared.update.busy(),"the hand-off slot is free for the next prepareExit");
+        rig.shared.lifecycle.request(QuitReason::Tray); rig.done();
+        assert_eq!(sent(&rig,1,"app.quit")[0]["args"],json!({"reason":"user"}),"only the user's own quit");
     }
     #[test] fn failed_install_relaunches_stopped_and_reports_install_result() {
         let fake=Arc::new(update::tests::Fake{fail_launch:true,..update::tests::Fake::new()});

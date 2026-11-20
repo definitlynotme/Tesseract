@@ -324,9 +324,12 @@ impl<N: Notify> Icon<N> {
         if !self.added { return Balloon::NoIcon; }
         if self.notify.balloon(&title, &text, severity) { Balloon::Submitted } else { Balloon::Rejected }
     }
-    pub fn remove(&mut self) {
+    /// False when Explorer did not take the icon away (a ghost stays until hovered).
+    pub fn remove(&mut self) -> bool {
         self.wanted = false;
-        if self.added { self.notify.delete(); self.added = false; }
+        let removed = !self.added || self.notify.delete();
+        self.added = false;
+        removed
     }
 }
 
@@ -673,7 +676,8 @@ impl Tray {
     }
     /// UI thread, after the event loop returned: remove the icon so no ghost stays behind.
     pub fn shutdown(&self) {
-        self.icon().remove();
+        let removed = self.icon().remove();
+        self.log(if removed { "tray_icon_removed" } else { "tray_icon_remove_failed" });
         self.feed.hwnd.store(0, Ordering::Release);
         unsafe { let _ = DestroyWindow(self.hwnd()); }
     }
@@ -708,6 +712,10 @@ unsafe extern "system" fn window_proc(hwnd: HWND, message: u32, wparam: WPARAM, 
             LRESULT(0)
         },
         WM_COMMAND => { tray.command(wparam.0 & 0xffff); LRESULT(0) },
+        // 11-20: Restart Manager follows an installer's WM_ENDSESSION with WM_CLOSE to every
+        // top-level window. Default handling would destroy this owner of the icon, and `shutdown`
+        // could no longer remove it (a ghost icon until hovered): the window goes only there.
+        WM_CLOSE => LRESULT(0),
         WM_TIMER => {
             let _ = KillTimer(Some(hwnd), wparam.0);
             match wparam.0 { TIMER_SHOW => { tray.show_now(); }, TIMER_STALE => tray.refresh(), TIMER_READD => tray.readd(), _ => () }
@@ -851,12 +859,12 @@ unsafe extern "system" fn window_proc(hwnd: HWND, message: u32, wparam: WPARAM, 
             assert_eq!(classify(NIN_BALLOONSHOW,v4),None);
         }
     }
-    #[derive(Default)] struct Fake { adds: Vec<String>, modifies: Vec<String>, glyphs: Vec<Glyph>, balloons: Vec<(String,String,Severity)>, deletes: usize, fail_add: bool, fail_modify: bool, fail_balloon: bool }
+    #[derive(Default)] struct Fake { adds: Vec<String>, modifies: Vec<String>, glyphs: Vec<Glyph>, balloons: Vec<(String,String,Severity)>, deletes: usize, fail_add: bool, fail_modify: bool, fail_balloon: bool, fail_delete: bool }
     impl Notify for Fake {
         fn add(&mut self, tip:&str, glyph:Glyph)->bool { self.adds.push(tip.into()); self.glyphs.push(glyph); !self.fail_add }
         fn modify(&mut self, tip:&str, glyph:Glyph)->bool { self.modifies.push(tip.into()); self.glyphs.push(glyph); !self.fail_modify }
         fn balloon(&mut self, t:&str, x:&str, s:Severity)->bool { self.balloons.push((t.into(),x.into(),s)); !self.fail_balloon }
-        fn delete(&mut self)->bool { self.deletes+=1; true }
+        fn delete(&mut self)->bool { self.deletes+=1; !self.fail_delete }
         fn v4(&self)->bool { true }
     }
     #[test] fn taskbar_created_readds_with_latest_tooltip() {
@@ -877,7 +885,11 @@ unsafe extern "system" fn window_proc(hwnd: HWND, message: u32, wparam: WPARAM, 
         assert_eq!(icon.notify.modifies.last().unwrap(),"d");
         icon.notify.fail_modify=false; icon.notify.fail_add=false;
         assert!(icon.taskbar_created()); assert_eq!(icon.notify.adds.last().unwrap(),"e");
-        icon.remove(); assert_eq!(icon.notify.deletes,1); assert!(!icon.wanted() && !icon.taskbar_created());
+        assert!(icon.remove()); assert_eq!(icon.notify.deletes,1); assert!(!icon.wanted() && !icon.taskbar_created());
+        // shutdown logs whether the icon went (tray_icon_removed / tray_icon_remove_failed).
+        assert!(icon.remove() && icon.notify.deletes==1, "no icon shown: nothing to delete");
+        assert!(icon.show("f",Glyph::UNKNOWN)); icon.notify.fail_delete=true;
+        assert!(!icon.remove() && !icon.wanted(), "Explorer kept it: reported");
     }
     #[test] fn balloon_result_mapping() {
         let mut icon=Icon::new(Fake::default());

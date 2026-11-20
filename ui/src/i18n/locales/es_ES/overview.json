@@ -69,7 +69,6 @@
   "overview.deck.node.unconfirmed": "Nodo actual desconocido · salida por Gateway",
   "overview.deck.node.untested": "Sin probar",
   "overview.deck.stat.bastion_off": "Desactivado",
-  "overview.deck.stat.bastion_capacity": "{capacity, plural, one {Hasta # nodo} many {Hasta # nodos} other {Hasta # nodos}}",
   "overview.deck.stat.collecting": "Recopilando…",
   "overview.deck.stat.bastion_filling": "Reponiendo · {n, number} disponibles",
   "overview.deck.stat.bastion_low": "{n, number} disponibles · {min, plural, one {bajo el mínimo de #} many {bajo el mínimo de #} other {bajo el mínimo de #}}",

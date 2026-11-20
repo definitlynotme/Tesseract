@@ -351,6 +351,7 @@
   "settings.app.update.state.downloading_plain": "{version} をダウンロードしています…",
   "settings.app.update.state.failed_plain": "更新の確認またはインストールに失敗しました：{reason}",
   "settings.app.update.state.found_plain": "<x>新しいバージョン {version} があります</x>",
+  "settings.app.update.state.handoff_failed": "インストールが開始されませんでした。",
   "settings.app.update.state.latest_plain": "最新バージョンです",
   "settings.app.update.state.unknown": "更新状態が不明です",
   "settings.app.update.state.verifying_done": "インストーラーの準備ができました",

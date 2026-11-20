@@ -95,7 +95,9 @@ export function updateStateOf(u) {
   switch (u.state) {
     case 'checking': return 'checking';
     case 'downloading': return 'dl';
-    case 'verified': return 'verify';
+    // verified + error: the hand-off did not happen (11-18). The installer is still there to be
+    // installed, so the footer offers the version again (有新版本) instead of 更新已就绪 for good.
+    case 'verified': return u.error ? 'found' : 'verify';
     case 'handoff': return 'ready';
     case 'failed': return 'fail';
     case 'available': return 'found';

@@ -17,10 +17,12 @@ from __future__ import annotations
 
 from collections import deque
 from concurrent.futures import Future
+from contextlib import contextmanager
 from copy import deepcopy
 import logging
 import os
 import re
+import sys
 from pathlib import Path
 from threading import RLock
 from time import monotonic, time_ns
@@ -171,6 +173,7 @@ class UpdateOwner:
         handoff_seconds: float = HANDOFF_SECONDS,
         exit_start_seconds: float = EXIT_START_SECONDS,
         update_enabled: bool = APP_UPDATE_ENABLED,
+        installed_copy: bool | Callable[[], bool] = True,
     ) -> None:
         self.state_path = Path(state_path)
         self.download_dir = Path(download_dir)
@@ -210,13 +213,34 @@ class UpdateOwner:
         # T-P4-C2 #10 (settings R-09): build switch and last finished check.
         self._update_enabled = bool(update_enabled)
         self._last_check_at_ms: int | None = None
+        # 11-19: only the copy the installer registered can update in the app (installed_copy()).
+        # 11-20: a callable is asked once, by the first check on its worker and never before hello:
+        # it reads the registry and may stat a folder, and the shell ends a sidecar that has not
+        # said hello within 10 s. Until a check has filled _info nothing is installable anyway.
+        self._installed_copy_probe: Callable[[], bool] | None = installed_copy if callable(installed_copy) else None
+        self._installed_copy = False if callable(installed_copy) else bool(installed_copy)
+
+    def _settle_installed_copy(self) -> None:
+        """Ask installed_copy() once, on a check's worker and outside the owner lock."""
+        probe = self._installed_copy_probe
+        if probe is None:
+            return
+        try:
+            value = bool(probe())
+        except Exception as exc:  # a check never fails over it: portable is the safe answer
+            _LOG.warning("installed-copy check failed: %s", type(exc).__name__)
+            value = False
+        with self._lock:
+            if self._installed_copy_probe is probe:
+                self._installed_copy = value
+                self._installed_copy_probe = None
 
     def _dto(self) -> dict[str, Any]:
         return {
             "state": self._state,
             "version": app_updater.normalize_version(self._info.latest_version) if self._info else None,
             "update_available": bool(self._info and self._info.update_available),
-            "installable": bool(self._info and self._info.installable),
+            "installable": bool(self._info and self._info.installable and self._installed_copy),
             "error": deepcopy(self._error),
             "current_version": app_updater.normalize_version(self.current_version) or None,
             "previous_version": self._previous_version,
@@ -272,7 +296,11 @@ class UpdateOwner:
             _LOG.warning("Completed-update record unreadable: %s", type(exc).__name__)
             return None
         previous = app_updater.normalize_version(notice.previous_version) or None
-        notes = installed_release_notes(notice.release_notes) if previous else None
+        # The saved notes describe the receipt's target only. Running past it means another
+        # install got here (11-18: 0.1.0-0.1.3 hand-offs always failed, so receipts for 0.1.3
+        # wait on machines that will install 0.1.4 by hand): no notes of a release not running.
+        reached = notice.installed_version == app_updater.normalize_version(self.current_version)
+        notes = installed_release_notes(notice.release_notes) if previous and reached else None
         with self._lock:
             self._previous_version = previous
             self._installed_notes = notes
@@ -294,11 +322,26 @@ class UpdateOwner:
             if self._auto_due is None or self._auto_started or self._clock() < self._auto_due:
                 return False
             self._auto_started = True
+            # 11-20: an epoch that began with a failed installer launch keeps saying so (failed:
+            # 检查或安装更新失败, with 前往发布页 and 检查更新). The automatic check would turn the
+            # kept receipt into a plain verified (a done check carries error=null): 安装包已就绪 ✓
+            # in Settings and a busy 更新已就绪 in the sidebar, although nothing is being installed.
+            # A check the user starts still does that, and 立即更新 then reuses the receipt.
+            skip = self._failed_launch_epoch_locked()
+        if skip:  # logged outside the owner lock (no disk I/O under it)
+            _LOG.info("automatic update check skipped: this epoch's installer launch failed")
+            return False
         return bool(submit_normal(self._automatic_check))
+
+    def _failed_launch_epoch_locked(self) -> bool:
+        last = self._last_install_result
+        return last is not None and last.get("launched") is False and self._state == "failed"
 
     def _automatic_check(self) -> None:
         try:
-            self.check()
+            # check() asks again in the critical section that opens its flight: an
+            # installResult{launched:false} may have landed since this was queued.
+            self.check(automatic=True)
         except JobFailure:
             pass  # The topic retains the classified failure; no automatic retry.
 
@@ -336,17 +379,28 @@ class UpdateOwner:
             self._deliveries.pop(delivery_id, None)
             self._candidates = deque(c for c in self._candidates if c["delivery_id"] != delivery_id)
 
-    def check(self) -> dict[str, Any]:
+    def check(self, *, automatic: bool = False) -> dict[str, Any] | None:
+        """The update check (app.update.check). automatic: the 6 s check of an epoch, which is
+        skipped (None) when this epoch recorded a failed installer launch, decided in the same
+        critical section that would open the flight. A later installResult then meets the open
+        flight (conflict) instead of being turned into a plain verified."""
+        self._settle_installed_copy()  # before _info is set: installable reads both
         self.poll_handoff()
+        skipped = False
         with self._lock:
             if self._installing or self._state == "handoff":
                 raise JobFailure("conflict")
             flight = self._flight
             leader = flight is None
-            if leader:
+            if leader and automatic and self._failed_launch_epoch_locked():
+                skipped = True
+            elif leader:
                 flight = self._flight = Future()
                 self._transition("checking")
                 receipt_ref = self._receipt_ref
+        if skipped:
+            _LOG.info("automatic update check skipped: this epoch's installer launch failed")
+            return None
         if not leader:
             return deepcopy(flight.result())
         try:
@@ -395,7 +449,7 @@ class UpdateOwner:
             if self._flight is not None or self._installing or self._state == "handoff":
                 raise JobFailure("conflict")
             info = self._info
-            if info is None or not info.installable:
+            if info is None or not info.installable or not self._installed_copy:
                 raise JobFailure("not_allowed")
             self._installing = True
             handoff = self._publish_handoff is not None
@@ -681,6 +735,143 @@ class UpdateOwner:
         """Shell-only control-domain replies (PROTOCOL §10 update.*)."""
         executor.register("update.exitResponse", self.exit_response_handler)
         executor.register("update.installResult", self.install_result_handler)
+
+
+# The installer's AppId (packaging/windows/Tesseract-shell.iss): Inno's uninstall entry for it.
+_UNINSTALL_KEY = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7D0F8A35-2A48-44A8-A75A-1A2F8631BA72}_is1"
+
+
+def _registered_install_location() -> str | None:
+    """InstallLocation of the installed copy (admin install: HKLM, 64-bit view), or None."""
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, _UNINSTALL_KEY, 0,
+                            winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+            value, _kind = winreg.QueryValueEx(key, "InstallLocation")
+    except (ImportError, OSError):
+        return None
+    return str(value).strip() or None
+
+
+def installed_copy(executable: str | None = None, *, frozen: bool | None = None,
+                   install_location: Callable[[], str | None] = _registered_install_location) -> bool:
+    """False for a frozen build running outside the folder the installer registered.
+
+    11-19: the hand-off works now, so a copy from the portable zip that offered 立即更新
+    would run the installer. That installs a second copy into Program Files ({autopf}; the
+    shell may pass no /DIR) and relaunches it, while the portable folder the user starts
+    stays old and keeps offering the update. Such a copy reports installable=false, so the
+    page offers the release page instead. Source runs (not frozen) keep the release's own
+    answer; their scopes never reach the release endpoint anyway.
+    """
+    if not (getattr(sys, "frozen", False) if frozen is None else frozen):
+        return True
+    location = install_location()
+    if not location:
+        return False
+    here = os.path.dirname(os.path.abspath(executable or sys.executable))
+    # 11-20: the shell starts the sidecar through fs::canonicalize (main.rs finish_options), so a
+    # frozen sys.executable reads \\?\C:\Program Files\Tesseract\tesseract-runtime.exe while
+    # InstallLocation reads C:\Program Files\Tesseract\. Compared as spelled, every installed copy
+    # looked portable and no installed 0.1.4 would have offered an in-app update.
+    def norm(path: str) -> str:
+        return os.path.normcase(os.path.normpath(_plain_path(path)))
+    if norm(here) == norm(location):
+        return True
+    # Asked on a check's worker (UpdateOwner._settle_installed_copy), not before hello. Still,
+    # nothing below stats a network share: one that is gone can take ~20 s to fail.
+    kind = _drive_type(location)
+    if kind == _DRIVE_REMOTE:
+        # A mapped network drive (Z:\...): canonicalize spells the running copy by its share
+        # (\\?\UNC\host\share\...). Compare with the drive's share from the local connection table.
+        share = _mapped_share_path(location)
+        return share is not None and norm(here) == norm(share)
+    if kind not in _LOCAL_DRIVES:
+        return False  # a UNC location (compared above), a missing drive, no drive letter
+    try:  # the same local folder under another spelling: an 8.3 short name, a junction
+        with _no_critical_error_box():
+            return os.path.samefile(here, location)
+    except (OSError, ValueError):
+        return False
+
+
+@contextmanager
+def _no_critical_error_box():
+    """SEM_FAILCRITICALERRORS on this thread while it lasts: a removable drive without media fails
+    the stat at once instead of showing Windows' 'No Disk' box and waiting for an answer."""
+    previous = None
+    try:
+        import ctypes
+        from ctypes import wintypes
+        old = wintypes.DWORD()
+        # SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX
+        if ctypes.windll.kernel32.SetThreadErrorMode(0x0001 | 0x8000, ctypes.byref(old)):
+            previous = old.value
+    except (AttributeError, OSError, ValueError):
+        previous = None
+    try:
+        yield
+    finally:
+        if previous is not None:
+            try:
+                import ctypes
+                ctypes.windll.kernel32.SetThreadErrorMode(previous, None)
+            except (AttributeError, OSError, ValueError):
+                pass
+
+
+_DRIVE_REMOTE = 4
+_LOCAL_DRIVES = (2, 3, 6)  # DRIVE_REMOVABLE, DRIVE_FIXED, DRIVE_RAMDISK
+
+
+def _drive_letter(path: str) -> str | None:
+    drive = os.path.splitdrive(_plain_path(path))[0]
+    return drive if len(drive) == 2 and drive[1] == ":" else None
+
+
+def _drive_type(path: str) -> int | None:
+    """GetDriveTypeW of a drive-letter path (answered from the device map, no I/O); None without
+    a drive letter (a UNC share, a relative path) or when it cannot be asked."""
+    drive = _drive_letter(path)
+    if drive is None:
+        return None
+    try:
+        import ctypes
+        return int(ctypes.windll.kernel32.GetDriveTypeW(drive + "\\"))
+    except (AttributeError, OSError, ValueError):
+        return None
+
+
+def _mapped_share_path(path: str) -> str | None:
+    r"""path with its mapped drive letter replaced by the share (Z:\x -> \\host\share\x), from the
+    local connection table (WNetGetConnectionW, no server I/O); None when it is not mapped."""
+    drive = _drive_letter(path)
+    share = _mapped_share(drive) if drive is not None else None
+    return None if share is None else share.rstrip("\\") + _plain_path(path)[2:]
+
+
+def _mapped_share(drive: str) -> str | None:
+    r"""The share a drive letter ("Z:") maps to (\\host\share), or None."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+        name = ctypes.create_unicode_buffer(1024)
+        size = wintypes.DWORD(len(name))
+        code = ctypes.WinDLL("mpr").WNetGetConnectionW(drive, name, ctypes.byref(size))
+    except (AttributeError, OSError, ValueError):
+        return None
+    share = name.value
+    # 0 = connected; 1201 = ERROR_CONNECTION_UNAVAIL, a remembered connection whose name is known
+    return share if code in (0, 1201) and share.startswith("\\\\") else None
+
+
+def _plain_path(path: str) -> str:
+    r"""A verbatim path's ordinary spelling: \\?\C:\x -> C:\x, \\?\UNC\host\share -> \\host\share."""
+    if path[:8].casefold() == "\\\\?\\unc\\":
+        return "\\\\" + path[8:]
+    if path.startswith("\\\\?\\"):
+        return path[4:]
+    return path
 
 
 class _HandoffUnpublished(Exception):

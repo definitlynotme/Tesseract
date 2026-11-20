@@ -279,10 +279,6 @@
     "m": "未启用",
     "_desc": "Bastion 层卡的状态行：Bastion 没有启用"
   },
-  "overview.deck.stat.bastion_capacity": {
-    "m": "{capacity, plural, other {最多 # 个节点}}",
-    "_desc": "Bastion 层卡的状态行（服务未启动）：最多容纳 capacity 个节点"
-  },
   "overview.deck.stat.collecting": {
     "m": "收集中…",
     "_desc": "层卡状态行：启动中，这一层还在收集节点"

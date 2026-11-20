@@ -465,6 +465,9 @@ try {
                 "autostart-window" { Scenario-Autostart $false }
                 default { throw "unknown scenario $Scenario" }
             }
+            # 11-18: the stand-in refuses what the real sidecar refuses (shell/app/src/fixture_contract.py)
+            $Refused = @(Get-ChildItem -LiteralPath $BaseData -Recurse -Filter "contract-violations.jsonl" -ErrorAction SilentlyContinue)
+            if ($Refused.Count) { throw "the real sidecar refuses frames the shell sent: $((Get-Content -LiteralPath $Refused[0].FullName -TotalCount 5) -join ' | ')" }
             $Passed = $true
         } catch { $Error1 = $_.Exception.Message } finally {
             $Steps = Cleanup-Shell
