@@ -110,10 +110,8 @@ fn main() {
     // T-P4-01: a release build embeds only the built app target (P4 architecture section 1.3).
     let manifest = fs::read(&manifest_path).ok()
         .and_then(|b| serde_json::from_slice::<serde_json::Value>(&b).ok());
-    if !debug {
-        if manifest.as_ref().and_then(|m| m["target"].as_str()) != Some("app") {
-            panic!("{} is missing or its target is not 'app': run scripts/shell_copy_ui.ps1 before a release build", manifest_path.display());
-        }
+    if !debug && manifest.as_ref().and_then(|m| m["target"].as_str()) != Some("app") {
+        panic!("{} is missing or its target is not 'app': run scripts/shell_copy_ui.ps1 before a release build", manifest_path.display());
     }
     // T-P4-C3 item 4: the build's H feature key (ENABLED_H_FEATURES) from the one canonical
     // manifest path; the shell allows an H command only with it and hello.caps.features.

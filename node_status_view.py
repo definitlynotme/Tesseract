@@ -154,8 +154,16 @@ def _runtime_failure_display_category(reason: Any) -> tuple[str, str]:
         return "", ""
     if normalized == "latency_limit_exceeded":
         return "latency_limit_exceeded", "延迟超过上限"
+    # Gateway checks (gateway_check.py): a direct failure with nothing to
+    # chain through is not a node failure; one that also failed through the
+    # fallback layers is.
+    if normalized == "gateway_no_upstream":
+        return "gateway_no_upstream", "直连不通，暂无上游可测"
+    if normalized == "gateway_unreachable":
+        return "gateway_unreachable", "直连和经回退层都不通"
     if (
-        normalized == "tcp_dns_failed"
+        # A category is its own category (the runtime's node records carry it).
+        normalized in {"tcp_dns_failed", "dns_resolution_failed"}
         or "getaddrinfo" in normalized
         or "name or service not known" in normalized
         or "no such host" in normalized

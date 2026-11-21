@@ -34,8 +34,10 @@ env:
 jobs:
   test-windows:
     # Setup plus the full test suite in a job of its own (about 40 minutes), at the
-    # same time as build-windows; sign-release-manifest needs both and checks that
-    # they saw the same commit. A hosted runner that goes silent is declared lost 45
+    # same time as build-windows and suites (ci.yml); sign-release-manifest needs all
+    # three and checks that test-windows and build-windows saw the same commit. Before
+    # pytest the test step runs scripts/ci_runner_probe.ps1, which records the runner's
+    # processes and privileges. A hosted runner that goes silent is declared lost 45
     # minutes later with no log (runs 43038448816, 43046356338, 43057341629), so
     # both jobs post a commit-status heartbeat (scripts/ci_heartbeat.ps1, hence
     # statuses: write) whose last status names the test or stage in progress.
@@ -473,6 +475,8 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           # Heartbeat (scripts/ci_heartbeat.ps1): only its own process gets the token.
+          # It also posts the runner probe's summary line (below) as a commit status.
+          $probeSummary = "$env:RUNNER_TEMP\runner-probe.txt"
           $heartbeat = $null
           try {
             $env:GH_TOKEN = $env:HEARTBEAT_TOKEN
@@ -480,10 +484,26 @@ jobs:
               -RedirectStandardOutput "$env:RUNNER_TEMP\heartbeat.out" `
               -RedirectStandardError "$env:RUNNER_TEMP\heartbeat.err" `
               -ArgumentList @("-NoProfile", "-File", "scripts\ci_heartbeat.ps1",
-                "-Context", "release-heartbeat/test-windows", "-ProgressFile", $env:RELEASE_PROGRESS_FILE)
+                "-Context", "release-heartbeat/test-windows", "-ProgressFile", $env:RELEASE_PROGRESS_FILE,
+                "-NoteFile", $probeSummary)
           }
           catch { Write-Warning "Heartbeat not started: $_" }
           finally { Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN -ErrorAction SilentlyContinue }
+          # Runner probe (scripts/ci_runner_probe.ps1), once the token is gone: who holds
+          # the PIDs the core-runner tests once put in a kill-on-close job, the PIDs and
+          # sessions of the runner agent and of this step, and this step's privileges. It
+          # runs in a process of its own and never fails the step. A lost runner keeps no
+          # log, so the heartbeat also posts its summary line.
+          try {
+            $probe = Start-Process pwsh -PassThru -NoNewWindow `
+              -RedirectStandardOutput "$env:RUNNER_TEMP\runner-probe.out" `
+              -RedirectStandardError "$env:RUNNER_TEMP\runner-probe.err" `
+              -ArgumentList @("-NoProfile", "-File", "scripts\ci_runner_probe.ps1",
+                "-StepProcessId", $PID, "-SummaryFile", $probeSummary)
+            if (-not $probe.WaitForExit(120000)) { Stop-Process -Id $probe.Id -Force -ErrorAction SilentlyContinue }
+            Get-Content -LiteralPath "$env:RUNNER_TEMP\runner-probe.out", "$env:RUNNER_TEMP\runner-probe.err" -ErrorAction SilentlyContinue
+          }
+          catch { Write-Warning "Runner probe failed: $_" }
           $result = "failure"
           try {
             .\scripts\build_windows.ps1 `
@@ -1154,10 +1174,22 @@ jobs:
           retention-days: 7
           compression-level: 0
 
+  suites:
+    # The shell, setup-window and UI suites: ci.yml, the jobs every pull request runs,
+    # here on the tagged commit at the same time as test-windows and build-windows.
+    # They stay out of test-windows, which already takes about 35 of its 120 minutes.
+    # The workflow's last job, "CI", fails unless every suite passed, and
+    # sign-release-manifest needs this job.
+    name: Shell, setup window and UI suites
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
   sign-release-manifest:
     needs:
       - build-windows
       - test-windows
+      - suites
     runs-on: windows-2022
     timeout-minutes: 30
     environment:

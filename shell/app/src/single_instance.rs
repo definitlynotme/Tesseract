@@ -3,7 +3,6 @@ use std::{io, marker::PhantomData, path::{Path, PathBuf}, rc::Rc,
     sync::{Arc, atomic::{AtomicBool, Ordering}}, time::{Duration, Instant}};
 
 type Handle = usize;
-pub const ACCESS_DENIED: u32 = 5;
 const NOT_FOUND: u32 = 2;
 const ALREADY_EXISTS: u32 = 183;
 const LIMIT: u32 = 30_000;
@@ -45,10 +44,8 @@ impl<A:Api> Drop for Object<A> {
 }
 pub struct Lease<A:Api> {
     // Drop events and legacy before releasing shell. All fields stay on this thread.
-    restore:Object<A>, quitting:Object<A>, _legacy:Object<A>, _shell:Object<A>,
-}
-impl<A:Api> Lease<A> {
-    pub fn mark_quitting(&self) -> Result<(),u32> { self.quitting.api.set(self.quitting.handle) }
+    // The quitting event is held open here for `Quitting`, which sets and clears it.
+    restore:Object<A>, _quitting:Object<A>, _legacy:Object<A>, _shell:Object<A>,
 }
 pub enum Outcome<A:Api> { Start(Lease<A>), Exit(i32) }
 #[derive(Debug, PartialEq)]
@@ -125,7 +122,7 @@ pub fn acquire<A:Api>(api:A,names:&serde_json::Value,cli:bool)->Result<Outcome<A
     let quitting=Object::new(&api,api.event(name("quitting_event"),true)?);
     api.reset(quitting.handle)?; // Only the new shell owner clears a prior generation.
     let restore=Object::new(&api,api.event(name("restore_event"),false)?);
-    Ok(Outcome::Start(Lease{restore,quitting,_legacy:legacy,_shell:shell}))
+    Ok(Outcome::Start(Lease{restore,_quitting:quitting,_legacy:legacy,_shell:shell}))
 }
 
 // Small raw FFI boundary: no new dependency/features or lockfile changes.
@@ -191,9 +188,9 @@ pub fn elevated()->io::Result<bool> {unsafe {
 pub fn profile(data:&Path,id:&str,admin:bool)->PathBuf {data.join(if admin {"WebView2-admin"} else {"WebView2"}).join(id)}
 
 /// Cloneable marker for P3-03/P3-04. Owns a separate event handle, never a mutex.
-pub struct Quitting {api:Win32,handle:Handle}
-impl Quitting {
-    pub fn new(api:Win32,names:&serde_json::Value)->Result<Self,u32> {
+pub struct Quitting<A:Api=Win32> {api:A,handle:Handle}
+impl<A:Api> Quitting<A> {
+    pub fn new(api:A,names:&serde_json::Value)->Result<Self,u32> {
         let handle=api.open_event(names["quitting_event"].as_str().unwrap())?.ok_or(NOT_FOUND)?;
         Ok(Self{api,handle})
     }
@@ -201,7 +198,7 @@ impl Quitting {
     /// P3-04: the user cancelled the quit at the unsaved-changes prompt.
     pub fn clear(&self)->Result<(),u32>{self.api.reset(self.handle)}
 }
-impl Drop for Quitting {fn drop(&mut self){if self.api.close(self.handle).is_err(){self.api.log("instance_close_failed");}}}
+impl<A:Api> Drop for Quitting<A> {fn drop(&mut self){if self.api.close(self.handle).is_err(){self.api.log("instance_close_failed");}}}
 
 pub struct RestoreListener {stop:Arc<AtomicBool>,thread:Option<std::thread::JoinHandle<()>>}
 impl RestoreListener {
@@ -240,6 +237,8 @@ pub struct ScopeNames(pub serde_json::Value);
 #[cfg(test)] mod tests {
     use super::*;
     use std::{cell::RefCell,collections::{HashMap,VecDeque}};
+    /// ERROR_ACCESS_DENIED: the refusal the tests inject, next to an unknown code (87).
+    const ACCESS_DENIED: u32 = 5;
     #[derive(Clone,Debug)] enum Reply {Create(bool),Open(bool),Wait(Wait),Unit,Error(u32)}
     #[derive(Default)] struct Trace {
         steps:VecDeque<(String,Reply)>,handles:HashMap<Handle,(String,bool)>,next:usize,
@@ -346,9 +345,16 @@ pub struct ScopeNames(pub serde_json::Value);
     }
     #[test] fn cli_takes_no_handles(){let f=check(vec![],0,false,true);assert_eq!(f.0.borrow().opens,0);assert_eq!(crate::cli_mode(&["--version".into()]),Some(0));}
     #[test] fn quitting_marker_is_manual_reset_only(){
-        let mut steps=start();steps.push(("set:quitting",Reply::Unit));let fake=Fake::new(steps);
+        // The lease creates the marker manual-reset (start: event:quitting:true) and holds it open;
+        // the shell's own handle on it (`Quitting`, as run() opens it) sets and clears it.
+        let mut steps=start();steps.extend([("open:quitting",Reply::Open(true)),("set:quitting",Reply::Unit),("reset:quitting",Reply::Unit)]);
+        let fake=Fake::new(steps);
         let names=bridge_host::scope::names("custom","0123456789abcdef01234567").unwrap();
         let Outcome::Start(lease)=acquire(fake.clone(),&names,false).unwrap() else {panic!()};
-        lease.mark_quitting().unwrap();drop(lease);assert!(fake.0.borrow().handles.is_empty());assert_eq!(fake.0.borrow().sets,vec!["quitting"]);
+        let marker=Quitting::new(fake.clone(),&names).unwrap();
+        marker.mark_quitting().unwrap();marker.clear().unwrap();drop(marker);drop(lease);
+        let trace=fake.0.borrow();
+        assert!(trace.handles.is_empty(),"leaked handles");assert!(trace.steps.is_empty(),"unconsumed steps {:?}",trace.steps);
+        assert_eq!(trace.sets,vec!["quitting"]);
     }
 }

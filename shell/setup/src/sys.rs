@@ -4,7 +4,7 @@ use std::{ffi::OsStr, os::windows::ffi::OsStrExt, path::{Path, PathBuf}};
 use windows::{
     core::{w, Interface, HSTRING, PCWSTR},
     Win32::{
-        Foundation::{CloseHandle, ERROR_CANCELLED, HWND, WAIT_OBJECT_0},
+        Foundation::{CloseHandle, ERROR_CANCELLED, FILETIME, HWND, WAIT_OBJECT_0},
         Globalization::GetUserDefaultUILanguage,
         Graphics::Dwm::{DwmSetWindowAttribute, DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND},
         Security::{GetLengthSid, GetTokenInformation, TokenElevation, TokenUser, TOKEN_ELEVATION, TOKEN_QUERY, TOKEN_USER},
@@ -19,7 +19,7 @@ use windows::{
             Registry::{RegGetValueW, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, REG_ROUTINE_FLAGS, RRF_RT_REG_SZ, RRF_SUBKEY_WOW6432KEY, RRF_SUBKEY_WOW6464KEY},
             RemoteDesktop::ProcessIdToSessionId,
             Threading::{
-                CreateProcessW, GetCurrentProcess, GetCurrentProcessId, GetExitCodeProcess, OpenEventW, OpenMutexW, OpenProcess, OpenProcessToken,
+                CreateProcessW, GetCurrentProcess, GetCurrentProcessId, GetExitCodeProcess, GetProcessTimes, OpenEventW, OpenMutexW, OpenProcess, OpenProcessToken,
                 QueryFullProcessImageNameW, WaitForSingleObject, CREATE_BREAKAWAY_FROM_JOB, INFINITE, PROCESS_INFORMATION, PROCESS_NAME_WIN32,
                 PROCESS_QUERY_LIMITED_INFORMATION, STARTUPINFOW, SYNCHRONIZATION_SYNCHRONIZE,
             },
@@ -265,6 +265,16 @@ pub fn image_path(pid: u32) -> Option<PathBuf> {
     unsafe { let _ = CloseHandle(process); }
     read.ok()?;
     Some(PathBuf::from(String::from_utf16_lossy(&buf[..len as usize])))
+}
+
+/// When a process started (GetProcessTimes); with its pid, how Restart Manager names one process
+/// (`RM_UNIQUE_PROCESS`). None when it cannot be asked (gone, or not ours to ask).
+pub fn process_start_time(pid: u32) -> Option<FILETIME> {
+    let process = unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid) }.ok()?;
+    let (mut created, mut exited, mut kernel, mut user) = (FILETIME::default(), FILETIME::default(), FILETIME::default(), FILETIME::default());
+    let read = unsafe { GetProcessTimes(process, &mut created, &mut exited, &mut kernel, &mut user) };
+    unsafe { let _ = CloseHandle(process); }
+    read.ok().map(|_| created)
 }
 
 /// Two paths name the same file: resolved (short names, links, case) when both exist.

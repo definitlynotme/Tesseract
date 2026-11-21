@@ -304,7 +304,7 @@ fn thread_windows_of_class(class: &str) -> Vec<HWND> {
         assert_eq!(reason(0), "shutdown");
         assert_eq!(reason(0x1), "shutdown", "ENDSESSION_CLOSEAPP alone is not a logoff");
         assert_eq!(reason(0x8000_0001u32 as i32 as isize), "logoff");
-        assert!(BUDGET_MS < 5000 && SHUTDOWN_LEVEL <= 0x3FF);
+        const { assert!(BUDGET_MS < 5000 && SHUTDOWN_LEVEL <= 0x3FF) };
     }
     #[test] fn request_frame_is_a_shell_only_p2_envelope() {
         let f = request_frame(9, "logoff", BUDGET_MS);

@@ -182,11 +182,13 @@ struct State {
 #[derive(Clone, Debug)]
 pub struct Request { pub id: u64, pub req_id: String, pub owner: String, pub cmd: String, pub args: Value }
 
+/// The page publisher: hands one frame to the page hub (main.rs).
+type Publisher = Box<dyn Fn(Value) + Send + Sync>;
 pub struct Host {
     desktop: Box<dyn Desktop>,
     pub outbox: Outbox,
     state: Mutex<State>,
-    publish: Mutex<Option<Box<dyn Fn(Value) + Send + Sync>>>,
+    publish: Mutex<Option<Publisher>>,
     sidecar: Mutex<Option<Arc<dyn SidecarPort>>>,
     locale: Mutex<Option<Box<dyn Fn() -> &'static str + Send + Sync>>>,
     dialog_open: AtomicBool,
@@ -199,7 +201,7 @@ impl Host {
     }
     fn state(&self) -> MutexGuard<'_, State> { self.state.lock().unwrap_or_else(|e| e.into_inner()) }
     /// Scope directories, the page publisher, the sidecar handle slot and the native locale.
-    pub fn attach(&self, config: PathBuf, data: PathBuf, publish: Box<dyn Fn(Value) + Send + Sync>, sidecar: Arc<dyn SidecarPort>,
+    pub fn attach(&self, config: PathBuf, data: PathBuf, publish: Publisher, sidecar: Arc<dyn SidecarPort>,
         locale: Box<dyn Fn() -> &'static str + Send + Sync>) {
         { let mut s = self.state(); s.log = Some(data.clone()); s.config = config; s.data = data; }
         *self.publish.lock().unwrap_or_else(|e| e.into_inner()) = Some(publish);

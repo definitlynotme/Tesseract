@@ -8,8 +8,8 @@
     "_desc": "页脚更新按钮的无障碍名称：status 为按钮上的更新状态（shell.foot.update.label 的结果）；点击后打开配置页的「应用」区（「配置 · 应用」是页面名 · 区块名）"
   },
   "shell.foot.update.label": {
-    "m": "{state, select, found {有新版本 {version}} found_nover {有新版本} checking {正在检查更新} fail {检查更新失败} dl {正在下载更新} verify {更新已就绪} ready {正在安装更新} updated {已更新} disabled {未启用应用内更新} unknown {检查更新} other {已是最新}}",
-    "_desc": "侧栏页脚的更新状态按钮（在版本号旁，长语言下会换到下一行）。state：found 有新版本（version 为新版本号）、found_nover 有新版本但版本号未知、checking 正在检查、fail 检查失败、dl 下载中（没有百分比）、verify 已下载并校验完、可以安装、ready 正在安装、updated 本次启动是刚完成的更新、disabled 本构建没有启用应用内更新、unknown 还没收到更新状态（不声称已是最新，点击前往配置检查）；other 已是最新"
+    "m": "{state, select, found {有新版本 {version}} found_nover {有新版本} checking {正在检查更新} fail {检查更新失败} install_fail {更新失败} dl {正在下载更新} verify {更新已就绪} ready {正在安装更新} updated {已更新} disabled {未启用应用内更新} unknown {检查更新} other {已是最新}}",
+    "_desc": "侧栏页脚的更新状态按钮（在版本号旁，长语言下会换到下一行）。state：found 有新版本（version 为新版本号）、found_nover 有新版本但版本号未知、checking 正在检查、fail 检查失败、install_fail 更新失败（检查与下载都成功了，但安装程序没能启动）、dl 下载中（没有百分比）、verify 已下载并校验完、可以安装、ready 正在安装、updated 本次启动是刚完成的更新、disabled 本构建没有启用应用内更新、unknown 还没收到更新状态（不声称已是最新，点击前往配置检查）；other 已是最新"
   },
   "shell.nav.aria": {
     "m": "主导航",

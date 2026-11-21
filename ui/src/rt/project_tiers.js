@@ -31,7 +31,8 @@ export const TIERS = Object.freeze(['vanguard', 'sentinel', 'bastion', 'gateway'
 // plus the page's own configuration_invalid; anything else reads as node_unavailable.
 export const REASON_CODES = Object.freeze(['cancelled', 'chain_requires_gateway', 'cleanup_failed', 'component_missing',
   'configuration_invalid', 'connection_refused', 'connection_timeout', 'diagnostic_in_progress', 'diagnostic_unavailable',
-  'disabled', 'dns_resolution_failed', 'invalid_request', 'latency_limit_exceeded', 'node_changed', 'node_index_unavailable',
+  'disabled', 'dns_resolution_failed', 'gateway_no_upstream', 'gateway_unreachable', 'invalid_request',
+  'latency_limit_exceeded', 'node_changed', 'node_index_unavailable',
   'node_not_found', 'node_unavailable', 'probe_failed', 'request_id_reused', 'service_closed', 'setup_failed', 'startup_failed',
   'subscription_recheck_pending', 'tier3_auto_pool_self_check', 'timeout', 'tls_failed', 'unsupported_protocol', 'upstream_missing']);
 export const reasonKey = code => (REASON_CODES.includes(code) ? code : 'node_unavailable');

@@ -38,6 +38,8 @@ enum Ev {
     Show,
     /// the installer has finished: what the page shows next and the phase it leaves us in
     Outcome(Value, Phase),
+    /// 打开 on the done page: whether Tesseract was started (open_app)
+    Opened(bool),
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -69,8 +71,8 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
     // wizard has Inno's own Preparing page, and /? installs nothing. /NOCLOSEAPPLICATIONS keeps it
     // running. A shell already on its way out (the in-app updater's, or one the user quit) gets the
     // full wait, also when the package then cannot even be extracted, and is not opened again for
-    // that (the updater's run opens its own below). One that cannot be asked (it runs elevated and
-    // this window does not) gets a short one: Inno then stops with nothing changed.
+    // that (the updater's run opens its own: after_hand_over). One that cannot be asked (it runs
+    // elevated and this window does not) gets a short one: Inno then stops with nothing changed.
     let mut closed = None;
     if rm::silent_install(args) && !rm::keep_running(args) {
         if let Some(dir) = &target {
@@ -81,10 +83,11 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
             closed = before;
         }
     }
+    let switches = inno_switches(args, closed.as_ref().map(reopens_with_own_token));
     let code = match payload::extract(source) {
         Err(_) => 1,
         Ok(file) => {
-            let mut params = args.iter().map(|a| sys::quote(a)).collect::<Vec<_>>();
+            let mut params = switches.iter().map(|a| sys::quote(a)).collect::<Vec<_>>();
             // The in-app updater's run leaves a log behind, for when an update does not finish.
             if rm::restarts_app(args) && !rm::logs_itself(args) {
                 if let Some(log) = temp_log("Tesseract-Update") { params.push(sys::quote(&format!("/LOG={}", log.display()))); }
@@ -96,21 +99,49 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
             }
         },
     };
-    // An install never leaves the user without Tesseract. The in-app updater (/RESTARTAPPLICATIONS
-    // is its switch) quit the app before this ran, and started this window with its own token:
-    // whenever the package ends without starting it again (UAC declined, aborted, rolled back, a
-    // failed relaunch), open the version installed now; after a good install the [Run] relaunch
-    // is already running. The Tesseract this window closed opens again after an install that did
-    // not finish, and after a good one too (Inno's own RestartApplications=yes), unless
-    // /NORESTARTAPPLICATIONS says it stays closed.
-    if let Some(dir) = &target {
-        if rm::restarts_app(args) { reopen(dir, Reopen::Own); }
-        else if let Some(shell) = closed.filter(|_| code != 0 || !rm::no_restart(args)) { reopen(dir, Reopen::Closed(shell)); }
-    }
+    // An install never leaves the user without Tesseract (after_hand_over).
+    if let (Some(dir), Some(how)) = (&target, after_hand_over(closed, args, code)) { reopen(dir, how); }
     code
 }
 
+/// Whether the copy this window closed opens again with this window's own token: `routes` starts
+/// it that way first only for the same account and elevation, outside a launcher's job. Test
+/// builds always do (they keep the sandbox scope in this window's environment).
+fn reopens_with_own_token(shell: &rm::Shell) -> bool {
+    sys::test_key().is_some()
+        || routes(shell, sys::own_user().as_deref(), sys::elevated(), sys::in_job(), sys::explorer_elevated()).first() == Some(&Route::Own)
+}
+
+/// The switches the Inno package gets. `/RESTARTAPPLICATIONS` also makes the .iss `[Run]` entry
+/// start the installed Tesseract after a good install with Inno's token, which is this window's
+/// (its runasoriginaluser does nothing for a window that is already elevated). That fits when this
+/// window closed nothing (`own_token` None: the in-app updater's run, whose shell quit before it
+/// started this window with its own token) or when this window's token is the closed copy's own.
+/// A deployment from an elevated console or another account that closed the user's copy runs
+/// without it (0.1.5), and that copy opens again as it ran (`after_hand_over`).
+fn inno_switches(args: &[String], own_token: Option<bool>) -> Vec<String> {
+    let keep = |a: &&String| own_token != Some(false) || !a.eq_ignore_ascii_case("/RESTARTAPPLICATIONS");
+    args.iter().filter(keep).cloned().collect()
+}
+
+/// How Tesseract opens again after a hand-over, if at all. The copy this window closed: as it ran
+/// (`Reopen::Closed`, `routes`), after an install that did not finish, and after a good one too
+/// (Inno's own RestartApplications=yes) unless /NORESTARTAPPLICATIONS says it stays closed; a
+/// `[Run]` relaunch already running is not started twice (`reopen`). Nothing closed and the in-app
+/// updater's run (`/RESTARTAPPLICATIONS`, its switch): whenever the package ends without starting
+/// it again (UAC declined, aborted, rolled back, a failed relaunch), the version installed now,
+/// with this window's token, which the app itself gave it. Before 0.1.5 every
+/// `/RESTARTAPPLICATIONS` run counted as the updater's, so an elevated console's deployment brought
+/// the user's copy back elevated.
+fn after_hand_over(closed: Option<rm::Shell>, args: &[String], code: i32) -> Option<Reopen> {
+    match closed {
+        Some(shell) => (code != 0 || !rm::no_restart(args)).then_some(Reopen::Closed(shell)),
+        None => rm::restarts_app(args).then_some(Reopen::Own),
+    }
+}
+
 /// How Tesseract is started again.
+#[derive(Debug, PartialEq)]
 enum Reopen {
     /// With this window's token: the in-app updater's run, which the app itself started (and
     /// whose job, if any, the app lived in too).
@@ -166,6 +197,16 @@ fn routes(shell: &rm::Shell, own_user: Option<&[u8]>, own_elevated: bool, in_job
     }
     if !elevated || explorer_elevated == Some(true) { routes.push(Route::Explorer); }
     routes
+}
+
+/// 打开 on the done page starts the installed Tesseract as the signed-in user: from this window
+/// (it runs as the user: `here`), or, from a window started as administrator, through Explorer
+/// only (`desktop`, which waits at most 10 s for it). True: started. 0.1.5: when Explorer cannot be
+/// asked or does not answer, nothing is started and the page says to use the Start menu. Before,
+/// this window then started an elevated copy itself, the case `routes` refuses, and Explorer could
+/// still run the queued start afterwards, a second copy that cannot open the first one's objects.
+fn open_app(elevated: bool, test_build: bool, desktop: impl FnOnce() -> bool, here: impl FnOnce() -> bool) -> bool {
+    if elevated && !test_build { desktop() } else { here() }
 }
 
 /// A fresh log path for one run of the package, `%TEMP%\<prefix>-<unix seconds>.log`. None unless
@@ -333,6 +374,8 @@ fn run(source: payload::Source) {
     let mut shown = false;
     let mut app_dir: Option<String> = None;
     let mut log: Option<String> = None;
+    // 打开 is being carried out (open_app, on a thread of its own): a second click waits for it
+    let mut opening = false;
 
     event_loop.run(move |event, _, flow| {
         *flow = ControlFlow::Wait;
@@ -350,6 +393,10 @@ fn run(source: payload::Source) {
                 if next == Phase::Done { app_dir = v.get("dir").and_then(Value::as_str).map(str::to_owned); }
                 log = v.get("log").and_then(Value::as_str).map(str::to_owned);
                 to_page(&v);
+            }
+            Event::UserEvent(Ev::Opened(started)) => {
+                opening = false;
+                if started { *flow = ControlFlow::Exit; } else { to_page(&json!({"ev": "openManual"})); }
             }
             Event::UserEvent(Ev::Ipc(text)) => {
                 let Ok(msg) = serde_json::from_str::<Value>(&text) else { return };
@@ -388,15 +435,18 @@ fn run(source: payload::Source) {
                         let p = proxy.clone();
                         std::thread::spawn(move || install(p, source, hwnd, progress_hwnd, dir, desktop));
                     }
-                    "open" if phase == Phase::Done => {
-                        if let Some(dir) = &app_dir {
-                            let dir = PathBuf::from(dir);
+                    "open" if phase == Phase::Done && !opening => {
+                        let Some(dir) = app_dir.clone().map(PathBuf::from) else { *flow = ControlFlow::Exit; return };
+                        // as the signed-in user, also from a window started as administrator; off
+                        // this thread, which must not stop drawing while Explorer takes its time
+                        opening = true;
+                        let (p, elevated, test_build) = (proxy.clone(), sys::elevated(), sys::test_key().is_some());
+                        std::thread::spawn(move || {
+                            sys::com_init();
                             let exe = dir.join("Tesseract.exe");
-                            // as the signed-in user, also from a window started as administrator
-                            let desktop = sys::elevated() && sys::test_key().is_none() && sys::open_as_desktop_user(&exe, "", &dir, SW_NORMAL);
-                            if !desktop { sys::open(&exe, Some(&dir)); }
-                        }
-                        *flow = ControlFlow::Exit;
+                            let started = open_app(elevated, test_build, || sys::open_as_desktop_user(&exe, "", &dir, SW_NORMAL), || sys::open(&exe, Some(&dir)));
+                            let _ = p.send_event(Ev::Opened(started));
+                        });
                     }
                     "log" => { if let Some(l) = &log { sys::open(Path::new(l), None); } }
                     _ => {}
@@ -433,6 +483,57 @@ mod tests {
         assert_eq!(routes(&shell(None, None), me.as_deref(), false, false, Some(false)), none);
         // UAC off: everything is elevated, Explorer too
         assert_eq!(routes(&shell(Some(true), me.clone()), me.as_deref(), true, false, Some(true)), [Route::Own, Route::Explorer]);
+    }
+
+    #[test]
+    fn only_the_updaters_own_run_reopens_with_this_windows_token() {
+        // 0.1.5: /RESTARTAPPLICATIONS is the in-app updater's switch, but also Inno's documented one.
+        // A deployment from an elevated console (or another account) that closed the user's running
+        // copy brought it back with this window's token: elevated, or as that account.
+        let args = |a: &[&str]| a.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+        let updater = args(&["/SILENT", "/SUPPRESSMSGBOXES", "/CLOSEAPPLICATIONS", "/RESTARTAPPLICATIONS", "/NORESTART"]);
+        let copy = rm::Shell { pid: 4, elevated: Some(false), user: Some(vec![1, 5, 0, 0, 0, 0, 0, 5, 21, 1]) };
+        // The updater's run: its shell had quit, nothing was closed here. The package keeps the switch
+        // (its [Run] relaunch), and the installed version opens with this window's token otherwise.
+        assert_eq!(inno_switches(&updater, None), updater);
+        for code in [0, 2, 5] { assert_eq!(after_hand_over(None, &updater, code), Some(Reopen::Own), "exit {code}"); }
+        // The same switches from a context whose token is not the closed copy's own: Inno runs
+        // without /RESTARTAPPLICATIONS (no [Run] relaunch as this window), and the copy opens again
+        // as it ran (routes), after a good install too.
+        assert_eq!(inno_switches(&updater, Some(false)), args(&["/SILENT", "/SUPPRESSMSGBOXES", "/CLOSEAPPLICATIONS", "/NORESTART"]));
+        assert_eq!(inno_switches(&args(&["/silent", "/RestartApplications", r"/DIR=D:\T"]), Some(false)), args(&["/silent", r"/DIR=D:\T"]), "any case");
+        for code in [0, 5] { assert_eq!(after_hand_over(Some(copy.clone()), &updater, code), Some(Reopen::Closed(copy.clone())), "exit {code}"); }
+        // This window's token is the copy's own (the same account and elevation): the [Run]
+        // relaunch may start it, and reopen() then finds it running.
+        assert_eq!(inno_switches(&updater, Some(true)), updater);
+        assert_eq!(after_hand_over(Some(copy.clone()), &updater, 0), Some(Reopen::Closed(copy.clone())));
+        // A deployment without the switch, as before: what was closed opens again unless
+        // /NORESTARTAPPLICATIONS after a good install; nothing closed, nothing opened.
+        let deploy = args(&["/VERYSILENT", "/NORESTARTAPPLICATIONS"]);
+        assert_eq!(inno_switches(&deploy, Some(false)), deploy);
+        assert_eq!(after_hand_over(Some(copy.clone()), &deploy, 0), None);
+        assert_eq!(after_hand_over(Some(copy.clone()), &deploy, 5), Some(Reopen::Closed(copy.clone())));
+        assert_eq!(after_hand_over(Some(copy.clone()), &args(&["/VERYSILENT"]), 0), Some(Reopen::Closed(copy.clone())));
+        assert_eq!(after_hand_over(None, &deploy, 5), None);
+    }
+
+    #[test]
+    fn the_done_pages_open_never_starts_an_elevated_copy_itself() {
+        // 0.1.5: from a window started as administrator, 打开 goes through Explorer only. When
+        // Explorer cannot be asked or does not answer, nothing starts from here (an elevated copy).
+        use std::cell::Cell;
+        let (desktop, here) = (Cell::new(0), Cell::new(0));
+        let open = |elevated, test_build, explorer_starts: bool, starts_here: bool| open_app(elevated, test_build,
+            || { desktop.set(desktop.get() + 1); explorer_starts }, || { here.set(here.get() + 1); starts_here });
+        assert!(open(false, false, true, true), "a window of the user's: from here");
+        assert_eq!((desktop.get(), here.get()), (0, 1));
+        assert!(open(true, false, true, true), "an elevated window: through Explorer");
+        assert_eq!((desktop.get(), here.get()), (1, 1));
+        assert!(!open(true, false, false, true), "Explorer did not start it: nothing started, the page says so");
+        assert_eq!((desktop.get(), here.get()), (2, 1), "never from this elevated window");
+        assert!(open(true, true, false, true), "test builds keep the sandbox scope in this window: from here");
+        assert_eq!((desktop.get(), here.get()), (2, 2));
+        assert!(!open(false, false, true, false), "a start that failed here is said too");
     }
 
     #[test]

@@ -1289,6 +1289,8 @@ TRANSLATIONS_EN = {
     "连接质量": "Connection Quality",
     "最大可用延迟": "Maximum Usable Latency",
     "延迟超过上限": "Latency exceeds the limit",
+    "直连不通，暂无上游可测": "Unreachable directly, no upstream to test",
+    "直连和经回退层都不通": "Unreachable directly and via fallback",
     "域名解析失败": "DNS resolution failed",
     "节点不可用": "Node unavailable",
     "连接超时": "Connection timed out",

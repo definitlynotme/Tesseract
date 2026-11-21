@@ -111,10 +111,14 @@ pub struct Machine {
     /// Windows is ending the session: no 20 s prompt (nobody can answer it). Cleared again when
     /// Windows cancels the session end (WM_ENDSESSION FALSE), see `session_end_cancelled`.
     stall_suppressed: bool,
+    /// 0.1.5: an installer's close ([`QuitReason::InstallerClose`]) came during an update quit,
+    /// which a failed install step turns back into Running: the shell then leaves for the
+    /// installer instead (Restart Manager does not ask twice).
+    installer_close_pending: bool,
 }
 impl Default for Machine { fn default() -> Self { Self::new() } }
 impl Machine {
-    pub fn new() -> Self { Self { phase: Phase::Running, reason: None, token: 0, send: None, sidecar: Sidecar::Starting, bye: false, stall_suppressed: false } }
+    pub fn new() -> Self { Self { phase: Phase::Running, reason: None, token: 0, send: None, sidecar: Sidecar::Starting, bye: false, stall_suppressed: false, installer_close_pending: false } }
     pub fn reason(&self) -> Option<QuitReason> { self.reason }
     pub fn sidecar(&self) -> Sidecar { self.sidecar }
     /// Page commands are refused once the quit command is on its way.
@@ -257,12 +261,19 @@ impl Machine {
     }
     /// T-P3-06: the install step's outcome. Launched: exit 0. Failed: back to Running — closing
     /// hides to the tray again, the quitting marker is cleared, the window is restored and the
-    /// worker relaunches the sidecar in the stopped state.
-    pub fn install_finished(&mut self, launched: bool) -> Vec<Action> {
+    /// worker relaunches the sidecar in the stopped state. 0.1.5: when an installer closed
+    /// Tesseract meanwhile, the failed update quits for it instead: `app.quit{reason:user}` goes to
+    /// the relaunched sidecar (its full exit recovery), and the window stays closed.
+    pub fn install_finished(&mut self, launched: bool, now: Instant) -> Vec<Action> {
         let mut out = Vec::new();
         if self.phase != Phase::Installing { return out; }
         if launched { self.exit(0, &mut out); return out; }
         self.phase = Phase::Running; self.reason = None; self.bye = false; self.stall_suppressed = false;
+        if std::mem::take(&mut self.installer_close_pending) {
+            out.push(Action::Log("update_install_failed_installer_close".into()));
+            out.extend(self.request(QuitReason::InstallerClose, now, false));
+            return out;
+        }
         out.push(Action::Log("update_install_failed_resume".into())); out.push(Action::ClearQuitting); out.push(Action::RestoreWindow);
         out
     }
@@ -324,8 +335,10 @@ impl Machine {
     /// WM_ENDSESSION(TRUE) of an installer's close ([`QuitReason::InstallerClose`]): an ordinary
     /// quit that asks no page. A user quit still asking the page (or showing the unsaved-changes
     /// prompt) goes out now: the installer is waiting, and that prompt's late answer is ignored,
-    /// as at a logoff. A quit already sent (the tray's, an update's, a session end), the install
-    /// step of an update, or a shell that is done just go on.
+    /// as at a logoff. A quit already sent (the tray's, a session end) or a shell that is done just
+    /// go on. An update quit goes on too, up to and through its install step, but the close is
+    /// remembered: should the install step fail, the shell leaves for the installer
+    /// (`install_finished`) instead of coming back.
     pub fn installer_close(&mut self, now: Instant) -> Vec<Action> {
         match self.phase {
             Phase::Running => self.request(QuitReason::InstallerClose, now, false),
@@ -334,6 +347,11 @@ impl Machine {
                 self.reason = Some(QuitReason::InstallerClose);
                 self.send_quit(now, &mut out);
                 out
+            },
+            Phase::Installing => { self.installer_close_pending = true; vec![Action::Log("installer_close_during_update".into())] },
+            Phase::QuitSent{..} | Phase::WaitingSidecar{..} if self.reason == Some(QuitReason::Update) => {
+                self.installer_close_pending = true;
+                vec![Action::Log("installer_close_during_update".into())]
             },
             _ => vec![Action::Log("installer_close_already_quitting".into())],
         }
@@ -411,7 +429,7 @@ impl Lifecycle {
         let actions = { let mut machine = self.machine(); if machine.phase != Phase::Running { return false; } machine.request(reason, Instant::now(), page) };
         self.run(actions); true
     }
-    pub fn install_finished(self: &Arc<Self>, launched: bool) { let a = self.machine().install_finished(launched); self.run(a); }
+    pub fn install_finished(self: &Arc<Self>, launched: bool) { let a = self.machine().install_finished(launched, Instant::now()); self.run(a); }
     pub fn installing(&self) -> bool { self.machine().installing() }
     pub fn running(&self) -> bool { self.machine().phase == Phase::Running }
     pub fn session_end_cancelled(self: &Arc<Self>) { let a = self.machine().session_end_cancelled(Instant::now()); self.run(a); }
@@ -658,14 +676,17 @@ impl Lifecycle {
         assert_eq!(m.installer_close(t(5_000)), already());
         assert!(m.take_send().is_none() && m.reason() == Some(QuitReason::Tray));
         assert_eq!(m.tick(t(20_000)).last(), Some(&Action::PromptStall), "the clock was not restarted");
-        // The update quit: unchanged before and during its install step.
+        // The update quit: unchanged before and during its install step (the close is only
+        // remembered, see an_installer_close_during_an_update_quits_when_the_install_step_fails).
+        let during = || vec![Action::Log("installer_close_during_update".into())];
         let mut m = live(); m.request(QuitReason::Update, t(0), false); assert_eq!(m.take_send(), Some(QuitReason::Update));
-        assert_eq!(m.installer_close(t(1)), already());
+        assert_eq!(m.installer_close(t(1)), during());
         assert_eq!(m.reason(), Some(QuitReason::Update));
+        assert!(m.take_send().is_none(), "nothing new goes out");
         m.bye(t(2)); assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Install));
-        assert_eq!(m.installer_close(t(3)), already());
+        assert_eq!(m.installer_close(t(3)), during());
         assert!(m.installing());
-        assert_eq!(m.install_finished(true).last(), Some(&Action::Exit(0)));
+        assert_eq!(m.install_finished(true, t(4)).last(), Some(&Action::Exit(0)));
         // A logoff or shutdown in flight keeps its fast path: no app.quit, no stall prompt.
         let mut m = live(); assert!(m.begin_session_end(t(0)).0);
         assert_eq!(m.installer_close(t(1)), already());
@@ -674,6 +695,42 @@ impl Lifecycle {
         let mut m = live(); m.request(QuitReason::Tray, t(0), false); m.take_send(); m.bye(t(1)); let _ = m.sidecar_exited(0);
         assert!(m.finished());
         assert_eq!(m.installer_close(t(2)), already());
+    }
+    #[test] fn an_installer_close_during_an_update_quits_when_the_install_step_fails() {
+        // 0.1.5: Setup's Restart Manager close came while the update quit ran (before or during its
+        // install step). Restart Manager asks once, so a failed install step must not forget it:
+        // instead of coming back (tray, restored window), the shell quits for the installer, with
+        // app.quit{reason:user} to the relaunched sidecar for its full exit recovery.
+        let t = clock();
+        let quit = vec![Action::Log("update_install_failed_installer_close".into()), Action::Log("quit_requested_installer_close".into()),
+            Action::MarkQuitting, Action::Log("quit_confirm_not_needed".into()), Action::Log("quit_send_installer_close".into())];
+        let update = |m: &mut Machine| { m.request(QuitReason::Update, t(0), false); assert_eq!(m.take_send(), Some(QuitReason::Update)); };
+        for during_install in [false, true] {
+            let mut m = live(); update(&mut m);
+            if !during_install { m.installer_close(t(1)); }
+            m.bye(t(2)); assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Install));
+            if during_install { m.installer_close(t(3)); }
+            let a = m.install_finished(false, t(4));
+            assert_eq!(a, quit, "during_install={during_install}: no ClearQuitting, no RestoreWindow");
+            assert!(m.quitting() && m.reason() == Some(QuitReason::InstallerClose));
+            // The worker relaunches the sidecar (the quit is not over) and sends the pending app.quit.
+            assert!(m.start_launch());
+            assert_eq!(m.take_send(), Some(QuitReason::InstallerClose));
+            m.set_sidecar(Sidecar::Live); m.bye(t(5));
+            assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Exit(0)));
+        }
+        // The 20 s prompt is armed for the relaunch and its quit, as for any installer close.
+        let mut m = live(); update(&mut m); m.bye(t(1)); m.sidecar_exited(0); m.installer_close(t(2)); m.install_finished(false, t(3));
+        assert!(m.tick(t(20_002)).is_empty());
+        assert_eq!(m.tick(t(20_003)).last(), Some(&Action::PromptStall));
+        // A relaunch that never comes: the queued quit leaves with 0.
+        let mut m = live(); update(&mut m); m.bye(t(1)); m.sidecar_exited(0); m.installer_close(t(2)); m.install_finished(false, t(3));
+        assert_eq!(m.set_sidecar(Sidecar::Down).last(), Some(&Action::Exit(0)));
+        // A succeeding install step exits as before; without an installer close a failed one resumes.
+        let mut m = live(); update(&mut m); m.bye(t(1)); m.sidecar_exited(0); m.installer_close(t(2));
+        assert_eq!(m.install_finished(true, t(3)).last(), Some(&Action::Exit(0)));
+        let mut m = live(); update(&mut m); m.bye(t(1)); m.sidecar_exited(0);
+        assert_eq!(m.install_finished(false, t(3))[0], Action::Log("update_install_failed_resume".into()));
     }
     #[test] fn a_session_end_during_an_installer_close_still_runs_rt2() {
         // Windows Update may close apps through Restart Manager and then restart: the shutdown
@@ -699,16 +756,16 @@ impl Lifecycle {
         assert!(!m.session_end_needed(), "the hand-off owns the exit; the sidecar is gone");
         assert!(m.set_sidecar(Sidecar::Down).is_empty(), "Down while installing does not exit");
         // Launched: exit 0.
-        assert_eq!(m.install_finished(true).last(), Some(&Action::Exit(0)));
+        assert_eq!(m.install_finished(true, t(20)).last(), Some(&Action::Exit(0)));
         assert!(m.finished());
         // Failed: back to Running, marker cleared, window restored; a relaunch is allowed.
         let mut m = live(); m.request(QuitReason::Update, t(0), false); m.take_send(); m.bye(t(1));
         m.sidecar_exited(0).unwrap();
-        let a = m.install_finished(false);
+        let a = m.install_finished(false, t(2));
         assert_eq!(a, vec![Action::Log("update_install_failed_resume".into()), Action::ClearQuitting, Action::RestoreWindow]);
         assert!(m.phase == Phase::Running && m.reason().is_none() && m.accepting());
         assert!(m.start_launch());
-        assert!(m.install_finished(true).is_empty(), "only while installing");
+        assert!(m.install_finished(true, t(3)).is_empty(), "only while installing");
         // The same exit outside an update quit still exits with the sidecar's code.
         let mut m = live(); m.request(QuitReason::Tray, t(0), false); m.take_send(); m.bye(t(1));
         assert_eq!(m.sidecar_exited(0).unwrap().last(), Some(&Action::Exit(0)));

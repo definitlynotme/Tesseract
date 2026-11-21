@@ -626,3 +626,71 @@ def test_manual_probe_runs_before_operation_lock_but_health_commit_waits(tmp_pat
     assert len(service.calls) == 1
     assert len(manager.replacement_calls) == 1
     assert manager.evaluate_calls == 1
+
+
+# -- Gateway health checks: the Manager's chain probe (gateway_check.py) ----
+
+
+def test_gateway_chain_probe_uses_its_own_isolated_service_in_chain_mode(
+    tmp_path: Path,
+) -> None:
+    gateway = _node("isp", tier="exit")
+    sentinel = _node("sentinel", tier="tier2")
+    manager = _Manager({"exit": [gateway], "tier2": [sentinel]})
+    manual = _DiagnosticService()
+    background = _DiagnosticService(latency_ms=310.0)
+    runtime = _runtime(tmp_path, manual, manager=manager)
+    runtime.gateway_chain_probe_service = background
+
+    result = runtime._gateway_chain_probe(gateway, [sentinel])
+
+    assert result["state"] == "success" and result["latency_ms"] == 310.0
+    # The user's diagnostic slot is never taken by a background check.
+    assert manual.calls == []
+    (call,) = background.calls
+    assert call["mode"] == "chain"
+    assert call["node_identity"] == diagnostic_node_identity(gateway)
+    assert [node.name for node in call["upstream_nodes"]] == ["sentinel"]
+    assert Path(call["binary_path"]) == (tmp_path / "bin" / "formal-mihomo.exe").resolve()
+    assert call["probe_url"] == "https://probe.example/generate_204"
+    assert str(call["request_id"]).startswith("gateway-chain-check-")
+    # Nothing is applied by the runtime and the formal Core is untouched.
+    assert manager.replacement_calls == [] and manager.evaluate_calls == 0
+    assert all(calls == [] for calls in _formal_calls(runtime).values())
+
+
+def test_close_node_diagnostics_also_closes_the_gateway_probe_service(
+    tmp_path: Path,
+) -> None:
+    manual = _DiagnosticService()
+    background = _DiagnosticService()
+    runtime = _runtime(tmp_path, manual, manager=None)
+    runtime.gateway_chain_probe_service = background
+
+    assert runtime.close_node_diagnostics(timeout=1.5) is True
+
+    assert manual.close_calls == [1.5]
+    assert background.close_calls == [1.5]
+
+
+def test_new_manager_gets_the_runtime_gateway_chain_prober(
+    tmp_path: Path, monkeypatch: Any,
+) -> None:
+    import desktop_runtime as desktop_runtime_module
+
+    class _FakeManager:
+        def __init__(self, **kwargs: Any) -> None:
+            self.kwargs = kwargs
+            self.subscription_operation_coordinator = kwargs.get(
+                "subscription_operation_coordinator"
+            )
+
+    monkeypatch.setattr(desktop_runtime_module, "ProxyTierManager", _FakeManager)
+    runtime = _runtime(tmp_path, _DiagnosticService(), manager=None)
+    runtime.alerts = MagicMock(name="alerts")
+    runtime.kill_switch = None
+    runtime.subscription_operation_coordinator = MagicMock(name="coordinator")
+
+    manager = runtime._new_proxy_tier_manager()
+
+    assert manager.gateway_chain_prober == runtime._gateway_chain_probe

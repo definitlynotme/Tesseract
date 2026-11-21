@@ -112,14 +112,13 @@ export const BASTION_SOURCES = [
   { id: 'src-subscription-1', kind: 'subscription_urls', display: 'subscription_urls', enabled: false },
 ];
 
-/* ---- alert channels (config.snapshot values.alerts, alerts.delivery, alerts.deliveries) ---- */
-export const ALERT_CHANNELS = [
-  { id: 'telegram-main', type: 'telegram', label: '手机提醒', enabled: true,
-    alert_types: ['WARNING', 'CRITICAL', 'EMERGENCY', 'RECOVERY', 'KILL_SWITCH_ON'],
-    config: { enabled: true, timeout: 10, parse_mode: 'HTML', silent: false, disable_link_preview: true } },
-  { id: 'desktop', type: 'desktop', label: '桌面通知', enabled: true, alert_types: [], config: { enabled: true, timeout: 5 } },
-];
-export const SECRET_FIELDS_SET = ['alerts.telegram-main.bot_token', 'alerts.telegram-main.chat_id'];
+/* ---- config.snapshot values.alerts: the notice switches only (10-30 alert redesign) ----
+   alert_policy.notify_settings' defaults, as the real sidecar projects them
+   (bridge_runtime_access.config_projection). The channels list it replaced left the protocol with
+   alerts.delivery / alerts.deliveries; without this block the settings page keeps its five notice
+   rows read-only (settings/changes.js fromSnapshot). */
+export const NOTIFY_DEFAULTS = Object.freeze({ enabled: true, events: Object.freeze(['connection', 'tier_fallback', 'update']), sound: true });
+export const SECRET_FIELDS_SET = [];
 
 /* ---- config.snapshot values: the §16 safe projection (bridge_runtime_access.config_projection
    field names), filled with the prototype's defaults. Read-only in the design target:
@@ -141,7 +140,7 @@ export function configValues(F, lang) {
       rule_list: [{ kind: 'suffix', value: 'example.cn', to: 'direct' }], providers: [] },
     latency: { primary_gateway_max_latency_ms: F.latCeiling },
     sources: BASTION_SOURCES.map(s => ({ ...s })),
-    alerts: { channels: ALERT_CHANNELS.map(c => ({ ...c, alert_types: c.alert_types.slice(), config: { ...c.config } })) },
+    alerts: { notify: { ...NOTIFY_DEFAULTS, events: NOTIFY_DEFAULTS.events.slice() } },
     ui: { language: lang, theme: 'light', overview_auto_exit_lookup: true },
     autostart: { enabled: false },
     traffic: { enabled: true, sample_interval: 1, history_hours: 24, retention_hours: 24, max_points: 86400 },

@@ -79,13 +79,19 @@ def test_manager_hands_completed_tcp_to_validation_before_wave_end(tmp_path, can
         return True
 
     try:
+        # The slow probe runs until the fast hand-off releases it, and the fast
+        # result reaches enqueue through a thread hop (asyncio.to_thread). That hop
+        # took about 0.1 s with 6 busy loops on 4 CPUs and 0.3 s with 12. A 0.2 s
+        # prefilter let the slow probe's entitlement run out first: its late result
+        # was dropped, or the probe ended before the hand-off. 5 s leaves only the
+        # hand-off to time, and the release ends the slow probe at once.
         with patch.object(tester, "_tcp_probe", probe_waiting_for_fast_handoff(release, finished)):
             outcome = owner._stream_tier3_outside_admission_batch(
                 candidates, CollectionReport(source_count=2, node_count=2),
                 startup_mode=True, intensive_expansion=True, target_alive=25,
                 decision=Tier3ControllerDecision(intensity=1.0, source_budget=2,
                                                 collect_interval=1, error=1.0, integral=0.0),
-                max_pool_size=100, tcp_prefilter_timeout_seconds=0.2,
+                max_pool_size=100, tcp_prefilter_timeout_seconds=5.0,
                 tcp_prefilter_concurrency=2, full_validation_enqueue=enqueue,
                 source_report_for_node=lambda node: reports[node.name],
                 dispatch_context_for_node=lambda node: contexts[node.name],

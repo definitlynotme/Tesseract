@@ -270,6 +270,7 @@
   "errors.superseded": "Esta operación se ha sustituido por otra posterior; vale el resultado más reciente.",
   "errors.timeout": "Se ha agotado el tiempo de espera y la operación no ha terminado. Revisa la red y vuelve a intentarlo.",
   "errors.unknown": "Se ha producido un error no reconocido. Vuelve a intentarlo; si se repite, exporta un paquete de diagnóstico e informa del problema.",
+  "errors.update.launch_failed": "No se pudo iniciar el instalador. Busca actualizaciones para volver a intentarlo o instálalo a mano desde la página de la versión.",
   "errors.update.operation_failed": "La actualización ha fallado. Revisa la red y vuelve a buscar actualizaciones.",
   "errors.validation": "Algunos datos introducidos no son válidos. Corrígelos según se indica y vuelve a intentarlo.",
   "errors.validation.field": "Este valor no es válido. Corrígelo según se indica y vuelve a guardar.",

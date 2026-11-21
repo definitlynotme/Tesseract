@@ -7,7 +7,10 @@ import sys
 import subprocess
 import os
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
+import tier3_windows_job
 from core_runner import CoreOutputEvent, MihomoCoreRunner
 
 
@@ -17,6 +20,8 @@ class FakeStdout:
 
 
 class FakeProcess:
+    # Made-up PIDs, which real processes may hold: one must never reach the real
+    # job binding (see CoreRunnerTests.setUp and CoreJobBindingTests).
     next_pid = 1000
 
     def __init__(self, command, **kwargs):
@@ -45,6 +50,48 @@ class FakeProcess:
 
 
 class CoreRunnerTests(unittest.TestCase):
+    def setUp(self) -> None:
+        # The real binding would put each made-up PID in a KILL_ON_JOB_CLOSE
+        # Windows job, and whatever real process holds that PID would be killed
+        # when the job closes. These tests only record what start asked to bind;
+        # CoreJobBindingTests runs the real binding.
+        self.bound: list[object] = []
+        patcher = mock.patch.object(
+            MihomoCoreRunner,
+            "_bind_process_to_job",
+            autospec=True,
+            side_effect=lambda _runner, process: self.bound.append(process),
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_start_binds_each_new_process_to_a_job(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            binary_path = temp_path / "mihomo.exe"
+            binary_path.write_text("fake", encoding="utf-8")
+            config_path = temp_path / "mihomo.yaml"
+            config_path.write_text("mixed-port: 7890\n", encoding="utf-8")
+            runner = MihomoCoreRunner(
+                binary_path=str(binary_path),
+                runtime_config_path=str(config_path),
+                work_dir="mihomo-work",
+                project_root=temp_path,
+                process_factory=FakeProcess,
+            )
+
+            runner.start()
+            first = runner.process
+            runner.start()
+            self.assertEqual(self.bound, [first])
+            self.assertTrue(runner.stop()["stopped"])
+
+            runner.start()
+            second = runner.process
+            self.assertIsNot(second, first)
+            self.assertEqual(self.bound, [first, second])
+            self.assertTrue(runner.stop()["stopped"])
+
     def test_missing_binary_raises_clear_error(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -742,6 +789,131 @@ class CoreRunnerTests(unittest.TestCase):
                 runner.status()["last_health_error"],
                 "mihomo proxy readiness wait cancelled",
             )
+
+
+@unittest.skipUnless(os.name == "nt", "Windows job objects")
+class CoreJobBindingTests(unittest.TestCase):
+    """The real binding: only a process the runner created joins a job."""
+
+    def _runner(self, temp_path: Path, factory) -> MihomoCoreRunner:
+        binary_path = temp_path / "mihomo.exe"
+        binary_path.write_text("fake", encoding="utf-8")
+        config_path = temp_path / "mihomo.yaml"
+        config_path.write_text("mixed-port: 7890\n", encoding="utf-8")
+        return MihomoCoreRunner(
+            binary_path=str(binary_path),
+            runtime_config_path=str(config_path),
+            work_dir="mihomo-work",
+            project_root=temp_path,
+            process_factory=factory,
+        )
+
+    def _real_core_factory(self, launched: list[subprocess.Popen]):
+        def factory(_command, **kwargs):
+            # A real child stands in for Mihomo: the base interpreter, since the
+            # venv's python.exe is a launcher that starts a second process. No
+            # pipe, so stop never waits on an output reader.
+            kwargs.update(
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            process = subprocess.Popen(
+                [
+                    getattr(sys, "_base_executable", sys.executable),
+                    "-c",
+                    "import time; time.sleep(120)",
+                ],
+                **kwargs,
+            )
+            launched.append(process)
+            return process
+
+        return factory
+
+    def _stop_fully(self, runner: MihomoCoreRunner) -> dict[str, object]:
+        deadline = time.monotonic() + 30.0
+        status = runner.stop(timeout=5.0)
+        while not status["stopped"] and time.monotonic() < deadline:
+            time.sleep(0.05)
+            status = runner.stop(timeout=5.0)
+        return status
+
+    def _kill_leftovers(self, launched: list[subprocess.Popen]) -> None:
+        for process in launched:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=10.0)
+
+    def test_a_stand_in_process_never_reaches_a_job(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir, mock.patch.object(
+            tier3_windows_job, "WindowsJob"
+        ) as job_class:
+            runner = self._runner(Path(temp_dir), FakeProcess)
+            self.assertTrue(runner.start()["running"])
+            runner._bind_process_to_job(SimpleNamespace(pid=1000, _handle=1000))
+            self.assertTrue(runner.stop()["stopped"])
+
+        job_class.assert_not_called()
+        self.assertIsNone(runner._process_job)
+        self.assertNotIn(
+            "Could not bind mihomo to a Windows job object",
+            runner.get_recent_logs(),
+        )
+
+    def test_a_popen_without_a_process_handle_is_not_bound(self) -> None:
+        stand_in = subprocess.Popen.__new__(subprocess.Popen)
+        stand_in.pid = 1000
+        with tempfile.TemporaryDirectory() as temp_dir, mock.patch.object(
+            tier3_windows_job, "WindowsJob"
+        ) as job_class:
+            runner = self._runner(Path(temp_dir), FakeProcess)
+            runner._bind_process_to_job(stand_in)
+
+        job_class.assert_not_called()
+        self.assertIsNone(runner._process_job)
+        self.assertIn(
+            "Could not bind mihomo to a Windows job object",
+            runner.get_recent_logs(),
+        )
+
+    def test_the_started_core_joins_a_job_through_its_own_handle(self) -> None:
+        launched: list[subprocess.Popen] = []
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runner = self._runner(Path(temp_dir), self._real_core_factory(launched))
+            try:
+                with mock.patch.object(
+                    tier3_windows_job.WindowsJob,
+                    "assign_pid",
+                    side_effect=AssertionError("the Core was reopened by PID"),
+                ):
+                    self.assertTrue(runner.start()["running"])
+                child, = launched
+                job = runner._process_job
+                self.assertIsNotNone(job)
+                self.assertEqual(job.snapshot().process_ids, (child.pid,))
+
+                self.assertTrue(self._stop_fully(runner)["stopped"])
+                self.assertIsNone(runner._process_job)
+                self.assertEqual(job.handle, 0)
+            finally:
+                self._kill_leftovers(launched)
+
+    def test_losing_the_job_handle_ends_the_core(self) -> None:
+        launched: list[subprocess.Popen] = []
+        with tempfile.TemporaryDirectory() as temp_dir:
+            runner = self._runner(Path(temp_dir), self._real_core_factory(launched))
+            try:
+                self.assertTrue(runner.start()["running"])
+                child, = launched
+                # What a force-killed app leaves: its last handle to the job closed.
+                runner._process_job.close()
+                child.wait(timeout=10.0)
+                self.assertIsNotNone(child.returncode)
+                self.assertTrue(self._stop_fully(runner)["stopped"])
+                self.assertIsNone(runner._process_job)
+            finally:
+                self._kill_leftovers(launched)
 
 
 if __name__ == "__main__":

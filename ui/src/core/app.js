@@ -151,7 +151,7 @@ import { installLetter } from '../letter/letter.js';
      disabled when the build has no in-app update (Update.enabled false); unknown while no
      update.state has arrived (nothing is claimed). A click goes to 配置 · 应用. */
   const foot = T.$('.side-foot');
-  const FOOT_STATES = ['found', 'fail', 'dl', 'verify', 'ready', 'checking', 'latest'];
+  const FOOT_STATES = ['found', 'fail', 'install_fail', 'dl', 'verify', 'ready', 'checking', 'latest'];
   function footModel() {
     const u = S.get('update');
     const d = raw('update.state');
@@ -182,7 +182,7 @@ import { installLetter } from '../letter/letter.js';
     const word = T.t('shell.foot.update.label', { state: m.state, version: m.latest });
     M.swapText(st, word, { instant: !animate });
     st.classList.toggle('is-found', m.state === 'found' || m.state === 'found_nover');
-    st.classList.toggle('is-fail', m.state === 'fail');
+    st.classList.toggle('is-fail', m.state === 'fail' || m.state === 'install_fail');
     st.classList.toggle('is-busy', ['checking', 'dl', 'verify', 'ready'].includes(m.state));
     st.setAttribute('aria-label', T.t('shell.foot.update.aria', { status: word }));
   }

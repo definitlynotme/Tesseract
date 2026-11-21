@@ -566,6 +566,8 @@
   "连接质量": "Calidad de la conexión",
   "最大可用延迟": "Latencia máxima utilizable",
   "延迟超过上限": "La latencia supera el límite",
+  "直连不通，暂无上游可测": "Inaccesible directamente, sin nodo previo para probar",
+  "直连和经回退层都不通": "Inaccesible directamente y por el respaldo",
   "域名解析失败": "Error de resolución DNS",
   "节点不可用": "Nodo no disponible",
   "连接超时": "Se agotó el tiempo de conexión",

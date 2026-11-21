@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import * as esbuild from 'esbuild';
 import { defineFor } from '../../build.mjs';
 import { UI, python } from './rt_helpers.mjs';
+import * as settingsChanges from '../../src/pages/settings/changes.js';
 
 const T0 = 1790812800000; // 2026-09-01T00:00:00Z
 const KB = 1024, MB = KB * KB;
@@ -460,6 +461,13 @@ test('queries: answers in the §11 / §16 shapes', withTimers(async () => {
   assert.deepEqual(Object.keys(snap.values).sort(), ['alerts', 'autostart', 'dns', 'killswitch', 'latency', 'network', 'routing', 'sources', 'traffic', 'ui']);
   assert.equal(snap.values.latency.primary_gateway_max_latency_ms, 800);
   assert.equal(snap.values.network.mode, 'system');
+  // 0.1.5 (review of 0.1.4): the notice switches' block, alert_policy.notify_settings' defaults.
+  // The simulator projected alerts.channels, so the settings page kept its five notice rows read-only.
+  assert.deepEqual(snap.values.alerts, { notify: { enabled: true, events: ['connection', 'tier_fallback', 'update'], sound: true } });
+  assert.deepEqual(snap.secret_fields_set, []);
+  const base = settingsChanges.fromSnapshot(snap.values, snap.secret_fields_set);
+  for (const key of ['nOn', 'nSound', 'nConn', 'nTier', 'nUpd']) assert.equal(base.known[key], true, `${key} is editable`);
+  assert.deepEqual([base.values.nOn, base.values.nSound, base.values.nConn, base.values.nTier, base.values.nUpd], [true, true, true, true, true]);
   const info = await q('app.info');
   assert.equal(info.version, '0.1.0');
   assert.ok(info.caps.includes('service.start') && info.caps.includes('logs.tail'));

@@ -7,15 +7,24 @@ param()
 # this script drops into <data>/notify-fixture/push. The script checks:
 #  - hello.lang and a later ui.language reach the page as host:language; shell.log records them;
 #  - ui.presence: full value first, the page id from host_set_page (whitelist), hidden after the
-#    window closes to the tray, visible again after the balloon click restores it;
+#    window closes to the tray, visible again after opening the notice restores it;
 #  - host:visibility false/true on the page around close-to-tray and restore;
-#  - alerts.desktop while hidden -> Windows balloon -> delivered/windows receipt; a click on the
-#    balloon (NIN_BALLOONUSERCLICK posted to the tray window) restores, and host:navigate reaches
-#    the page only after the host:visibility{true} of the restored window;
-#  - in front: a page that has not called host_notify_ready still gets the balloon; after it,
-#    in-app host:notify, host_notify_rendered -> delivered/in_app; a silent page ->
-#    dropped/none after 3 s. If Windows refuses this test the foreground (focus-steal rules), the
-#    route must still match the probed state, and result.json records foreground=false;
+#  - alerts.desktop while hidden -> outside the window (10-30 notice redesign, notify.rs): the
+#    notice card window (route=card), or the tray balloon when the card window cannot show it
+#    (route=windows) -> delivered/windows receipt; opening it (notice_open from the card page: its
+#    body or its View button; NIN_BALLOONUSERCLICK posted to the tray window for the balloon)
+#    restores, and host:navigate reaches the page only after the host:visibility{true} of the
+#    restored window;
+#  - while Windows says the user is busy (SHQueryUserNotificationState: full screen, presentation,
+#    quiet time) an unforced notice is held (route=held, no receipt) and shown once the user is
+#    free. That is the machine's state, not a contract error: a forced preview (never held) then
+#    stands in for the hidden-window notice, every other check still runs, and the smoke ends with
+#    an "environment:" failure naming the state (result.json: checks.environment);
+#  - in front: a page that has not called host_notify_ready still gets its notice outside the
+#    window (card, balloon, or held while busy); after it, in-app host:notify,
+#    host_notify_rendered -> delivered/in_app; a silent page -> dropped/none after 3 s. If Windows
+#    refuses this test the foreground (focus-steal rules), the route must still match the probed
+#    state, and result.json records foreground=false;
 #  - desktop-test-* always tries Windows; a repeated id gets no second receipt; the page cannot
 #    send alerts.desktopDelivered itself (rt -> not_allowed) nor confirm an unknown id;
 #  - tray Quit exits 0 with no owned process left.
@@ -60,6 +69,10 @@ public static class P3Notify {
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [DllImport("shell32.dll")] static extern int SHQueryUserNotificationState(out int state);
+    // QUNS_*: 1 not present, 2 busy, 3 full-screen D3D, 4 presentation, 5 accepts notifications,
+    // 6 quiet time, 7 app; -1 when it cannot be asked. 2, 3, 4 and 6 hold cards (notice.rs busy_state).
+    public static int UserState() { int state; return SHQueryUserNotificationState(out state) == 0 ? state : -1; }
     public static IntPtr Find(string cls, string title, uint pid) {
         IntPtr after = IntPtr.Zero;
         while (true) {
@@ -106,23 +119,24 @@ function Log-Has([string] $Prefix, [int] $Count = 1) {
     return @(Log-Lines | Where-Object { ($_ -replace '^\d+ ','').StartsWith($Prefix) }).Count -ge $Count
 }
 function Log-Count([string] $Prefix) { return @(Log-Lines | Where-Object { ($_ -replace '^\d+ ','').StartsWith($Prefix) }).Count }
-function Page-Socket {
+# The CDP target of one of the shell's pages: the dev page (main window) or notice.html (the card window).
+function Page-Socket([string] $Page = "dev-rt.html") {
     try { $Pages = [P3Notify]::Http("http://127.0.0.1:$script:Port/json/list") | ConvertFrom-Json } catch { return $null }
-    $Page = @($Pages | Where-Object { $_.type -eq "page" -and $_.url -like "*dev-rt.html*" }) | Select-Object -First 1
-    if ($Page) { return $Page.webSocketDebuggerUrl } else { return $null }
+    $Target = @($Pages | Where-Object { $_.type -eq "page" -and $_.url -like "*$Page*" }) | Select-Object -First 1
+    if ($Target) { return $Target.webSocketDebuggerUrl } else { return $null }
 }
-function Page-Eval([string] $Expression) {
-    $Socket = Page-Socket
+function Page-Eval([string] $Expression, [string] $Page = "dev-rt.html") {
+    $Socket = Page-Socket $Page
     if (-not $Socket) { return $null }
     try { $Reply = [P3Notify]::Evaluate($Socket, $Expression) | ConvertFrom-Json } catch { return $null }
     return $Reply.result.result.value
 }
 # A Tauri invoke from the page; returns "ok:<json>" or "err:<message>".
-function Page-Invoke([string] $Command, [string] $ArgsJs) {
+function Page-Invoke([string] $Command, [string] $ArgsJs, [string] $Page = "dev-rt.html") {
     $Key = "__p305_" + [Guid]::NewGuid().ToString("N").Substring(0,8)
-    [void](Page-Eval "(window.$Key = null, window.__TAURI__.core.invoke('$Command', $ArgsJs).then(r => window.$Key = 'ok:' + JSON.stringify(r === undefined ? null : r), e => window.$Key = 'err:' + String(e)), true)")
-    Wait-Until { $null -ne (Page-Eval "window.$Key") } "invoke $Command" 10
-    return Page-Eval "window.$Key"
+    [void](Page-Eval "(window.$Key = null, window.__TAURI__.core.invoke('$Command', $ArgsJs).then(r => window.$Key = 'ok:' + JSON.stringify(r === undefined ? null : r), e => window.$Key = 'err:' + String(e)), true)" $Page)
+    Wait-Until { $null -ne (Page-Eval "window.$Key" $Page) } "invoke $Command" 10
+    return Page-Eval "window.$Key" $Page
 }
 function Page-Count([string] $Filter) { return [int](Page-Eval "window.devFrames.filter(f => $Filter).length") }
 function Fixture-Frames {
@@ -154,9 +168,29 @@ function Expect-Receipt([string] $Id, [string] $Outcome, [string] $Surface, [int
     if (-not (Log-Has "notify_receipt_sent delivery=$Id outcome=$Outcome surface=$Surface")) { throw "shell.log lacks the receipt of $Id" }
     return "$Outcome/$Surface"
 }
+# The latest notify_route line of a delivery: a held notice gets a second one once it is released,
+# and a card's line is written when the card is on screen (or its balloon fallback was submitted).
 function Route-Of([string] $Id) {
-    foreach ($Line in (Log-Lines)) { $M = [regex]::Match($Line, " notify_route delivery=$([regex]::Escape($Id)) route=(\w+) force=(\w+) visible=(\w+) focused=(\w+)"); if ($M.Success) { return $M } }
-    return $null
+    $Last = $null
+    foreach ($Line in (Log-Lines)) { $M = [regex]::Match($Line, " notify_route delivery=$([regex]::Escape($Id)) route=(\w+) force=(\w+) visible=(\w+) focused=(\w+)"); if ($M.Success) { $Last = $M } }
+    return $Last
+}
+# The route of a notice that is not shown in the page: card or windows once it is on screen (the
+# card window builds and loads its page first; its balloon fallback can take ~12 s), or held while
+# Windows says the user is busy. The shell asks again every 5 s whether the user is free; a held
+# notice gets $script:HoldWait seconds to come out (shorter once this run has seen the user busy).
+$script:HoldWait = 25
+function Wait-Shown([string] $Id) {
+    Wait-Until { $null -ne (Route-Of $Id) } "route of $Id" 20
+    try { Wait-Until { (Route-Of $Id).Groups[1].Value -ne "held" } "release of $Id" $script:HoldWait } catch { }
+    return (Route-Of $Id)
+}
+# Windows says the user is busy (a held notice): recorded once; the smoke ends with "environment:".
+function Note-Busy([string] $Id) {
+    $script:HoldWait = 6
+    if (-not $S.checks.environment) {
+        $S.checks.environment = "Windows reports the user busy (SHQueryUserNotificationState=$([P3Notify]::UserState())): $Id was held, not shown"
+    }
 }
 
 $Names = @("TESSERACT_CONFIG_DIR","TESSERACT_DATA_DIR","TESSERACT_INSTANCE_SCOPE","TESSERACT_ISOLATED_AUDIT_MANIFEST","TESSERACT_SHELL_CDP_PORT","PYTHONDONTWRITEBYTECODE","TEMP","TMP")
@@ -217,19 +251,44 @@ try {
     $S.checks.unknown_render = Page-Invoke "host_notify_rendered" "{delivery_id: 'desktop-never-sent'}"
     if ($S.checks.unknown_render -notlike "err:*unknown_delivery*") { throw "an unknown delivery was confirmed: $($S.checks.unknown_render)" }
 
-    # 4. Close to tray: host:visibility false and presence hidden; a notice goes to the balloon.
+    # 4. Close to tray: host:visibility false and presence hidden; a notice goes outside the window:
+    #    the card window (route=card) or its tray-balloon fallback (route=windows), delivered/windows.
     [void][P3Notify]::PostMessageW($S.main, $WM_CLOSE, [IntPtr]::Zero, [IntPtr]::Zero)
     Wait-Until { Log-Has "window_closed_to_tray" } "closed to tray" 10
     Wait-Until { (Page-Count "f.t === 'host:visibility' && f.visible === false") -ge 1 } "host:visibility false" 10
     Wait-Until { -not (Last-Presence).visible } "presence hidden" 10
     Push-Event (Desktop "desktop-smoke-bg" "T-P3-05 notify smoke (background)")
-    $S.checks.background = Expect-Receipt "desktop-smoke-bg" "delivered" "windows"
-    $Route = Route-Of "desktop-smoke-bg"
-    if (-not $Route -or $Route.Groups[1].Value -ne "windows" -or $Route.Groups[3].Value -ne "false") { throw "background route not logged as windows/hidden" }
+    $Route = Wait-Shown "desktop-smoke-bg"
+    $S.checks.background_route = $Route.Groups[1].Value
+    if ($Route.Groups[3].Value -ne "false") { throw "background route not logged as hidden: $($Route.Value)" }
+    $Shown = "desktop-smoke-bg"
+    $S.checks.background_held = $S.checks.background_route -eq "held"
+    if ($S.checks.background_held) {
+        # Windows says the user is busy: held, and a held notice is not delivered (no receipt).
+        Note-Busy "desktop-smoke-bg"
+        if (@(Receipts "desktop-smoke-bg").Count -ne 0) { throw "a held notice was receipted" }
+        # A forced preview is never held: it stands in for the hidden-window notice.
+        $Shown = "desktop-test-smoke-bg"
+        Push-Event (Desktop $Shown "T-P3-05 notify smoke (background, forced)")
+        $Route = Wait-Shown $Shown
+        if ($Route.Groups[2].Value -ne "true" -or $Route.Groups[3].Value -ne "false") { throw "forced background route: $($Route.Value)" }
+    }
+    $Surface = $Route.Groups[1].Value
+    if (@("card","windows") -notcontains $Surface) { throw "background notice routed $Surface, expected card or windows" }
+    $S.checks.background_surface = $Surface
+    $S.checks.background = Expect-Receipt $Shown "delivered" "windows"
 
-    # 5. Balloon click: restore, then host:navigate{page: target}.
-    [void][P3Notify]::PostMessageW($S.tray, $TrayCallback, [IntPtr]::Zero, [IntPtr]$NIN_BALLOONUSERCLICK)
-    Wait-Until { Log-Has "tray_balloon_navigate page=alerts" } "balloon click navigate" 10
+    # 5. Open it: the card's body or its View button (notice_open from the card page), or the
+    #    balloon (the card window's fallback): restore, then host:navigate{page: target}.
+    if ($Surface -eq "card") {
+        Wait-Until { $null -ne (Page-Socket "notice.html") } "card page target" 10
+        $S.checks.card_open = Page-Invoke "notice_open" "{delivery_id: '$Shown'}" "notice.html"
+        if ($S.checks.card_open -ne "ok:null") { throw "notice_open: $($S.checks.card_open)" }
+        Wait-Until { Log-Has "notice_opened target=alerts" } "card opened" 10
+    } else {
+        [void][P3Notify]::PostMessageW($S.tray, $TrayCallback, [IntPtr]::Zero, [IntPtr]$NIN_BALLOONUSERCLICK)
+    }
+    Wait-Until { Log-Has "tray_balloon_navigate page=alerts" } "$Surface click navigate" 10
     Wait-Until { (Page-Count "f.t === 'host:navigate' && f.page === 'alerts'") -ge 1 } "host:navigate on the page" 10
     Wait-Until { [P3Notify]::IsWindowVisible($S.main) } "window restored" 10
     Wait-Until { (Page-Count "f.t === 'host:visibility' && f.visible === true") -ge 2 } "host:visibility true again" 10
@@ -238,69 +297,98 @@ try {
     $S.checks.navigate_after_visible = [bool](Page-Eval "(() => { const a = window.devFrames; const h = a.map(f => f.t === 'host:visibility' && f.visible === false).lastIndexOf(true); const v = a.findIndex((f, i) => i > h && f.t === 'host:visibility' && f.visible === true); const n = a.findIndex((f, i) => i > h && f.t === 'host:navigate'); return h >= 0 && v > h && n > v; })()")
     if (-not $S.checks.navigate_after_visible) { throw "host:navigate reached the page before the restored window was visible" }
     if (-not (Log-Has "tray_balloon_navigate page=alerts visible=true")) { throw "navigate not logged as sent to a visible window" }
-    $S.checks.balloon_click = "restored+navigate:alerts"
+    $S.checks.click = "${Surface}:restored+navigate:alerts"
 
     # 6. In front: in-app, page confirmation; a silent page is dropped after 3 s.
     if ([P3Notify]::GetForegroundWindow() -ne $S.main) { [void][P3Notify]::SetForegroundWindow($S.main); Start-Sleep -Milliseconds 300 }
     $S.checks.foreground = ([P3Notify]::GetForegroundWindow() -eq $S.main)
     Wait-Until { [bool](Last-Presence).focused -eq $S.checks.foreground } "presence focused=$($S.checks.foreground)" 10
     if ($S.checks.foreground) {
-        # The page has not declared host_notify_ready yet: even in front, the balloon.
+        # The page has not declared host_notify_ready yet: even in front, not in the page: the
+        # card (or its balloon), held while Windows says the user is busy.
         Push-Event (Desktop "desktop-smoke-unready" "T-P3-05 notify smoke (page not ready)")
-        $S.checks.unready = Expect-Receipt "desktop-smoke-unready" "delivered" "windows"
-        $Route = Route-Of "desktop-smoke-unready"
-        if ($Route.Groups[1].Value -ne "windows" -or -not (Log-Has "notify_route delivery=desktop-smoke-unready route=windows force=false visible=true focused=true severity=info target=alerts page=unready")) { throw "an undeclared page was not routed to the balloon" }
+        $Route = Wait-Shown "desktop-smoke-unready"
+        $S.checks.unready_route = $Route.Groups[1].Value
+        if (@("card","windows","held") -notcontains $S.checks.unready_route) { throw "an undeclared page's notice was routed $($S.checks.unready_route)" }
+        if (-not (Log-Has "notify_route delivery=desktop-smoke-unready route=$($S.checks.unready_route) force=false visible=true focused=true severity=info target=alerts page=unready")) { throw "an undeclared page was not routed outside the page: $($Route.Value)" }
+        if ($S.checks.unready_route -eq "held") { Note-Busy "desktop-smoke-unready" } else { $S.checks.unready = Expect-Receipt "desktop-smoke-unready" "delivered" "windows" }
         if ((Page-Count "f.t === 'host:notify'") -ne 0) { throw "an undeclared page got host:notify" }
     }
     $S.checks.notify_ready = Page-Invoke "host_notify_ready" "{}"
     if ($S.checks.notify_ready -ne "ok:null") { throw "host_notify_ready: $($S.checks.notify_ready)" }
     Wait-Until { Log-Has "notify_page_ready page=" } "notify_page_ready logged" 10
-    Push-Event (Desktop "desktop-smoke-fg" "T-P3-05 notify smoke (front)")
-    Wait-Until { $null -ne (Route-Of "desktop-smoke-fg") } "front route" 10
-    $Route = Route-Of "desktop-smoke-fg"
+    # The front step needs the window in front when it is routed, as the silent step below: regain
+    # the foreground first (a held notice before it waits seconds, and the user may click elsewhere
+    # meanwhile); a route with focused=false means another window took it: outside the page is then
+    # the right answer, and one retry follows with a new id.
+    $FrontTries = @()
+    foreach ($Try in 1..2) {
+        $FrontId = if ($Try -eq 1) { "desktop-smoke-fg" } else { "desktop-smoke-fg-retry" }
+        if ($S.checks.foreground) {
+            if ([P3Notify]::GetForegroundWindow() -ne $S.main) { [void][P3Notify]::SetForegroundWindow($S.main); Start-Sleep -Milliseconds 300 }
+            try { Wait-Until { [bool](Last-Presence).focused } "presence focused before the front step" 5 } catch { }
+        }
+        Push-Event (Desktop $FrontId "T-P3-05 notify smoke (front)")
+        $Route = Wait-Shown $FrontId
+        $FrontTries += "$FrontId route=$($Route.Groups[1].Value) focused=$($Route.Groups[4].Value)"
+        if (-not $S.checks.foreground -or $Route.Groups[4].Value -eq "true") { break }
+        if (@("card","windows","held") -notcontains $Route.Groups[1].Value) { throw "not in front, yet route $($Route.Groups[1].Value)" }
+        if ($Route.Groups[1].Value -eq "held") { Note-Busy $FrontId } else { [void](Expect-Receipt $FrontId "delivered" "windows") }
+    }
+    $S.checks.front_tries = $FrontTries
     $S.checks.front_route = $Route.Groups[1].Value
     if ($S.checks.foreground) {
+        if ($Route.Groups[4].Value -ne "true") { throw "environment: the foreground was taken before the front step was routed, twice ($($FrontTries -join '; '))" }
         if ($S.checks.front_route -ne "in_app") { throw "in front with a page: route $($S.checks.front_route)" }
-        Wait-Until { (Page-Count "f.t === 'host:notify' && f.delivery_id === 'desktop-smoke-fg'") -ge 1 } "host:notify on the page" 5
-        $S.checks.rendered = Page-Invoke "host_notify_rendered" "{delivery_id: 'desktop-smoke-fg'}"
+        Wait-Until { (Page-Count "f.t === 'host:notify' && f.delivery_id === '$FrontId'") -ge 1 } "host:notify on the page" 5
+        $S.checks.rendered = Page-Invoke "host_notify_rendered" "{delivery_id: '$FrontId'}"
         if ($S.checks.rendered -ne "ok:null") { throw "render confirmation refused: $($S.checks.rendered)" }
-        $S.checks.front = Expect-Receipt "desktop-smoke-fg" "delivered" "in_app"
-        $S.checks.second_render = Page-Invoke "host_notify_rendered" "{delivery_id: 'desktop-smoke-fg'}"
+        $S.checks.front = Expect-Receipt $FrontId "delivered" "in_app"
+        $S.checks.second_render = Page-Invoke "host_notify_rendered" "{delivery_id: '$FrontId'}"
         if ($S.checks.second_render -notlike "err:*already_receipted*") { throw "a second confirmation was accepted" }
         # The silent step needs the window in front when it is routed (T-P3-H fix 1, S4). Regain the
         # foreground first; if the route still says focused=false, another window took the
-        # foreground (the balloon is then the right answer): retry once with a new id, and if it
-        # happens again, fail as an environment problem rather than a contract error.
+        # foreground (outside the page is then the right answer: the card, or a hold while Windows
+        # says the user is busy): retry once with a new id, and if it happens again, fail as an
+        # environment problem rather than a contract error.
         $SilentTries = @()
         foreach ($Try in 1..2) {
             $SilentId = if ($Try -eq 1) { "desktop-smoke-silent" } else { "desktop-smoke-silent-retry" }
             if ([P3Notify]::GetForegroundWindow() -ne $S.main) { [void][P3Notify]::SetForegroundWindow($S.main); Start-Sleep -Milliseconds 300 }
             try { Wait-Until { [bool](Last-Presence).focused } "presence focused before the silent step" 5 } catch { }
             Push-Event (Desktop $SilentId "T-P3-05 notify smoke (silent page)")
-            Wait-Until { $null -ne (Route-Of $SilentId) } "silent route" 10
-            $SilentRoute = Route-Of $SilentId
+            $SilentRoute = Wait-Shown $SilentId
             $SilentTries += "$SilentId route=$($SilentRoute.Groups[1].Value) focused=$($SilentRoute.Groups[4].Value)"
-            if ($SilentRoute.Groups[4].Value -eq "true") { $S.checks.silent = Expect-Receipt $SilentId "dropped" "none" 10; break }
-            [void](Expect-Receipt $SilentId "delivered" "windows")
+            if ($SilentRoute.Groups[4].Value -eq "true") {
+                if ($SilentRoute.Groups[1].Value -ne "in_app") { throw "in front with a ready page: route $($SilentRoute.Groups[1].Value)" }
+                $S.checks.silent = Expect-Receipt $SilentId "dropped" "none" 10; break
+            }
+            if ($SilentRoute.Groups[1].Value -eq "held") { Note-Busy $SilentId } else { [void](Expect-Receipt $SilentId "delivered" "windows") }
         }
         $S.checks.silent_tries = $SilentTries
         if (-not $S.checks.silent) { throw "environment: the foreground was taken before the silent step was routed, twice ($($SilentTries -join '; '))" }
     } else {
-        # Windows kept the foreground elsewhere: the route must follow the probed state.
-        if ($S.checks.front_route -ne "windows" -or $Route.Groups[4].Value -ne "false") { throw "not in front, yet route $($S.checks.front_route)" }
-        $S.checks.front = Expect-Receipt "desktop-smoke-fg" "delivered" "windows"
+        # Windows kept the foreground elsewhere: the route must follow the probed state (outside the
+        # page: the card or its balloon, held while Windows says the user is busy).
+        if (@("card","windows","held") -notcontains $S.checks.front_route -or $Route.Groups[4].Value -ne "false") { throw "not in front, yet route $($S.checks.front_route)" }
+        if ($S.checks.front_route -eq "held") { Note-Busy $FrontId } else { $S.checks.front = Expect-Receipt $FrontId "delivered" "windows" }
         $S.checks.in_app_note = "foreground refused by Windows; the in-app branch is covered by cargo test shell_topics_route_notices_report_presence_and_switch_language"
     }
 
-    # 7. A forced test always tries Windows; a repeated id gets no second receipt.
+    # 7. A forced test always tries Windows (never held, never in the page); a repeated id gets no
+    #    second receipt (a held one counts as known too).
     Push-Event (Desktop "desktop-test-smoke" "T-P3-05 notify smoke (forced test)")
+    $Route = Wait-Shown "desktop-test-smoke"
+    if (@("card","windows") -notcontains $Route.Groups[1].Value -or $Route.Groups[2].Value -ne "true") { throw "forced test routed: $($Route.Value)" }
     $S.checks.forced = Expect-Receipt "desktop-test-smoke" "delivered" "windows"
-    if ((Route-Of "desktop-test-smoke").Groups[2].Value -ne "true") { throw "forced flag not logged" }
     Push-Event (Desktop "desktop-smoke-bg" "T-P3-05 notify smoke (repeat)")
     Wait-Until { Log-Has "notify_route delivery=desktop-smoke-bg route=duplicate" } "duplicate logged" 10
     Start-Sleep -Milliseconds 500
     $S.checks.repeat_receipts = @(Receipts "desktop-smoke-bg").Count
-    if ($S.checks.repeat_receipts -ne 1) { throw "desktop-smoke-bg receipted $($S.checks.repeat_receipts) times" }
+    # Shown at step 4: exactly its one receipt. Held there: none, or one if the shell released it
+    # meanwhile (the user became free); never two.
+    $Fewest = if ($S.checks.background_held) { 0 } else { 1 }
+    if ($S.checks.repeat_receipts -lt $Fewest -or $S.checks.repeat_receipts -gt 1) { throw "desktop-smoke-bg receipted $($S.checks.repeat_receipts) times" }
 
     # 8. ui.language: native text and the page follow it.
     Push-Event ([ordered]@{ topic = "ui.language"; kind = "edge"; data = [ordered]@{ language = "ja_JP"; config_rev = 2 } })
@@ -333,6 +421,9 @@ try {
     # 11-18: the stand-in refuses what the real sidecar refuses (shell/app/src/fixture_contract.py)
     $Refused = Join-Path $script:State "contract-violations.jsonl"
     if (Test-Path -LiteralPath $Refused) { throw "the real sidecar refuses frames the shell sent: $((Get-Content -LiteralPath $Refused -TotalCount 5) -join ' | ')" }
+    # Every contract check above passed; an unforced notice outside the page was never shown,
+    # because Windows said the user was busy: not a pass on this machine state.
+    if ($S.checks.environment) { throw "environment: $($S.checks.environment); every other check passed" }
     $Passed = $true
 } catch {
     $Failure = $_.Exception.Message

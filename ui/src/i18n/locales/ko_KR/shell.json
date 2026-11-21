@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {중지됨} starting {시작 중} running {실행 중} stopping {중지 중} failed {시작 실패} unknown {연결 중} other {연결 중}}",
   "shell.foot.update.aria": "{status}. 설정 · 앱으로 이동",
-  "shell.foot.update.label": "{state, select, found {새 버전 {version}} found_nover {새 버전 있음} checking {업데이트 확인 중} fail {업데이트 확인 실패} dl {업데이트 다운로드 중} verify {업데이트 준비됨} ready {업데이트 설치 중} updated {업데이트됨} disabled {앱 내 업데이트 비활성} unknown {업데이트 확인} other {최신 버전}}",
+  "shell.foot.update.label": "{state, select, found {새 버전 {version}} found_nover {새 버전 있음} checking {업데이트 확인 중} fail {업데이트 확인 실패} install_fail {업데이트 실패} dl {업데이트 다운로드 중} verify {업데이트 준비됨} ready {업데이트 설치 중} updated {업데이트됨} disabled {앱 내 업데이트 비활성} unknown {업데이트 확인} other {최신 버전}}",
   "shell.nav.aria": "주 탐색",
   "shell.nav.logs": "로그",
   "shell.nav.overview": "개요",

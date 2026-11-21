@@ -243,6 +243,8 @@ pub fn with_retries<T, E>(mut attempt: impl FnMut(u32) -> Result<T, E>, mut slee
     }
 }
 
+/// Starts a main-window recreation in the given mode (main.rs `recreate_main_window`).
+type RecreateHandler = Arc<dyn Fn(Recreate) -> bool + Send + Sync>;
 /// What the WebView2 event handlers, the `host_ready` command, the recreation thread and the exit
 /// path share.
 pub struct Supervisor {
@@ -255,7 +257,7 @@ pub struct Supervisor {
     reloads: Mutex<Budget>,
     recreations: Mutex<Budget>,
     /// The browser-loss handler (main.rs). False: it did not start (the shell is leaving).
-    recreate: Mutex<Option<Arc<dyn Fn(Recreate) -> bool + Send + Sync>>>,
+    recreate: Mutex<Option<RecreateHandler>>,
     /// Environment generations: the last one handed out ([`Self::reserve_browser`]), the current
     /// main window's one (published only once its `BrowserProcessExited` hook is in place, A-S7),
     /// and the last one whose browser exited.
@@ -279,7 +281,7 @@ impl Supervisor {
     pub fn recovering(&self) -> bool { self.recovering.load(Ordering::Acquire) }
     pub fn recovered(&self) { self.recovering.store(false, Ordering::Release); }
     /// The browser-loss handler (main.rs): it spawns the recreation thread.
-    pub fn set_recreate(&self, recreate: Arc<dyn Fn(Recreate) -> bool + Send + Sync>) { *self.recreate.lock().unwrap_or_else(|e| e.into_inner()) = Some(recreate); }
+    pub fn set_recreate(&self, recreate: RecreateHandler) { *self.recreate.lock().unwrap_or_else(|e| e.into_inner()) = Some(recreate); }
     /// `ProcessFailed` on the UI thread. `reload` reloads the failed page (true = accepted).
     pub fn process_failed(&self, failure: Failure, reload: impl FnOnce() -> bool, now: Instant) -> Remedy {
         let remedy = failure.remedy();

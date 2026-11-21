@@ -4,7 +4,7 @@
 //
 // Host contract (src/main.rs): the page posts {cmd} with window.ipc.postMessage — hello, shown,
 // drag, min, close, pick {dir}, install {dir, desktop}, open, log, refresh — and the host calls
-// window.__host(event) with {ev: init | dir | step | progress | done | failed | declined}.
+// window.__host(event) with {ev: init | dir | step | progress | done | failed | declined | openManual}.
 // Opened in a plain browser (no window.ipc), a small simulator plays the host (end of file).
 'use strict';
 
@@ -187,6 +187,8 @@ function onProgress(st, permille) {
   actProgress(p);
 }
 
+const doneTitle = () => isUp() ? t('d_update') : isRe() ? t('d_reinstall') : t('d_install');
+
 function onDone(ev) {
   phase = 'done';
   setClose(true);
@@ -196,14 +198,20 @@ function onDone(ev) {
   dot.classList.add('is-lit');                           // the light lands
   if (!reduced()) { dot.classList.remove('is-landing'); void dot.getBBox(); dot.classList.add('is-landing'); }
   ver.textContent = facts.version;
-  const title = isUp() ? t('d_update') : isRe() ? t('d_reinstall') : t('d_install');
   const sub = facts.scene === 'fresh' ? t(ev.desktop ? 'd_sub_desk' : 'd_sub') : t('d_sub_kept');
-  setBody(`<div class="title">${esc(title)}</div><div class="sub">${esc(sub)}</div>`);
+  setBody(`<div class="title">${esc(doneTitle())}</div><div class="sub">${esc(sub)}</div>`);
   setTimeout(() => {
     footer([], [ghostBtn(t('finish'), () => post({ cmd: 'close' }))]);
     actButton(t('open'), () => post({ cmd: 'open' }));
     act.focus({ preventScroll: true });
   }, 900);
+}
+
+// 打开 started nothing (0.1.5): from a window run as administrator only Explorer may start the
+// app, as the signed-in user, and it could not be asked or did not answer (src/main.rs open_app).
+// The install is done; the window stays, with its 完成 and 打开.
+function onOpenManual() {
+  setBody(`<div class="title">${esc(doneTitle())}</div><div class="sub reason">${esc(t('o_manual'))}</div>`);
 }
 
 function onFailed(ev) {
@@ -297,11 +305,12 @@ window.__host = ev => {
     case 'done': onDone(ev); break;
     case 'failed': onFailed(ev); break;
     case 'declined': renderReady(t('declined')); break;
+    case 'openManual': onOpenManual(); break;
   }
 };
 
 // ---- a stand-in host for a plain browser (design review only; never runs in the product) ----
-// ?lang=zh_CN&scene=fresh|update|reinstall&running=1&fail=4|disk|decline|running|busy
+// ?lang=zh_CN&scene=fresh|update|reinstall&running=1&fail=4|disk|decline|running|busy|open
 const Sim = (() => {
   const q = new URLSearchParams(location.search);
   const scene = q.get('scene') || 'fresh';
@@ -312,6 +321,8 @@ const Sim = (() => {
     post(m) {
       if (m.cmd === 'hello' || m.cmd === 'refresh') say(init());
       if (m.cmd === 'pick') say({ ev: 'dir', dir: m.dir.startsWith('C:') ? 'D:\\Apps\\Tesseract' : 'C:\\Program Files\\Tesseract' });
+      // fail=open: an elevated window whose Explorer did not start the app (the page says how)
+      if (m.cmd === 'open' && q.get('fail') === 'open') say({ ev: 'openManual' });
       if (m.cmd === 'install') {
         const fail = q.get('fail');
         if (fail === 'disk') return say({ ev: 'failed', kind: 'disk', need: 312e6, free: 118e6, drive: 'C:' });

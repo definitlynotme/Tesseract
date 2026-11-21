@@ -429,13 +429,15 @@ fn load_icon(size: i32) -> (HICON, bool) {
 /// and later; resolved at run time because Cargo.toml has no HiDpi feature), else
 /// `GetSystemMetrics`, which keeps the DPI the session started with.
 fn small_icon_size(hwnd: HWND) -> i32 {
+    // What GetProcAddress hands back (FARPROC's function), and the two real signatures.
+    type Proc = unsafe extern "system" fn() -> isize;
     type ForWindow = unsafe extern "system" fn(HWND) -> u32;
     type ForDpi = unsafe extern "system" fn(i32, u32) -> i32;
     unsafe {
         let user32 = GetModuleHandleW(w!("user32.dll")).ok();
         let lookup = |name: PCSTR| user32.and_then(|module| GetProcAddress(module, name));
         if let (Some(for_window), Some(for_dpi)) = (lookup(s!("GetDpiForWindow")), lookup(s!("GetSystemMetricsForDpi"))) {
-            let (for_window, for_dpi) = (std::mem::transmute::<_, ForWindow>(for_window), std::mem::transmute::<_, ForDpi>(for_dpi));
+            let (for_window, for_dpi) = (std::mem::transmute::<Proc, ForWindow>(for_window), std::mem::transmute::<Proc, ForDpi>(for_dpi));
             let dpi = for_window(hwnd);
             let size = if dpi > 0 { for_dpi(SM_CXSMICON.0, dpi) } else { 0 };
             if size > 0 { return size; }

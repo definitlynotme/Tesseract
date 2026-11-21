@@ -23,7 +23,7 @@ def audited_core(tmp_path, monkeypatch):
     config = {'interface-name': 'physical', 'tun': {'enable': False}}
     pin_mihomo_audit_dns(config, 19111)
     path.write_text(yaml.safe_dump(config), encoding='utf-8')
-    processes, commands = [], []
+    processes, commands, bound = [], [], []
 
     def factory(*args, **kwargs):
         commands.append((args, kwargs))
@@ -33,19 +33,24 @@ def audited_core(tmp_path, monkeypatch):
         return process
 
     monkeypatch.setattr(core_runner.MihomoCoreRunner, '_start_reader_thread', lambda *a, **k: None)
+    # These PIDs are made up: the real binding would put whatever real process
+    # holds one in a KILL_ON_JOB_CLOSE job. Only record what start asks to bind.
+    monkeypatch.setattr(core_runner.MihomoCoreRunner, '_bind_process_to_job',
+                        lambda _runner, process: bound.append(process.pid))
     guard._install_core_runner(core_runner)
     runner = core_runner.MihomoCoreRunner(
         binary_path=str(binary), runtime_config_path=str(path),
         work_dir=str(tmp_path / 'data'), process_factory=factory,
     )
     yield SimpleNamespace(guard=guard, runner=runner, path=path, config=config,
-                          processes=processes, commands=commands, binary=binary)
+                          processes=processes, commands=commands, binary=binary, bound=bound)
     guard.uninstall_for_test()
 
 
 def test_core_start_and_final_exit_are_both_registered(audited_core):
     case = audited_core
     assert case.runner.start()['running']
+    assert case.bound == [101]
     item, = case.guard.receipt['native_process_inventory']['attempts']
     assert item['pid'] == 101 and item['creation_attempted']
     assert item['configs'][0]['sha256'] == hashlib.sha256(case.path.read_bytes()).hexdigest()

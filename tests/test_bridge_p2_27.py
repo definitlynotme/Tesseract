@@ -551,7 +551,17 @@ def test_late_install_result_cannot_clear_a_newer_unanswered_handoff(env):
     assert updater.downloads == 1
 
 
-def test_install_result_conflicts_with_in_flight_check_and_keeps_receipt(env):
+def launch_failed(owner):
+    data = dto(owner)
+    return data["state"], data["error"] and data["error"]["code"], data["error"] and data["error"]["message_key"]
+
+
+LAUNCH_FAILED = ("failed", "io", "errors.update.launch_failed")
+
+
+def test_install_result_during_a_check_is_recorded_once_it_lands(env):
+    """0.1.5 (review of 0.1.4): launched=false that met a check in flight was refused as conflict,
+    and the shell sends it once, so the failure Settings should show was lost."""
     owner, updater, publisher, _, _ = env
     receipt_ref = installed(owner)["receipt_ref"]
     owner.exit_response(publisher.frames[0]["handoff_id"], False)
@@ -560,13 +570,35 @@ def test_install_result_conflicts_with_in_flight_check_and_keeps_receipt(env):
     with ThreadPoolExecutor(2) as pool:
         checking = pool.submit(owner.check)
         assert updater.check_entered.wait(2)
-        with pytest.raises(JobFailure) as caught:
-            owner.install_result(receipt_ref, False, "spawn_failed")
-        assert caught.value.code == "conflict"
+        assert owner.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
+        assert owner.last_install_result() is None and dto(owner)["state"] == "checking"
         updater.release_check.set()
-        assert checking.result(3)["state"] == "verified"
-    assert owner._receipt_ref == receipt_ref and owner.last_install_result() is None
+        assert checking.result(3)["state"] == "verified", "the job's own result stays a done check"
+    assert launch_failed(owner) == LAUNCH_FAILED
+    assert owner.last_install_result() == {"receipt_ref": receipt_ref, "launched": False, "reason_code": "spawn_failed"}
+    assert owner._receipt_ref == receipt_ref
     assert owner.install()["receipt_ref"] == receipt_ref and updater.downloads == 1
+
+
+def test_install_result_during_a_failing_check_is_recorded_too(env):
+    owner, updater, publisher, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    owner.exit_response(publisher.frames[0]["handoff_id"], False)
+    entered, release_check = Event(), Event()
+
+    def failing_check(*, current_version):
+        entered.set()
+        assert release_check.wait(3)
+        raise app_updater.AppUpdateError("offline")
+    updater.check_latest_update = failing_check
+    with ThreadPoolExecutor(2) as pool:
+        checking = pool.submit(owner.check)
+        assert entered.wait(2)
+        assert owner.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
+        release_check.set()
+        with pytest.raises(JobFailure):
+            checking.result(3)
+    assert launch_failed(owner) == LAUNCH_FAILED and owner._receipt_ref == receipt_ref
 
 
 def test_install_result_conflicts_with_in_flight_install(env):
@@ -588,7 +620,9 @@ def test_install_result_conflicts_with_in_flight_install(env):
     assert owner.last_install_result() is None
 
 
-def test_cross_restart_install_result_conflicts_with_automatic_check(env):
+def test_cross_restart_install_result_during_the_automatic_check_is_not_lost(env):
+    """The live path of the finding: a slow relaunch, the new epoch's automatic check already in
+    flight when the shell's only installResult arrives."""
     owner, updater, _, _, _ = env
     receipt_ref = installed(owner)["receipt_ref"]
     fresh = UpdateOwner(owner.state_path, owner.download_dir, current_version="1.0.0", updater=updater)
@@ -596,16 +630,16 @@ def test_cross_restart_install_result_conflicts_with_automatic_check(env):
     updater.release_check = Event()
     updater.check_entered.clear()
     with ThreadPoolExecutor(2) as pool:
-        checking = pool.submit(fresh.check)
+        checking = pool.submit(fresh.check, automatic=True)
         assert updater.check_entered.wait(2)
-        with pytest.raises(JobFailure) as caught:
-            fresh.install_result(receipt_ref, False, "spawn_failed")
-        assert caught.value.code == "conflict"
+        assert fresh.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
         updater.release_check.set()
-        assert checking.result(3)["state"] == "available"  # No receipt in memory yet.
-    # The shell's retry after the check lands normally.
-    assert fresh.install_result(receipt_ref, False, "spawn_failed") == {"recorded": True}
-    assert dto(fresh)["state"] == "failed"
+        assert checking.result(3)["state"] == "available"  # its own result: no receipt in memory then
+    assert launch_failed(fresh) == LAUNCH_FAILED
+    assert fresh.last_install_result() == {"receipt_ref": receipt_ref, "launched": False, "reason_code": "spawn_failed"}
+    # 立即更新 hands the kept installer off again: no second download.
+    downloads = updater.downloads
+    assert fresh.install()["receipt_ref"] == receipt_ref and updater.downloads == downloads
 
 
 def test_tampered_installer_bytes_force_redownload_before_handoff(env):
@@ -617,6 +651,43 @@ def test_tampered_installer_bytes_force_redownload_before_handoff(env):
     assert updater.downloads == 2 and result["receipt_ref"] != receipt_ref
     assert owner.resolve_receipt(receipt_ref) is None
     assert Path(publisher.frames[1]["installer_path"]).read_bytes() == INSTALLER_BYTES
+
+
+def new_epoch(owner, updater):
+    """The app reopened (Setup after UAC 否, or any restart): an owner with nothing in memory."""
+    publisher = FakePublisher()
+    fresh = UpdateOwner(owner.state_path, owner.download_dir, current_version="1.0.0", updater=updater)
+    fresh.attach_handoff(publisher, FakeExitPort())
+    return fresh, publisher
+
+
+def test_a_verified_installer_from_an_earlier_epoch_is_handed_off_without_a_download(env):
+    """0.1.5 (review of 0.1.4): the receipt lived only in memory, so after UAC 否 (Setup reopens
+    the app) or any restart 立即更新 revoked the durable receipt and downloaded the installer again."""
+    owner, updater, _, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    fresh, publisher = new_epoch(owner, updater)
+    assert fresh.check()["state"] == "available"  # the check keeps reporting what it found
+    assert fresh.install()["receipt_ref"] == receipt_ref and updater.downloads == 1
+    assert publisher.frames[0]["receipt_ref"] == receipt_ref and dto(fresh)["state"] == "handoff"
+    assert fresh.resolve_receipt(receipt_ref) is not None
+
+
+def test_a_kept_installer_is_downloaded_again_when_it_no_longer_fits(env):
+    owner, updater, _, _, _ = env
+    receipt_ref = installed(owner)["receipt_ref"]
+    # Its bytes changed since: revoked, downloaded again.
+    Path(owner.download_dir / release().installer.name).write_bytes(b"tampered")
+    fresh, _ = new_epoch(owner, updater)
+    fresh.check()
+    assert fresh.install()["receipt_ref"] != receipt_ref and updater.downloads == 2
+    assert fresh.resolve_receipt(receipt_ref) is None
+    # A newer release than the kept installer's: that one is downloaded.
+    updater.info = release("2.1.0")
+    fresh, publisher = new_epoch(owner, updater)
+    fresh.check()
+    fresh.install()
+    assert updater.downloads == 3 and publisher.frames[0]["version"] == "2.1.0"
 
 
 # ---- repeated install / concurrency with check -------------------------------

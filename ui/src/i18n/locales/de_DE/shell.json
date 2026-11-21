@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {Gestoppt} starting {Startet} running {Läuft} stopping {Stoppt} failed {Start fehlgeschlagen} unknown {Verbindung wird hergestellt} other {Verbindung wird hergestellt}}",
   "shell.foot.update.aria": "{status}. Zu Einstellungen · App wechseln",
-  "shell.foot.update.label": "{state, select, found {{version} verfügbar} found_nover {Update verfügbar} checking {Suche nach Updates} fail {Update-Prüfung fehlgeschlagen} dl {Update wird geladen} verify {Update bereit} ready {Update wird installiert} updated {Aktualisiert} disabled {In-App-Updates nicht aktiv} unknown {Nach Updates suchen} other {Auf dem neuesten Stand}}",
+  "shell.foot.update.label": "{state, select, found {{version} verfügbar} found_nover {Update verfügbar} checking {Suche nach Updates} fail {Update-Prüfung fehlgeschlagen} install_fail {Update fehlgeschlagen} dl {Update wird geladen} verify {Update bereit} ready {Update wird installiert} updated {Aktualisiert} disabled {In-App-Updates nicht aktiv} unknown {Nach Updates suchen} other {Auf dem neuesten Stand}}",
   "shell.nav.aria": "Hauptnavigation",
   "shell.nav.logs": "Protokolle",
   "shell.nav.overview": "Übersicht",

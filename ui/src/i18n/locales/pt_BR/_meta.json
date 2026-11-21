@@ -3960,6 +3960,9 @@
   "errors.unknown": {
     "src_hash": "974c416a0df6a5c8"
   },
+  "errors.update.launch_failed": {
+    "src_hash": "468b0d8864f77c4b"
+  },
   "errors.update.operation_failed": {
     "src_hash": "015ce880a36b560a"
   },
@@ -6529,7 +6532,7 @@
     "src_hash": "158178644a9e3de9"
   },
   "shell.foot.update.label": {
-    "src_hash": "04e4549d92cbc7e1"
+    "src_hash": "28574285b19827bb"
   },
   "shell.nav.aria": {
     "src_hash": "9bae680405099fc8"
@@ -7844,6 +7847,18 @@
   },
   "tiers.reason.dns_resolution_failed.fix": {
     "src_hash": "5ccf128f4c2a4ca6"
+  },
+  "tiers.reason.gateway_no_upstream": {
+    "src_hash": "435d60f28d05e4a9"
+  },
+  "tiers.reason.gateway_no_upstream.fix": {
+    "src_hash": "ad085fa1b540e181"
+  },
+  "tiers.reason.gateway_unreachable": {
+    "src_hash": "d2874c8d301e77dd"
+  },
+  "tiers.reason.gateway_unreachable.fix": {
+    "src_hash": "64d5741111ba54d8"
   },
   "tiers.reason.invalid_request": {
     "src_hash": "9fb90ef25a622b63"

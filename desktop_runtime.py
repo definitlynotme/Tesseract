@@ -1521,6 +1521,7 @@ class DesktopRuntime:
         subscription_preview_service: SubscriptionPreviewService | None = None,
         node_diagnostic_service: EphemeralNodeDiagnosticService | None = None,
         autostart_manager: AutostartManager | None = None,
+        gateway_chain_probe_service: EphemeralNodeDiagnosticService | None = None,
     ) -> None:
         if app_paths is None and project_root is not None:
             root = Path(project_root).resolve()
@@ -1577,6 +1578,14 @@ class DesktopRuntime:
             )
         self.node_diagnostic_service = (
             node_diagnostic_service
+            or EphemeralNodeDiagnosticService(logger=self.logger)
+        )
+        # Gateway health checks probe through the fallback layers in their own
+        # isolated Mihomo (gateway_check.py). The service holds one request at
+        # a time, so a background check must never take the user's diagnostic
+        # slot: it gets its own.
+        self.gateway_chain_probe_service = (
+            gateway_chain_probe_service
             or EphemeralNodeDiagnosticService(logger=self.logger)
         )
         self.subscription_server: SubscriptionServer | None = None
@@ -2248,6 +2257,15 @@ class DesktopRuntime:
         probe_broker = getattr(self, "_runtime_probe_broker", None)
         if probe_broker is not None:
             probe_broker.stop(cancel_active=True)
+        # A Gateway chain probe in flight (the monitor thread's Gateway check)
+        # ends now instead of holding the stop for its Mihomo startup and
+        # probe timeout; the service stays open for the next start.
+        gateway_probe = getattr(self, "gateway_chain_probe_service", None)
+        if gateway_probe is not None:
+            try:
+                gateway_probe.cancel_all()
+            except Exception:
+                pass
         recovery_pressure = getattr(self, "_runtime_recovery_pressure", None)
         if recovery_pressure is not None:
             recovery_pressure.stop(timeout_seconds=0.5)
@@ -2676,6 +2694,9 @@ class DesktopRuntime:
             manager.subscription_operation_coordinator = (
                 self.subscription_operation_coordinator
             )
+        # The Manager never starts Mihomo itself: a Gateway that fails its
+        # direct check is probed through the fallback layers by this runtime.
+        manager.gateway_chain_prober = self._gateway_chain_probe
         return manager
 
     def _start_locked(
@@ -53630,6 +53651,30 @@ class DesktopRuntime:
                     )
         return result
 
+    def _gateway_chain_probe(
+        self,
+        node: Node,
+        upstream_nodes: list[Node],
+    ) -> EphemeralNodeDiagnosticResult:
+        """Manager callback (gateway_check.ChainProber): one Gateway node
+        through the given usable fallback nodes, in a request-owned Mihomo
+        that has no tie to the formal Core. Nothing is applied here; the
+        Manager commits the verdict with its own health check."""
+
+        mihomo_paths = mihomo_client_paths(self._client_config())
+        return self.gateway_chain_probe_service.diagnose(
+            node,
+            node_identity=diagnostic_node_identity(node),
+            binary_path=self._resolve_path(mihomo_paths.binary_path),
+            probe_url=self._default_probe_url(),
+            request_id=f"gateway-chain-check-{time.time_ns()}",
+            mode="chain",
+            upstream_nodes=list(upstream_nodes),
+            timeout_ms=self._default_probe_timeout_ms(),
+            ipv6=coerce_bool(self._client_config().get("ipv6", False), False),
+            excluded_ports=self._node_diagnostic_excluded_ports(),
+        )
+
     def cancel_node_diagnostic(self, request_id: str) -> bool:
         return bool(self.node_diagnostic_service.cancel(str(request_id or "")))
 
@@ -53637,7 +53682,11 @@ class DesktopRuntime:
         return int(self.node_diagnostic_service.cancel_all())
 
     def close_node_diagnostics(self, *, timeout: float = 3.0) -> bool:
-        return bool(self.node_diagnostic_service.close(timeout=timeout))
+        closed = bool(self.node_diagnostic_service.close(timeout=timeout))
+        gateway_probe = getattr(self, "gateway_chain_probe_service", None)
+        if gateway_probe is not None:
+            closed = bool(gateway_probe.close(timeout=timeout)) and closed
+        return closed
 
     def test_proxy_delay(self, name: str, *, url: str | None = None, timeout_ms: int = 5000) -> dict[str, Any]:
         probe = url or self._default_probe_url()
@@ -55372,6 +55421,7 @@ class DesktopRuntime:
         """
         from bridge_runtime_access import immutable_record, display_filter, opaque_id, observation_ms
         from bridge_vocab import RUNTIME_TIERS
+        from node_status_view import _runtime_failure_display_category
         from tier1_protocols import group_tier1_nodes, is_tier1_protocol_variant, protocol_variant_key
         owner = self._bridge_read_owner()
         manager = owner[2]
@@ -55394,7 +55444,7 @@ class DesktopRuntime:
                         node.extra.get("tier3_origin") or node.extra.get("source_origin"),
                         (node.protocol, node.address, node.port, node.uuid, node.password, node.method,
                          node.security, node.network, node.host, node.path, node.sni, node.plugin),
-                        variants.get(id(node))))
+                        variants.get(id(node)), str(node.suspicious_reason or "")))
                     secret_nodes.append({"uri": node.uri, "password": node.password,
                         "uuid": node.uuid, "extra": copy.deepcopy(node.extra),
                         "source": node.source, "sources": tuple(node.sources)})
@@ -55410,10 +55460,16 @@ class DesktopRuntime:
         clean = display_filter({"config": copy.deepcopy(owner[3]), "nodes": secret_nodes,
                                 "loaded": self.bridge_secret_facts()})
         rows = []
-        for tier, name, protocol, status, latency, checked, source, sources, origin, identity, variant in sampled:
+        for (tier, name, protocol, status, latency, checked, source, sources, origin, identity,
+                variant, failure) in sampled:
             pool = "automatic" if tier == "tier3" and origin != "tier3a" else "user"
+            # A failed node's reason crosses only as its display category (never the
+            # raw check text); bridge_nodes maps it to Node.reason_code.
+            reason = (_runtime_failure_display_category(failure)[0] or None
+                      if failure and status in {"dead", "suspicious"} else None)
             row = {"id": opaque_id(owner[0], tier, identity), "name": clean(name),
                 "tier": RUNTIME_TIERS[tier], "protocol": clean(protocol), "status": status,
+                "reason_code": reason,
                 "pool_kind": pool, "latency_ms": latency, "checked_at_ms": observation_ms(checked),
                 "source_id": opaque_id(tier, source) if source else None,
                 "source_ids": tuple(opaque_id(tier, value) for value in sources)}

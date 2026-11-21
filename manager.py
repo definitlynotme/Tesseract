@@ -58,6 +58,14 @@ from clash_formatter import (
     selected_gateway_nodes,
 )
 from exit_nodes import exit_nodes_from_entry, mark_exit_node
+from gateway_check import (
+    CHAIN_PROBE_INTERVAL_SECONDS,
+    CHAIN_UPSTREAM_LIMIT,
+    ChainProber,
+    ChainVerdict,
+    GatewayCheckOutcome,
+    resolve_gateway_check,
+)
 from gateway_selection import GatewaySelection, read_selection
 from killswitch import KillSwitchManager
 from log_event_reports import log_raw_diagnostic
@@ -1961,6 +1969,11 @@ class ProxyTierManager:
         self.runtime_nodes: dict[str, list[Node]] = {tier_id: [] for tier_id in DISPLAY_TIER_IDS}
         self.last_check_monotonic: dict[str, float] = {tier_id: 0.0 for tier_id in DISPLAY_TIER_IDS}
         self.last_urgent_check_monotonic: dict[str, float] = {tier_id: 0.0 for tier_id in DISPLAY_TIER_IDS}
+        # Gateway checks (gateway_check.py): the runtime injects the chain
+        # probe (an isolated Mihomo); without one a direct failure stands.
+        self.gateway_chain_prober: ChainProber | None = None
+        self._gateway_chain_verdicts: dict[str, ChainVerdict] = {}
+        self._gateway_waiting_for_upstream = False
         self.last_tier2_remote_refresh_attempt_monotonic = 0.0
         self.last_tier3_user_subscription_collect_attempt_monotonic = 0.0
         self.tier2_full_outage_started_monotonic = 0.0
@@ -3449,6 +3462,9 @@ class ProxyTierManager:
                 self.exit_last_refresh_at = exit_snapshot.generated_at if exit_cache_nodes else None
                 self.runtime_nodes["exit"] = self._load_exit_nodes(exit_cache_nodes)
                 self._clear_subscription_source_check_evidence("exit")
+                # The reload dropped every Gateway health result: check on the
+                # next cycle, so a just-imported node can be picked at once.
+                self.last_check_monotonic.pop("exit", None)
                 return
         self._load_initial_state()
 
@@ -6366,6 +6382,69 @@ class ProxyTierManager:
         if "ipv6" not in config:
             config["ipv6"] = coerce_bool(self.client_config.get("ipv6", dns_config.get("ipv6", False)), False)
         return config
+
+    def _gateway_chain_upstream_nodes(self, limit: int = CHAIN_UPSTREAM_LIMIT) -> list[Node]:
+        """Usable fallback-layer nodes in PROXY-FALLBACK order (Vanguard,
+        Sentinel, then Bastion when enabled): what a Gateway is dialled through."""
+
+        upstream: list[Node] = []
+        with self.lock:
+            tiers: list[tuple[str, list[Node] | None]] = [("tier1", None), ("tier2", None)]
+            if self._tier3_enabled():
+                tiers.append(
+                    ("tier3", self._tier3_main_pool_nodes_for_display(list(self.runtime_nodes["tier3"])))
+                )
+            for tier_id, nodes in tiers:
+                usable = [
+                    node
+                    for node in self.runtime_effective_nodes(tier_id, nodes)
+                    if node.status in {NodeStatus.ALIVE, NodeStatus.SLOW}
+                ]
+                upstream.extend(usable if tier_id == "tier1" else sort_nodes_for_use(usable))
+                if len(upstream) >= limit:
+                    break
+        return upstream[: max(0, int(limit))]
+
+    def _resolve_gateway_direct_failures(self, tested: list[Node]) -> GatewayCheckOutcome:
+        """Direct first; a direct failure is checked through the fallback layers
+        (rate limited per node) or, with none usable, waits for them."""
+
+        verdicts = getattr(self, "_gateway_chain_verdicts", None)
+        if verdicts is None:
+            verdicts = self._gateway_chain_verdicts = {}
+        return resolve_gateway_check(
+            tested,
+            prober=getattr(self, "gateway_chain_prober", None),
+            upstream=self._gateway_chain_upstream_nodes,
+            verdicts=verdicts,
+            testing_config=self._testing_config_for_node_checks(),
+            interval_seconds=getattr(
+                self, "gateway_chain_probe_interval_seconds", CHAIN_PROBE_INTERVAL_SECONDS
+            ),
+            cancelled=self._manager_stop_requested,
+            logger=self.logger,
+        )
+
+    def _set_gateway_waiting_for_upstream(self, waiting: bool) -> None:
+        waiting = bool(waiting)
+        if waiting and not getattr(self, "_gateway_waiting_for_upstream", False):
+            log_raw_diagnostic(
+                self.logger,
+                "info",
+                "Gateway direct check failed and no fallback node is usable; "
+                "the Gateway is checked again once one is",
+            )
+        self._gateway_waiting_for_upstream = waiting
+
+    def _gateway_upstream_appeared(self) -> bool:
+        """True once, when a Gateway waiting for an upstream can now chain."""
+
+        if not getattr(self, "_gateway_waiting_for_upstream", False):
+            return False
+        if not self._gateway_chain_upstream_nodes(limit=1):
+            return False
+        self._gateway_waiting_for_upstream = False
+        return True
 
     def _gateway_nodes_for_testing(self, tier_id: str) -> list[Node]:
         # Gateway is the exit itself, so Gateway-layer checks must not chain through another Gateway.
@@ -33001,7 +33080,12 @@ class ProxyTierManager:
             )
             if self._manager_stop_requested():
                 return previous_nodes
+            gateway_outcome = self._resolve_gateway_direct_failures(tested)
+            tested = gateway_outcome.nodes
+            if self._manager_stop_requested():
+                return previous_nodes
             complete = self._commit_layer_health_checks("exit", tested, check_contexts)
+            self._set_gateway_waiting_for_upstream(gateway_outcome.waiting_for_upstream)
             checked_subscription_urls = self._subscription_sources_in_nodes(
                 "exit",
                 [*previous_nodes, *tested],
@@ -34503,6 +34587,11 @@ class ProxyTierManager:
             )
             if not tested:
                 raise RuntimeError("node test returned no result")
+            if tier_id == "exit":
+                gateway_outcome = self._resolve_gateway_direct_failures(tested)
+                tested = gateway_outcome.nodes
+                if gateway_outcome.waiting_for_upstream:
+                    self._set_gateway_waiting_for_upstream(True)
             if persist_result:
                 self._replace_tested_runtime_node(
                     tier_id,
@@ -34808,8 +34897,15 @@ class ProxyTierManager:
             collect_interval=tier3_collect_interval,
         )
 
-        if self._exit_active() and self._is_due("exit", now, exit_interval):
-            self.check_exit(force_remote_refresh=True)
+        # Gateway candidates are checked even while none is selected: picking
+        # one needs it in the Mihomo export (ALIVE/SLOW), so an unchecked
+        # candidate could never be picked.  Only a selected Gateway refreshes
+        # its subscriptions remotely.  A Gateway that failed directly with no
+        # usable fallback node is checked again as soon as one is usable.
+        if self._gateway_upstream_appeared():
+            self.last_check_monotonic.pop("exit", None)
+        if self._exit_tier_configured() and self._is_due("exit", now, exit_interval):
+            self.check_exit(force_remote_refresh=self._exit_active())
 
         self._run_due_urgent_checks(now=now)
 

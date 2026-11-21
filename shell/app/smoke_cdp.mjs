@@ -91,7 +91,14 @@ await until(()=>frames().some(f=>f.t==='bye'),'bye on Channel');
 const bye=frames().find(f=>f.t==='bye'); assert.equal(bye.exit_code,0);
 for(const domain of ['proxy','firewall']) assert(['not_needed','not_owned','restored'].includes(bye.network_recovery[domain].state));
 assert(deliveries.every((d,i)=>!i || d.order===deliveries[i-1].order+1),'Channel order must be contiguous');
-assert(frames().filter(f=>!f.t.startsWith('rt:')).every(f=>f.epoch===epoch),'epoch mismatch');
+// Every frame but the shell's rt:* markers carries the hello's epoch. The exception is what the
+// shell sent before that hello (11-05 window-first launch: the window and its page come first):
+// its own host:* frames, stamped with the epoch it had then, "" (Hub::host). A page connection made
+// before hello replays rt:reset{runtime_gone}, host:caps{epoch:""}, the shell's own host:* state,
+// rt:replayed (PROTOCOL.md host:caps); the reveal's host:visibility can also come live before hello.
+const all=frames(), helloAt=all.indexOf(hello);
+const foreign=all.filter((f,i)=>!f.t.startsWith('rt:') && f.epoch!==epoch && !(f.t.startsWith('host:') && f.epoch==='' && i<helloAt));
+assert(foreign.length===0,`epoch mismatch (hello ${epoch}): ${JSON.stringify(foreign.slice(0,5).map(f=>({t:f.t,topic:f.topic,epoch:f.epoch})))}`);
 await writeFile(output,JSON.stringify({passed:true,runtime_pid:hello.runtime_pid,epoch,deliveries:deliveries.length,
   snapshots,start_state:startJob.data.state,start_result:startJob.data.result,start_error:startJob.data.error,
   stop_state:stopJob.data.state,bye,channel_order:true,cache_replay:true,whitelist:true,prototype},null,2));

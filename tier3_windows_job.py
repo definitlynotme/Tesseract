@@ -300,22 +300,40 @@ class WindowsJob:
         if not process:
             _raise_last_error(f"OpenProcess({target_pid})")
         try:
-            if not kernel32.AssignProcessToJobObject(
-                wintypes.HANDLE(self.handle),
-                process,
-            ):
-                _raise_last_error(f"AssignProcessToJobObject({target_pid})")
-            in_job = wintypes.BOOL(False)
-            if not kernel32.IsProcessInJob(
-                process,
-                wintypes.HANDLE(self.handle),
-                ctypes.byref(in_job),
-            ):
-                _raise_last_error(f"IsProcessInJob({target_pid})")
-            if not bool(in_job.value):
-                raise WindowsJobError(f"process {target_pid} was not assigned to validator Job")
+            self._assign_open_process(process, str(target_pid))
         finally:
             kernel32.CloseHandle(process)
+
+    def assign_process_handle(self, process_handle: int) -> None:
+        """Assign the process behind a handle the caller already holds.
+
+        Nothing is reopened by PID, so no other process can be reached: the
+        handle names the very process the caller created. The caller keeps
+        ownership of the handle.
+        """
+
+        if not IS_WINDOWS:
+            raise WindowsJobError("process handles are Windows only")
+        handle = int(process_handle)
+        if handle <= 0:
+            raise WindowsJobError(f"invalid process handle {handle}")
+        self._assign_open_process(handle, f"handle {handle:#x}")
+
+    def _assign_open_process(self, process: int, label: str) -> None:
+        if not kernel32.AssignProcessToJobObject(
+            wintypes.HANDLE(self.handle),
+            process,
+        ):
+            _raise_last_error(f"AssignProcessToJobObject({label})")
+        in_job = wintypes.BOOL(False)
+        if not kernel32.IsProcessInJob(
+            process,
+            wintypes.HANDLE(self.handle),
+            ctypes.byref(in_job),
+        ):
+            _raise_last_error(f"IsProcessInJob({label})")
+        if not bool(in_job.value):
+            raise WindowsJobError(f"process {label} was not assigned to validator Job")
 
     def snapshot(self) -> JobSnapshot:
         if not IS_WINDOWS:

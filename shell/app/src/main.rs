@@ -393,6 +393,11 @@ fn wait_main_label_gone(app:&tauri::AppHandle, limit:Duration) -> bool {
     }
     true
 }
+/// What every main-window recreation is given besides the supervisor and the mode: the setup's
+/// handles, cloned for each one.
+#[derive(Clone)]
+struct Recreation { app:tauri::AppHandle, spec:WindowSpec, probe:Arc<presence::Win32Probe>, lifecycle:Arc<Lifecycle>, feed:Arc<tray::Feed>,
+    session_end:Arc<endsession::Tracker> }
 /// The per-window hooks of the main window (presence probe, host owner window).
 fn attach_window(app:&tauri::AppHandle, probe:&presence::Win32Probe, hwnd:windows::Win32::Foundation::HWND) {
     probe.set(hwnd.0 as isize);
@@ -404,8 +409,8 @@ fn attach_window(app:&tauri::AppHandle, probe:&presence::Win32Probe, hwnd:window
 /// native box with 「退出」, then the normal quit (network restore first, T-P3-04).
 /// Fix round 1: `mode` Limited (A-S2) skips the rebuild and goes to the exhausted path at once;
 /// while the shell is leaving (A-S1) nothing happens at all (false = not started).
-fn recreate_main_window(app:tauri::AppHandle, supervisor:Arc<webview::Supervisor>, spec:WindowSpec, probe:Arc<presence::Win32Probe>,
-    lifecycle:Arc<Lifecycle>, feed:Arc<tray::Feed>, session_end:Arc<endsession::Tracker>, mode:webview::Recreate) -> bool {
+fn recreate_main_window(parts:Recreation, supervisor:Arc<webview::Supervisor>, mode:webview::Recreate) -> bool {
+    let Recreation{app,spec,probe,lifecycle,feed,session_end}=parts;
     let leaving=|| webview::skip_recreate(lifecycle.accepting(),lifecycle.machine().reason()==Some(QuitReason::Update),session_end.active());
     if leaving() { log_code(&spec.data,"webview_recreate_skipped_quitting"); return false; }
     std::thread::spawn(move || {
@@ -781,18 +786,22 @@ fn reap(handle:Option<isize>, ms:u32) -> (bool,Option<u32>) {
         (stopped,code)
     }
 }
+/// The worker's relaunch state: the §2.2.6 policy and, after a crash, (exit code, restarts) so the
+/// next hello turns the banner into "restarted".
+#[derive(Default)]
+struct Restarts { policy:crash::RestartPolicy, recovering:Option<(Option<u32>,usize)> }
 /// §2.2.6 unexpected exit: banner, then a stopped-state relaunch (≤3 per 5 min). True = relaunch.
 /// 10-30: while the window is not in front the shell also shows its own `service_stopped` card.
-fn crash_restart(code:Option<u32>, lifecycle:&Arc<Lifecycle>, policy:&mut crash::RestartPolicy, recovering:&mut Option<(Option<u32>,usize)>,
+fn crash_restart(code:Option<u32>, lifecycle:&Arc<Lifecycle>, restarts:&mut Restarts,
     hub:&Mutex<Hub>, desk:&notify::Desk, data:&std::path::Path, timing:Timing) -> bool {
     lifecycle.set_sidecar(Sidecar::Down);
     let exit=code.map_or("none".into(),|c|c.to_string());
     desk.service_stopped(Instant::now());
-    match policy.on_crash(Instant::now()) {
+    match restarts.policy.on_crash(Instant::now()) {
         crash::Restart::Allowed{attempt}=>{
             shell_log::fields(data,"sidecar_crashed",&[("exit_code",&exit),("restart",&attempt.to_string())]);
             hub.lock().unwrap().banner(crash::banner::crashed("restarting",code,attempt));
-            *recovering=Some((code,attempt));
+            restarts.recovering=Some((code,attempt));
             // A quit during the pause finds no sidecar and exits 0; then nothing is relaunched.
             let until=Instant::now()+timing.restart_delay;
             while Instant::now()<until && !lifecycle.finished() { lifecycle.tick(); std::thread::sleep(Duration::from_millis(20)); }
@@ -828,9 +837,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
     std::thread::spawn(move || {
         let Shared{lifecycle,session_end,child,force_restart,unresponsive,done,desk,host:host_cmds,update,autostart,notice:_}=worker;
         let mut ready_tx=Some(ready_tx);
-        let mut rebuilds=0; let mut policy=crash::RestartPolicy::default();
-        // After a crash: (exit code, restarts) so the next hello turns the banner into "restarted".
-        let mut recovering:Option<(Option<u32>,usize)>=None;
+        let mut rebuilds=0; let mut restarts=Restarts::default();
         loop {
         if !lifecycle.start_launch() { break; }
         let mut ready=false; let mut child_exit=None; let mut bye=false;
@@ -892,7 +899,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
             ready=true; lifecycle.set_sidecar(Sidecar::Live);
             shell_log::fields(&data,"sidecar_ready",&[("pid",&host.child_pid().to_string())]);
             if let Some(tx)=ready_tx.take() { let _=tx.send(Ok(())); }
-            if let Some((code,restarts))=recovering.take() { h.lock().unwrap().banner(crash::banner::crashed("restarted",code,restarts)); }
+            if let Some((code,attempts))=restarts.recovering.take() { h.lock().unwrap().banner(crash::banner::crashed("restarted",code,attempts)); }
             let mut quit=false; let mut ping=Instant::now(); let mut n=0;
             let mut watchdog=crash::Watchdog::new(Instant::now(),endsession::resume_count(),timing.pong_timeout);
             let mut shell_ids:Vec<u64>=Vec::new(); let mut drain_until=None;
@@ -958,7 +965,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
                 while report_ids.len()>REPORT_CAPACITY {
                     let Some((&oldest,&code))=report_ids.iter().next() else { break };
                     report_ids.remove(&oldest); unanswered+=1;
-                    if unanswered==1 || unanswered%64==0 { shell_log::fields(&data,"shell_report_unanswered",&[("kind",code),("total",&unanswered.to_string())]); }
+                    if unanswered==1 || unanswered.is_multiple_of(64) { shell_log::fields(&data,"shell_report_unanswered",&[("kind",code),("total",&unanswered.to_string())]); }
                 }
                 // T-P2-31b: list-slot replacement snapshots and next pages the hub asked for (the
                 // shell is the v1 subscriber, PROTOCOL §11); one the lane cannot take is retried.
@@ -1129,7 +1136,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
                         crash::ExitKind::Normal|crash::ExitKind::CleanupFailed=>{ lifecycle.follow_sidecar_exit(code); break; },
                         crash::ExitKind::Crash=>{},
                     }
-                    if !crash_restart(Some(code),&lifecycle,&mut policy,&mut recovering,&h,&desk,&data,timing) { break; }
+                    if !crash_restart(Some(code),&lifecycle,&mut restarts,&h,&desk,&data,timing) { break; }
                 }
             },
             (result,_)=>{
@@ -1146,7 +1153,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
                     }
                     if lifecycle.finished() { break; }
                     log_code(&data,"sidecar_restart_failed");
-                    if !crash_restart(None,&lifecycle,&mut policy,&mut recovering,&h,&desk,&data,timing) { break; }
+                    if !crash_restart(None,&lifecycle,&mut restarts,&h,&desk,&data,timing) { break; }
                 } else {
                     log_code(&data,"bridge_worker_failed"); h.lock().unwrap().gone(); feed.gone();
                     let (stopped,exit)=reap(handle,20000);
@@ -1170,7 +1177,7 @@ fn start_worker(options:&Options, feed:Arc<tray::Feed>, hub:Arc<Mutex<Hub>>, sha
                     }
                     // A live sidecar still holds its runtime lease: a relaunch would only wait on it.
                     if !stopped { h.lock().unwrap().banner(crash::banner::crashed("unrecoverable",None,0)); break; }
-                    if !crash_restart(exit,&lifecycle,&mut policy,&mut recovering,&h,&desk,&data,timing) { break; }
+                    if !crash_restart(exit,&lifecycle,&mut restarts,&h,&desk,&data,timing) { break; }
                 }
             },
         }
@@ -1355,10 +1362,11 @@ fn run() -> Result<i32,Box<dyn std::error::Error>> {
         presence::spawn_visibility(bridge.shared.desk.clone(),bridge.hub.clone(),options.data.clone());
         // T-P3-07 §2.2.6: a lost browser process rebuilds the window with the same hooks.
         {
-            let (app,weak,probe,lifecycle,feed)=(application.handle().clone(),Arc::downgrade(&setup_supervisor),probe.clone(),recreate_lifecycle.clone(),feed.clone());
-            let session_end=application.state::<Bridge>().shared.session_end.clone();
+            let weak=Arc::downgrade(&setup_supervisor);
+            let parts=Recreation{app:application.handle().clone(),spec,probe:probe.clone(),lifecycle:recreate_lifecycle.clone(),feed:feed.clone(),
+                session_end:application.state::<Bridge>().shared.session_end.clone()};
             setup_supervisor.set_recreate(Arc::new(move |mode| {
-                weak.upgrade().is_some_and(|supervisor| recreate_main_window(app.clone(),supervisor,spec.clone(),probe.clone(),lifecycle.clone(),feed.clone(),session_end.clone(),mode))
+                weak.upgrade().is_some_and(|supervisor| recreate_main_window(parts.clone(),supervisor,mode))
             }));
         }
         if let Some(port)=options.verify_port {
@@ -1472,9 +1480,9 @@ fn run() -> Result<i32,Box<dyn std::error::Error>> {
                 log_code(&data,"sidecar_prehello_dialog_closed");
             }
             log_code(&data,&format!("shell_exit_{code}"));
-            return Ok(code);
+            Ok(code)
         },
-        Err(e)=>{lifecycle.request(QuitReason::HostGone);let _=done.recv_timeout(Duration::from_secs(20));return Err(e.into());},
+        Err(e)=>{lifecycle.request(QuitReason::HostGone);let _=done.recv_timeout(Duration::from_secs(20));Err(e.into())},
     }
 }
 /// T-P3-06 `--autostart` (D8): stay in the tray only when `ui.start_in_tray_on_autostart` is true
@@ -1861,7 +1869,7 @@ fn main() {
         let shown=json!({"visible":true,"focused":false,"page":"none"});
         let presences=|launch:u32| rig.received(launch).into_iter().filter(|f|f["cmd"]=="ui.presence").map(|f|f["args"].clone()).collect::<Vec<_>>();
         wait("relaunched",15,|| rig.hub.lock().unwrap().epoch=="notify-2" && rig.hub.lock().unwrap().ready);
-        assert_eq!(presences(1),[shown.clone()],"the first sidecar heard the value once");
+        assert_eq!(presences(1),std::slice::from_ref(&shown),"the first sidecar heard the value once");
         // Nothing changed in the window, yet the new session gets the full value again.
         wait("presence after the restart",5,|| presences(2)==[shown.clone()]);
         rig.shared.lifecycle.request(QuitReason::Tray); rig.done();
@@ -2382,9 +2390,11 @@ fn main() {
             assert_eq!(DISTRIBUTION,cfg!(feature="distribution"));
             let r=root("flavour");
             let env=fake(&[("APPDATA",&r.0.join("Roaming")),("LOCALAPPDATA",&r.0.join("Local"))]);
-            match resolve_scope(&env,DISTRIBUTION) {
-                Ok(scope)=>{ assert!(DISTRIBUTION); assert_eq!(scope.kind,"default"); },
-                Err(error)=>{ assert!(!DISTRIBUTION); assert_eq!(error.to_string(),"explicit_custom_scope_required"); },
+            let scope=resolve_scope(&env,DISTRIBUTION);
+            assert_eq!(scope.is_ok(),DISTRIBUTION,"only the distribution build falls back to the default scope");
+            match scope {
+                Ok(scope)=>assert_eq!(scope.kind,"default"),
+                Err(error)=>assert_eq!(error.to_string(),"explicit_custom_scope_required"),
             }
             assert_eq!(APP_VERSION.trim(),fs::read_to_string(super::repo().join("app_version.txt")).unwrap().trim());
         }

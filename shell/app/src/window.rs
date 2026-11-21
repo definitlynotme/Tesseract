@@ -209,12 +209,12 @@ pub fn create(app: &tauri::AppHandle, scope: &str, data: &Path, dev_page: bool, 
                 if !show { apply_visibility(false); }
                 let core = controller.CoreWebView2()?;
                 let settings = core.Settings()?;
-                settings.SetAreDevToolsEnabled(p.devtools.into())?;
+                settings.SetAreDevToolsEnabled(p.devtools)?;
                 let s3: ICoreWebView2Settings3 = settings.cast()?;
                 s3.SetAreBrowserAcceleratorKeysEnabled(p.browser_keys)?;
-                settings.SetAreDefaultContextMenusEnabled(p.context_menu.into())?;
-                settings.SetIsStatusBarEnabled(p.status_bar.into())?;
-                settings.SetIsZoomControlEnabled(p.zoom.into())?;
+                settings.SetAreDefaultContextMenusEnabled(p.context_menu)?;
+                settings.SetIsStatusBarEnabled(p.status_bar)?;
+                settings.SetIsZoomControlEnabled(p.zoom)?;
                 let s4: ICoreWebView2Settings4 = settings.cast()?;
                 s4.SetIsPasswordAutosaveEnabled(p.autofill)?;
                 s4.SetIsGeneralAutofillEnabled(p.autofill)?;

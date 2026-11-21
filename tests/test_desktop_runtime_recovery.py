@@ -10132,6 +10132,50 @@ proxies:
             self.assertLess(order.index("system_proxy"), order.index("core"))
             self.assertLess(order.index("core"), order.index("manager_close"))
 
+    def test_stop_cancels_an_in_flight_gateway_chain_probe_first(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
+            backend = MemoryProxyBackend(
+                ProxySettings(enabled=False, server="", override="")
+            )
+            runtime = self._runtime(temp_path, backend)
+            order: list[str] = []
+
+            class GatewayProbeService:
+                def cancel_all(self) -> int:
+                    order.append("gateway_probe_cancel")
+                    return 1
+
+            class StoppingManager:
+                tier3_close_stage_observer = None
+
+                def request_stop(self) -> bool:
+                    order.append("manager_request_stop")
+                    return True
+
+                def mark_tier3_core_stopped(self, _reason: str) -> None:
+                    pass
+
+                def close(self, *, timeout_seconds: float) -> str:
+                    return "STOPPED"
+
+            runtime.gateway_chain_probe_service = GatewayProbeService()
+            runtime.manager = StoppingManager()
+            runtime.core_runner = FakeLifecycleCoreRunner()
+            runtime.core_runner.start()
+            runtime.running = True
+            runtime._runtime_generation = 10
+            runtime._detach_manager_runtime_hooks = lambda _manager: None
+            runtime.restore_system_proxy = lambda: None
+
+            runtime.stop(
+                actor="user",
+                reason="gateway chain probe cancellation",
+                expected_generation=10,
+            )
+
+            self.assertEqual(order[:2], ["gateway_probe_cancel", "manager_request_stop"])
+
     def test_runtime_does_not_report_stopped_while_core_process_is_still_active(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)

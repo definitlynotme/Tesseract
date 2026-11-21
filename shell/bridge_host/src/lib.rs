@@ -361,7 +361,7 @@ impl PendingIo {
         }
         let mut n = 0;
         unsafe {
-            if GetOverlappedResult(pipe, &mut *self.overlapped, &mut n, 0) != 0 {
+            if GetOverlappedResult(pipe, &*self.overlapped, &mut n, 0) != 0 {
                 self.active = false;
                 return Ok(Some(n as usize));
             }
@@ -381,7 +381,7 @@ impl PendingIo {
                 // ERROR_NOT_FOUND may mean completion raced with cancellation.
                 // Reap either outcome before freeing the OVERLAPPED or buffer.
                 let mut n = 0;
-                GetOverlappedResult(pipe, &mut *self.overlapped, &mut n, 1);
+                GetOverlappedResult(pipe, &*self.overlapped, &mut n, 1);
             }
             self.active = false;
         }

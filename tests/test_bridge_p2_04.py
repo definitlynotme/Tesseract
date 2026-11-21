@@ -529,6 +529,29 @@ def test_node_time_is_numeric_fact_and_never_free_text(runtime):
     assert "LoadedPasswordOnly" not in json.dumps(wire(result))
 
 
+@pytest.mark.parametrize(("status", "raw", "expected"), [
+    (NodeStatus.SUSPICIOUS, "gateway_no_upstream", "gateway_no_upstream"),
+    (NodeStatus.DEAD, "gateway_unreachable", "gateway_unreachable"),
+    (NodeStatus.DEAD, "latency_limit_exceeded", "latency_limit_exceeded"),
+    (NodeStatus.DEAD, "OSError: [WinError 10060] LoadedPasswordOnly timed out", "connection_timeout"),
+    (NodeStatus.DEAD, "socket.gaierror: getaddrinfo failed for LoadedPasswordOnly", "dns_resolution_failed"),
+    (NodeStatus.DEAD, "Traceback LoadedPasswordOnly", "node_unavailable"),
+    (NodeStatus.ALIVE, "latency_limit_exceeded", None),
+])
+def test_node_failure_reason_is_a_display_category_never_free_text(runtime, status, raw, expected):
+    from bridge_nodes import _runtime_failure_display_category
+
+    node = runtime.manager.runtime_nodes["exit"][0]
+    node.status, node.suspicious_reason = status, raw
+    result = RuntimeAccess(runtime).node_records()
+    row = next(item for item in result["items"] if item["tier"] == "gateway")
+    assert row["reason_code"] == expected
+    assert "LoadedPasswordOnly" not in json.dumps(wire(result))
+    # bridge_nodes re-applies the same categories: a category maps to itself.
+    if expected is not None:
+        assert _runtime_failure_display_category(expected)[0] == expected
+
+
 @pytest.mark.parametrize("enabled", [True, False])
 def test_autostart_uses_registry_enablement_instead_of_config(runtime, enabled):
     runtime.config["autostart"] = {"enabled": not enabled, "command": "private-config-path"}

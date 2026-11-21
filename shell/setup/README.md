@@ -22,19 +22,23 @@ Inno's, unchanged.
   given, else the existing install; a `/DIR=expand:…` (Inno's constants, only Inno can expand
   them) also means the existing install. Inno's own Restart Manager pass cannot close it: the
   windowless sidecar is `RmUnknownApp`, so Inno aborts and rolls back (exit 5). Restart Manager
-  is given `<dir>\Tesseract.exe` alone and asks the shell politely (WM_QUERYENDSESSION /
+  is given this session's shell alone, by its pid and start time (`RM_UNIQUE_PROCESS`; 0.1.4
+  registered the file `<dir>\Tesseract.exe`, which made `RmShutdown` act on everything that had it
+  open), and asks it politely (WM_QUERYENDSESSION /
   WM_ENDSESSION with ENDSESSION_CLOSEAPP: the sidecar restores the proxy and firewall and exits).
   The window then waits until no `.exe`/`.dll` under `<dir>` is in use. Never forced, and never cut short: the sidecar leaves a moment after the
   shell, and Inno must not start before it has. When Restart Manager cannot ask the shell at all
-  (it runs elevated and this window does not, it is already leaving and has no window, or
-  another session's copy is in the list), the wait is 5 s (`rm::UNASKED_WAIT`), except for a
+  (it runs elevated and this window does not, it is already leaving and has no window, or no
+  shell of this session uses the folder, only another session's copy or what a gone shell left),
+  the wait is 5 s (`rm::UNASKED_WAIT`), except for a
   shell that is already quitting (the default scope's `Local\TesseractShellQuitting` is set) and
   the in-app updater's run, which wait the full 30 s. If something still uses the folder, the
   window's own install installs nothing and fails with `running` (the shell itself is still here:
   quit it from the tray) or `busy` (it went, but another program keeps one of the folder's modules
-  loaded: the page names the program). Restart Manager counts loaded modules and running images,
-  not plain open handles, which Inno overwrites in place, and reports no session for the
-  windowless sidecar (asked with ProcessIdToSessionId then).
+  loaded: the page names the program). The wait counts what Restart Manager lists for those
+  files: loaded modules, running images and plain open handles (a scanner, Explorer showing the
+  folder), and it reports no session for the windowless sidecar (asked with ProcessIdToSessionId
+  then).
 - **How the shell takes that close** (`shell/app/src/endsession.rs`, 11-20): from 0.1.4 the shell
   quits as it does from the tray, minus the unsaved-changes question: `app.quit`, the sidecar's
   full exit recovery, the 20 s stall prompt, the bounded wait for the WebView2 browser to exit
@@ -51,7 +55,13 @@ Inno's, unchanged.
   is not started. The in-app updater's run (`/RESTARTAPPLICATIONS`) quit the app itself and
   started this window with the app's token (and in the app's job, if any), so after it the
   hand-over opens it with that token whenever it is not running (the `[Run]` relaunch after a
-  good install is). Running means a process of this session whose image is
+  good install is). That holds only when this window found no running copy to close (0.1.5,
+  `after_hand_over`): `/RESTARTAPPLICATIONS` is also Inno's documented switch, and a deployment
+  from an elevated console or another account that closes the user's copy opens it again as it
+  ran, like any other copy this window closed. When this window's token is not that copy's own,
+  Inno runs without `/RESTARTAPPLICATIONS`, so the `[Run]` entry cannot start it with this
+  window's token (its runasoriginaluser does nothing for a window that is already elevated).
+  Running means a process of this session whose image is
   `<dir>\Tesseract.exe`: Restart Manager also lists other users' copies. Never in a service's
   session (0). What the window closed starts (`routes` in `main.rs`) with this window's token only
   when that is the copy's own (same account, same elevation), and then never inside a launcher's
@@ -61,7 +71,9 @@ Inno's, unchanged.
   10 s) as the signed-in user, which fits a copy that ran unelevated (and any copy where UAC is
   off). A copy that ran elevated, closed by SYSTEM or another account, stays closed: never
   started as the wrong account or unelevated. 打开 on the done page also starts through Explorer
-  from an elevated window.
+  from an elevated window, on a thread of its own; when Explorer cannot be asked or does not
+  answer within 10 s, nothing is started (never an elevated copy from here) and the page says to
+  open Tesseract from the Start menu (0.1.5).
 - **Logs**: the window's own install and the in-app updater's run (unless it passes `/LOG`) log to
   `%TEMP%\Tesseract-Setup-<unix seconds>.log` and `%TEMP%\Tesseract-Update-<unix seconds>.log`,
   when %TEMP% is on a local fixed disk: the elevated Inno does not see this logon's network,

@@ -551,12 +551,21 @@ if ($Scenarios -contains "webview") {
         # The page builds its DOM from real state while cloaked (here: the dev page's replay).
         $First = Subscribe-Replay $Cdp
         $Checks.epoch = $First.epoch; $Checks.runtime_pid = $First.runtime_pid
-        # T-P4-C3: the replay opens with rt:reset, host:caps, hello; rt:replayed ends it (or the
-        # new epoch's seed, when the page connected before the seed was complete).
-        $ReplayProbe = "(()=>{const t=window.devFrames.map(f=>f.t);const c=window.devFrames.find(f=>f.t==='host:caps')||{invokes:[],events:[]};return {order:t.slice(0,3),replayed:t.indexOf('rt:replayed'),hello:t.indexOf('hello'),resync:c.invokes.includes('rt_resync'),marker:c.events.includes('rt:replayed')}})()"
-        Wait-Until { (Cdp-Eval $Cdp "window.devFrames.some(f=>f.t==='rt:replayed')") -eq $true } "rt:replayed" 30
-        $Checks.c3_replay = Cdp-Eval $Cdp $ReplayProbe
-        if ((@($Checks.c3_replay.order) -join ",") -ne "rt:reset,host:caps,hello" -or $Checks.c3_replay.replayed -le $Checks.c3_replay.hello -or -not $Checks.c3_replay.resync -or -not $Checks.c3_replay.marker) { throw "replay frames: $($Checks.c3_replay | ConvertTo-Json -Compress)" }
+        # T-P4-C3: every replay opens with rt:reset, host:caps (which lists rt_resync and the
+        # rt:replayed event) and ends with rt:replayed. A page that subscribes after the sidecar's
+        # hello gets rt:reset, host:caps, hello, the snapshots, rt:replayed (sent by the new epoch's
+        # seed instead when the page connected before the seed was complete). Since the 11-05
+        # window-first launch the page may subscribe first (a close race): rt:reset,
+        # host:caps{epoch:""}, only the shell's own host:* state (shell_state, usually none),
+        # rt:replayed; hello then follows live and the seed ends with a later rt:replayed (PROTOCOL
+        # host:caps). Either way an rt:replayed must follow hello; the seed can still be arriving,
+        # so wait for it.
+        $ReplayProbe = "(()=>{const t=window.devFrames.map(f=>f.t);const c=window.devFrames.find(f=>f.t==='host:caps')||{invokes:[],events:[]};const r=t.indexOf('rt:replayed'),h=t.indexOf('hello');return {order:t.slice(0,3),replayed:r,replayed_last:t.lastIndexOf('rt:replayed'),hello:h,caps_epoch:c.epoch,hello_epoch:(window.devFrames[h]||{}).epoch,shell_state:r>=2&&r<h?t.slice(2,r):null,resync:c.invokes.includes('rt_resync'),marker:c.events.includes('rt:replayed')}})()"
+        Wait-Until { (Cdp-Eval $Cdp "(()=>{const t=window.devFrames.map(f=>f.t),h=t.indexOf('hello');return h>=0&&t.lastIndexOf('rt:replayed')>h})()") -eq $true } "rt:replayed after hello" 30
+        $Replay = Cdp-Eval $Cdp $ReplayProbe; $Checks.c3_replay = $Replay
+        $AfterHello = (@($Replay.order) -join ",") -eq "rt:reset,host:caps,hello" -and $Replay.caps_epoch -eq $Replay.hello_epoch
+        $BeforeHello = (@($Replay.order)[0..1] -join ",") -eq "rt:reset,host:caps" -and $Replay.caps_epoch -eq "" -and $null -ne $Replay.shell_state -and @($Replay.shell_state | Where-Object { $_ -notlike "host:*" }).Count -eq 0
+        if (-not ($AfterHello -or $BeforeHello) -or $Replay.replayed_last -le $Replay.hello -or -not $Replay.resync -or -not $Replay.marker) { throw "replay frames: $($Replay | ConvertTo-Json -Compress)" }
         Wait-Until { (Log-Count $Log ' rt_seed_done ') -ge 1 } "seed end" 30
         $Checks.c3_seed_line = ((Get-Content -LiteralPath $Log) | Where-Object { $_ -match ' rt_seed_done ' } | Select-Object -First 1) -replace '^\d+ ',''
         $Checks.cloaked_before_ready = [P3Web]::Cloaked($Hwnd)
@@ -729,7 +738,11 @@ foreach ($LostMode in @(@("lost","lostbuilt") | Where-Object { $Scenarios -conta
         $Watcher = Start-WatchedShell $Box @()
         $ShellPid = [int]((Get-Content -LiteralPath (Join-Path $Box.box "root.json") -Raw | ConvertFrom-Json).pid)
         $ShellProcess = Get-Process -Id $ShellPid; $null = $ShellProcess.Handle
-        Wait-Until { (Log-Count $Log ' shell_window_ready$') -ge 1 -and (Log-Count $Log ' window_reveal_timeout ') -ge 1 } "shell window" 60
+        # The built app page sends host_ready, so the window is revealed by it (window_revealed
+        # reason=ready); the 1.5 s timeout reveal is only the fallback (the dev page in "main"). The
+        # window comes first (11-05 window-first launch): the sidecar's hello follows, so wait for it too.
+        Wait-Until { (Log-Count $Log ' shell_window_ready$') -ge 1 -and ((Log-Count $Log ' window_revealed ') + (Log-Count $Log ' window_reveal_timeout ')) -ge 1 } "shell window" 60
+        Wait-Until { (Log-Count $Log ' sidecar_ready pid=\d+$') -ge 1 } "sidecar hello" 60
         $RuntimePid = [int]([regex]::Match(((Get-Content -LiteralPath $Log) | Where-Object { $_ -match ' sidecar_ready pid=\d+$' } | Select-Object -First 1), 'pid=(\d+)').Groups[1].Value)
         if (-not $RuntimePid -or -not (Get-Process -Id $RuntimePid -ErrorAction SilentlyContinue)) { throw "sidecar not running" }
         $Checks.runtime_pid = $RuntimePid

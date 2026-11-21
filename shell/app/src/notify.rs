@@ -446,7 +446,8 @@ impl Notifier {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Handled { Duplicate, InApp, InAppFull, Card, Held, Closed }
 /// Submits one balloon and calls `done` with the result, possibly later and on another thread.
-type BalloonPort = Box<dyn Fn(&Notice, BalloonDone) + Send + Sync>;
+type BalloonFn = dyn Fn(&Notice, BalloonDone) + Send + Sync;
+type BalloonPort = Box<BalloonFn>;
 /// The page-side state `notify_route` records: online and declared (`host_notify_ready`), only
 /// online, or no page Channel.
 #[derive(Clone, Copy)]
@@ -477,7 +478,7 @@ pub struct Desk {
     /// A clicked balloon's or card's target, sent once the restored window is visible (presence.rs).
     pub navigate: presence::Navigate,
     pub probe: Box<dyn presence::Probe>,
-    balloon: Arc<dyn Fn(&Notice, BalloonDone) + Send + Sync>,
+    balloon: Arc<BalloonFn>,
     cards: Arc<dyn Cards>,
     busy: BusyPort,
     sound: SoundPort,
@@ -753,8 +754,10 @@ pub fn language_frame(language: &str) -> Option<Value> {
         fn close(&self, incident: &str) { self.closed.lock().unwrap().push(incident.to_owned()); }
         fn reset(&self) { *self.resets.lock().unwrap() += 1; }
     }
-    pub fn desk(window: Option<Window>, tray: Option<Balloon>) -> (Desk, Arc<FakeProbe>, Arc<Mutex<Option<Balloon>>>, Arc<Mutex<Vec<String>>>) { desk_at(window, tray, None) }
-    pub fn desk_at(window: Option<Window>, tray: Option<Balloon>, data: Option<PathBuf>) -> (Desk, Arc<FakeProbe>, Arc<Mutex<Option<Balloon>>>, Arc<Mutex<Vec<String>>>) {
+    /// A desk with its fakes: the window probe, the tray's next answer and the balloons it was given.
+    pub type DeskParts = (Desk, Arc<FakeProbe>, Arc<Mutex<Option<Balloon>>>, Arc<Mutex<Vec<String>>>);
+    pub fn desk(window: Option<Window>, tray: Option<Balloon>) -> DeskParts { desk_at(window, tray, None) }
+    pub fn desk_at(window: Option<Window>, tray: Option<Balloon>, data: Option<PathBuf>) -> DeskParts {
         let probe = Arc::new(FakeProbe(Mutex::new(window)));
         let tray = Arc::new(Mutex::new(tray)); let balloons = Arc::new(Mutex::new(Vec::new()));
         let (t, b) = (tray.clone(), balloons.clone());
@@ -763,7 +766,7 @@ pub fn language_frame(language: &str) -> Option<Value> {
         (desk, probe, tray, balloons)
     }
     fn rig(window: Option<Window>, tray: Option<Balloon>, page: bool) -> Rig { rig_from(desk(window, tray), page, |d| d) }
-    fn rig_from(parts: (Desk, Arc<FakeProbe>, Arc<Mutex<Option<Balloon>>>, Arc<Mutex<Vec<String>>>), page: bool, wrap: impl FnOnce(Desk) -> Desk) -> Rig {
+    fn rig_from(parts: DeskParts, page: bool, wrap: impl FnOnce(Desk) -> Desk) -> Rig {
         let (desk, window, tray, balloons) = parts;
         let mut hub = Hub::default(); hub.reset(json!({"epoch":"one"}));
         let rig = Rig { desk: wrap(desk), hub: Mutex::new(hub), balloons, frames: Arc::new(Mutex::new(Vec::new())), window, tray };

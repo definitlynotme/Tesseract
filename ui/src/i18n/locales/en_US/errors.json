@@ -270,6 +270,7 @@
   "errors.superseded": "This action was replaced by a later one; the latest result applies.",
   "errors.timeout": "The action timed out before it could finish. Check your network, then try again.",
   "errors.unknown": "An unrecognized error occurred. Try again; if it keeps happening, export a diagnostic bundle and report it.",
+  "errors.update.launch_failed": "The installer could not be started. Check for updates to try again, or install it by hand from the release page.",
   "errors.update.operation_failed": "The update failed. Check your network, then check for updates again.",
   "errors.validation": "Some of what you entered isn't valid. Fix it as indicated, then try again.",
   "errors.validation.field": "This value isn't valid. Fix it as indicated, then save again.",

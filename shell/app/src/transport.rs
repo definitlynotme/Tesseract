@@ -498,7 +498,7 @@ impl Hub {
             // T-P4-C3: the cache never steps back to an older rev (defensive: the sidecar gives a
             // replacement snapshot a fresh wire rev from the stream's own counter, so a later
             // stream frame is always newer). The tray takes only what the cache took.
-            if self.snapshots.get(topic).and_then(|f| f["rev"].as_u64()).map_or(true, |cached| rev >= cached) {
+            if self.snapshots.get(topic).and_then(|f| f["rev"].as_u64()).is_none_or(|cached| rev >= cached) {
                 self.snapshots.insert(topic.into(), frame.clone());
                 if FACT_TOPICS.contains(&topic) { self.facts.push(frame.clone()); }
                 self.stale.remove(topic);

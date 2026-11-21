@@ -566,6 +566,8 @@
   "连接质量": "Verbindungsqualität",
   "最大可用延迟": "Maximal nutzbare Latenz",
   "延迟超过上限": "Latenz überschreitet den Grenzwert",
+  "直连不通，暂无上游可测": "Nicht direkt erreichbar, kein Upstream zum Testen",
+  "直连和经回退层都不通": "Weder direkt noch über Fallback erreichbar",
   "域名解析失败": "DNS-Auflösung fehlgeschlagen",
   "节点不可用": "Knoten nicht verfügbar",
   "连接超时": "Zeitüberschreitung bei der Verbindung",

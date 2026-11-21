@@ -392,8 +392,12 @@ class GeoDownloadPolicyTests(unittest.TestCase):
             script = _Script([slow, _Stream(size, 4096 * KIB)])
             started = time.monotonic()
 
+            # The rate rule is under test. With the short stagger (0.15 s), a loaded
+            # runner can delay the slow lead's first bytes past it, and the rule for a
+            # lead that has not answered opens the rival before the 0.3 s window.
+            policy = _fast_policy(stagger=3.0)
             with patch("urllib.request.OpenerDirector.open", script.open):
-                status = updater.update_now(force=True, policy=_fast_policy(), assets=["geoip"])
+                status = updater.update_now(force=True, policy=policy, assets=["geoip"])
 
             self.assertEqual(status["errors"], {})
             self.assertEqual((tmp / "mihomo" / "geoip.dat").read_bytes(), b"\x01" * size)

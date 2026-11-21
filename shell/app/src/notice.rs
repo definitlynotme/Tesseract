@@ -418,7 +418,7 @@ fn build(env: &Env) -> Result<isize, &'static str> {
         .data_directory(env.profile.clone()).additional_browser_args(&env.browser_args)
         .devtools(env.devtools).zoom_hotkeys_enabled(false)
         .initialization_script(crate::window::init_script(env.reduced))
-        .on_navigation(|url| crate::window::internal(url))
+        .on_navigation(crate::window::internal)
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .build().map_err(|_| "build_failed")?;
     let hwnd = match window.hwnd() { Ok(hwnd) => HWND(hwnd.0), Err(_) => { let _ = window.destroy(); return Err("hwnd_failed"); } };
@@ -428,10 +428,10 @@ fn build(env: &Env) -> Result<isize, &'static str> {
         CONTROLLER.with(|c| *c.borrow_mut() = Some(controller.clone()));
         let Ok(core) = controller.CoreWebView2() else { return };
         let Ok(settings) = core.Settings() else { return };
-        let _ = settings.SetAreDevToolsEnabled(devtools.into());
-        let _ = settings.SetAreDefaultContextMenusEnabled(false.into());
-        let _ = settings.SetIsStatusBarEnabled(false.into());
-        let _ = settings.SetIsZoomControlEnabled(false.into());
+        let _ = settings.SetAreDevToolsEnabled(devtools);
+        let _ = settings.SetAreDefaultContextMenusEnabled(false);
+        let _ = settings.SetIsStatusBarEnabled(false);
+        let _ = settings.SetIsZoomControlEnabled(false);
         if let Ok(s3) = settings.cast::<ICoreWebView2Settings3>() { let _ = s3.SetAreBrowserAcceleratorKeysEnabled(false); }
         if let Ok(s4) = settings.cast::<ICoreWebView2Settings4>() { let _ = s4.SetIsPasswordAutosaveEnabled(false); let _ = s4.SetIsGeneralAutofillEnabled(false); }
         if let Ok(s5) = settings.cast::<ICoreWebView2Settings5>() { let _ = s5.SetIsPinchZoomEnabled(false); }

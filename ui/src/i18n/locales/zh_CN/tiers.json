@@ -1115,6 +1115,22 @@
     "m": "检查地址拼写，或稍后重试。",
     "_desc": "原因 dns_resolution_failed 的建议"
   },
+  "tiers.reason.gateway_no_upstream": {
+    "m": "直连不通，暂无上游可测",
+    "_desc": "原因词：Gateway 节点直连检测没有通过，回退层又没有可用节点，没法经回退层再测（还不能断定节点坏了）；Gateway 为层级代号（不译）"
+  },
+  "tiers.reason.gateway_no_upstream.fix": {
+    "m": "回退层有了可用节点后，会自动经回退层再测一次。",
+    "_desc": "原因 gateway_no_upstream 的说明：回退层出现可用节点时会立即自动重测，用户不用操作"
+  },
+  "tiers.reason.gateway_unreachable": {
+    "m": "直连和经回退层都不通",
+    "_desc": "原因词：Gateway 节点直连检测没有通过，经回退层再测也没有通过"
+  },
+  "tiers.reason.gateway_unreachable.fix": {
+    "m": "检查节点的地址、端口和账号密码，或联系节点服务商。",
+    "_desc": "原因 gateway_unreachable 的建议"
+  },
   "tiers.reason.invalid_request": {
     "m": "请求无效",
     "_desc": "原因词：检测请求不完整"

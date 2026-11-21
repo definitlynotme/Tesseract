@@ -712,16 +712,23 @@ class MihomoCoreRunner:
         every later start fails its listener preflight until the machine is
         rebooted (observed 2026-09-20 04:31-04:35, 16 consecutive failures).
         The Job sets KILL_ON_JOB_CLOSE, so losing our handle kills the Core.
+
+        Only a process this runner really created is bound, through the handle
+        its Popen already holds. A PID is never reopened: whatever real process
+        holds a stand-in's PID (a test's fake) would join the Job and be killed
+        when it closes.
         """
 
-        pid = getattr(process, "pid", None)
-        if os.name != "nt" or not pid:
+        if os.name != "nt" or not isinstance(process, subprocess.Popen):
             return
+        process_handle = getattr(process, "_handle", None)
         try:
+            if not process_handle:
+                raise OSError("Popen holds no process handle")
             from tier3_windows_job import WindowsJob
 
             job = WindowsJob()
-            job.assign_pid(int(pid))
+            job.assign_process_handle(int(process_handle))
         except Exception:
             # A Core that cannot be tied to a Job still has to run; the only
             # loss is that a force-kill can orphan it, exactly as before.

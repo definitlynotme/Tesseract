@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {停止} starting {起動中} running {実行中} stopping {停止中} failed {起動失敗} unknown {接続中} other {接続中}}",
   "shell.foot.update.aria": "{status}。設定 · アプリに移動",
-  "shell.foot.update.label": "{state, select, found {新バージョン {version}} found_nover {新バージョンあり} checking {更新を確認中} fail {更新の確認に失敗} dl {更新をダウンロード中} verify {更新の準備完了} ready {更新をインストール中} updated {更新済み} disabled {アプリ内更新は無効} unknown {更新を確認} other {最新です}}",
+  "shell.foot.update.label": "{state, select, found {新バージョン {version}} found_nover {新バージョンあり} checking {更新を確認中} fail {更新の確認に失敗} install_fail {更新に失敗} dl {更新をダウンロード中} verify {更新の準備完了} ready {更新をインストール中} updated {更新済み} disabled {アプリ内更新は無効} unknown {更新を確認} other {最新です}}",
   "shell.nav.aria": "メインナビゲーション",
   "shell.nav.logs": "ログ",
   "shell.nav.overview": "概要",

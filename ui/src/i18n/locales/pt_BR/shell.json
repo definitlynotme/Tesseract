@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {Parado} starting {Iniciando} running {Em execução} stopping {Parando} failed {Falha ao iniciar} unknown {Conectando} other {Conectando}}",
   "shell.foot.update.aria": "{status}. Ir para Configurações · Aplicativo",
-  "shell.foot.update.label": "{state, select, found {{version} disponível} found_nover {Atualização disponível} checking {Verificando atualizações} fail {Falha ao verificar atualizações} dl {Baixando atualização} verify {Atualização pronta} ready {Instalando atualização} updated {Atualização concluída} disabled {Atualizações no app desativadas} unknown {Verificar atualizações} other {Atualizado}}",
+  "shell.foot.update.label": "{state, select, found {{version} disponível} found_nover {Atualização disponível} checking {Verificando atualizações} fail {Falha ao verificar atualizações} install_fail {Falha ao atualizar} dl {Baixando atualização} verify {Atualização pronta} ready {Instalando atualização} updated {Atualização concluída} disabled {Atualizações no app desativadas} unknown {Verificar atualizações} other {Atualizado}}",
   "shell.nav.aria": "Navegação principal",
   "shell.nav.logs": "Registros",
   "shell.nav.overview": "Visão geral",

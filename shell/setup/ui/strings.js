@@ -27,6 +27,7 @@ window.STRINGS = {
     e_unknown: '安装程序报告了错误（代码 {code}）。查看日志了解原因。',
     sub_unchanged: '没有做任何改动。', sub_rolledback: '已还原到安装前。',
     declined: '没有获得管理员授权，没有做任何改动。',
+    o_manual: '没能从这里打开 Tesseract。从开始菜单打开它。',
   },
   en_US: {
     min: 'Minimize', close: 'Close',
@@ -51,6 +52,7 @@ window.STRINGS = {
     e_unknown: 'The installer reported an error (code {code}). The log says why.',
     sub_unchanged: 'Nothing was changed.', sub_rolledback: 'Everything was rolled back.',
     declined: 'Administrator permission was not given. Nothing was changed.',
+    o_manual: 'Tesseract could not be opened from here. Open it from the Start menu.',
   },
   de_DE: {
     min: 'Minimieren', close: 'Schließen',
@@ -75,6 +77,7 @@ window.STRINGS = {
     e_unknown: 'Das Installationsprogramm meldet einen Fehler (Code {code}). Das Protokoll nennt den Grund.',
     sub_unchanged: 'Es wurde nichts geändert.', sub_rolledback: 'Alle Änderungen wurden zurückgenommen.',
     declined: 'Keine Administratorberechtigung erteilt. Es wurde nichts geändert.',
+    o_manual: 'Tesseract konnte von hier aus nicht geöffnet werden. Über das Startmenü öffnen.',
   },
   es_ES: {
     min: 'Minimizar', close: 'Cerrar',
@@ -99,6 +102,7 @@ window.STRINGS = {
     e_unknown: 'El instalador informó de un error (código {code}). El registro indica el motivo.',
     sub_unchanged: 'No se cambió nada.', sub_rolledback: 'Se deshicieron todos los cambios.',
     declined: 'No se concedió permiso de administrador. No se cambió nada.',
+    o_manual: 'No se pudo abrir Tesseract desde aquí. Ábrelo desde el menú Inicio.',
   },
   fr_FR: {
     min: 'Réduire', close: 'Fermer',
@@ -123,6 +127,7 @@ window.STRINGS = {
     e_unknown: 'Le programme d’installation a signalé une erreur (code {code}). Le journal en donne la raison.',
     sub_unchanged: 'Rien n’a été modifié.', sub_rolledback: 'Toutes les modifications ont été annulées.',
     declined: 'L’autorisation administrateur n’a pas été accordée. Rien n’a été modifié.',
+    o_manual: 'Impossible d’ouvrir Tesseract d’ici. Ouvrez-le depuis le menu Démarrer.',
   },
   pt_BR: {
     min: 'Minimizar', close: 'Fechar',
@@ -147,6 +152,7 @@ window.STRINGS = {
     e_unknown: 'O instalador relatou um erro (código {code}). O log mostra o motivo.',
     sub_unchanged: 'Nada foi alterado.', sub_rolledback: 'Todas as alterações foram desfeitas.',
     declined: 'A permissão de administrador não foi concedida. Nada foi alterado.',
+    o_manual: 'Não foi possível abrir o Tesseract daqui. Abra-o pelo menu Iniciar.',
   },
   ja_JP: {
     min: '最小化', close: '閉じる',
@@ -171,6 +177,7 @@ window.STRINGS = {
     e_unknown: 'インストーラーがエラーを報告しました（コード {code}）。理由はログにあります。',
     sub_unchanged: '何も変更されていません。', sub_rolledback: 'すべての変更を元に戻しました。',
     declined: '管理者の許可が得られませんでした。何も変更されていません。',
+    o_manual: 'ここから Tesseract を開けませんでした。スタート メニューから開いてください。',
   },
   ko_KR: {
     min: '최소화', close: '닫기',
@@ -195,6 +202,7 @@ window.STRINGS = {
     e_unknown: '설치 프로그램이 오류를 보고했습니다(코드 {code}). 이유는 로그에 있습니다.',
     sub_unchanged: '아무것도 변경되지 않았습니다.', sub_rolledback: '모든 변경을 되돌렸습니다.',
     declined: '관리자 권한을 받지 못했습니다. 아무것도 변경되지 않았습니다.',
+    o_manual: '여기에서 Tesseract를 열지 못했습니다. 시작 메뉴에서 여세요.',
   },
   ru_RU: {
     min: 'Свернуть', close: 'Закрыть',
@@ -219,5 +227,6 @@ window.STRINGS = {
     e_unknown: 'Установщик сообщил об ошибке (код {code}). Причина — в журнале.',
     sub_unchanged: 'Ничего не изменено.', sub_rolledback: 'Все изменения отменены.',
     declined: 'Права администратора не предоставлены. Ничего не изменено.',
+    o_manual: 'Не удалось открыть Tesseract отсюда. Откройте его из меню «Пуск».',
   },
 };

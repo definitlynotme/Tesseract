@@ -50,6 +50,12 @@ INSTALLER_ARGS = ("/SILENT", "/SUPPRESSMSGBOXES", "/CLOSEAPPLICATIONS",
 # A child of the bridge.log logger (bridge_main), like bridge_shutdown's: under
 # its module name nothing of the update owner ever reached bridge.log.
 _LOG = logging.getLogger("tesseract.bridge.update")
+# Update.error.message_key: a check, download or verification that failed.
+OPERATION_FAILED_KEY = "errors.update.operation_failed"
+# 0.1.5: the shell could not start the installer (update.installResult launched:false). The check
+# and the download had worked, so the text does not send the user to their network, and the
+# sidebar says 更新失败 rather than 检查更新失败 (ui/src/rt/project.js updateStateOf).
+LAUNCH_FAILED_KEY = "errors.update.launch_failed"
 
 
 class HandoffPublisher(Protocol):
@@ -205,6 +211,9 @@ class UpdateOwner:
         # Exit observed after an accepted handoff: permanent for this epoch.
         self._exit_observed = False
         self._last_install_result: dict[str, Any] | None = None
+        # 0.1.5: an installResult{launched:false} that came while a check was in flight; recorded
+        # once that check lands (_land_deferred_locked). The shell sends it once per failure.
+        self._deferred_install_result: dict[str, Any] | None = None
         # T-P4-C1 #7 (G51): the version this sidecar replaced, when the app
         # was just updated to current_version (see load_completed_update).
         self._previous_version: str | None = None
@@ -251,10 +260,10 @@ class UpdateOwner:
             "last_check_at_ms": self._last_check_at_ms,
         }
 
-    def _transition(self, state: str, code: str | None = None) -> None:
+    def _transition(self, state: str, code: str | None = None, message_key: str = OPERATION_FAILED_KEY) -> None:
         self._state = state
         self._error = (None if code is None else {
-            "code": code, "message_key": "errors.update.operation_failed", "params": {},
+            "code": code, "message_key": message_key, "params": {},
         })
         self._dirty = True
 
@@ -383,7 +392,8 @@ class UpdateOwner:
         """The update check (app.update.check). automatic: the 6 s check of an epoch, which is
         skipped (None) when this epoch recorded a failed installer launch, decided in the same
         critical section that would open the flight. A later installResult then meets the open
-        flight (conflict) instead of being turned into a plain verified."""
+        flight and is recorded once the check lands (failed, receipt kept), instead of being
+        turned into a plain verified."""
         self._settle_installed_copy()  # before _info is set: installable reads both
         self.poll_handoff()
         skipped = False
@@ -403,11 +413,12 @@ class UpdateOwner:
             return None
         if not leader:
             return deepcopy(flight.result())
+        landed = None
         try:
             info = self._updater.check_latest_update(current_version=self.current_version)
             version = app_updater.normalize_version(info.latest_version)
             with self._persistence_lock:
-                # The flight excludes installs and installResult(conflict).
+                # The flight excludes installs; an installResult waits for it (deferred).
                 receipt = self.resolve_receipt(receipt_ref) if receipt_ref else None
                 due = bool(info.update_available and
                            app_update_state.notice_due(self.state_path, version))
@@ -426,6 +437,7 @@ class UpdateOwner:
                 self._transition("verified" if verified else "available" if info.update_available else "idle")
                 self._offer_notice(version, due=due)
                 result = self._dto()
+                landed = self._land_deferred_locked()  # after the result: the job's own stays a done check
         except Exception as exc:
             code = "timeout" if isinstance(exc, TimeoutError) else "io" if isinstance(
                 exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
@@ -435,6 +447,7 @@ class UpdateOwner:
                 self._transition("failed", code)
                 failure = JobFailure(code, self._dto())
                 flight.set_exception(failure)
+                landed = self._land_deferred_locked()
             raise failure from exc
         else:
             flight.set_result(result)
@@ -442,6 +455,11 @@ class UpdateOwner:
         finally:
             with self._lock:
                 self._flight = None
+                late = self._land_deferred_locked()  # one that came after the result was taken
+            for event in (landed, late):
+                if event is not None:
+                    _LOG.info("update installer launch failure recorded after the check: receipt=%s landed=%s",
+                              event[0]["receipt_ref"], event[1])
 
     def install(self) -> dict[str, Any]:
         self.poll_handoff()
@@ -457,14 +475,19 @@ class UpdateOwner:
             # failed launch is reused once its installer bytes re-hash equal.
             reuse = self._receipt_ref if handoff else None
             self._receipt_ref = None
-            if reuse is None:
+            if not handoff:
                 self._transition("downloading")
         try:
-            receipt = self._revalidated_receipt(reuse, info) if reuse else None
+            # 0.1.5: with none in memory (a new epoch: Setup reopened the app after UAC 否, or any
+            # restart), the durable receipt an earlier epoch verified for this release is reused on
+            # the same terms. Before, 立即更新 revoked it and downloaded the installer again.
+            receipt = None
+            if handoff:
+                receipt = self._revalidated_receipt(reuse, info) if reuse else self._adoptable_receipt(info)
             if receipt is not None:
                 receipt_ref = receipt["receipt_ref"]
             else:
-                if reuse:
+                if handoff:
                     with self._lock:
                         self._transition("downloading")
                 receipt_ref = self._download_receipt(info)
@@ -510,6 +533,18 @@ class UpdateOwner:
         with self._persistence_lock:
             app_update_state.record_pending_update(self.state_path, downloaded, receipt_ref=receipt_ref)
         return receipt_ref
+
+    def _adoptable_receipt(self, info: app_updater.AppUpdateInfo) -> dict[str, Any] | None:
+        """Worker-only: the durable receipt of an earlier epoch, when it is for this release and its
+        installer bytes still match (_revalidated_receipt). None otherwise; never raises."""
+        try:
+            with self._persistence_lock:
+                pending = app_update_state._read_state(self.state_path).get("pending")
+            receipt_ref = pending.get("receipt_ref") if isinstance(pending, dict) else None
+            return self._revalidated_receipt(receipt_ref, info) if isinstance(receipt_ref, str) and receipt_ref else None
+        except Exception as exc:  # a download is always the safe way on
+            _LOG.warning("kept update receipt unreadable: %s", type(exc).__name__)
+            return None
 
     def _revalidated_receipt(self, receipt_ref: str, info: app_updater.AppUpdateInfo) -> dict[str, Any] | None:
         """Worker-only: durable receipt for this release whose bytes still match."""
@@ -631,21 +666,46 @@ class UpdateOwner:
             _LOG.info("update handoff declined: handoff=%s reason=%s", handoff_id, _safe_code(reason_code))
         return {"recorded": True}
 
-    def _install_result_busy_locked(self, receipt_ref: str) -> bool:
-        """launched=false must not race an install, a check, an unanswered or
-        foreign handoff, another in-memory receipt, or an exit already begun."""
+    def _install_result_busy_locked(self, receipt_ref: str, *, flight: bool = True) -> bool:
+        """launched=false must not race an install, a check (flight=False: install_result defers to
+        it instead), an unanswered or foreign handoff, another in-memory receipt, or an exit
+        already begun."""
         handoff = self._handoff
-        return bool(self._installing or self._flight is not None or self._exit_observed
+        return bool(self._installing or (flight and self._flight is not None) or self._exit_observed
                     or (handoff is not None and (not handoff["responded"]
                                                  or handoff["receipt_ref"] != receipt_ref))
                     or self._receipt_ref not in (None, receipt_ref))
 
+    def _record_install_result_locked(self, result: dict[str, Any]) -> None:
+        self._last_install_result = result
+        if not result["launched"]:
+            self._handoff = None  # Only a responded handoff for this receipt.
+            self._receipt_ref = result["receipt_ref"]  # Kept for retry; never launched here.
+            self._transition("failed", "io", LAUNCH_FAILED_KEY)
+
+    def _land_deferred_locked(self) -> tuple[dict[str, Any], bool] | None:
+        """The check a launch failure deferred to is over: record it now, as the shell's own retry
+        after that check would have been (receipt kept, failed). (result, False) when the epoch
+        moved on meanwhile (an install began, another receipt is kept, the exit began)."""
+        deferred, self._deferred_install_result = self._deferred_install_result, None
+        if deferred is None:
+            return None
+        if self._install_result_busy_locked(deferred["receipt_ref"], flight=False):
+            return deferred, False
+        self._record_install_result_locked(deferred)
+        return deferred, True
+
     def install_result(self, receipt_ref: str, launched: bool, reason_code: str | None = None) -> dict[str, Any]:
-        """update.installResult; the receipt may come from before a restart."""
+        """update.installResult; the receipt may come from before a restart.
+
+        0.1.5: launched=false that meets a check in flight (the relaunched epoch's automatic one,
+        say) is recorded once that check lands. It used to be refused as conflict, and the shell
+        sends it once, so the failure the page should show was lost and 立即更新 downloaded again.
+        """
         launched = bool(launched)
         reason = _safe_code(reason_code)
         with self._lock:
-            if not launched and self._install_result_busy_locked(receipt_ref):
+            if not launched and self._install_result_busy_locked(receipt_ref, flight=False):
                 raise JobFailure("conflict")
             known = receipt_ref == self._receipt_ref
         if not known:
@@ -659,18 +719,19 @@ class UpdateOwner:
             if receipt is None:
                 raise JobFailure("conflict")
         with self._lock:
-            if not launched and self._install_result_busy_locked(receipt_ref):
-                raise JobFailure("conflict")  # A check/install began meanwhile.
-            self._last_install_result = {"receipt_ref": receipt_ref, "launched": launched,
-                                         "reason_code": reason}
-            if not launched:
-                self._handoff = None  # Only a responded handoff for this receipt.
-                self._receipt_ref = receipt_ref  # Kept for retry; never launched here.
-                self._transition("failed", "io")
+            if not launched and self._install_result_busy_locked(receipt_ref, flight=False):
+                raise JobFailure("conflict")  # An install began meanwhile.
+            result = {"receipt_ref": receipt_ref, "launched": launched, "reason_code": reason}
+            deferred = not launched and self._flight is not None
+            if deferred:
+                self._deferred_install_result = result
+            else:
+                self._record_install_result_locked(result)
         if launched:
             _LOG.info("update installer launched: receipt=%s", receipt_ref)
         else:
-            _LOG.warning("update installer launch failed: receipt=%s reason=%s", receipt_ref, reason)
+            _LOG.warning("update installer launch failed: receipt=%s reason=%s%s", receipt_ref, reason,
+                         " (recorded once the check in flight lands)" if deferred else "")
         return {"recorded": True}
 
     def last_install_result(self) -> dict[str, Any] | None:

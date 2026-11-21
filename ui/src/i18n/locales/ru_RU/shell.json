@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {Остановлено} starting {Запуск} running {Работает} stopping {Остановка} failed {Ошибка запуска} unknown {Подключение} other {Подключение}}",
   "shell.foot.update.aria": "{status}. Перейти в «Настройки · Приложение»",
-  "shell.foot.update.label": "{state, select, found {Доступна версия {version}} found_nover {Доступно обновление} checking {Проверка обновлений} fail {Ошибка проверки обновлений} dl {Загрузка обновления} verify {Обновление готово} ready {Установка обновления} updated {Обновлено} disabled {Обновления в приложении отключены} unknown {Проверить обновления} other {Актуальная версия}}",
+  "shell.foot.update.label": "{state, select, found {Доступна версия {version}} found_nover {Доступно обновление} checking {Проверка обновлений} fail {Ошибка проверки обновлений} install_fail {Ошибка обновления} dl {Загрузка обновления} verify {Обновление готово} ready {Установка обновления} updated {Обновлено} disabled {Обновления в приложении отключены} unknown {Проверить обновления} other {Актуальная версия}}",
   "shell.nav.aria": "Основная навигация",
   "shell.nav.logs": "Журнал",
   "shell.nav.overview": "Обзор",

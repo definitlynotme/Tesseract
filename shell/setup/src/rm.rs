@@ -8,9 +8,13 @@
 //! the tray installed nothing, while this window said 安装时会先关闭它 (seen 11-18, Inno log:
 //! "Some applications could not be shut down ... Defaulting to Abort").
 //!
-//! Here only `<dir>\Tesseract.exe` is registered, so Restart Manager sees the shell alone
-//! (`RmMainWindow`) and asks it politely: WM_QUERYENDSESSION / WM_ENDSESSION with
-//! ENDSESSION_CLOSEAPP, then WM_CLOSE, to each of its top-level windows. Shells 0.1.0–0.1.3 take
+//! Here only this session's shell is registered, by its pid and start time (`RM_UNIQUE_PROCESS`),
+//! so Restart Manager sees the shell alone (`RmMainWindow`) and asks it politely:
+//! WM_QUERYENDSESSION / WM_ENDSESSION with ENDSESSION_CLOSEAPP, then WM_CLOSE, to each of its
+//! top-level windows. (Registering the file `<dir>\Tesseract.exe` instead, as 0.1.4 did, makes
+//! `RmShutdown` act on everything that has that file open: another user's copy, Explorer showing
+//! the folder, a scanner. One it cannot close stops the whole shutdown; Explorer it closes and
+//! never restarts.) Shells 0.1.0–0.1.3 take
 //! that as a session end, 0.1.4 and later as an ordinary quit (endsession.rs): either way the
 //! sidecar restores the system proxy and firewall, says bye and exits, and the shell quits. Then
 //! this waits until no `.exe` / `.dll` under `<dir>` is in use, the files Inno's pass registers
@@ -21,7 +25,7 @@ use windows::{
     core::{HSTRING, PCWSTR, PWSTR},
     Win32::{
         Foundation::{ERROR_FAIL_NOACTION_REBOOT, ERROR_MORE_DATA, ERROR_SUCCESS},
-        System::RestartManager::{RmEndSession, RmGetList, RmRegisterResources, RmShutdown, RmStartSession, CCH_RM_SESSION_KEY, RM_PROCESS_INFO},
+        System::RestartManager::{RmEndSession, RmGetList, RmRegisterResources, RmShutdown, RmStartSession, CCH_RM_SESSION_KEY, RM_PROCESS_INFO, RM_UNIQUE_PROCESS},
     },
 };
 
@@ -61,6 +65,10 @@ impl Session {
         let names: Vec<HSTRING> = files.iter().map(|f| HSTRING::from(f.as_os_str())).collect();
         let ptrs: Vec<PCWSTR> = names.iter().map(|n| PCWSTR(n.as_ptr())).collect();
         (unsafe { RmRegisterResources(self.0, Some(&ptrs), None, None) }) == ERROR_SUCCESS
+    }
+    /// Registers one process, named by its pid and start time: a pid reused since is never it.
+    fn register_process(&self, process: RM_UNIQUE_PROCESS) -> bool {
+        (unsafe { RmRegisterResources(self.0, None, Some(&[process]), None) }) == ERROR_SUCCESS
     }
     /// The processes using the registered files, in every session.
     fn users(&self) -> Option<Vec<User>> {
@@ -143,11 +151,24 @@ pub struct Shell { pub pid: u32, pub elevated: Option<bool>, pub user: Option<Ve
 /// cannot be told, None: a second start only wakes the first, or waits for one that is quitting
 /// (single_instance.rs in the shell).
 pub fn shell_here(dir: &Path) -> Option<Shell> {
+    shell_pid(dir).map(|pid| Shell { pid, elevated: crate::sys::process_elevated(pid), user: crate::sys::process_user(pid) })
+}
+
+/// The pid of [`shell_here`].
+fn shell_pid(dir: &Path) -> Option<u32> {
     let exe = dir.join("Tesseract.exe");
     let here = crate::sys::session_id()?;
     let list = users(std::slice::from_ref(&exe))?;
     find_shell(&list, here, &exe, crate::sys::image_path)
-        .map(|pid| Shell { pid, elevated: crate::sys::process_elevated(pid), user: crate::sys::process_user(pid) })
+}
+
+/// The Restart Manager session [`close_app`] shuts down: the shell `pid` alone, named by its pid
+/// and start time. None when the process is gone (its start time cannot be read) or Restart
+/// Manager cannot be asked.
+fn shutdown_session(pid: u32) -> Option<Session> {
+    let started = crate::sys::process_start_time(pid)?;
+    let session = Session::start()?;
+    session.register_process(RM_UNIQUE_PROCESS { dwProcessId: pid, ProcessStartTime: started }).then_some(session)
 }
 
 /// Whether the Tesseract from `dir` runs in this session (before opening it again).
@@ -176,15 +197,18 @@ pub fn close_app(dir: &Path, wait: Duration, unasked: Duration) -> Closed {
         Some(u) if u.is_empty() => return Closed::NothingRunning,
         Some(_) => {},
     }
-    // The shell alone. A shell already on its way out (no window left), one that runs elevated
-    // while this window does not, or another session's copy in the list make Restart Manager do
-    // nothing at all (ERROR_FAIL_NOACTION_REBOOT); the wait then covers a shell that is leaving.
-    let mut asked = true;
-    if let Some(session) = Session::start() {
-        if session.register(&[dir.join("Tesseract.exe")]) {
-            asked = unsafe { RmShutdown(session.0, 0, None) } != ERROR_FAIL_NOACTION_REBOOT;
-        }
-    }
+    // This session's shell alone (see the module doc). None here (another session's copy, or only
+    // the sidecar left of a shell that has gone): nothing to ask, the unasked wait. A shell already
+    // on its way out (no window left) or one that runs elevated while this window does not make
+    // Restart Manager do nothing (ERROR_FAIL_NOACTION_REBOOT); the wait then covers a shell that is
+    // leaving. When Restart Manager cannot be asked at all, the full wait, as before.
+    let asked = match shell_pid(dir) {
+        None => false,
+        Some(pid) => match shutdown_session(pid) {
+            Some(session) => (unsafe { RmShutdown(session.0, 0, None) }) != ERROR_FAIL_NOACTION_REBOOT,
+            None => true,
+        },
+    };
     let deadline = Instant::now() + if asked { wait } else { unasked };
     loop {
         match users(&files) {
@@ -276,6 +300,31 @@ mod tests {
         assert!(!in_use(&dir));
         assert_eq!(close_app(&dir, Duration::from_secs(1), Duration::from_secs(1)), Closed::NothingRunning);
         assert_eq!(close_app(&dir.join("missing"), Duration::from_secs(1), Duration::from_secs(1)), Closed::NothingRunning);
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_shutdown_session_holds_the_shell_alone() {
+        // 0.1.5: RmShutdown acts on everything its session lists. With the file <dir>\Tesseract.exe
+        // registered (0.1.4) that was every process holding it open (Explorer, a scanner, another
+        // user's copy); the session close_app shuts down lists the shell alone. Real Restart
+        // Manager, nothing shut down: a stand-in shell (ping.exe copied as Tesseract.exe) and this
+        // test holding a plain handle on the same file.
+        struct Running(std::process::Child);
+        impl Drop for Running { fn drop(&mut self) { let _ = self.0.kill(); let _ = self.0.wait(); } }
+        let dir = temp("shutdown");
+        let exe = dir.join("Tesseract.exe");
+        fs::copy(PathBuf::from(std::env::var_os("SystemRoot").unwrap()).join(r"System32\PING.EXE"), &exe).unwrap();
+        let null = std::process::Stdio::null;
+        let shell = Running(std::process::Command::new(&exe).args(["-n", "60", "127.0.0.1"]).stdin(null()).stdout(null()).stderr(null()).spawn().unwrap());
+        let holder = fs::File::open(&exe).unwrap();
+        let pids = |list: Vec<User>| { let mut p: Vec<u32> = list.iter().map(|u| u.pid).collect(); p.sort(); p.dedup(); p };
+        let by_file = pids(users(std::slice::from_ref(&exe)).expect("Restart Manager answers"));
+        assert!(by_file.contains(&shell.0.id()) && by_file.contains(&std::process::id()), "the file has both users: {by_file:?}");
+        let session = shutdown_session(shell.0.id()).expect("a session for the running shell");
+        assert_eq!(pids(session.users().expect("Restart Manager answers")), [shell.0.id()], "only the shell would be shut down");
+        assert!(shutdown_session(u32::MAX - 3).is_none(), "no such process: no session");
+        drop((session, holder, shell));
         let _ = fs::remove_dir_all(&dir);
     }
 

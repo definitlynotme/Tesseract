@@ -17,8 +17,10 @@ session starts one group, held or not, as before.
 
 Each test runs one real ``refresh_tier3`` session with deterministic helpers.
 The fake source collector holds the first transport until the test has seen
-the cohort it expects, then starts it (or ends without one).  Recorded on both
-sides of that moment:
+the cohort it expects, then starts it (or ends without one).  Once it has
+delivered its candidates it keeps the collection open until the test is done,
+so the session cannot wind down underneath it.  Recorded on both sides of that
+moment:
 
 * every process target the manager hands the validation domain
   (``set_envelope`` desired workers and ``set_shell_prewarm_workers``), in
@@ -186,6 +188,10 @@ class _Session:
         self.lock = threading.Lock()
         self.transport_started = False
         self.release_transport = threading.Event()
+        # A source that delivers and returns at once lets the session quiesce, and
+        # stop its validation domain, before the envelope grows past the hold. The
+        # collection stays open until the driver is done.
+        self.end_collection = threading.Event()
         # (after the first transport, desired identities, dispatch enabled)
         self.targets: list[tuple[bool, int, bool]] = []
         self.shells: list[tuple[bool, int]] = []
@@ -228,6 +234,14 @@ class _Session:
             return any(
                 flag and count == value for flag, count, _enabled in self.targets
             ) and any(flag and count == value for flag, count in self.shells)
+
+    def supervisor_state(self) -> dict[str, Any]:
+        """A compact supervisor snapshot, for failure details."""
+        try:
+            snapshot = self.domains[-1].supervisor.snapshot()
+        except Exception as exc:  # no domain yet, or one already torn down
+            return {"unavailable": repr(exc)}
+        return {name: getattr(snapshot, name, None) for name in _SUPERVISOR_FIELDS}
 
     def _patches(self) -> list[Any]:
         real_domain = manager_module.Tier3ValidationDomain
@@ -364,6 +378,7 @@ class _Session:
         source_observer = kwargs.get("source_observer")
         if callable(source_observer):
             source_observer(list(self.candidates), report)
+        self.end_collection.wait(120.0)
         return list(self.candidates), report
 
     # -- driver ----------------------------------------------------------
@@ -391,6 +406,7 @@ class _Session:
                     drive(self)
                 finally:
                     self.release_transport.set()
+                    self.end_collection.set()
                     if stop_after_drive:
                         self.owner.request_stop()
                     self.worker.join(30.0)
@@ -421,6 +437,7 @@ class _Session:
             return observed
         finally:
             self.release_transport.set()
+            self.end_collection.set()
             self.owner.close(timeout_seconds=3.0)
 
 
@@ -447,6 +464,14 @@ def _spawned(spawns: list[tuple[bool, int, int]], *, after: bool) -> set[int]:
     return {index for started, index, _generation in spawns if started is after}
 
 
+_SUPERVISOR_FIELDS = (
+    "desired_workers", "shell_prewarm_workers", "pending_spawn_workers",
+    "startup_pipeline_workers", "active_workers", "idle_workers", "starting_workers",
+    "waiting_start_workers", "retiring_workers", "quarantined_workers", "stop_status",
+    "startup_failure_count", "last_failure_reason", "failure_reason_counts",
+)
+
+
 def _detail(observed: dict[str, Any]) -> dict[str, Any]:
     report = observed.get("report") or {}
     return {
@@ -454,7 +479,9 @@ def _detail(observed: dict[str, Any]) -> dict[str, Any]:
             key: observed.get(key)
             for key in (
                 "targets", "shells", "spawns", "activations", "initial_counts",
-                "errors", "supervisor_classes",
+                "errors", "supervisor_classes", "ended_on_its_own",
+                "worker_alive_after_stop", "session_alive_after_release",
+                "supervisor_in_hold", "supervisor_after_release",
             )
         },
         "report": {
@@ -499,10 +526,16 @@ def test_cold_start_hold_is_four_helper_processes_until_first_transport(
         observed_live["held_cohort_requested"] = _wait_for(
             lambda: len(current.spawned(after=False)) >= 4, 45.0,
         )
+        # Then up and started, so the window below follows a settled hold even on
+        # a loaded runner, where four helper processes take a while to start.
+        observed_live["held_cohort_ready"] = _wait_for(
+            lambda: {1, 2, 3, 4} <= current.all_activated(), 90.0,
+        )
         # A fifth helper would be requested within this window.
         time.sleep(0.5)
         observed_live["session_alive_in_hold"] = current.worker.is_alive()
         observed_live["started_before_release"] = current.started()
+        observed_live["supervisor_in_hold"] = current.supervisor_state()
         current.release_transport.set()
         observed_live["full_target_after"] = _wait_for(
             lambda: current.seen_after(cap_identities), 30.0,
@@ -510,6 +543,8 @@ def test_cold_start_hold_is_four_helper_processes_until_first_transport(
         observed_live["spawned_beyond_hold_after"] = _wait_for(
             lambda: any(index > 4 for index in current.spawned(after=True)), 60.0,
         )
+        observed_live["session_alive_after_release"] = current.worker.is_alive()
+        observed_live["supervisor_after_release"] = current.supervisor_state()
 
     observed = session.run(drive, stop_after_drive=True)
     observed.update(observed_live)
@@ -521,6 +556,8 @@ def test_cold_start_hold_is_four_helper_processes_until_first_transport(
     assert observed["supervisor_classes"] == [backend], detail
     assert observed["session_alive_in_hold"], detail
     assert not observed["started_before_release"], detail
+    # The session (its collection still open) lasted until the driver was done.
+    assert observed["session_alive_after_release"], detail
 
     # Before the first transport: every target is the hold, never less than
     # four processes and never more.
@@ -534,6 +571,7 @@ def test_cold_start_hold_is_four_helper_processes_until_first_transport(
     # Physically: exactly four helper processes were requested (worker ids on
     # the single-slot backend, group indices on the batch backend).
     assert observed["held_cohort_requested"], detail
+    assert observed["held_cohort_ready"], detail
     assert _spawned(observed["spawns"], after=False) == {1, 2, 3, 4}, detail
 
     # After it: the full envelope, and helper processes beyond the hold.

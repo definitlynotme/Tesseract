@@ -270,6 +270,7 @@
   "errors.superseded": "Esta ação foi substituída por uma posterior; vale o resultado mais recente.",
   "errors.timeout": "A ação expirou antes de terminar. Verifique a rede e tente novamente.",
   "errors.unknown": "Ocorreu um erro não reconhecido. Tente novamente; se continuar acontecendo, exporte um pacote de diagnóstico e envie o relato.",
+  "errors.update.launch_failed": "Não foi possível iniciar o instalador. Verifique se há atualizações para tentar de novo ou instale manualmente pela página da versão.",
   "errors.update.operation_failed": "A atualização falhou. Verifique a rede e procure atualizações novamente.",
   "errors.validation": "Algum dado preenchido não é válido. Corrija conforme indicado e tente novamente.",
   "errors.validation.field": "O valor deste campo é inválido. Corrija conforme indicado e salve novamente.",

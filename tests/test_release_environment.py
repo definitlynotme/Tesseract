@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import tempfile
 import textwrap
+import time
 from pathlib import Path
 
 import pytest
@@ -48,14 +49,14 @@ def test_stable_source_pe_and_inno_fallback_versions_are_synchronized() -> None:
         ROOT / "packaging" / "windows" / "Tesseract-shell.iss"
     ).read_text(encoding="utf-8")
 
-    assert 'APP_RELEASE_BASE_VERSION = "0.1.4"' in app_info_source
+    assert 'APP_RELEASE_BASE_VERSION = "0.1.5"' in app_info_source
     assert "APP_RELEASE_CANDIDATE_NUMBER: int | None = None" in app_info_source
-    assert 'StringStruct("FileVersion", "0.1.4")' in pe_version
-    assert 'StringStruct("ProductVersion", "0.1.4")' in pe_version
-    assert "filevers=(0, 1, 4, 65535)" in pe_version
-    assert "prodvers=(0, 1, 4, 65535)" in pe_version
-    assert '#define AppVersion "0.1.4"' in installer
-    assert '#define AppVersionNumeric "0.1.4.65535"' in installer
+    assert 'StringStruct("FileVersion", "0.1.5")' in pe_version
+    assert 'StringStruct("ProductVersion", "0.1.5")' in pe_version
+    assert "filevers=(0, 1, 5, 65535)" in pe_version
+    assert "prodvers=(0, 1, 5, 65535)" in pe_version
+    assert '#define AppVersion "0.1.5"' in installer
+    assert '#define AppVersionNumeric "0.1.5.65535"' in installer
 
 
 def test_committed_release_notes_reach_the_update_window_unchanged() -> None:
@@ -159,7 +160,7 @@ def test_windows_powershell_5_executes_release_python_c_blocks_without_quote_los
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath '{root_literal}'
 $Python = (Get-Command 'python' -ErrorAction Stop).Source
-$Version = '0.1.4'
+$Version = '0.1.5'
 {assignments}
 $Results = [ordered]@{{}}
 $Results.version = [string] (& $Python -c $VersionContractPython $Version)
@@ -194,8 +195,8 @@ $Results | ConvertTo-Json -Compress
     source = json.loads(payload["source"])
     repository = json.loads(payload["repository"])
     key_ids = json.loads(payload["keys"])
-    assert version["version"] == "0.1.4"
-    assert version["windows_version_numeric"] == "0.1.4.65535"
+    assert version["version"] == "0.1.5"
+    assert version["windows_version_numeric"] == "0.1.5.65535"
     assert source == version
     assert repository == {
         "repository_url": "https://github.com/definitlynotme/Tesseract",
@@ -800,7 +801,8 @@ def test_release_workflow_pins_python_requires_honest_signing_and_rechecks_hashe
     assert uses
     assert all(re.fullmatch(r"[0-9a-f]{40}", revision) for revision in uses)
     assert workflow.count("contents: write") == 1
-    assert workflow.count("contents: read") == 4  # test-windows, build-windows, signing, attestation
+    # test-windows, build-windows, suites, signing, attestation
+    assert workflow.count("contents: read") == 5
     assert workflow.count("id-token: write") == 1
     assert workflow.count("attestations: write") == 1
     assert workflow.index("contents: write") > workflow.index("publish-release:")
@@ -957,8 +959,13 @@ def test_release_workflow_pwsh_blocks_parse_with_windows_powershell_5() -> None:
     assert len(powershell_blocks) == 23
     powershell_sources = [
         *powershell_blocks,
-        (ROOT / "scripts" / "verify_release_tag_identity.ps1").read_text(
-            encoding="utf-8"
+        *(
+            (ROOT / "scripts" / name).read_text(encoding="utf-8")
+            for name in (
+                "verify_release_tag_identity.ps1",
+                "ci_heartbeat.ps1",
+                "ci_runner_probe.ps1",
+            )
         ),
     ]
 
@@ -1863,7 +1870,7 @@ def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commi
     jobs = workflow["jobs"]
     tests, build, sign = jobs["test-windows"], jobs["build-windows"], jobs["sign-release-manifest"]
     assert "needs" not in tests and "needs" not in build
-    assert sign["needs"] == ["build-windows", "test-windows"]
+    assert sign["needs"] == ["build-windows", "test-windows", "suites"]
     assert tests["outputs"] == {"release_commit": "${{ steps.release.outputs.release_commit }}"}
     names = [step.get("name") for step in tests["steps"]]
     assert names[:3] == ["Check out the tagged source", "Set up exact release Python",
@@ -1904,3 +1911,190 @@ def test_release_workflow_splits_tests_from_the_build_and_ties_them_to_one_commi
         assert "scripts\\ci_heartbeat.ps1" in step["run"] and f"release-heartbeat/{job_name}" in step["run"], job_name
         assert "Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN" in step["run"], job_name
     assert "RELEASE_PROGRESS_FILE" in script and (ROOT / "tests" / "conftest.py").is_file()
+
+
+def test_release_signing_waits_for_the_ci_suites_on_the_tagged_commit() -> None:
+    """ci.yml, the shell, setup-window and UI suites every pull request runs, gates the
+    release too: called as a job of its own beside test-windows (which already takes
+    about 35 of its 120 minutes), and needed by sign-release-manifest. Its last job,
+    CI, fails unless every suite passed."""
+    workflows = ROOT / ".github" / "workflows"
+    release = yaml.safe_load((workflows / "release-windows.yml").read_text(encoding="utf-8"))
+    ci = yaml.safe_load((workflows / "ci.yml").read_text(encoding="utf-8"))
+    # A calling job has no steps, runner or secrets: only the called jobs run, with the
+    # read-only token this job grants (the release's default is no permission at all).
+    assert release["jobs"]["suites"] == {
+        "name": "Shell, setup window and UI suites",
+        "uses": "./.github/workflows/ci.yml",
+        "permissions": {"contents": "read"},
+    }
+    assert "suites" in release["jobs"]["sign-release-manifest"]["needs"]
+    test_run = next(
+        step["run"] for step in release["jobs"]["test-windows"]["steps"]
+        if step.get("name") == "Run the release tests"
+    )
+    assert "ci.yml" not in test_run and "cargo" not in test_run and "node" not in test_run
+
+    # PyYAML reads the bare key "on" as True.
+    assert "workflow_call" in ci.get("on", ci.get(True))
+    assert ci["permissions"] == {"contents": "read"}
+    # Called from the release, ci.yml's group is ci-refs/tags/<tag>: never the release's
+    # own group, and never cancelled (only pull requests cancel).
+    assert ci["concurrency"]["group"].startswith("ci-")
+    assert release["concurrency"]["group"].startswith("release-")
+    assert ci["concurrency"]["cancel-in-progress"] == "${{ github.event_name == 'pull_request' }}"
+    jobs = ci["jobs"]
+    aggregate = jobs["ci"]
+    assert aggregate["if"] == "${{ always() }}"
+    assert set(aggregate["needs"]) == set(jobs) - {"ci"}
+    assert 'all(.[]; .result == "success")' in aggregate["steps"][-1]["run"]
+    for name, job in jobs.items():
+        # The calling job cannot set a timeout, so each called job sets its own.
+        assert 0 < job["timeout-minutes"] <= 60, name
+        for step in job.get("steps", ()):
+            if str(step.get("uses", "")).startswith("actions/checkout@"):
+                # No ref: every suite checks out the commit of the caller's event, the tag.
+                assert "ref" not in step.get("with", {}), name
+
+
+def test_release_test_step_probes_the_runner_without_the_token_before_the_tests() -> None:
+    """A lost runner keeps no log, so the test step records the runner's processes and
+    privileges (scripts/ci_runner_probe.ps1) and the heartbeat posts the summary."""
+    release = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "release-windows.yml").read_text(encoding="utf-8")
+    )
+    run = next(
+        step["run"] for step in release["jobs"]["test-windows"]["steps"]
+        if step.get("name") == "Run the release tests"
+    )
+    token_removed = run.index("Remove-Item Env:GH_TOKEN, Env:HEARTBEAT_TOKEN")
+    probe = run.index("scripts\\ci_runner_probe.ps1")
+    tests = run.index(".\\scripts\\build_windows.ps1")
+    # Once the token is gone (the probe never holds it), and before the tests.
+    assert token_removed < probe < tests
+    block = run[run.rindex("try {", 0, probe):tests]
+    assert '"-StepProcessId", $PID, "-SummaryFile", $probeSummary' in block
+    assert "WaitForExit(120000)" in block and "Stop-Process -Id $probe.Id" in block
+    assert 'catch { Write-Warning "Runner probe failed: $_" }' in block
+    assert '"-NoteFile", $probeSummary)' in run[:token_removed]
+    probe_script = (ROOT / "scripts" / "ci_runner_probe.ps1").read_text(encoding="utf-8")
+    assert "$probePids = @(100, 1000, 1004, 1008, 1012, 1016)" in probe_script
+    # whoami reads the token before this process's own Get-Process calls can change it.
+    assert probe_script.index("whoami.exe /priv") < probe_script.index("Get-Holder -Id")
+    assert probe_script.rstrip().endswith("exit 0")
+
+
+def _powershell_for_scripts() -> str:
+    shell = shutil.which("pwsh") or shutil.which("powershell.exe")
+    if not shell:
+        pytest.skip("PowerShell is required for the release scripts")
+    return shell
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the runner probe reads Windows processes")
+def test_runner_probe_reports_the_old_fake_pids_and_never_fails(tmp_path: Path) -> None:
+    shell = _powershell_for_scripts()
+
+    def probe(summary: Path) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [shell, "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+             "-File", str(ROOT / "scripts" / "ci_runner_probe.ps1"),
+             "-StepProcessId", str(os.getpid()), "-SummaryFile", str(summary)],
+            capture_output=True, text=True, timeout=120, check=False,
+        )
+
+    summary = tmp_path / "runner-probe.txt"
+    completed = probe(summary)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    for pid in (100, 1000, 1004, 1008, 1012, 1016):
+        assert re.search(rf"^\s+{pid}\s", completed.stdout, re.MULTILINE), pid
+    assert "whoami /priv" in completed.stdout
+    assert "Runner.Listener" in completed.stdout and "Runner.Worker" in completed.stdout
+    line = summary.read_text(encoding="utf-8")
+    assert re.fullmatch(
+        r"debug=\S+ L=\S+ W=\S+ step=\d+/s\S+ \| 100=\S+ 1000=\S+ 1004=\S+ 1008=\S+ 1012=\S+ 1016=\S+",
+        line,
+    ), line
+    assert f" step={os.getpid()}/s" in line
+    assert len(line) <= 140, line
+
+    # A summary it cannot write is reported, and the step still goes on.
+    completed = probe(tmp_path / "missing" / "runner-probe.txt")
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "Could not write" in completed.stdout
+
+
+@pytest.mark.skipif(os.name != "nt", reason="the heartbeat is a Windows release script")
+def test_heartbeat_posts_the_probe_note_once_under_its_own_context(tmp_path: Path) -> None:
+    shell = _powershell_for_scripts()
+    calls, progress, note = tmp_path / "gh.jsonl", tmp_path / "progress.txt", tmp_path / "note.txt"
+    # A stand-in gh: a function wins over any gh.exe on PATH, and records each call.
+    command = (
+        "function global:gh { Add-Content -LiteralPath $env:FAKE_GH_CALLS -Encoding utf8 "
+        "-Value (ConvertTo-Json -Compress -InputObject @($args)) }\n"
+        "& $env:HEARTBEAT_SCRIPT -Context release-heartbeat/test-windows "
+        "-ProgressFile $env:HEARTBEAT_PROGRESS -IntervalSeconds 1 -NoteFile $env:HEARTBEAT_NOTE\n"
+    )
+    environment = dict(
+        os.environ,
+        GITHUB_REPOSITORY="owner/repository", GITHUB_SHA="0" * 40, GH_TOKEN="not-a-token",
+        FAKE_GH_CALLS=str(calls), HEARTBEAT_SCRIPT=str(ROOT / "scripts" / "ci_heartbeat.ps1"),
+        HEARTBEAT_PROGRESS=str(progress), HEARTBEAT_NOTE=str(note),
+    )
+    output = tmp_path / "heartbeat.log"
+
+    def posted() -> list[dict[str, str]]:
+        statuses = []
+        if calls.is_file():
+            for raw in calls.read_text(encoding="utf-8-sig").splitlines():
+                try:
+                    arguments = json.loads(raw)
+                except ValueError:
+                    continue  # a line still being written
+                assert arguments[:4] == ["api", "--method", "POST",
+                                         "repos/owner/repository/statuses/" + "0" * 40]
+                statuses.append(dict(
+                    arguments[index + 1].split("=", 1)
+                    for index, value in enumerate(arguments) if value == "-f"
+                ))
+        return statuses
+
+    with output.open("w", encoding="utf-8") as log:
+        heartbeat = subprocess.Popen(
+            [shell, "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+             "-EncodedCommand", base64.b64encode(command.encode("utf-16-le")).decode("ascii")],
+            env=environment, stdout=log, stderr=subprocess.STDOUT,
+        )
+
+        def wait_for(predicate) -> None:
+            deadline = time.monotonic() + 90.0
+            while not predicate():
+                assert heartbeat.poll() is None and time.monotonic() < deadline, (
+                    posted(), output.read_text(encoding="utf-8", errors="replace"))
+                time.sleep(0.1)
+
+        try:
+            # The note appears only after the heartbeat started, as the probe's does.
+            wait_for(lambda: len(posted()) >= 1)
+            assert all(status["context"] == "release-heartbeat/test-windows" for status in posted())
+            note.write_text("debug=Enabled L=1/s0 W=2/s0 step=3/s0 | 100=- 1000=x", encoding="utf-8")
+            wait_for(lambda: any(s["context"].endswith("/probe") for s in posted()))
+            # Two more beats: the note is not posted again.
+            wait_for(lambda: len(posted()) >= 4)
+            Path(f"{progress}.done").write_text("success", encoding="utf-8")
+            assert heartbeat.wait(timeout=90.0) == 0
+        finally:
+            if heartbeat.poll() is None:
+                heartbeat.kill()
+                heartbeat.wait(timeout=10.0)
+
+    statuses = posted()
+    notes = [status for status in statuses if status["context"] != "release-heartbeat/test-windows"]
+    assert notes == [{
+        "state": "success",
+        "context": "release-heartbeat/test-windows/probe",
+        "description": "debug=Enabled L=1/s0 W=2/s0 step=3/s0 | 100=- 1000=x",
+    }]
+    beats = [status for status in statuses if status not in notes]
+    assert {status["state"] for status in beats[:-1]} == {"pending"}
+    assert beats[-1]["state"] == "success" and beats[-1]["description"].endswith(": success")

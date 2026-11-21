@@ -14,6 +14,7 @@
 //!    relaunched in the stopped state and `update.installResult{receipt_ref, launched:false,
 //!    reason_code}` goes to the new epoch. Success: the shell exits 0 (no `installResult{true}`:
 //!    the sidecar is gone; the next start reads the receipt, P2-26/27).
+//!
 //! shell.log keeps only ids, the version and fixed result codes, never frames or paths.
 use crate::shell_log;
 use serde_json::{json, Value};
@@ -150,10 +151,17 @@ pub trait Platform: Send + Sync {
     fn launch(&self, path: &Path, args: &[String]) -> io::Result<()>;
 }
 pub struct Win32Platform;
-/// `C:\dir\` lower case, `\\?\` stripped, for prefix comparison of image paths.
+/// `C:\dir\` lower case, for prefix comparison of image paths: the verbatim spellings
+/// fs::canonicalize gives a root are taken back to the Win32 ones QueryFullProcessImageNameW gives
+/// an image, `\\?\C:\dir` to `c:\dir\` and `\\?\UNC\host\share\dir` to `\\host\share\dir\`. Before
+/// 0.1.5 only `\\?\` was taken off, so a root on a share (`unc\host\…`) matched no image at all.
 pub fn path_prefix(path: &Path) -> String {
     let raw = path.to_string_lossy().replace('/', "\\");
-    let mut text = raw.strip_prefix(r"\\?\").unwrap_or(&raw).to_lowercase();
+    let plain = match raw.get(..8) {
+        Some(head) if head.eq_ignore_ascii_case(r"\\?\UNC\") => format!(r"\\{}", &raw[8..]),
+        _ => raw.strip_prefix(r"\\?\").map(str::to_owned).unwrap_or(raw),
+    };
+    let mut text = plain.to_lowercase();
     if !text.ends_with('\\') { text.push('\\'); }
     text
 }
@@ -426,7 +434,10 @@ pub fn request_frame(id: u64, cmd: &str, args: Value) -> Value {
 ///   `target\debug` also holds running test binaries, so it is not a root there).
 ///
 /// Every named root must resolve; if any does not, the result is empty and the install fails
-/// closed with `residual_roots_unknown` instead of checking a partial set.
+/// closed with `residual_roots_unknown` instead of checking a partial set. A root is kept as it
+/// resolved and, when that reads differently, also as it was named: a copy run from a mapped
+/// network drive resolves to its share (`\\?\UNC\host\share\…`), while the images of what it
+/// started may still be spelled with the drive letter (`Z:\…`).
 pub fn install_roots(shell_exe: &Path, sidecar: Option<&Path>, source_bin: Option<&Path>, release: bool, debug_override: Option<PathBuf>) -> Vec<PathBuf> {
     let mut named: Vec<Option<PathBuf>> = Vec::new();
     if let Some(root) = debug_override { named.push(Some(root)); }
@@ -440,8 +451,11 @@ pub fn install_roots(shell_exe: &Path, sidecar: Option<&Path>, source_bin: Optio
     }
     let mut roots: Vec<PathBuf> = Vec::new();
     for root in named {
-        let Some(resolved) = root.filter(|r| !r.as_os_str().is_empty()).and_then(|r| fs::canonicalize(r).ok()) else { return Vec::new() };
-        if !roots.contains(&resolved) { roots.push(resolved); }
+        let Some(root) = root.filter(|r| !r.as_os_str().is_empty()) else { return Vec::new() };
+        let Ok(resolved) = fs::canonicalize(&root) else { return Vec::new() };
+        for spelling in [resolved, root] {
+            if spelling.is_absolute() && !roots.iter().any(|known| path_prefix(known) == path_prefix(&spelling)) { roots.push(spelling); }
+        }
     }
     roots
 }
@@ -653,6 +667,15 @@ pub fn install_roots(shell_exe: &Path, sidecar: Option<&Path>, source_bin: Optio
         assert!(under(r"c:\program files\tesseract\Tesseract.exe", &prefixes));
         assert!(!under(r"C:\Program Files\Tesseract2\x.exe", &prefixes));
         assert!(!under(r"C:\Program Files\Tesseract", &prefixes));
+        // 0.1.5: an install on a share. canonicalize spells its root \\?\UNC\host\share\…, the image
+        // names are Win32 paths (\\host\share\…). Before, the root read unc\host\… and matched nothing.
+        let share = vec![path_prefix(Path::new(r"\\?\UNC\nas\apps\Tesseract"))];
+        assert_eq!(share, [r"\\nas\apps\tesseract\"]);
+        assert_eq!(path_prefix(Path::new(r"\\?\unc\NAS\Apps\Tesseract\")), share[0], "any case, trailing backslash or not");
+        assert!(under(r"\\nas\apps\Tesseract\_internal\bin\mihomo.exe", &share));
+        assert!(under(r"\\NAS\apps\tesseract\Tesseract.exe", &share));
+        assert!(!under(r"\\nas\apps\Tesseract2\x.exe", &share) && !under(r"\\nas\apps\Tesseract", &share));
+        assert!(!under(r"C:\nas\apps\Tesseract\x.exe", &share));
         // Roots: every named root must resolve, else none (the install then fails closed).
         let dir = temp_dir("roots"); let (app, side, bin) = (dir.0.join("app"), dir.0.join("side"), dir.0.join("bin"));
         for d in [&app, &side, &bin] { fs::create_dir_all(d).unwrap(); }
@@ -666,6 +689,18 @@ pub fn install_roots(shell_exe: &Path, sidecar: Option<&Path>, source_bin: Optio
         assert!(install_roots(&shell, None, Some(&dir.0.join("missing")), true, None).is_empty(), "an unresolvable root: none at all");
         assert!(install_roots(&shell, None, None, false, Some(dir.0.join("missing"))).is_empty());
         assert!(install_roots(&shell, None, None, false, None).is_empty());
+        // A root named through a link resolves elsewhere, as a mapped drive letter resolves to its
+        // share: kept both ways, so an image spelled either way is found. (A junction needs no
+        // privilege; only the junction is removed, never what it points at.)
+        let plain = |p: &Path| p.to_string_lossy().trim_start_matches(r"\\?\").to_owned();
+        let link = dir.0.join("link");
+        let made = Command::new("cmd").args(["/d", "/c", "mklink", "/J", &plain(&link), &plain(&app)]).stdout(Stdio::null()).stderr(Stdio::null()).status();
+        assert!(made.is_ok_and(|s| s.success()), "junction {}", plain(&link));
+        let roots = install_roots(&link.join("Tesseract.exe"), None, None, true, None);
+        fs::remove_dir(&link).unwrap();
+        assert_eq!(roots, vec![app.clone(), link.clone()], "as resolved, then as named");
+        let prefixes: Vec<String> = roots.iter().map(|r| path_prefix(r)).collect();
+        assert!(under(&format!(r"{}\bin\mihomo.exe", plain(&link)), &prefixes) && under(&format!(r"{}\bin\mihomo.exe", plain(&app)), &prefixes));
         let sha = sha256_hex(&mut &b"abc"[..]).unwrap();
         assert_eq!(sha, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     }

@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory = $true)] [string] $Context,
     [Parameter(Mandatory = $true)] [string] $ProgressFile,
-    [int] $IntervalSeconds = 15
+    [int] $IntervalSeconds = 15,
+    [string] $NoteFile = ""
 )
 
 # Release workflow only. A GitHub-hosted runner that stops communicating is
@@ -12,6 +13,10 @@ param(
 # runner shows within a minute and its last status names where it was. The step
 # writes "$ProgressFile.done" (success or failure) to end it. Nothing here can
 # change the step's own result: every failure to post is ignored.
+#
+# $NoteFile, when given, is one line the step writes after starting this (the test
+# job's runner probe, scripts/ci_runner_probe.ps1). It is posted once, as soon as it
+# appears, as the status "$Context/probe", so it outlives a lost runner too.
 
 $ErrorActionPreference = "Continue"
 $repository = $env:GITHUB_REPOSITORY
@@ -20,11 +25,11 @@ if (-not $repository -or -not $commit -or -not $env:GH_TOKEN) { exit 0 }
 $doneFile = "$ProgressFile.done"
 $started = Get-Date
 
-function Send-Status([string] $State, [string] $Text) {
+function Send-Status([string] $State, [string] $Text, [string] $StatusContext = $Context) {
     $text = ($Text -replace '\s+', ' ').Trim()
     if ($text.Length -gt 140) { $text = $text.Substring(0, 137) + "..." }
     try {
-        & gh api --method POST "repos/$repository/statuses/$commit" -f "state=$State" -f "context=$Context" -f "description=$text" *> $null
+        & gh api --method POST "repos/$repository/statuses/$commit" -f "state=$State" -f "context=$StatusContext" -f "description=$text" *> $null
     }
     catch { }
 }
@@ -50,6 +55,7 @@ function Read-Machine {
     return ($parts -join " ")
 }
 
+$notePosted = -not $NoteFile
 while ($true) {
     $minutes = [int] [Math]::Floor(((Get-Date) - $started).TotalMinutes)
     if (Test-Path -LiteralPath $doneFile) {
@@ -57,6 +63,13 @@ while ($true) {
         $state = if ($result -eq "success") { "success" } else { "failure" }
         Send-Status $state "after $minutes min: $result"
         exit 0
+    }
+    if (-not $notePosted) {
+        $note = Read-Text $NoteFile
+        if ($note) {
+            Send-Status "success" $note "$Context/probe"
+            $notePosted = $true
+        }
     }
     $doing = Read-Text $ProgressFile
     if (-not $doing) { $doing = "starting" }

@@ -2,11 +2,12 @@
 // at least, and the derived values (run / phase / cancelling, killswitch, tier state, rt:tier).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { cancellingOf, exitOf, killswitchOf, phaseOf, runOf, tierState, updateStateOf } from '../../src/rt/project.js';
 import { E1, E2, boot, evt, flush, hello, job, live, loadScenario, python, svc, tierSummary } from './rt_helpers.mjs';
+import { loadI18n } from '../fixtures/i18n/helpers.mjs';
 
 const ALL_TOPICS = ['service.state', 'route.published', 'tiers.summary', 'traffic.tick', 'traffic.history', 'logs.batch', 'core.info', 'jobs',
   'service.collect', 'tier.transition', 'exit.identity', 'protocols.mix', 'network.mode', 'killswitch.state', 'bastion.pool', 'gateway.current',
@@ -462,7 +463,26 @@ test('update.state row: every v1 state maps to the footer state', () => {
   assert.equal(updateStateOf(u('verified', { update_available: true, installable: true, error: { code: 'timeout' } })), 'found');
   assert.equal(updateStateOf(u('handoff')), 'ready');
   assert.equal(updateStateOf(u('failed', { error: { code: 'io' } })), 'fail');
+  assert.equal(updateStateOf(u('failed', { error: { code: 'io', message_key: 'errors.update.operation_failed' } })), 'fail');
   assert.equal(updateStateOf(u('idle', { error: { code: 'io' } })), 'fail');
+  // 0.1.5: the installer could not be started (installResult launched:false) — the check had
+  // worked, so not 检查更新失败 for the whole epoch
+  assert.equal(updateStateOf(u('failed', { version: null, error: { code: 'io', message_key: 'errors.update.launch_failed' } })), 'install_fail');
+});
+
+test('the footer word: 更新失败 for a launch failure, 检查更新失败 for a failed check (0.1.5)', async () => {
+  const { icu, icuEnv } = await loadI18n();
+  const label = lang => {
+    const v = JSON.parse(readFileSync(new URL(`../../src/i18n/locales/${lang}/shell.json`, import.meta.url), 'utf8'))['shell.foot.update.label'];
+    return typeof v === 'string' ? v : v.m;
+  };
+  const word = (lang, state) => icu.format(icu.parse(label(lang)), { state, version: '0.2.0' }, icuEnv(lang));
+  assert.deepEqual([word('zh_CN', 'fail'), word('zh_CN', 'install_fail')], ['检查更新失败', '更新失败']);
+  assert.deepEqual([word('en_US', 'fail'), word('en_US', 'install_fail')], ['Update check failed', 'Update failed']);
+  for (const lang of ['de_DE', 'es_ES', 'fr_FR', 'ja_JP', 'ko_KR', 'pt_BR', 'ru_RU']) {
+    assert.notEqual(word(lang, 'install_fail'), word(lang, 'other'), `${lang}: its own word, not the fallback`);
+    assert.notEqual(word(lang, 'install_fail'), word(lang, 'fail'), lang);
+  }
 });
 
 test('update.state / protocols.mix / gateway.current / route.published / config.changed rows', async () => {

@@ -1,7 +1,7 @@
 {
   "shell.brand.title": "Tesseract · {run, select, stopped {Arrêté} starting {Démarrage en cours} running {En marche} stopping {Arrêt en cours} failed {Échec du démarrage} unknown {Connexion en cours} other {Connexion en cours}}",
   "shell.foot.update.aria": "{status}. Aller à Paramètres · Application",
-  "shell.foot.update.label": "{state, select, found {{version} disponible} found_nover {Mise à jour disponible} checking {Recherche de mises à jour} fail {Échec de la vérification} dl {Téléchargement de la mise à jour} verify {Mise à jour prête} ready {Installation de la mise à jour} updated {Mis à jour} disabled {Mises à jour désactivées} unknown {Vérifier les mises à jour} other {À jour}}",
+  "shell.foot.update.label": "{state, select, found {{version} disponible} found_nover {Mise à jour disponible} checking {Recherche de mises à jour} fail {Échec de la vérification} install_fail {Échec de la mise à jour} dl {Téléchargement de la mise à jour} verify {Mise à jour prête} ready {Installation de la mise à jour} updated {Mis à jour} disabled {Mises à jour désactivées} unknown {Vérifier les mises à jour} other {À jour}}",
   "shell.nav.aria": "Navigation principale",
   "shell.nav.logs": "Journaux",
   "shell.nav.overview": "Aperçu",

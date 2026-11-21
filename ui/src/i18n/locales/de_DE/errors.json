@@ -270,6 +270,7 @@
   "errors.superseded": "Dieser Vorgang wurde durch einen späteren ersetzt; es gilt das neueste Ergebnis.",
   "errors.timeout": "Zeitüberschreitung: Der Vorgang wurde nicht rechtzeitig abgeschlossen. Prüfen Sie Ihre Netzwerkverbindung und versuchen Sie es dann erneut.",
   "errors.unknown": "Ein unbekannter Fehler ist aufgetreten. Versuchen Sie es erneut; tritt der Fehler wiederholt auf, exportieren Sie ein Diagnosepaket und melden Sie ihn.",
+  "errors.update.launch_failed": "Das Installationsprogramm konnte nicht gestartet werden. Suchen Sie nach Updates, um es erneut zu versuchen, oder installieren Sie es von Hand über die Release-Seite.",
   "errors.update.operation_failed": "Das Update ist fehlgeschlagen. Prüfen Sie Ihre Netzwerkverbindung und suchen Sie dann erneut nach Updates.",
   "errors.validation": "Einige Eingaben sind ungültig. Korrigieren Sie sie wie angegeben und versuchen Sie es dann erneut.",
   "errors.validation.field": "Dieser Wert ist ungültig. Korrigieren Sie ihn wie angegeben und speichern Sie dann erneut.",

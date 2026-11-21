@@ -67,9 +67,15 @@ powershell -ExecutionPolicy Bypass -File scripts\publish_release.ps1           #
 - 版本标签已推到 GitHub 但没有任何 Release（含草稿）用它时，`-MoveUnreleasedTag` 先取消该
   标签仍在运行的工作流，再删掉标签、给当前源码重新打签名标签；已发布的标签永远不动。
 
-发布工作流分两个 job：`test-windows`（环境准备 + 全部测试）通过后，`build-windows` 才在同一
-提交上构建（不再重跑测试）。GitHub 托管 runner 在本仓库的单个 job 里大约 60 分钟就会失联，
-所以任何一个 job 都不能接近这个时长。
+发布工作流里 `test-windows`（环境准备 + 全部 pytest）、`build-windows`（构建，不再重跑测试）和
+`suites`（调用 `.github/workflows/ci.yml`：shell、安装窗口和 UI 的测试，与拉取请求上跑的相同）
+同时在各自的 runner 上跑；`sign-release-manifest` 要等三者都通过，并核对 `test-windows` 与
+`build-windows` 用的是同一提交。GitHub 托管 runner 在本仓库的单个 job 里大约 60 分钟就会失联，
+所以任何一个 job 都不能接近这个时长，这些测试也不并进 `test-windows`。
+
+`test-windows` 在跑测试前用 `scripts/ci_runner_probe.ps1` 记录 runner 的进程与权限（谁占着
+旧 core-runner 测试用过的 PID、runner 代理与测试步骤的 PID 和会话、`whoami /priv`）。失联的
+runner 不留日志，所以心跳还会把一行摘要发成提交状态 `release-heartbeat/test-windows/probe`。
 
 下面是脚本内部做的分步流程，手动发布时参考：
 

@@ -1,5 +1,6 @@
 """T-P2-19: save grants, diagnostic bundle and filtered log export."""
 
+import gc
 import io
 import json
 import logging
@@ -731,6 +732,12 @@ def test_large_registry_scan_keeps_other_threads_running():
             stall[0], last = max(stall[0], now - last), now
 
     thread = threading.Thread(target=ticker)
+    # A generation-2 collection walks every object the whole pytest run still holds,
+    # with the GIL held, and on a 4-vCPU hosted runner that walk alone stalled the
+    # ticker past 0.5 s. Frozen, the run's heap is left out, so a collection during
+    # the scan walks only what the scan itself creates.
+    gc.collect()
+    gc.freeze()
     thread.start()
     try:
         secrets = SecretPass(values)
@@ -739,6 +746,7 @@ def test_large_registry_scan_keeps_other_threads_running():
     finally:
         stop.set()
         thread.join(5)
+        gc.unfreeze()
     assert not leaked and secrets.replacements > 0
     assert not any(value in cleaned for value in chosen[:200])
     assert stall[0] < 0.5, stall[0]

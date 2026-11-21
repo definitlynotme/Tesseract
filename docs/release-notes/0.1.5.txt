@@ -1,0 +1,57 @@
+[zh_CN]
+改进：住宅、ISP 类 Gateway 节点不再被直连检测误判
+
+- 不少住宅或 ISP 类的 Gateway 节点不接受从本机直接发起的连接，经回退层（Vanguard、Sentinel、Bastion）转发时却能正常使用。以前定时检测只做直连，直连不通就判为不可用，这样的节点既不会写进配置，也选不上。
+- 现在先做直连检测；直连不通时，再经回退层里可用的节点测一次，以这次结果为准。这次检测在单独的临时 Mihomo 里进行，不影响正在使用的连接。测得的延迟包含回退层那一段，照常受 Gateway 的延迟上限约束。
+- 回退层暂时没有可用节点时，节点显示「直连不通，暂无上游可测」，不再直接判为失效；回退层一有可用节点就立即重测。直连和经回退层都不通时，显示「直连和经回退层都不通」。
+- 经回退层的检测要启动一个临时 Mihomo，所以只在直连不通时进行，同一个节点 5 分钟内最多一次。它不占用「连通诊断」，停止运行或退出时立即取消。
+- 刚导入、还没选为出口的 Gateway 节点现在也会被检测，通过后就能直接选用。以前要先选中才会检测，而没通过检测的节点又选不上，例如导入到空 Gateway 层的 SOCKS5 节点始终无法选用。
+- 各层失败的节点现在都显示具体原因，例如「连接超时」「连接被拒绝」「延迟超过上限」「域名解析失败」「TLS 连接失败」，不再一律显示「节点不可用」。
+
+修复：应用内更新
+
+- 安装程序没能启动时，设置页会说明是安装程序没能启动，不再像网络出错那样提示；侧栏底部显示「更新失败」。安装包已经下载并校验过：点「检查更新」后用「立即更新」即可重试，也可以前往发布页手动安装。
+- 重新启动 Tesseract 后（例如在授权提示时选了「否」，安装程序把它重新打开）再点「立即更新」，会直接使用已下载并校验过的安装包，不再重新下载；只有安装包已不对应最新版本时才重新下载。
+- 检查更新进行中时发生的安装失败不会再丢失，设置页会照常说明更新失败。
+- 更新过程中安装程序请 Tesseract 退出、而安装步骤失败时，Tesseract 现在会照常退出，让安装继续。以前它会回到托盘：安装程序一直等到超时并报告 Tesseract 仍在运行，静默安装则直接中止。
+- 安装在网络共享路径或映射驱动器上的 Tesseract，判断是否为已安装副本时更准确。
+
+修复：安装程序
+
+- 安装程序现在只请当前会话中运行的 Tesseract 退出。以前它按文件登记，会把当时打开着 Tesseract.exe 的其他程序也一并请求关闭。
+- 从管理员命令行或其他账户运行安装程序时，被它关闭的 Tesseract 装完后按原来的身份重新打开，不再以安装程序的管理员身份打开。
+- 完成页的「打开」永远不会以管理员身份启动 Tesseract；从这里打不开时，页面会提示从开始菜单打开它。
+
+关于更新
+
+- 已安装 0.1.4 的，可以直接在应用内更新到本版本。
+- 0.1.0 到 0.1.3 仍按旧代码交接，应用内更新会停在「安装包已就绪」。请在浏览器中打开 github.com/definitlynotme/Tesseract/releases/latest，下载 Tesseract-Setup-0.1.5-win-x64.exe 手动安装一次（Tesseract 在托盘里运行也没关系，安装程序会先关闭它，装完再打开；它以管理员身份运行时，先从托盘退出它）。
+
+[en_US]
+Improved: residential and ISP Gateway nodes are no longer condemned by the direct check
+
+- Many residential or ISP Gateway nodes refuse connections made straight from this computer, yet work fine through the fallback tiers (Vanguard, Sentinel, Bastion). The scheduled check used to test only the direct path and marked such a node unusable when it failed, so the node was left out of the configuration and could not be picked.
+- The check now tests the direct path first. When that fails, it tests once more through a usable node of the fallback tiers, and that result stands. This check runs in a separate, temporary Mihomo and does not touch the connection in use. The latency it measures includes the fallback hop and is held to the Gateway's latency limit as usual.
+- When no fallback node is usable yet, the node shows "Unreachable directly, no upstream to test" instead of being marked dead, and it is tested again as soon as a fallback node is usable. When both paths fail, it shows "Unreachable directly and via fallback".
+- The check through the fallback tiers starts a temporary Mihomo, so it runs only after a direct failure and at most once per node every 5 minutes. It never takes the slot of the connectivity diagnostic, and it is cancelled at once when Tesseract stops or quits.
+- A Gateway node that was just imported and is not selected yet is now checked too, so it can be picked once it passes. Before, only a selected Gateway was checked, while a node that had not passed a check could not be selected: a SOCKS5 node imported into an empty Gateway tier, for example, could never be picked.
+- Failed nodes in every tier now show their actual reason, such as "Connection timed out", "Connection refused", "Latency over limit", "DNS lookup failed" or "TLS connection failed", instead of "Node unavailable" for all of them.
+
+Fixed: in-app updates
+
+- When the installer could not be started, Settings now says so instead of reading like a network error, and the sidebar shows "Update failed". The installer is already downloaded and verified: choose "Check for updates" and then "Update now" to try again, or install by hand from the release page.
+- After Tesseract restarts (for example, you answer No at the permission prompt and Setup opens it again), "Update now" uses the installer that was already downloaded and verified instead of downloading it again. It downloads again only when that installer no longer matches the latest release.
+- An install failure that happens while an update check is running is no longer lost: Settings reports the failed update as usual.
+- When Setup asks Tesseract to quit during an update and the install step then fails, Tesseract now quits so the install can go on. It used to go back to the tray: Setup waited until it timed out and reported that Tesseract was still running, and a silent install stopped.
+- Tesseract installed on a network share or a mapped drive is recognised as the installed copy more reliably.
+
+Fixed: Setup
+
+- Setup now asks only the Tesseract running in your session to quit. It used to register the file, which also asked every other program that had Tesseract.exe open at the time to close.
+- When Setup runs from an elevated console or another account, the Tesseract it closed opens again afterwards as it ran before, not with Setup's administrator rights.
+- "Open" on the last page never starts Tesseract as administrator. When it cannot open Tesseract from there, the page says to open it from the Start menu.
+
+About updating
+
+- If you have 0.1.4, you can update to this version from inside the app.
+- 0.1.0 to 0.1.3 still hand off with their old code, so their in-app update stops at "Installer ready". Open github.com/definitlynotme/Tesseract/releases/latest in your browser, download Tesseract-Setup-0.1.5-win-x64.exe and install it once (Tesseract may keep running in the tray: Setup closes it first and opens it again afterwards. If it runs as administrator, quit it from the tray first.).

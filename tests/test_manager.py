@@ -30,6 +30,7 @@ import tier3_candidate_scheduler as tier3_candidate_scheduler_module
 import tier3_refresh_controller as tier3_refresh_controller_module
 from alerts import AlertManager
 from killswitch import KillSwitchManager
+from gateway_check import CHAIN_PROBE_INTERVAL_SECONDS, ChainVerdict
 from manager import (
     ProxyTierManager,
     Tier3ControllerDecision,
@@ -5692,6 +5693,265 @@ class ManagerTests(unittest.TestCase):
 
             self.assertEqual(manager._exit_max_pool_size(), 50)
             self.assertEqual(checked, [gateway])
+
+    def test_run_cycle_checks_unselected_gateway_candidate_so_it_can_be_selected(self) -> None:
+        # Field report (0.1.4): a SOCKS5 node imported into an empty Gateway
+        # could never be picked.  Picking needs the node in the Mihomo export
+        # (ALIVE/SLOW), and the cycle only checked Gateway once one was picked.
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manager = self._minimal_manager(Path(temp_dir))
+            manager.config["tiers"]["exit"]["nodes"] = [
+                {"name": "1", "uri": "socks5://isp-user:isp-pass@isp.example.net:1080#1"},
+            ]
+            now = time.monotonic()
+            for tier_id in ["tier1", "tier2", "tier3", "exit"]:
+                manager.last_check_monotonic[tier_id] = now
+                manager.last_urgent_check_monotonic[tier_id] = now
+            manager.last_collect_tier3 = now
+            # The import's config reload: a fresh, never-checked candidate.
+            manager.reload_tier_state("exit")
+            self.assertFalse(manager._exit_active())
+            self.assertEqual(
+                [node.status for node in manager.runtime_effective_nodes("exit")],
+                [NodeStatus.UNKNOWN],
+            )
+            calls: list[str] = []
+            manager.check_tier1 = lambda: calls.append("tier1")
+            manager.check_tier2 = lambda **_kwargs: calls.append("tier2")
+            manager.check_tier3 = lambda **_kwargs: calls.append("tier3")
+            manager.refresh_exit_remote = lambda: calls.append("exit_remote") or False
+            manager.evaluate_state = lambda: {"ok": True}
+            probed: list[str] = []
+
+            async def fake_test_nodes(nodes, **_kwargs):
+                tested = []
+                for node in nodes:
+                    probed.append(f"{node.address}:{node.port}")
+                    updated = node.clone()
+                    updated.status = NodeStatus.ALIVE
+                    updated.latency_ms = 120
+                    tested.append(updated)
+                return tested
+
+            with patch.object(manager_module, "test_nodes", fake_test_nodes):
+                manager.run_cycle()
+
+            self.assertEqual(probed, ["isp.example.net:1080"])
+            self.assertEqual(
+                [node.status for node in manager.runtime_effective_nodes("exit")],
+                [NodeStatus.ALIVE],
+            )
+            # Unused Gateway: candidates are checked, subscriptions not fetched.
+            self.assertNotIn("exit_remote", calls)
+
+    # -- Gateway checks: direct first, then through the fallback layers ------
+
+    _ISP_GATEWAY_URI = "socks5://isp-user:isp-pass@isp.example.net:1080#isp"
+
+    def _gateway_check_manager(self, temp_path: Path, prober=None) -> ProxyTierManager:
+        manager = self._minimal_manager(temp_path)
+        manager.config["tiers"]["exit"]["nodes"] = [{"name": "isp", "uri": self._ISP_GATEWAY_URI}]
+        manager.reload_tier_state("exit")
+        manager.gateway_chain_prober = prober
+        return manager
+
+    @staticmethod
+    def _usable_sentinel() -> Node:
+        return Node(
+            name="sentinel",
+            protocol="ss",
+            uri="ss://sentinel",
+            address="sentinel.example",
+            port=8388,
+            tier="tier2",
+            method="aes-256-gcm",
+            password="sentinel-password",
+            status=NodeStatus.ALIVE,
+            latency_ms=110,
+        )
+
+    @staticmethod
+    def _direct_probe(status: NodeStatus):
+        async def fake_test_nodes(nodes, **_kwargs):
+            tested = []
+            for node in nodes:
+                updated = node.clone()
+                updated.status = status
+                alive = status in {NodeStatus.ALIVE, NodeStatus.SLOW}
+                updated.latency_ms = 95 if alive else None
+                updated.suspicious_reason = None if alive else "tcp connection timed out"
+                tested.append(updated)
+            return tested
+
+        return fake_test_nodes
+
+    class _ChainProber:
+        def __init__(self, result=None) -> None:
+            self.result = result or {"state": "success", "latency_ms": 300.0, "reason": "ok"}
+            self.calls: list[tuple[Node, list[Node]]] = []
+
+        def __call__(self, node, upstream):
+            self.calls.append((node, upstream))
+            return self.result
+
+    def _exit_effective(self, manager: ProxyTierManager) -> Node:
+        (node,) = manager.runtime_effective_nodes("exit")
+        return node
+
+    def test_gateway_direct_pass_needs_no_chain_probe(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.ALIVE)):
+                manager.check_exit()
+
+            self.assertEqual(prober.calls, [])
+            self.assertEqual(self._exit_effective(manager).status, NodeStatus.ALIVE)
+
+    def test_gateway_direct_failure_is_checked_through_usable_fallback_nodes(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+
+            self.assertEqual(len(prober.calls), 1)
+            probed, upstream = prober.calls[0]
+            self.assertEqual((probed.address, probed.port), ("isp.example.net", 1080))
+            self.assertEqual([node.name for node in upstream], ["sentinel"])
+            node = self._exit_effective(manager)
+            self.assertEqual(node.status, NodeStatus.ALIVE)
+            self.assertEqual(node.latency_ms, 300.0)
+            self.assertFalse(manager._gateway_waiting_for_upstream)
+
+    def test_gateway_failing_direct_and_through_fallback_is_unreachable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber({"state": "failed", "latency_ms": None, "reason": "timeout"})
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+
+            node = self._exit_effective(manager)
+            self.assertEqual(node.status, NodeStatus.DEAD)
+            self.assertEqual(node.suspicious_reason, "gateway_unreachable")
+
+    def test_gateway_direct_failure_without_fallback_nodes_waits_for_upstream(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            dead_sentinel = self._usable_sentinel()
+            dead_sentinel.status = NodeStatus.DEAD
+            manager.runtime_nodes["tier2"] = [dead_sentinel]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+
+            self.assertEqual(prober.calls, [])
+            node = self._exit_effective(manager)
+            self.assertEqual(node.status, NodeStatus.SUSPICIOUS)
+            self.assertEqual(node.suspicious_reason, "gateway_no_upstream")
+            self.assertTrue(manager._gateway_waiting_for_upstream)
+            # A verdict, not a deferral: the tier is marked checked.
+            self.assertFalse(manager._is_due("exit", time.monotonic(), 60))
+
+    def test_gateway_chain_probe_is_rate_limited_across_checks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+                manager.check_exit()
+
+            self.assertEqual(len(prober.calls), 1)
+            self.assertEqual(self._exit_effective(manager).status, NodeStatus.ALIVE)
+
+            # Once the interval has passed, the next direct failure probes again.
+            for key, verdict in list(manager._gateway_chain_verdicts.items()):
+                manager._gateway_chain_verdicts[key] = ChainVerdict(
+                    verdict.probed_at - CHAIN_PROBE_INTERVAL_SECONDS,
+                    verdict.outcome,
+                    verdict.latency_ms,
+                    verdict.reason,
+                )
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+
+            self.assertEqual(len(prober.calls), 2)
+
+    def test_run_cycle_rechecks_waiting_gateway_as_soon_as_upstream_is_usable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.check_exit()
+            self.assertEqual(self._exit_effective(manager).suspicious_reason, "gateway_no_upstream")
+            now = time.monotonic()
+            for tier_id in ["tier1", "tier2", "tier3", "exit"]:
+                manager.last_check_monotonic[tier_id] = now
+                manager.last_urgent_check_monotonic[tier_id] = now
+            manager.last_collect_tier3 = now
+            manager.check_tier1 = lambda: None
+            manager.check_tier2 = lambda **_kwargs: None
+            manager.check_tier3 = lambda **_kwargs: None
+            manager.evaluate_state = lambda: {"ok": True}
+
+            # Still no usable fallback node: nothing is rechecked early.
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.run_cycle()
+            self.assertEqual(prober.calls, [])
+
+            # The fallback layers gain a usable node: Gateway is rechecked now.
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                manager.run_cycle()
+                manager.run_cycle()
+
+            self.assertEqual(len(prober.calls), 1)
+            self.assertEqual([node.name for node in prober.calls[0][1]], ["sentinel"])
+            self.assertEqual(self._exit_effective(manager).status, NodeStatus.ALIVE)
+            self.assertFalse(manager._gateway_waiting_for_upstream)
+
+    def test_single_gateway_recheck_uses_the_same_direct_then_chain_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            prober = self._ChainProber()
+            manager = self._gateway_check_manager(Path(temp_dir), prober)
+            manager.runtime_nodes["tier2"] = [self._usable_sentinel()]
+            (gateway,) = manager.runtime_nodes["exit"]
+
+            with patch.object(manager_module, "test_nodes", self._direct_probe(NodeStatus.DEAD)):
+                tested = manager._test_runtime_node_by_identity(
+                    "exit", manager._node_identity(gateway), persist_result=False,
+                )
+
+            self.assertEqual(len(prober.calls), 1)
+            self.assertEqual(tested.status, NodeStatus.ALIVE)
+
+    def test_run_cycle_skips_gateway_check_when_no_gateway_is_configured(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            manager = self._minimal_manager(Path(temp_dir))
+            now = time.monotonic()
+            for tier_id in ["tier1", "tier2", "tier3"]:
+                manager.last_check_monotonic[tier_id] = now
+                manager.last_urgent_check_monotonic[tier_id] = now
+            manager.last_collect_tier3 = now
+            calls: list[str] = []
+            manager.check_tier1 = lambda: calls.append("tier1")
+            manager.check_tier2 = lambda **_kwargs: calls.append("tier2")
+            manager.check_tier3 = lambda **_kwargs: calls.append("tier3")
+            manager.check_exit = lambda **_kwargs: calls.append("exit")
+            manager.evaluate_state = lambda: {"ok": True}
+
+            manager.run_cycle()
+
+            self.assertEqual(calls, [])
 
     def test_normal_check_resets_urgent_due_timer(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

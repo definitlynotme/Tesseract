@@ -99,7 +99,9 @@ export function updateStateOf(u) {
     // installed, so the footer offers the version again (有新版本) instead of 更新已就绪 for good.
     case 'verified': return u.error ? 'found' : 'verify';
     case 'handoff': return 'ready';
-    case 'failed': return 'fail';
+    // 0.1.5: the shell could not start the installer (bridge_update LAUNCH_FAILED_KEY). The check
+    // and the download had worked, so the footer says 更新失败, not 检查更新失败, for that epoch.
+    case 'failed': return u.error && u.error.message_key === 'errors.update.launch_failed' ? 'install_fail' : 'fail';
     case 'available': return 'found';
     case 'idle': return u.update_available ? 'found' : (u.error ? 'fail' : 'latest');
     default: return 'latest';
