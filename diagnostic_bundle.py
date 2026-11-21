@@ -707,6 +707,9 @@ def state_file_candidates(data_dir: Path, extra: Iterable[tuple[str, Path]] = ()
         "tier3-source-state.json": data_dir / "tier3-source-state.json",
         "tier3-control-state.json": data_dir / "tier3-control-state.json",
         "mihomo-runtime.yaml": data_dir / "mihomo-runtime.yaml",
+        # 0.1.6: the update receipt and notices, and the last update attempts (bridge_update).
+        "app-update-state.json": data_dir / "app-update-state.json",
+        "app-update-history.json": data_dir / "app-update-history.json",
     }
     for name, path in extra:
         candidates[str(name)] = Path(path)

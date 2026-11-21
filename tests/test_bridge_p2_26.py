@@ -328,7 +328,8 @@ def test_install_verified_durable_opaque_receipt_no_launch(setup_owner, monkeypa
     assert set(result) == {"verified", "handoff_pending", "receipt_ref"}
     assert result["verified"] is True and result["handoff_pending"] is True
     assert adapt_result("app.update.install", result)[0] is True
-    assert len(replacements) == 1
+    # One receipt write; 0.1.6's attempt history is its own file (app-update-history.json).
+    assert [Path(args[1]).name for args in replacements] == ["app-update-state.json", "app-update-history.json"]
     assert owner.snapshot()["data"]["state"] == "verified"
     assert not state.notice_due(owner.state_path, "2.0.0")
     receipt = restart(owner, updater).resolve_receipt(result["receipt_ref"])

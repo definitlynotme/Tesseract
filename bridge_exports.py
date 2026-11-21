@@ -97,6 +97,15 @@ STATE_TOPICS = (
 # Written by the shell (``data/logs/shell.log``) and the sidecar
 # (``data/logs/sidecar-stderr.log``); both roll over to ``<name>.1``.
 EXTRA_LOG_FAMILIES = ("shell.log", "sidecar-stderr.log")
+# 0.1.6: the bridge's own log (``data/bridge.log``): the update owner's failures, the hand-off
+# and installResult lines. Up to 0.1.5 no bundle had them (11-22: an update failure left no trace).
+DATA_LOG_FAMILIES = ("bridge.log",)
+# The in-app updater's and the setup window's Inno logs in the user's %TEMP%
+# (shell/setup/README.md "Logs"): whether an in-app install ran, finished or was cancelled.
+SETUP_LOG_PATTERNS = ("Tesseract-Update-*.log", "Tesseract-Setup-*.log")
+SETUP_LOG_COUNT = 4
+SETUP_LOG_TAIL_BYTES = 512 * 1024
+SETUP_LOG_MAX_AGE_SECONDS = 30 * 24 * 3600
 _LOG_FIELDS = ("seq", "ts_ms", "rx_ms", "source", "level", "category", "key",
                "title", "detail", "raw")
 _CSV_COLUMNS = ("seq", "time", "source", "level", "category", "key", "title",
@@ -199,6 +208,10 @@ class BundlePaths:
     events_file: Path | None
     extra_log_dir: Path | None
     home: str | None
+    # 0.1.6: bridge.log sits in the data folder itself (DATA_LOG_FAMILIES); the in-app update's
+    # Setup logs in the user's %TEMP% (SETUP_LOG_PATTERNS). None: not collected.
+    data_dir: Path | None = None
+    setup_log_dir: Path | None = None
 
 
 class ExportSourcesPort(Protocol):
@@ -513,7 +526,37 @@ class SessionExportSources:
             events_file=structured_event_log_path(log_file),
             extra_log_dir=Path(paths.data_dir) / "logs",
             home=str(Path.home()),
+            data_dir=Path(paths.data_dir),
+            setup_log_dir=Path(tempfile.gettempdir()),
         )
+
+    def update_environment(self) -> Mapping[str, Any]:
+        """What decides how an in-app update reaches GitHub on this computer (0.1.6).
+
+        Booleans and route labels only, never an address, a PAC URL or a path:
+        the browser follows a PAC script or WPAD, the updater only a manual
+        proxy (urllib getproxies), and with the service stopped it has no route
+        through Tesseract itself (11-22: "the browser downloads it, the app says
+        network").
+        """
+        facts: dict[str, Any] = {"system_proxy": _wininet_proxy_facts(),
+                                 "env_proxy": any(os.environ.get(name) for name in
+                                                  ("HTTPS_PROXY", "https_proxy", "HTTP_PROXY", "http_proxy",
+                                                   "ALL_PROXY", "all_proxy"))}
+        try:
+            import app_updater
+            core = self._session.runtime.update_download_proxy_url()
+            facts["routes"] = [label for label, _opener in app_updater.network_routes(core)]
+        except Exception as exc:
+            facts["routes"] = None
+            facts["routes_error"] = type(exc).__name__
+        try:
+            import bridge_update
+            facts["installed_copy"] = bool(bridge_update.installed_copy())
+        except Exception as exc:
+            facts["installed_copy"] = None
+            facts["installed_copy_error"] = type(exc).__name__
+        return facts
 
     def app_facts(self) -> Mapping[str, Any]:
         try:
@@ -534,6 +577,51 @@ class SessionExportSources:
             except Exception:
                 facts[topic] = None
         return facts
+
+
+_INTERNET_SETTINGS = r"Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+
+
+def _wininet_proxy_facts() -> dict[str, Any] | None:
+    """The user's WinINet proxy settings as booleans, never their values (0.1.6).
+
+    ``manual_*``: what urllib.request.getproxies() (the updater's "system
+    proxy" route) follows. ``pac_url_set`` / ``auto_detect``: what a browser
+    follows and the updater does not. None off Windows or when unreadable.
+    """
+    try:
+        import winreg
+    except ImportError:
+        return None
+    facts: dict[str, Any] = {}
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _INTERNET_SETTINGS) as key:
+            def value(name: str) -> Any:
+                try:
+                    return winreg.QueryValueEx(key, name)[0]
+                except OSError:
+                    return None
+            server = str(value("ProxyServer") or "").strip()
+            hosts = [entry.split("=", 1)[-1].strip().lower() for entry in server.split(";") if entry.strip()]
+            facts.update(
+                manual_enabled=bool(value("ProxyEnable")),
+                manual_server_set=bool(server),
+                manual_server_loopback=bool(hosts) and all(
+                    host.startswith(("127.", "localhost", "[::1]", "::1")) for host in hosts),
+                pac_url_set=bool(str(value("AutoConfigURL") or "").strip()),
+            )
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, _INTERNET_SETTINGS + r"\Connections") as key:
+            try:
+                blob = winreg.QueryValueEx(key, "DefaultConnectionSettings")[0]
+            except OSError:
+                blob = None
+        if isinstance(blob, (bytes, bytearray)) and len(blob) > 8:
+            # INTERNET_PER_CONN_FLAGS: 0x02 manual proxy, 0x04 PAC URL, 0x08 auto-detect (WPAD).
+            facts.update(auto_detect=bool(blob[8] & 0x08), connection_pac=bool(blob[8] & 0x04),
+                         connection_manual=bool(blob[8] & 0x02))
+    except OSError:
+        return facts or None
+    return facts
 
 
 # ------------------------------------------------------- known-secret pass
@@ -1420,12 +1508,47 @@ class ExportService:
                 raise SecretLeak("filtered export failed the registry check")
         return text.encode("utf-8"), len(records), missing
 
-    def _extra_logs(self, directory: Path | None, known: KnownSecrets, secrets: SecretPass,
+    def _setup_logs(self, directory: Path | None, known: KnownSecrets, secrets: SecretPass,
                     times: dict[str, int]) -> list[DiagnosticAttachment]:
+        """The newest in-app update / setup window Inno logs in %TEMP% (0.1.6)."""
         attachments: list[DiagnosticAttachment] = []
         if directory is None:
             return attachments
-        for family in EXTRA_LOG_FAMILIES:
+        found: list[tuple[float, Path]] = []
+        now = time.time()
+        for pattern in SETUP_LOG_PATTERNS:
+            try:
+                candidates = list(directory.glob(pattern))
+            except OSError:
+                continue
+            for path in candidates:
+                try:
+                    modified = path.stat().st_mtime
+                except OSError:
+                    continue
+                if now - modified <= SETUP_LOG_MAX_AGE_SECONDS:
+                    found.append((modified, path))
+        for _modified, path in sorted(found, key=lambda item: item[0], reverse=True)[:SETUP_LOG_COUNT]:
+            tail = _read_tail(path, SETUP_LOG_TAIL_BYTES)
+            if tail is None:
+                continue
+            text, size, truncated = tail
+            times[path.name] = self._wall_ms()
+            try:
+                attachments.append(DiagnosticAttachment(
+                    path.name, redact_lines(text, known, secrets), source_bytes=size,
+                    truncated=truncated))
+            except ValueError:
+                continue  # not a plain file name the bundle accepts
+        return attachments
+
+    def _extra_logs(self, directory: Path | None, known: KnownSecrets, secrets: SecretPass,
+                    times: dict[str, int], families: Iterable[str] = EXTRA_LOG_FAMILIES
+                    ) -> list[DiagnosticAttachment]:
+        attachments: list[DiagnosticAttachment] = []
+        if directory is None:
+            return attachments
+        for family in families:
             budget = EXTRA_LOG_TAIL_BYTES
             for path in (directory / family, directory / f"{family}.1"):
                 if budget <= 0:
@@ -1486,6 +1609,9 @@ class ExportService:
         times: dict[str, int] = {}
         attachments, key_events, retention = self._log_model_attachment(times)
         attachments += self._extra_logs(paths.extra_log_dir, known, secrets, times)
+        attachments += self._extra_logs(getattr(paths, "data_dir", None), known, secrets, times,
+                                        families=DATA_LOG_FAMILIES)
+        attachments += self._setup_logs(getattr(paths, "setup_log_dir", None), known, secrets, times)
         published, unavailable = {}, []
         for topic, event in self.sources.published_facts().items():
             if not isinstance(event, Mapping):
@@ -1499,6 +1625,12 @@ class ExportService:
         status: dict[str, Any] = {"published": published, "unavailable": unavailable}
         if retention is not None:
             status["log_model"] = retention
+        environment = getattr(self.sources, "update_environment", None)
+        if callable(environment):
+            try:
+                status["update_environment"] = dict(environment())
+            except Exception as exc:  # a fact that cannot be read never fails the bundle
+                status["update_environment"] = {"error": type(exc).__name__}
         now = datetime.now().astimezone()
         times["bundle"] = self._wall_ms()
         inputs = DiagnosticBundleInputs(

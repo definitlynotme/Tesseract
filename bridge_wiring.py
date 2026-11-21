@@ -1029,6 +1029,10 @@ class RoutedUpdater:
 
     def __init__(self, core_proxy_url: Callable[[], str | None]) -> None:
         self._core_proxy_url = core_proxy_url
+        # 0.1.6: what the last check or download went through, for the attempt history
+        # (labels only: "core proxy"/"system proxy"/"direct", "github"/"mirror <host>").
+        self._last_opener: Any = None
+        self._last_route_labels: tuple[str, ...] = ()
 
     def _routes(self) -> list[Any]:
         import app_updater
@@ -1036,12 +1040,26 @@ class RoutedUpdater:
             core = self._core_proxy_url()
         except Exception:  # No Core route is the neutral answer, never a failure.
             core = None
-        return app_updater.network_routes(core)
+        routes = app_updater.network_routes(core)
+        self._last_route_labels = tuple(label for label, _opener in routes)
+        return routes
 
     def _opener(self) -> Any:
         # Each source (github.com, then the GitHub mirrors) over each route.
         import app_updater
-        return app_updater.SourcedOpener(app_updater.RoutedOpener(self._routes))
+        opener = app_updater.SourcedOpener(app_updater.RoutedOpener(self._routes))
+        self._last_opener = opener
+        self._last_route_labels = ()
+        return opener
+
+    def transport_facts(self) -> dict[str, Any]:
+        """The routes the last operation was offered and the source/route that answered last."""
+        opener = self._last_opener
+        return {
+            "routes": list(self._last_route_labels),
+            "source": getattr(opener, "last_source", None),
+            "route": getattr(opener, "last_route", None),
+        }
 
     def check_latest_update(self, *, current_version: str) -> Any:
         """The signed manifest first (no API rate limit, mirrored), the API second."""

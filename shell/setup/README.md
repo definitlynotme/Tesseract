@@ -9,6 +9,15 @@ Inno's, unchanged.
 - **Hand-over**: any command-line switch (`/VERYSILENT`, `/DIR=…`, the in-app updater's
   `/SILENT …`) or a machine without the WebView2 runtime runs the embedded Inno package as it is,
   with its own wizard or silently, and returns its exit code.
+- **The in-app update's elevation** (`src/handover.rs`, 0.1.6): the updater's run
+  (`/RESTARTAPPLICATIONS`, silent, started unelevated) shows a small native window at once
+  (正在更新 Tesseract… and what to do in User Account Control), brings it to the foreground (the
+  app that started it had the foreground; from 0.1.6 the shell also calls
+  `AllowSetForegroundWindow` for it) and makes it the owner of the elevation. Before, the
+  hand-over elevated with no window at all, and Windows shows such a request only as a flashing
+  taskbar button: on 11-22 the app vanished, nothing seemed to happen, and the user opened the old
+  version again. The window closes as soon as the elevation is answered; Inno's own `/SILENT`
+  progress window takes over. Deployments (`/VERYSILENT`, an elevated console) show nothing.
 - **The command line** (`sys::params`, 11-19) is split the way Inno splits it: a double quote
   toggles quoting and a backslash is literal. So `/DIR="C:\Program Files\Tesseract\"
   /VERYSILENT` means here what it means to Inno, where the C runtime's rules would read `\"` as a

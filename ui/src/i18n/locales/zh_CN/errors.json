@@ -1091,6 +1091,26 @@
     "m": "更新操作失败。检查网络后重新检查更新。",
     "_desc": "应用更新的检查、下载或安装失败（bridge_update）"
   },
+  "errors.update.rate_limited": {
+    "m": "GitHub 暂时拒绝了来自这个网络的请求（访问次数受限）。稍后再检查更新，或启动服务后再试。",
+    "_desc": "应用更新的检查或下载失败（bridge_update，app_updater.failure_kind = rate_limited）：每个回应都是 HTTP 403/429。GitHub 对未登录的访问按出口 IP 限次，共用出口的移动网络常被用完；启动服务后更新会经过 Tesseract 的代理。设置页更新行「检查或安装更新失败：」之后的原因"
+  },
+  "errors.update.storage_failed": {
+    "m": "无法在这台电脑上保存更新文件（文件被占用、没有权限或磁盘已满），与网络无关。关闭正在运行的安装程序、暂停杀毒软件后再试。",
+    "_desc": "应用更新的下载失败（failure_kind = storage）：%LOCALAPPDATA%\\Tesseract\\updates 无法创建、写入、读取或替换，例如同名安装程序还在运行（WinError 32/5）或杀毒软件占着它。与网络无关。设置页更新行「检查或安装更新失败：」之后的原因"
+  },
+  "errors.update.unreachable": {
+    "m": "连不上 GitHub 和下载镜像：每个地址、每条线路都没有回应。检查网络后重新检查更新，或前往发布页手动安装。",
+    "_desc": "应用更新的检查或下载失败（failure_kind = network）：github.com 与各镜像在每条线路上（Tesseract 代理、系统代理、直接连接）都没有回应（DNS、连接、TLS、超时或 HTTP 错误），且这次有 Tesseract 代理线路。设置页更新行「检查或安装更新失败：」之后的原因"
+  },
+  "errors.update.unreachable_direct": {
+    "m": "服务没有运行，更新只能直连 GitHub，但没有连上。启动服务后再检查更新，更新会经过代理；或前往发布页手动安装。",
+    "_desc": "应用更新的检查或下载失败（failure_kind = network），而这次没有 Tesseract 代理线路（服务没有运行或出口还没验证），只试了系统代理和直接连接。服务运行时更新先走 Tesseract 自己的代理（app_updater.network_routes 的 core proxy），所以启动服务就是办法（11-22 报告：用户在服务停止时更新失败，浏览器却能下载）。设置页更新行「检查或安装更新失败：」之后的原因"
+  },
+  "errors.update.verify_failed": {
+    "m": "下载到的更新文件没有通过校验，可能被网络或镜像截断、替换；每个下载地址都试过了。稍后再试，或前往发布页手动安装。",
+    "_desc": "应用更新的检查或下载失败（failure_kind = integrity）：有地址回应了，但内容没通过大小、签名或 SHA-256 校验，github.com 与每个镜像都换过（SourcedOpener.drop_last_source）。设置页更新行「检查或安装更新失败：」之后的原因"
+  },
   "errors.validation": {
     "m": "填写的内容有误。按提示修改后再试。",
     "_desc": "通用错误（code = validation）：作业失败、提醒测试等按错误码给出的一级键 errors.<code>"

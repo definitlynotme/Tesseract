@@ -101,7 +101,10 @@ export function updateStateOf(u) {
     case 'handoff': return 'ready';
     // 0.1.5: the shell could not start the installer (bridge_update LAUNCH_FAILED_KEY). The check
     // and the download had worked, so the footer says 更新失败, not 检查更新失败, for that epoch.
-    case 'failed': return u.error && u.error.message_key === 'errors.update.launch_failed' ? 'install_fail' : 'fail';
+    // 0.1.6: so does any failure of the install itself (download, verification, saving the file:
+    // Error.params.stage 'install'); a failed check stays 检查更新失败.
+    case 'failed': return u.error && (u.error.message_key === 'errors.update.launch_failed'
+      || (u.error.params && u.error.params.stage === 'install')) ? 'install_fail' : 'fail';
     case 'available': return 'found';
     case 'idle': return u.update_available ? 'found' : (u.error ? 'fail' : 'latest');
     default: return 'latest';

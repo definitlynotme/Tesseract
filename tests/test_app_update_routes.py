@@ -333,7 +333,7 @@ def test_an_install_failure_reaches_bridge_log_without_urls(tmp_path):
         bridge_log.removeHandler(handler)
     messages = [r.getMessage() for r in handler.records if r.name == "tesseract.bridge.update"]
     assert messages == [
-        "update install failed: code=io AppUpdateError(Download failed for SHA256SUMS.txt.sig) "
+        "update install failed: code=io kind=network AppUpdateError(Download failed for SHA256SUMS.txt.sig) "
         "<- RouteFailure(direct=TimeoutError)"]
     assert not any("secret" in m for m in messages)
 

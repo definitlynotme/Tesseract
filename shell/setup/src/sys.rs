@@ -162,6 +162,13 @@ pub enum Run { Exited(u32), Declined, Failed(String) }
 /// Runs `exe params` and waits for it. `elevate`: the "runas" verb (UAC). Declined: the user
 /// said no to the elevation prompt.
 pub fn run_and_wait(owner: isize, exe: &Path, params: &str, elevate: bool) -> Run {
+    run_and_wait_then(owner, exe, params, elevate, || {})
+}
+
+/// [`run_and_wait`], calling `started` once ShellExecuteExW has returned: the elevation was
+/// answered (or the launch failed), and the process, if any, runs. The in-app updater's hand-over
+/// closes its waiting window there (handover.rs).
+pub fn run_and_wait_then(owner: isize, exe: &Path, params: &str, elevate: bool, started: impl FnOnce()) -> Run {
     let file = wide(exe.as_os_str());
     let params = wide(OsStr::new(params));
     let dir = wide(exe.parent().unwrap_or(Path::new(".")).as_os_str());
@@ -176,7 +183,9 @@ pub fn run_and_wait(owner: isize, exe: &Path, params: &str, elevate: bool) -> Ru
         nShow: SW_SHOWNORMAL.0,
         ..Default::default()
     };
-    if let Err(e) = unsafe { ShellExecuteExW(&mut info) } {
+    let launched = unsafe { ShellExecuteExW(&mut info) };
+    started();
+    if let Err(e) = launched {
         if e.code() == ERROR_CANCELLED.to_hresult() { return Run::Declined; }
         return Run::Failed(e.message().trim().to_owned());
     }

@@ -1,0 +1,49 @@
+[zh_CN]
+修复：Gateway 运行中、停止时都能选用
+
+- 运行中选用 Gateway 节点时，保存选择会把 Gateway 层的节点重新载入一遍，刚通过检测的节点又变回待检查。代理核心只载入通过检测的节点，于是这次载入的 Gateway 只剩「拒绝」，出口检测随即失败，提示「配置应用失败」（原因误写成 Bastion Layer），服务也被重启。现在选用只改选择，不再重新载入节点，选中的节点直接生效。
+- 服务停止时点「使用」，以前总是提示「找不到这个节点，节点列表可能已经更新」，刷新也没用。现在会保存这次选择，下次启动服务时生效。
+- 启动服务时，如果已选了 Gateway 而它还没检测过，会先检测它（先直连，不通时经回退层），再生成配置。以前启动时它被当作不可用，出口直接关闭。
+- 经回退层转发的 Gateway 多了一跳，出口检测现在给它和启动时相同的时间，不再只有 1.5 秒。
+- 这类失败的原因现在写明是出口（FINAL-EXIT）检测失败，并附上检测遇到的情况。
+
+修复：应用内更新
+
+- 应用内更新时，安装程序会先显示「正在更新 Tesseract…」窗口，再由它请求「用户帐户控制」授权。以前 Tesseract 关闭后没有任何窗口，授权提示常常只在任务栏上闪烁，看起来像什么都没发生；这时重新打开 Tesseract 再点「立即更新」，新下载的安装包替换不了仍在等待授权的安装程序，于是提示网络出错。
+- 更新失败时，设置页现在说明是哪一种：连不上 GitHub 和下载镜像（服务没有运行时，提示启动服务后再试，更新会经过代理）、GitHub 暂时限制了访问次数、下载到的文件没通过校验、无法在本机保存更新文件（文件被占用、没有权限或磁盘已满）。以前一律提示检查网络。下载或安装阶段失败时，侧栏底部显示「更新失败」。
+- 某个下载地址（GitHub 或镜像）返回的内容没通过大小、签名或 SHA-256 校验时，会换下一个地址再试，不再直接失败。
+- 下载中途被服务器提前断开时，会从断开处接着下载。以前不完整的文件会被当成完整的，校验失败后整次更新就失败了。
+
+改进：诊断包
+
+- 诊断包现在包含 bridge.log、最近的更新记录（每次检查和下载用了哪条线路、哪个下载地址、为什么失败；下次启动时还会记下上次的安装是否真的完成）、应用内更新和安装程序的安装日志，以及系统代理的类型（手动代理、PAC 自动配置、自动检测，只记有没有，不记地址）。更新出问题时，凭它就能看出原因。
+
+关于更新
+
+- 已安装 0.1.4 或 0.1.5 的，可以直接在应用内更新到本版本。点「立即更新」后 Tesseract 会关闭，并显示「正在更新 Tesseract…」窗口；在「用户帐户控制」中选择「是」即可。如果没有看到授权提示，点任务栏上闪烁的按钮。
+- 0.1.0 到 0.1.3 仍需在浏览器中打开 github.com/definitlynotme/Tesseract/releases/latest，下载 Tesseract-Setup-0.1.6-win-x64.exe 手动安装一次。
+
+[en_US]
+Fixed: a Gateway can be picked while the service runs and while it is stopped
+
+- Picking a Gateway node while the service ran saved the pick by reloading the Gateway tier's nodes, so the node that had just passed its check went back to unchecked. The proxy core loads only nodes that passed their check, so that reload loaded a Gateway holding only "reject": the exit check failed at once, Settings said the configuration could not be applied (blaming the Bastion Layer), and the service restarted. A pick now changes only the selection and keeps the nodes as checked, and the picked node takes effect at once.
+- "Use" while the service was stopped always said the node could not be found and the node list might have changed, and refreshing did not help. The pick is now saved and takes effect the next time the service starts.
+- When the service starts with a Gateway picked that has not been checked yet, it is checked first (directly, then through the fallback tiers if that fails) before the configuration is written. It used to count as unusable at the start, which closed the exit.
+- A Gateway reached through the fallback tiers has one hop more, and the exit check now gives it the same time as the start does instead of only 1.5 seconds.
+- Such a failure now names the exit check (FINAL-EXIT) and what the check ran into.
+
+Fixed: in-app updates
+
+- During an in-app update, Setup now shows an "Updating Tesseract…" window first, and that window asks for User Account Control approval. Tesseract used to close with no window at all, and the approval prompt often only flashed on the taskbar, as if nothing were happening. Opening Tesseract again and choosing "Update now" then downloaded an installer that could not replace the one still waiting for approval, and Settings reported a network error.
+- When an update fails, Settings now says which way: GitHub and its download mirrors could not be reached (with the service stopped, it suggests starting the service and trying again, since the update then goes through the proxy), GitHub is limiting requests for now, the downloaded files failed verification, or the update files could not be saved on this computer (file in use, no permission or disk full). It used to tell you to check your network every time. A failure while downloading or installing shows "Update failed" at the bottom of the sidebar.
+- When a download address (GitHub or a mirror) sends something that fails the size, signature or SHA-256 check, the next address is tried instead of the update failing.
+- A download the server cuts off part-way now resumes where it stopped. An incomplete file used to be taken as complete, failed verification and ended the update.
+
+Improved: the diagnostic bundle
+
+- The diagnostic bundle now includes bridge.log, the recent update attempts (which route and download address each check and download used and why it failed, and on the next start whether the last install really finished), the in-app update's and Setup's install logs, and which kinds of system proxy are set (manual proxy, PAC script, automatic detection: only whether they are set, never an address). When an update goes wrong, the bundle now shows why.
+
+About updating
+
+- If you have 0.1.4 or 0.1.5, you can update to this version from inside the app. After "Update now", Tesseract closes and an "Updating Tesseract…" window appears: choose Yes in User Account Control. If you see no prompt, click the flashing button on the taskbar.
+- 0.1.0 to 0.1.3 still need one install by hand: open github.com/definitlynotme/Tesseract/releases/latest in your browser and download Tesseract-Setup-0.1.6-win-x64.exe.

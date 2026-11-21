@@ -13,10 +13,16 @@ from app_updater import DownloadedUpdate, compare_versions, normalize_version
 
 
 UPDATE_STATE_FILENAME = "app-update-state.json"
+# 0.1.6: the last update attempts, beside the state file and apart from it, so a diagnostic
+# record can never touch the receipt or the notice records (bridge_update.UpdateOwner).
+UPDATE_HISTORY_FILENAME = "app-update-history.json"
 UPDATE_STATE_SCHEMA_VERSION = 1
 MAX_RELEASE_NOTES_CHARS = 65_536
 MAX_SHOWN_VERSIONS = 32
 MAX_NOTICED_VERSIONS = 16
+# 0.1.6: the last update attempts (bridge_update.UpdateOwner), kept for the diagnostic bundle.
+MAX_ATTEMPT_HISTORY = 24
+_ATTEMPT_TEXT_LIMIT = 600
 
 
 @dataclass(frozen=True)
@@ -179,6 +185,57 @@ def discard_pending_update(path: Path) -> None:
     if "pending" in state:
         state.pop("pending")
         _write_state(path, state)
+
+
+def _attempt_value(value: Any) -> Any:
+    if isinstance(value, bool) or value is None or isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return round(value, 3)
+    if isinstance(value, (list, tuple)):
+        return [_attempt_value(item) for item in list(value)[:12]]
+    return _bounded_text(value, limit=_ATTEMPT_TEXT_LIMIT)
+
+
+def update_history_path(state_path: Path) -> Path:
+    return Path(state_path).with_name(UPDATE_HISTORY_FILENAME)
+
+
+def read_update_history(path: Path) -> list[dict[str, Any]]:
+    attempts = _read_state(path).get("attempts")
+    return [item for item in attempts if isinstance(item, dict)] if isinstance(attempts, list) else []
+
+
+def record_update_attempt(path: Path, entry: Mapping[str, Any]) -> None:
+    """Append one attempt to the bounded history file (0.1.6).
+
+    Callers pass labels, versions, class names and counts only (never a URL,
+    a host, a proxy address or a path): the diagnostic bundle carries this
+    file. Up to 0.1.5 an update failure left no trace in any bundle (11-22).
+    """
+
+    record = {str(key): _attempt_value(value) for key, value in dict(entry).items()}
+    record.setdefault("at", datetime.now(UTC).isoformat(timespec="seconds"))
+    # Strict: a history this read cannot open is left alone; the caller logs it.
+    payload = _read_state(path, strict=True)
+    attempts = payload.get("attempts")
+    attempts = [item for item in attempts if isinstance(item, dict)] if isinstance(attempts, list) else []
+    attempts.append(record)
+    _write_state(path, {"schema_version": UPDATE_STATE_SCHEMA_VERSION,
+                        "attempts": attempts[-MAX_ATTEMPT_HISTORY:]})
+
+
+def pending_update_summary(path: Path) -> dict[str, Any] | None:
+    """The kept receipt's versions and download time (read only)."""
+
+    pending = _read_state(path).get("pending")
+    if not isinstance(pending, dict):
+        return None
+    return {
+        "previous_version": normalize_version(str(pending.get("previous_version") or "")),
+        "target_version": normalize_version(str(pending.get("target_version") or "")),
+        "requested_at": _bounded_text(pending.get("requested_at"), limit=80),
+    }
 
 
 def completed_update_notice(path: Path, current_version: str) -> CompletedUpdateNotice | None:

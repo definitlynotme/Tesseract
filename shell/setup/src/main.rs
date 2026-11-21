@@ -10,6 +10,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod assets;
+mod handover;
 mod payload;
 mod progress;
 mod rm;
@@ -65,6 +66,9 @@ fn main() {
 
 /// Runs the Inno package with our command line and returns its exit code.
 fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
+    // 0.1.6: the in-app updater's run waits in a window of its own (handover.rs), shown at once
+    // while the app closes, so its elevation prompt opens instead of flashing on the taskbar.
+    let mut waiting = shows_handover_window(args, sys::elevated()).then(|| handover::show(sys::ui_language()));
     let existing = sys::existing_install().map(|e| e.dir);
     let target = rm::target_dir(args, existing.as_deref());
     // A running Tesseract would make Inno abort (rm.rs). Only a silent install closes it here: a
@@ -84,6 +88,7 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
         }
     }
     let switches = inno_switches(args, closed.as_ref().map(reopens_with_own_token));
+    let owner = waiting.as_ref().map_or(0, handover::Window::owner);
     let code = match payload::extract(source) {
         Err(_) => 1,
         Ok(file) => {
@@ -92,16 +97,24 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
             if rm::restarts_app(args) && !rm::logs_itself(args) {
                 if let Some(log) = temp_log("Tesseract-Update") { params.push(sys::quote(&format!("/LOG={}", log.display()))); }
             }
-            match sys::run_and_wait(0, file.path(), &params.join(" "), false) {
+            match sys::run_and_wait_then(owner, file.path(), &params.join(" "), false, || drop(waiting.take())) {
                 sys::Run::Exited(code) => code as i32,
                 sys::Run::Declined => 2,
                 sys::Run::Failed(_) => 1,
             }
         },
     };
+    drop(waiting);
     // An install never leaves the user without Tesseract (after_hand_over).
     if let (Some(dir), Some(how)) = (&target, after_hand_over(closed, args, code)) { reopen(dir, how); }
     code
+}
+
+/// Whether a hand-over waits for its elevation in a window of its own (handover.rs): the in-app
+/// updater's run (`/RESTARTAPPLICATIONS`, silent), started unelevated, so the elevation prompts.
+/// Deployments (`/VERYSILENT` without it, or an elevated console) keep running with no window.
+fn shows_handover_window(args: &[String], elevated: bool) -> bool {
+    !elevated && rm::restarts_app(args) && rm::silent_install(args)
 }
 
 /// Whether the copy this window closed opens again with this window's own token: `routes` starts
@@ -460,6 +473,16 @@ fn run(source: payload::Source) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn only_the_unelevated_in_app_update_waits_in_a_window() {
+        let args = |line: &str| line.split(' ').map(str::to_owned).collect::<Vec<_>>();
+        let in_app = args("/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTART");
+        assert!(shows_handover_window(&in_app, false));
+        assert!(!shows_handover_window(&in_app, true), "already elevated: no prompt to wait for");
+        assert!(!shows_handover_window(&args("/VERYSILENT /DIR=C:\\Apps\\Tesseract"), false), "a deployment");
+        assert!(!shows_handover_window(&args("/RESTARTAPPLICATIONS"), false), "Inno's own wizard");
+        assert!(!shows_handover_window(&args("/SILENT /RESTARTAPPLICATIONS /?"), false));
+    }
     #[test]
     fn the_copy_this_window_closed_starts_with_its_own_kind_of_token() {
         let user = |n: u8| Some(vec![1, 5, 0, 0, 0, 0, 0, 5, 21, n]);

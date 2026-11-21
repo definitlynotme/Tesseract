@@ -272,6 +272,11 @@
   "errors.unknown": "An unrecognized error occurred. Try again; if it keeps happening, export a diagnostic bundle and report it.",
   "errors.update.launch_failed": "The installer could not be started. Check for updates to try again, or install it by hand from the release page.",
   "errors.update.operation_failed": "The update failed. Check your network, then check for updates again.",
+  "errors.update.rate_limited": "GitHub is refusing requests from this network for now (too many requests). Check for updates again later, or start the service and try again.",
+  "errors.update.storage_failed": "The update files couldn't be saved on this computer (file in use, no permission or disk full); this isn't a network problem. Close any running installer or pause your antivirus, then try again.",
+  "errors.update.unreachable": "Couldn't reach GitHub or its download mirrors: no address answered on any route. Check your network, then check for updates again, or install it by hand from the release page.",
+  "errors.update.unreachable_direct": "The service isn't running, so the update could only connect to GitHub directly, and that failed. Start the service and check for updates again; the update then goes through the proxy. Or install it by hand from the release page.",
+  "errors.update.verify_failed": "The downloaded update files failed verification; the network or a mirror may have cut them short or replaced them. Every download address was tried. Try again later, or install it by hand from the release page.",
   "errors.validation": "Some of what you entered isn't valid. Fix it as indicated, then try again.",
   "errors.validation.field": "This value isn't valid. Fix it as indicated, then save again.",
   "errors.settings.alerts_endpoint_changed": "This channel's destination changed. To avoid sending saved secrets to the new destination, this section wasn't saved. Re-enter or clear this channel's keys, tokens, and credential headers, then save again."

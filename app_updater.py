@@ -47,7 +47,41 @@ _SAFE_HEADLINE_RE = re.compile(r"^[A-Za-z0-9 ._()-]{1,120}$")
 
 
 class AppUpdateError(RuntimeError):
-    pass
+    """A check, download or verification that failed; ``kind`` says what failed.
+
+    0.1.6: up to 0.1.5 every failure reached the page as 更新操作失败。检查网络…,
+    a locked installer file and a mirror's bad copy included (11-22 report).
+    """
+
+    kind = "other"
+
+
+class UpdateNetworkError(AppUpdateError):
+    """No source answered on any route (DNS, connect, TLS, timeouts, HTTP errors)."""
+
+    kind = "network"
+
+
+class UpdateRateLimitedError(UpdateNetworkError):
+    """Every answer was HTTP 403/429: GitHub refused this address for now."""
+
+    kind = "rate_limited"
+
+
+class UpdateIntegrityError(AppUpdateError):
+    """A source answered, but what it sent failed the size, signature or SHA-256 check."""
+
+    kind = "integrity"
+
+
+class UpdateStorageError(AppUpdateError):
+    """The update folder could not be prepared, written or replaced on this computer."""
+
+    kind = "storage"
+
+
+FAILURE_KINDS = ("storage", "integrity", "network", "rate_limited", "other")
+_RATE_LIMIT_ERRORS = frozenset({"HTTP 403", "HTTP 429"})
 
 
 class RouteFailure(URLError):
@@ -64,12 +98,29 @@ class RouteFailure(URLError):
         super().__init__(f"every network route failed ({summary or 'no route'})")
 
 
+def _os_error_name(exc: BaseException) -> str:
+    """The class name, plus the Windows/errno number when there is one (never the text).
+
+    0.1.6: ``ConnectionResetError[10054]``, ``gaierror[11001]`` (no such host),
+    ``PermissionError[32]`` (in use by another program), ``SSLCertVerificationError[20]``
+    (a TLS-inspecting program's certificate) say what a bare class name cannot.
+    """
+
+    name = type(exc).__name__
+    code = getattr(exc, "verify_code", None)
+    if not isinstance(code, int):
+        code = getattr(exc, "winerror", None)
+    if not isinstance(code, int):
+        code = getattr(exc, "errno", None)
+    return f"{name}[{code}]" if isinstance(code, int) and not isinstance(code, bool) else name
+
+
 def _error_name(exc: BaseException) -> str:
     if isinstance(exc, HTTPError):
         return f"HTTP {exc.code}"
     if isinstance(exc, URLError) and isinstance(exc.reason, BaseException):
-        return type(exc.reason).__name__
-    return type(exc).__name__
+        return _os_error_name(exc.reason)
+    return _os_error_name(exc)
 
 
 def _same_proxy(left: str, right: str) -> bool:
@@ -183,14 +234,38 @@ class SourcedOpener:
         self._routed = RoutedOpener() if routed is None else routed
         self._mirrors = tuple(mirrors)
         self._preferred: str | None = None
+        self._dropped: set[str] = set()
         self.last_source: str | None = None
+
+    @property
+    def last_route(self) -> str | None:
+        return getattr(self._routed, "last_route", None)
+
+    def drop_last_source(self) -> bool:
+        """The last answer's content failed verification: never ask that source again.
+
+        0.1.6: a mirror that answers 200 with an HTML page, a truncated file or
+        a stale copy used to end the whole update (a size, signature or
+        SHA-256 failure was final), although github.com or the other mirror
+        might have served the right bytes. True when another source is left.
+        """
+
+        label = self.last_source
+        if label is None:
+            return False
+        self._dropped.add(label)
+        self._preferred = None
+        self.last_source = None
+        return len(self._dropped) < 1 + len(self._mirrors)
 
     def __call__(self, request: Request, timeout: float = DEFAULT_TIMEOUT_SECONDS) -> Any:
         data, method = request.data, request.get_method()
         headers = dict(request.header_items())
-        sources = source_urls(request.full_url, self._mirrors)
+        sources = [source for source in source_urls(request.full_url, self._mirrors)
+                   if source[0] not in self._dropped]
         sources.sort(key=lambda source: source[0] != self._preferred)
-        attempts: list[tuple[str, str]] = []
+        attempts: list[tuple[str, str]] = [(label, "failed verification") for label in sorted(self._dropped)
+                                           if not sources]
         for label, url in sources:
             try:
                 response = self._routed(Request(url, data=data, headers=headers, method=method),
@@ -220,23 +295,65 @@ def failure_summary(exc: BaseException) -> str:
     """
 
     parts: list[str] = []
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen and len(parts) < 6:
-        seen.add(id(current))
+    for current in _failure_chain(exc):
+        if len(parts) >= 6:
+            break
         if isinstance(current, RouteFailure):
             parts.append("RouteFailure(" + ", ".join(
                 f"{label}={error}" for label, error in current.attempts) + ")")
         elif isinstance(current, HTTPError):
             parts.append(f"HTTPError({current.code})")
         elif isinstance(current, AppUpdateError):
+            name = type(current).__name__
             headline = str(current).split(": ", 1)[0].strip()
-            parts.append(f"AppUpdateError({headline})" if _SAFE_HEADLINE_RE.fullmatch(headline)
-                         else "AppUpdateError")
+            parts.append(f"{name}({headline})" if _SAFE_HEADLINE_RE.fullmatch(headline) else name)
         else:
-            parts.append(type(current).__name__)
-        current = current.__cause__ or current.__context__
+            parts.append(_os_error_name(current))
     return " <- ".join(parts)
+
+
+def _failure_chain(exc: BaseException) -> list[BaseException]:
+    chain: list[BaseException] = []
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen and len(chain) < 12:
+        seen.add(id(current))
+        chain.append(current)
+        current = current.__cause__ or current.__context__
+    return chain
+
+
+def _route_failure_kind(failure: RouteFailure) -> str:
+    errors = [error for _label, error in failure.attempts]
+    return "rate_limited" if errors and all(error in _RATE_LIMIT_ERRORS for error in errors) else "network"
+
+
+def failure_kind(exc: BaseException) -> str:
+    """What failed, for the page's message and the attempt history (0.1.6).
+
+    The whole cause chain counts, most specific first: a file this computer
+    could not write (storage), bytes that failed verification (integrity), no
+    answer (network), only HTTP 403/429 answers (rate_limited). The signed
+    manifest's network failure therefore outranks the API fallback's rate
+    limit behind it. Anything else is ``other``.
+    """
+
+    kinds: set[str] = set()
+    for current in _failure_chain(exc):
+        if isinstance(current, AppUpdateError):
+            kinds.add(current.kind)
+        elif isinstance(current, RouteFailure):
+            kinds.add(_route_failure_kind(current))
+        elif isinstance(current, (URLError, http.client.HTTPException, TimeoutError, ConnectionError)):
+            kinds.add("network")
+        elif isinstance(current, OSError) and not isinstance(current, (URLError,)):
+            # socket.gaierror, ssl.SSLError and friends are network failures.
+            module = type(current).__module__
+            kinds.add("network" if module in {"socket", "ssl", "_socket", "_ssl"} else "storage")
+    for kind in FAILURE_KINDS:
+        if kind in kinds:
+            return kind
+    return "other"
 
 
 @dataclass(frozen=True)
@@ -386,16 +503,28 @@ def _request(url: str, *, accept: str = "application/octet-stream",
     )
 
 
+def _network_failure(message: str, exc: BaseException) -> UpdateNetworkError:
+    limited = isinstance(exc, RouteFailure) and _route_failure_kind(exc) == "rate_limited"
+    return (UpdateRateLimitedError if limited else UpdateNetworkError)(message)
+
+
 def _read_url(url: str, *, timeout: float, accept: str, opener: UrlOpener,
               max_bytes: int | None = None) -> bytes:
     try:
         with opener(_request(url, accept=accept), timeout=timeout) as response:
             body = response.read() if max_bytes is None else response.read(max_bytes + 1)
     except _NETWORK_ERRORS as exc:
-        raise AppUpdateError(f"Network request failed: {exc}") from exc
+        raise _network_failure(f"Network request failed: {exc}", exc) from exc
     if max_bytes is not None and len(body) > max_bytes:
-        raise AppUpdateError("Release file exceeds the allowed size.")
+        raise UpdateIntegrityError("Release file exceeds the allowed size.")
     return body
+
+
+def _drop_failed_source(opener: UrlOpener) -> bool:
+    """Drop the source whose content just failed verification; False when none is left."""
+
+    dropper = getattr(opener, "drop_last_source", None)
+    return bool(callable(dropper) and dropper())
 
 
 def _asset_from_payload(payload: dict[str, Any]) -> ReleaseAsset | None:
@@ -550,17 +679,26 @@ def check_latest_release(
     keys = _trusted_keys(public_key)
     if not keys:
         raise AppUpdateError("No trusted release-signing public key is configured.")
-    signature = _read_url(f"{latest_url}/SHA256SUMS.txt.sig", timeout=timeout,
-                          accept="application/octet-stream", opener=opener,
-                          max_bytes=MAX_SIGNATURE_DOCUMENT_BYTES)
-    manifest = _read_url(f"{latest_url}/SHA256SUMS.txt", timeout=timeout,
-                         accept="application/octet-stream", opener=opener,
-                         max_bytes=MAX_CHECKSUM_MANIFEST_BYTES)
-    try:
-        verify_signature_document_with_keyring(manifest, signature, keys)
-        text = manifest.decode("utf-8")
-    except (ReleaseSignatureError, UnicodeDecodeError) as exc:
-        raise AppUpdateError(f"Release manifest signature verification failed: {exc}") from exc
+    while True:
+        # 0.1.6: a source whose copy fails the size or signature check is dropped and the
+        # next one asked (SourcedOpener.drop_last_source); only the last failure is final.
+        try:
+            signature = _read_url(f"{latest_url}/SHA256SUMS.txt.sig", timeout=timeout,
+                                  accept="application/octet-stream", opener=opener,
+                                  max_bytes=MAX_SIGNATURE_DOCUMENT_BYTES)
+            manifest = _read_url(f"{latest_url}/SHA256SUMS.txt", timeout=timeout,
+                                 accept="application/octet-stream", opener=opener,
+                                 max_bytes=MAX_CHECKSUM_MANIFEST_BYTES)
+            try:
+                verify_signature_document_with_keyring(manifest, signature, keys)
+                text = manifest.decode("utf-8")
+            except (ReleaseSignatureError, UnicodeDecodeError) as exc:
+                raise UpdateIntegrityError(f"Release manifest signature verification failed: {exc}") from exc
+        except UpdateIntegrityError:
+            if _drop_failed_source(opener):
+                continue
+            raise
+        break
     installer_name, version = installer_from_manifest(text)
     tag = f"v{version}"
     base = f"{app_info.APP_REPOSITORY_URL}/releases/download/{tag}"
@@ -614,6 +752,16 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _declared_length(response: Any) -> int | None:
+    """This response's Content-Length (a 206's is its part), or None."""
+    headers = getattr(response, "headers", None)
+    try:
+        value = int(str(headers.get("Content-Length", "")).strip()) if headers is not None else None
+    except ValueError:
+        return None
+    return value if value is not None and value >= 0 else None
+
+
 def _resumes_at(response: Any, offset: int) -> bool:
     """Whether a Range response continues exactly at ``offset`` (206 + Content-Range)."""
     status = getattr(response, "status", None)
@@ -631,16 +779,21 @@ def _download_file(
     max_bytes: int | None = None,
 ) -> None:
     if max_bytes is not None and asset.size is not None and asset.size > max_bytes:
-        raise AppUpdateError(f"Download for {asset.name} exceeds the allowed size.")
-    target.parent.mkdir(parents=True, exist_ok=True)
+        raise UpdateIntegrityError(f"Download for {asset.name} exceeds the allowed size.")
     tmp_path = target.with_name(target.name + ".download")
-    # A partial file of an earlier run may belong to another release: start clean.
-    tmp_path.unlink(missing_ok=True)
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # A partial file of an earlier run may belong to another release: start clean.
+        tmp_path.unlink(missing_ok=True)
+    except OSError as exc:
+        raise UpdateStorageError(f"Cannot prepare the update folder for {asset.name}: {exc}") from exc
     # A dropped or stalled transfer is retried (a RoutedOpener/SourcedOpener
     # walks the routes and sources again) and continues where it stopped when
     # the server answers the Range request with 206; otherwise it starts over.
     # The bytes are only trusted after the SHA-256 check, so a bad splice fails
-    # there. A size violation is final.
+    # there. A size violation is final for this source (download_update asks
+    # the next one). 0.1.6: a file this computer cannot write is a storage
+    # failure at once, never retried as a dropped transfer.
     for attempt in range(1, DOWNLOAD_ATTEMPTS + 1):
         offset = tmp_path.stat().st_size if tmp_path.exists() else 0
         headers = {"Range": f"bytes={offset}-"} if offset else None
@@ -648,19 +801,34 @@ def _download_file(
             with opener(_request(asset.download_url, headers=headers), timeout=timeout) as response:
                 resumed = offset > 0 and _resumes_at(response, offset)
                 downloaded_bytes = offset if resumed else 0
-                with tmp_path.open("ab" if resumed else "wb") as output:
+                received = 0
+                try:
+                    output = tmp_path.open("ab" if resumed else "wb")
+                except OSError as exc:
+                    raise UpdateStorageError(f"Cannot write {asset.name}: {exc}") from exc
+                with output:
                     while True:
                         chunk = response.read(1024 * 1024)
                         if not chunk:
                             break
+                        received += len(chunk)
                         downloaded_bytes += len(chunk)
                         if max_bytes is not None and downloaded_bytes > max_bytes:
-                            raise AppUpdateError(f"Download for {asset.name} exceeds the allowed size.")
-                        output.write(chunk)
+                            raise UpdateIntegrityError(f"Download for {asset.name} exceeds the allowed size.")
+                        try:
+                            output.write(chunk)
+                        except OSError as exc:
+                            raise UpdateStorageError(f"Cannot write {asset.name}: {exc}") from exc
+                # 0.1.6: read(n) answers b"" when the server closes early, so a cut transfer used to
+                # end the loop like a whole one and fail the SHA-256 check for good. Short of its
+                # Content-Length it is a dropped transfer: the next attempt resumes it (Range).
+                declared = _declared_length(response)
+                if declared is not None and received < declared:
+                    raise http.client.IncompleteRead(b"", declared - received)
         except _NETWORK_ERRORS as exc:
             if attempt >= DOWNLOAD_ATTEMPTS:
                 tmp_path.unlink(missing_ok=True)
-                raise AppUpdateError(f"Download failed for {asset.name}: {exc}") from exc
+                raise _network_failure(f"Download failed for {asset.name}: {exc}", exc) from exc
             continue
         except BaseException:
             tmp_path.unlink(missing_ok=True)
@@ -670,7 +838,8 @@ def _download_file(
         os.replace(tmp_path, target)
     except OSError as exc:
         tmp_path.unlink(missing_ok=True)
-        raise AppUpdateError(f"Download failed for {asset.name}: {exc}") from exc
+        # WinError 5/32: the previous installer of this name is still running or held open.
+        raise UpdateStorageError(f"Cannot save {asset.name}: {exc}") from exc
 
 
 def download_update(
@@ -696,35 +865,49 @@ def download_update(
     if not trusted_public_keys:
         raise AppUpdateError("No trusted release-signing public key is configured.")
 
-    download_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        download_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        raise UpdateStorageError(f"Cannot create the update folder: {exc}") from exc
     installer_path = download_dir / update.installer.name
     checksum_path = download_dir / update.checksum.name
     signature_path = download_dir / update.checksum_signature.name
-    _download_file(
-        update.checksum_signature,
-        signature_path,
-        timeout=timeout,
-        opener=opener,
-        max_bytes=MAX_SIGNATURE_DOCUMENT_BYTES,
-    )
-    _download_file(
-        update.checksum,
-        checksum_path,
-        timeout=timeout,
-        opener=opener,
-        max_bytes=MAX_CHECKSUM_MANIFEST_BYTES,
-    )
-
-    try:
-        checksum_bytes = checksum_path.read_bytes()
-        signature_bytes = signature_path.read_bytes()
-        manifest_key_id = verify_signature_document_with_keyring(
-            checksum_bytes,
-            signature_bytes,
-            trusted_public_keys,
-        )
-    except (OSError, ReleaseSignatureError) as exc:
-        raise AppUpdateError(f"Release manifest signature verification failed: {exc}") from exc
+    # 0.1.6: each verification failure drops the source that sent the bytes and asks the next
+    # one (SourcedOpener.drop_last_source); only a failure with no source left is final.
+    while True:
+        try:
+            _download_file(
+                update.checksum_signature,
+                signature_path,
+                timeout=timeout,
+                opener=opener,
+                max_bytes=MAX_SIGNATURE_DOCUMENT_BYTES,
+            )
+            _download_file(
+                update.checksum,
+                checksum_path,
+                timeout=timeout,
+                opener=opener,
+                max_bytes=MAX_CHECKSUM_MANIFEST_BYTES,
+            )
+            try:
+                checksum_bytes = checksum_path.read_bytes()
+                signature_bytes = signature_path.read_bytes()
+            except OSError as exc:
+                raise UpdateStorageError(f"Cannot read the downloaded release manifest: {exc}") from exc
+            try:
+                manifest_key_id = verify_signature_document_with_keyring(
+                    checksum_bytes,
+                    signature_bytes,
+                    trusted_public_keys,
+                )
+            except ReleaseSignatureError as exc:
+                raise UpdateIntegrityError(f"Release manifest signature verification failed: {exc}") from exc
+        except UpdateIntegrityError:
+            if _drop_failed_source(opener):
+                continue
+            raise
+        break
 
     try:
         checksum_text = checksum_bytes.decode("utf-8")
@@ -735,11 +918,21 @@ def download_update(
         raise AppUpdateError(
             f"SHA256SUMS.txt must include exactly one valid entry for {update.installer.name}."
         )
-    _download_file(update.installer, installer_path, timeout=timeout, opener=opener)
-    actual = sha256_file(installer_path)
-    if actual.lower() != expected.lower():
-        installer_path.unlink(missing_ok=True)
-        raise AppUpdateError("Downloaded installer checksum did not match SHA256SUMS.txt.")
+    while True:
+        try:
+            _download_file(update.installer, installer_path, timeout=timeout, opener=opener)
+            try:
+                actual = sha256_file(installer_path)
+            except OSError as exc:
+                raise UpdateStorageError(f"Cannot read the downloaded installer: {exc}") from exc
+            if actual.lower() != expected.lower():
+                installer_path.unlink(missing_ok=True)
+                raise UpdateIntegrityError("Downloaded installer checksum did not match SHA256SUMS.txt.")
+        except UpdateIntegrityError:
+            if _drop_failed_source(opener):
+                continue
+            raise
+        break
     return DownloadedUpdate(
         update=update,
         installer_path=installer_path,

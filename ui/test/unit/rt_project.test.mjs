@@ -468,6 +468,13 @@ test('update.state row: every v1 state maps to the footer state', () => {
   // 0.1.5: the installer could not be started (installResult launched:false) — the check had
   // worked, so not 检查更新失败 for the whole epoch
   assert.equal(updateStateOf(u('failed', { version: null, error: { code: 'io', message_key: 'errors.update.launch_failed' } })), 'install_fail');
+  // 0.1.6: a download, verification or storage failure of the install says 更新失败 too; the same
+  // kind of failure in a check stays 检查更新失败 (Error.params.stage)
+  const failed = (key, stage) => u('failed', { error: { code: 'io', message_key: key, params: { stage } } });
+  assert.equal(updateStateOf(failed('errors.update.storage_failed', 'install')), 'install_fail');
+  assert.equal(updateStateOf(failed('errors.update.unreachable_direct', 'install')), 'install_fail');
+  assert.equal(updateStateOf(failed('errors.update.unreachable_direct', 'check')), 'fail');
+  assert.equal(updateStateOf(failed('errors.update.verify_failed', 'check')), 'fail');
 });
 
 test('the footer word: 更新失败 for a launch failure, 检查更新失败 for a failed check (0.1.5)', async () => {

@@ -272,6 +272,11 @@
   "errors.unknown": "Ocorreu um erro não reconhecido. Tente novamente; se continuar acontecendo, exporte um pacote de diagnóstico e envie o relato.",
   "errors.update.launch_failed": "Não foi possível iniciar o instalador. Verifique se há atualizações para tentar de novo ou instale manualmente pela página da versão.",
   "errors.update.operation_failed": "A atualização falhou. Verifique a rede e procure atualizações novamente.",
+  "errors.update.rate_limited": "O GitHub está recusando por enquanto as solicitações desta rede (solicitações demais). Procure atualizações de novo mais tarde, ou inicie o serviço e tente outra vez.",
+  "errors.update.storage_failed": "Não foi possível salvar os arquivos da atualização neste computador (arquivo em uso, sem permissão ou disco cheio); não é um problema de rede. Feche qualquer instalador em execução ou pause o antivírus e tente de novo.",
+  "errors.update.unreachable": "Não foi possível acessar o GitHub nem seus espelhos de download: nenhum endereço respondeu por nenhuma rota. Verifique a rede e procure atualizações de novo, ou instale manualmente pela página da versão.",
+  "errors.update.unreachable_direct": "O serviço não está em execução, então a atualização só podia se conectar ao GitHub de forma direta, e isso falhou. Inicie o serviço e procure atualizações de novo; a atualização passa então pelo proxy. Ou instale manualmente pela página da versão.",
+  "errors.update.verify_failed": "Os arquivos da atualização baixados não passaram na verificação; a rede ou um espelho pode tê-los cortado ou substituído. Todos os endereços de download foram tentados. Tente mais tarde, ou instale manualmente pela página da versão.",
   "errors.validation": "Algum dado preenchido não é válido. Corrija conforme indicado e tente novamente.",
   "errors.validation.field": "O valor deste campo é inválido. Corrija conforme indicado e salve novamente.",
   "errors.settings.alerts_endpoint_changed": "O destino de envio deste canal mudou. Para não enviar segredos salvos ao novo destino, esta seção não foi salva. Informe novamente ou apague as chaves, os tokens e os cabeçalhos de credenciais deste canal e salve de novo."

@@ -174,7 +174,7 @@ def picking(rt, *, during=None, running=True):
     rt._declare_runtime_selector_intent = (
         lambda reason, *, group=None: rt._runtime_selector_intent_revision)
     rt._core_transition_lock = threading.RLock()
-    log = {"writes": [], "reloads": [], "puts": [], "rechecks": 0}
+    log = {"writes": [], "reloads": [], "puts": [], "rechecks": 0, "config_reloads": []}
 
     def set_exit_selection(label, *, identity=None, unresolved=None):
         log["writes"].append((label, identity))
@@ -204,8 +204,13 @@ def picking(rt, *, during=None, running=True):
     def recheck():
         log["rechecks"] += 1
 
+    def reload_config(*, target_tier=None, keep_tier_state=False):
+        # Recorded, not run: tests/test_gateway_pick_keeps_health.py runs the real one with a
+        # real Manager (a pick must keep the Gateway nodes as checked).
+        log["config_reloads"].append((target_tier, keep_tier_state))
+
     rt.config_store.set_exit_selection = set_exit_selection
-    rt.reload_config = lambda target_tier=None: None
+    rt.reload_config = reload_config
     rt.reload_core_config = reload_core_config
     rt.select_mihomo_proxy = select_mihomo_proxy
     rt._queue_incremental_egress_recheck = recheck

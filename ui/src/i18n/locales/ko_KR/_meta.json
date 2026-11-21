@@ -3940,6 +3940,21 @@
   "errors.update.operation_failed": {
     "src_hash": "015ce880a36b560a"
   },
+  "errors.update.rate_limited": {
+    "src_hash": "e024e51deea81183"
+  },
+  "errors.update.storage_failed": {
+    "src_hash": "32c70cece65890f9"
+  },
+  "errors.update.unreachable": {
+    "src_hash": "43131224fe6148e5"
+  },
+  "errors.update.unreachable_direct": {
+    "src_hash": "12d5dd005b927f72"
+  },
+  "errors.update.verify_failed": {
+    "src_hash": "88308c07ec2637b7"
+  },
   "errors.validation": {
     "src_hash": "a1cc63374ee652cc"
   },

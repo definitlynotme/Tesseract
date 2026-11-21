@@ -214,9 +214,15 @@ impl Platform for Win32Platform {
         // installer with the exiting shell); a job without breakaway refuses it: plain launch.
         const CREATE_BREAKAWAY_FROM_JOB: u32 = 0x0100_0000;
         let spawn = |flags: u32| Command::new(path).args(args).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null()).creation_flags(flags).spawn();
+        // 0.1.6: this shell still has the foreground (the user just clicked 立即更新) and hands it
+        // to the installer, whose window then owns the elevation prompt (shell/setup handover.rs).
+        // A prompt asked for without the foreground only flashes on the taskbar (11-22 report).
+        let allow_foreground = |child: std::process::Child| {
+            unsafe { let _ = windows::Win32::UI::WindowsAndMessaging::AllowSetForegroundWindow(child.id()); }
+        };
         match spawn(CREATE_BREAKAWAY_FROM_JOB) {
-            Ok(_) => Ok(()),
-            Err(e) if e.raw_os_error() == Some(5) => spawn(0).map(|_| ()),
+            Ok(child) => { allow_foreground(child); Ok(()) }
+            Err(e) if e.raw_os_error() == Some(5) => spawn(0).map(allow_foreground),
             Err(e) => Err(e),
         }
     }

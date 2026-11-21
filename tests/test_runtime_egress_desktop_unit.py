@@ -230,9 +230,10 @@ def test_blocked_user_reload_does_not_leave_a_deferred_gate_token() -> None:
 
 def test_blocked_gateway_reload_never_touches_live_selectors() -> None:
     runtime = object.__new__(DesktopRuntime)
-    runtime._reload_after = lambda _action, *, target_tier: {
+    runtime._reload_after = lambda _action, *, target_tier, keep_tier_state=False: {
         "stored": True,
         "target_tier": target_tier,
+        "keep_tier_state": keep_tier_state,
     }
     runtime.core_runner = _Runner()
     runtime._core_transition_lock = threading.RLock()

@@ -272,6 +272,11 @@
   "errors.unknown": "Se ha producido un error no reconocido. Vuelve a intentarlo; si se repite, exporta un paquete de diagnóstico e informa del problema.",
   "errors.update.launch_failed": "No se pudo iniciar el instalador. Busca actualizaciones para volver a intentarlo o instálalo a mano desde la página de la versión.",
   "errors.update.operation_failed": "La actualización ha fallado. Revisa la red y vuelve a buscar actualizaciones.",
+  "errors.update.rate_limited": "GitHub está rechazando por ahora las solicitudes de esta red (demasiadas solicitudes). Vuelve a buscar actualizaciones más tarde, o inicia el servicio e inténtalo de nuevo.",
+  "errors.update.storage_failed": "No se pudieron guardar los archivos de la actualización en este equipo (archivo en uso, sin permiso o disco lleno); no es un problema de red. Cierra cualquier instalador en ejecución o pausa el antivirus y vuelve a intentarlo.",
+  "errors.update.unreachable": "No se puede acceder a GitHub ni a sus réplicas de descarga: ninguna dirección respondió por ninguna ruta. Revisa la red y vuelve a buscar actualizaciones, o instálalo a mano desde la página de la versión.",
+  "errors.update.unreachable_direct": "El servicio no está en ejecución, así que la actualización solo podía conectarse a GitHub de forma directa, y no lo logró. Inicia el servicio y vuelve a buscar actualizaciones; así pasará por el proxy. O instálalo a mano desde la página de la versión.",
+  "errors.update.verify_failed": "Los archivos de la actualización descargados no superaron la verificación; la red o una réplica pudo cortarlos o sustituirlos. Se probaron todas las direcciones de descarga. Inténtalo más tarde o instálalo a mano desde la página de la versión.",
   "errors.validation": "Algunos datos introducidos no son válidos. Corrígelos según se indica y vuelve a intentarlo.",
   "errors.validation.field": "Este valor no es válido. Corrígelo según se indica y vuelve a guardar.",
   "errors.settings.alerts_endpoint_changed": "El destino de envío ha cambiado. Para no enviar los secretos guardados al nuevo destino, esta sección no se ha guardado. Vuelve a introducir o borra las claves, los tokens y los encabezados de credenciales de este canal, y guarda de nuevo."

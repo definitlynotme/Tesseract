@@ -513,6 +513,9 @@ CORE_HEALTH_RESTART_LOCK_WAIT_S = 2.0
 CORE_HEALTH_DEFER_LOG_INTERVAL_S = 30.0
 _INITIAL_FINAL_EXIT_ACTIVATION_PATH_REVISION = "authority_host_capture_v2"
 _INITIAL_EGRESS_ADMISSION_DEADLINE_SECONDS = 15.0
+# One authoritative FINAL-EXIT 204 through the fallback layers (_probe_mihomo_mixed_port); a
+# selected Gateway gets the startup probe timeout instead (_final_exit_probe_budget_seconds).
+FINAL_EXIT_PROBE_BUDGET_SECONDS = 1.5
 # Resolver ladder: one rung per runtime run, escalated only on positive evidence.
 _DNS_RESOLVER_PLAN_CACHE_SECONDS = 60.0
 _DNS_RESOLVER_ESCALATION_MIN_SECONDS = 5.0
@@ -6317,6 +6320,73 @@ class DesktopRuntime:
         runtime_nodes = getattr(manager, "runtime_nodes", {})
         return primary_runtime_healthy_count(runtime_nodes)
 
+    def _selected_gateway_usable(self) -> bool:
+        """Whether the export would carry the selected Gateway now (ALIVE/SLOW).
+
+        A selection saved by identity needs that node; an older name-only one
+        needs any usable Gateway (its member is resolved by the renderer).
+        """
+
+        manager = self.manager
+        selection = self._gateway_selection()
+        if manager is None or selection is None or not selection.active:
+            return True
+        usable = [
+            node
+            for node in manager.runtime_effective_nodes("exit")
+            if node.status in {NodeStatus.ALIVE, NodeStatus.SLOW}
+        ]
+        if selection.state == "bound":
+            return any(gateway_identity(node) == selection.identity for node in usable)
+        return bool(usable)
+
+    def _check_selected_gateway_before_core_start(self) -> None:
+        """Check a selected Gateway the export would leave out, before the render.
+
+        A selected Gateway is fail-closed: missing from the export, EXIT-SELECT
+        is [REJECT]. A start loads every node unchecked and checks only the
+        fallback layers first, so a saved pick was missing from every start's
+        first render; a reload of the Gateway inventory (an import, an edit)
+        leaves it unchecked the same way. Checked here through the fallback
+        layers just checked (direct first, then chained). Nothing when it is
+        already usable, no Gateway is selected, or the check cannot run.
+        """
+
+        manager = self.manager
+        if manager is None or not self._active_gateway_policy_enabled():
+            return
+        try:
+            if self._selected_gateway_usable():
+                return
+        except Exception:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "Selected Gateway state unreadable before the Core render",
+                exc_info=True,
+            )
+        checker = getattr(manager, "check_exit", None)
+        if not callable(checker):
+            return
+        self.logger.info("Checking the selected Gateway before the Core render")
+        try:
+            checker(force_remote_refresh=False)
+            usable = self._selected_gateway_usable()
+        except Exception:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "Selected Gateway check before the Core render failed",
+                exc_info=True,
+            )
+            return
+        if not usable:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "The selected Gateway is not usable; FINAL-EXIT stays closed until it is",
+            )
+
     def _primary_layers_ready_for_start(self) -> bool:
         if not self._primary_layers_configured():
             self._primary_startup_error = "no primary layers are configured"
@@ -7212,9 +7282,27 @@ class DesktopRuntime:
             queue_timeout_seconds=timeout_seconds,
             socket_start_timeout_seconds=timeout_seconds,
             execution_deadline_monotonic=(
-                time.monotonic() + min(1.5, timeout_seconds)
+                time.monotonic()
+                + self._final_exit_probe_budget_seconds(timeout_seconds)
             ),
         )
+
+    def _final_exit_probe_budget_seconds(self, timeout_seconds: float) -> float:
+        """Execution budget of one authoritative FINAL-EXIT 204 (every probe URL).
+
+        1.5 s through the fallback layers. A selected Gateway is dialled through
+        them (dialer-proxy PROXY-FALLBACK): two hops, its own SOCKS5/HTTP
+        handshake and then the 204's TLS over both. On 11-22 a SOCKS5 ISP
+        Gateway needed 1.9-2.5 s in its chain check and 4.9 s in a start's
+        admission, so the reload after a pick could never pass in 1.5 s
+        (0.1.6). With a Gateway selected the 204 gets the startup probe
+        timeout; a route that answers fast still returns at once.
+        """
+
+        budget = float(timeout_seconds)
+        if self._active_gateway_policy_enabled():
+            return max(budget, FINAL_EXIT_PROBE_BUDGET_SECONDS)
+        return min(FINAL_EXIT_PROBE_BUDGET_SECONDS, budget)
 
     def _probe_mihomo_mixed_port_leased(
         self,
@@ -8879,6 +8967,7 @@ class DesktopRuntime:
             return
         primary_ready = self._primary_layers_ready_for_start()
         if primary_ready:
+            self._check_selected_gateway_before_core_start()
             return
         tier3_enabled = getattr(manager, "_tier3_enabled", None)
         if not callable(tier3_enabled):
@@ -43429,10 +43518,29 @@ class DesktopRuntime:
         self,
         runner: Any,
         controller: dict[str, Any],
+        *,
+        verification_error: BaseException | None = None,
     ) -> dict[str, Any]:
-        if self._tier3_is_primary_export() or not self._repair_tier3_export_order_from_core_delays():
+        if self._tier3_is_primary_export():
             return build_tier3_core_reload_failure_result(
                 reason="Bastion Layer verification failed after hot reload",
+                stop_sensitive=False,
+            )
+        if not self._repair_tier3_export_order_from_core_delays():
+            # 0.1.6: the route is the fallback layers or a Gateway, not Bastion: say so, with
+            # what the 204 met (probe endpoint labels and error classes only). Up to 0.1.5 a
+            # Gateway pick that failed here read "Bastion Layer verification failed".
+            detail = str(verification_error or "").strip()
+            prefix = "Mihomo reload FINAL-EXIT 204 verification failed:"
+            if detail.startswith(prefix):
+                detail = detail[len(prefix):].strip()
+            detail = " ".join(detail.split())[:240]
+            return build_tier3_core_reload_failure_result(
+                reason=(
+                    f"FINAL-EXIT verification failed after hot reload ({detail})"
+                    if detail
+                    else "FINAL-EXIT verification failed after hot reload"
+                ),
                 stop_sensitive=False,
             )
         # T-P2-RT3 fix 1: the mode this re-render loads (recorded by the caller,
@@ -44400,10 +44508,14 @@ class DesktopRuntime:
                 pending_tier3_repair_plan = candidate_plan
         try:
             self._verify_tier3_after_core_reload(save_snapshot=pending_tier3_repair_plan is None)
-        except Exception:
+        except Exception as verification_error:
             if pending_tier3_repair_plan is not None:
                 self._clear_tier3_core_export_override()
-            repair_reload = self._repair_and_retry_tier3_reload_after_verification_failure(runner, controller)
+            repair_reload = self._repair_and_retry_tier3_reload_after_verification_failure(
+                runner,
+                controller,
+                verification_error=verification_error,
+            )
             record_stage_reload(repair_reload)
             if not repair_reload.get("reloaded"):
                 return self._stop_sensitive_reload_failure_response(
@@ -44535,7 +44647,19 @@ class DesktopRuntime:
             raise RuntimeError("manager service is not running")
         return self.manager.trigger_tier3_prune()
 
-    def reload_config(self, *, target_tier: str | None = None) -> dict[str, Any]:
+    def reload_config(
+        self,
+        *,
+        target_tier: str | None = None,
+        keep_tier_state: bool = False,
+    ) -> dict[str, Any]:
+        """Reload the settings files and hand them to the Manager.
+
+        ``target_tier`` reloads that tier's inventory (its nodes come back
+        unchecked); ``keep_tier_state`` passes the new settings on and keeps
+        every tier's nodes and health as they are, for a change that adds,
+        edits or removes no node (a Gateway pick).
+        """
         self._clear_runtime_audit_export_overlay()
         bootstrap_user_files(self.app_paths)
         self.config = self._disable_external_desktop_notifications(
@@ -44587,7 +44711,13 @@ class DesktopRuntime:
             egress_proxy=self._remote_refresh_egress_proxy_config() or {},
         )
         if self.manager:
-            self._reconfigure_manager_after_config_reload(target_tier=target_tier)
+            if keep_tier_state:
+                self._reconfigure_manager_after_config_reload(
+                    target_tier=target_tier,
+                    keep_tier_state=True,
+                )
+            else:
+                self._reconfigure_manager_after_config_reload(target_tier=target_tier)
         self._sync_subscription_server_config()
         result = self.status()
         log_event(
@@ -44599,7 +44729,12 @@ class DesktopRuntime:
         )
         return result
 
-    def _reconfigure_manager_after_config_reload(self, *, target_tier: str | None = None) -> None:
+    def _reconfigure_manager_after_config_reload(
+        self,
+        *,
+        target_tier: str | None = None,
+        keep_tier_state: bool = False,
+    ) -> None:
         if not self.manager:
             return
         if self.kill_switch:
@@ -44629,6 +44764,10 @@ class DesktopRuntime:
                 self.manager.testing_config = dict(self._testing_block())
                 self.manager.validation_mode = str(self.manager.testing_config.get("validation_mode", "optional")).lower()
                 self.manager.tier3_controller.config = self.manager._tier3_controller_config()
+                if keep_tier_state:
+                    # The settings changed, no node did: the Manager reads the new
+                    # selection from manager.config and keeps its checked nodes.
+                    return
                 reloader = getattr(self.manager, "reload_tier_state", None)
                 tier = str(target_tier or "").strip()
                 if tier and callable(reloader):
@@ -53023,9 +53162,15 @@ class DesktopRuntime:
         return tuple(state.members) if state is not None else None
 
     def _set_exit_selection_locked(self, selected: str, identity: str | None) -> dict[str, Any]:
+        # 0.1.6: a pick changes which node is selected, never which nodes exist, so the Gateway
+        # inventory stays as checked. Up to 0.1.5 this reloaded the exit tier: a configured
+        # Gateway came back UNKNOWN, the export (ALIVE/SLOW only) left it out, the strict reload
+        # below loaded EXIT-SELECT [REJECT] and every pick of a running service failed its 204
+        # (field report 11-22: "Bastion Layer verification failed after hot reload").
         result = self._reload_after(
             lambda: self.config_store.set_exit_selection(selected, identity=identity),
             target_tier="exit",
+            keep_tier_state=True,
         )
         core_running = bool(self.core_runner and self.core_runner.is_running())
         selection = self._gateway_selection()
@@ -53158,10 +53303,19 @@ class DesktopRuntime:
                 return {**result, "reloaded": False, "reload_error": type(exc).__name__}
             return {**result, "reloaded": True, "reload_error": None}
 
-    def _reload_after(self, action: Callable[[], dict[str, Any]], *, target_tier: str | None = None) -> dict[str, Any]:
+    def _reload_after(
+        self,
+        action: Callable[[], dict[str, Any]],
+        *,
+        target_tier: str | None = None,
+        keep_tier_state: bool = False,
+    ) -> dict[str, Any]:
         with self._config_change_lock:
             result = action()
-            self.reload_config(target_tier=target_tier)
+            if keep_tier_state:
+                self.reload_config(target_tier=target_tier, keep_tier_state=True)
+            else:
+                self.reload_config(target_tier=target_tier)
             return result
 
     def discover_tier3_sources(self, *, limit: int = 10, force: bool = False) -> dict[str, Any]:
@@ -56568,6 +56722,14 @@ class DesktopRuntime:
         {"status": ok|unknown|not_gateway|unusable|stale,
          "proxy_name": str|None, "display_name": str|None,
          "identity": str|None}.
+
+        0.1.6: with the service stopped (no Manager) the id is resolved in the
+        configured inventory nodes.list shows then (bridge_stopped_node_inventory),
+        and any Gateway there is ``ok``: the pick is saved by identity and takes
+        effect at the next start, which checks a selected Gateway before its first
+        render (_check_selected_gateway_before_core_start). The name is the one the
+        renderer gives the node on its own. Up to 0.1.5 every stopped pick answered
+        unknown and the page said 找不到这个节点，节点列表可能已经更新 (11-22).
         """
         from bridge_runtime_access import display_filter, immutable_record, opaque_id
         from clash_formatter import build_clash_proxy_list
@@ -56581,13 +56743,46 @@ class DesktopRuntime:
             return answer("unknown")
         owner = self._bridge_read_owner()
         manager = owner[2]
-        if manager is None:
-            return answer("unknown")
         fields = ("protocol", "address", "port", "uuid", "password", "method", "security",
                   "network", "host", "path", "sni", "plugin")  # = bridge_node_records
 
         def identity(node):
             return tuple(getattr(node, name) for name in fields)
+
+        def displayed(raw_name):
+            clean = display_filter({"config": copy.deepcopy(owner[3]), "loaded": self.bridge_secret_facts()})
+            return clean(raw_name)
+
+        if manager is None:
+            # Stopped: the inventory nodes.list shows now (fresh copies), no export to read.
+            try:
+                inventory = self.bridge_stopped_node_inventory()
+            except Exception:
+                return answer("unknown" if self._bridge_owner_current(owner) else "stale")
+            listed = [(str(tier), identity(node), node)
+                      for tier, nodes in inventory.items() for node in nodes]
+            matches = {tier: ident for tier, ident, _node in listed
+                       if opaque_id(owner[0], tier, ident) == node_id}
+            if not matches:
+                return answer("unknown" if self._bridge_owner_current(owner) else "stale")
+            if "exit" not in matches:
+                return answer("not_gateway")
+            hits = [node for tier, ident, node in listed if tier == "exit" and ident == matches["exit"]]
+            carried = {gateway_identity(node) for node in hits}
+            if len(carried) != 1:
+                return answer("unusable" if self._bridge_owner_current(owner) else "stale")
+            quiet = logging.Logger("bridge-exit-proxy-name")
+            quiet.addHandler(logging.NullHandler())
+            pairs = []
+            build_clash_proxy_list([hits[0]], logger=quiet, seen_names=set(MIHOMO_RESERVED_PROXY_NAMES),
+                                   rendered_pairs=pairs)
+            names = [str(proxy["name"]) for _node, proxy in pairs]
+            if len(names) != 1 or not names[0] or names[0] != names[0].strip():
+                return answer("unusable" if self._bridge_owner_current(owner) else "stale")
+            shown = displayed(names[0])
+            if not self._bridge_owner_current(owner):
+                return answer("stale")
+            return answer("ok", names[0], shown, carried.pop())
 
         with manager.lock:
             stale = manager.runtime_generation != owner[0]

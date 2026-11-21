@@ -284,8 +284,13 @@ def test_getter_statuses(runtime):
     rt.manager.runtime_generation = 99  # manager moved on: ids of generation 7 are stale
     assert rt.bridge_exit_proxy_name(node_id(rt, "exit", live))["status"] == "stale"
     rt.manager.runtime_generation = 7
+    # 0.1.6: stopped, the id resolves in the configured inventory nodes.list shows then
+    # (tests/test_gateway_pick_keeps_health.py); an id it does not list stays unknown.
     rt.manager = None
-    assert rt.bridge_exit_proxy_name(node_id(rt, "exit", live))["status"] == "unknown"
+    rt.bridge_stopped_node_inventory = lambda: {"tier1": [], "tier2": [tier2], "tier3": [], "exit": [live]}
+    assert rt.bridge_exit_proxy_name(node_id(rt, "exit", live))["status"] == "ok"
+    assert rt.bridge_exit_proxy_name(node_id(rt, "tier2", tier2))["status"] == "not_gateway"
+    assert rt.bridge_exit_proxy_name(node_id(rt, "exit", dead))["status"] == "unknown"
 
 
 @pytest.mark.parametrize("variant", ["username", "grpc_service"])

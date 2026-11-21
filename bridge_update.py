@@ -50,12 +50,24 @@ INSTALLER_ARGS = ("/SILENT", "/SUPPRESSMSGBOXES", "/CLOSEAPPLICATIONS",
 # A child of the bridge.log logger (bridge_main), like bridge_shutdown's: under
 # its module name nothing of the update owner ever reached bridge.log.
 _LOG = logging.getLogger("tesseract.bridge.update")
-# Update.error.message_key: a check, download or verification that failed.
+# Update.error.message_key: a check, download or verification that failed for another reason.
 OPERATION_FAILED_KEY = "errors.update.operation_failed"
 # 0.1.5: the shell could not start the installer (update.installResult launched:false). The check
 # and the download had worked, so the text does not send the user to their network, and the
 # sidebar says 更新失败 rather than 检查更新失败 (ui/src/rt/project.js updateStateOf).
 LAUNCH_FAILED_KEY = "errors.update.launch_failed"
+# 0.1.6: what failed (app_updater.failure_kind) chooses the text. Up to 0.1.5 every failure read
+# 更新操作失败。检查网络后重新检查更新。, a locked file or a mirror's bad copy included, and a user
+# whose browser reached GitHub was sent to their network (11-22). Error.params.stage says whether
+# the check or the install (download, verification, hand-off) failed.
+FAILURE_MESSAGE_KEYS = {
+    "network": "errors.update.unreachable",
+    "rate_limited": "errors.update.rate_limited",
+    "integrity": "errors.update.verify_failed",
+    "storage": "errors.update.storage_failed",
+}
+# No route went through Tesseract's own proxy (the service was stopped): starting it is the fix.
+UNREACHABLE_DIRECT_KEY = "errors.update.unreachable_direct"
 
 
 class HandoffPublisher(Protocol):
@@ -260,12 +272,74 @@ class UpdateOwner:
             "last_check_at_ms": self._last_check_at_ms,
         }
 
-    def _transition(self, state: str, code: str | None = None, message_key: str = OPERATION_FAILED_KEY) -> None:
+    def _transition(self, state: str, code: str | None = None, message_key: str = OPERATION_FAILED_KEY,
+                    params: dict[str, Any] | None = None) -> None:
         self._state = state
         self._error = (None if code is None else {
-            "code": code, "message_key": message_key, "params": {},
+            "code": code, "message_key": message_key, "params": dict(params or {}),
         })
         self._dirty = True
+
+    # ---- 0.1.6: what failed, and a trace of every attempt -----------------
+
+    def _transport_facts(self) -> dict[str, Any]:
+        """Routes offered and the source/route that answered last (labels), when the updater says."""
+        getter = getattr(self._updater, "transport_facts", None)
+        if not callable(getter):
+            return {}
+        try:
+            facts = getter()
+        except Exception:
+            return {}
+        return dict(facts) if isinstance(facts, dict) else {}
+
+    def _failure(self, exc: BaseException, stage: str) -> tuple[str, str, str, dict[str, Any]]:
+        """(code, kind, message_key, params) of a failed check or install.
+
+        The codes stay each command's own: app.update.check fails timeout/io/internal,
+        app.update.install io/internal (bridge_protocol COMMAND_SPECS)."""
+        code = "timeout" if stage == "check" and isinstance(exc, TimeoutError) else "io" if isinstance(
+            exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
+        kind = app_updater.failure_kind(exc) if code != "internal" else "other"
+        message_key = FAILURE_MESSAGE_KEYS.get(kind, OPERATION_FAILED_KEY)
+        if kind == "network":
+            routes = self._transport_facts().get("routes")
+            if isinstance(routes, list) and routes and "core proxy" not in routes:
+                message_key = UNREACHABLE_DIRECT_KEY
+        return code, kind, message_key, {"stage": stage}
+
+    @property
+    def history_path(self) -> Path:
+        """app-update-history.json beside the state file (0.1.6, diagnostic bundle)."""
+        return app_update_state.update_history_path(self.state_path)
+
+    def _record_attempt(self, entry: dict[str, Any]) -> None:
+        """Disk I/O: workers only, never under the owner lock; never raises."""
+        try:
+            with self._persistence_lock:
+                app_update_state.record_update_attempt(self.history_path, {
+                    "app_version": app_updater.normalize_version(self.current_version), **entry})
+        except Exception as exc:  # the trace must never fail an update
+            _LOG.warning("update attempt history unwritable: %s", type(exc).__name__)
+
+    def _attempt_entry(self, op: str, started: float, *, automatic: bool = False,
+                       failure: tuple[str, str, BaseException] | None = None, **extra: Any) -> dict[str, Any]:
+        transport = self._transport_facts()
+        entry: dict[str, Any] = {
+            "op": op,
+            "result": "failed" if failure else "ok",
+            "elapsed_ms": int(max(0.0, self._clock() - started) * 1000),
+            "routes": transport.get("routes") or None,
+            "source": transport.get("source"),
+            "route": transport.get("route"),
+            **extra,
+        }
+        if op == "check":
+            entry["automatic"] = bool(automatic)
+        if failure is not None:
+            code, kind, exc = failure
+            entry.update(code=code, kind=kind, summary=app_updater.failure_summary(exc))
+        return entry
 
     def snapshot(self) -> dict[str, Any]:
         """Unstamped topic template; publisher owns epoch/rev/time/sequence."""
@@ -299,11 +373,15 @@ class UpdateOwner:
             with self._persistence_lock:
                 notice = app_update_state.completed_update_notice(self.state_path, self.current_version)
                 if notice is None or not notice.previous_version:
+                    self._note_unfinished_install_locked()
                     return None
                 app_update_state.mark_update_notice_shown(self.state_path, notice.installed_version)
         except Exception as exc:  # Never block startup on the notice record.
             _LOG.warning("Completed-update record unreadable: %s", type(exc).__name__)
             return None
+        self._record_attempt({"op": "installed", "result": "ok",
+                              "from": app_updater.normalize_version(notice.previous_version),
+                              "to": notice.installed_version})
         previous = app_updater.normalize_version(notice.previous_version) or None
         # The saved notes describe the receipt's target only. Running past it means another
         # install got here (11-18: 0.1.0-0.1.3 hand-offs always failed, so receipts for 0.1.3
@@ -315,6 +393,23 @@ class UpdateOwner:
             self._installed_notes = notes
             self._dirty = True
         return previous
+
+    def _note_unfinished_install_locked(self) -> None:
+        """Under _persistence_lock: a kept receipt for a newer release than this one runs means
+        its installer did not finish (UAC 否, a busy folder, a failed or cancelled Setup, or only
+        downloaded). Recorded once per receipt, for the diagnostic bundle (0.1.6: 11-22 left no
+        way to tell whether the relaunched copy was the old or the new version)."""
+        pending = app_update_state.pending_update_summary(self.state_path)
+        if (not pending or not pending["target_version"]
+                or not app_updater.is_newer_version(pending["target_version"], self.current_version)):
+            return
+        note = {"op": "not_installed", "result": "failed", "to": pending["target_version"],
+                "downloaded_at": pending["requested_at"]}
+        if any(item.get("op") == "not_installed" and item.get("to") == note["to"]
+               and item.get("downloaded_at") == note["downloaded_at"]
+               for item in app_update_state.read_update_history(self.history_path)):
+            return  # this receipt was reported by an earlier start
+        self._record_attempt(note)
 
     def on_ready(self) -> None:
         with self._lock:
@@ -414,6 +509,8 @@ class UpdateOwner:
         if not leader:
             return deepcopy(flight.result())
         landed = None
+        started = self._clock()
+        attempt: dict[str, Any] | None = None
         try:
             info = self._updater.check_latest_update(current_version=self.current_version)
             version = app_updater.normalize_version(info.latest_version)
@@ -438,13 +535,18 @@ class UpdateOwner:
                 self._offer_notice(version, due=due)
                 result = self._dto()
                 landed = self._land_deferred_locked()  # after the result: the job's own stays a done check
+            attempt = self._attempt_entry("check", started, automatic=automatic, latest=version,
+                                          update_available=bool(info.update_available))
+            _LOG.info("update check ok: latest=%s available=%s via=%s/%s elapsed_ms=%s", version,
+                      bool(info.update_available), attempt.get("source"), attempt.get("route"),
+                      attempt.get("elapsed_ms"))
         except Exception as exc:
-            code = "timeout" if isinstance(exc, TimeoutError) else "io" if isinstance(
-                exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
-            _LOG.warning("update check failed: code=%s %s", code, app_updater.failure_summary(exc))
+            code, kind, message_key, params = self._failure(exc, "check")
+            _LOG.warning("update check failed: code=%s kind=%s %s", code, kind, app_updater.failure_summary(exc))
+            attempt = self._attempt_entry("check", started, automatic=automatic, failure=(code, kind, exc))
             with self._lock:
                 self._last_check_at_ms = self._wall_ms()
-                self._transition("failed", code)
+                self._transition("failed", code, message_key, params)
                 failure = JobFailure(code, self._dto())
                 flight.set_exception(failure)
                 landed = self._land_deferred_locked()
@@ -460,6 +562,8 @@ class UpdateOwner:
                 if event is not None:
                     _LOG.info("update installer launch failure recorded after the check: receipt=%s landed=%s",
                               event[0]["receipt_ref"], event[1])
+            if attempt is not None:
+                self._record_attempt(attempt)
 
     def install(self) -> dict[str, Any]:
         self.poll_handoff()
@@ -477,6 +581,9 @@ class UpdateOwner:
             self._receipt_ref = None
             if not handoff:
                 self._transition("downloading")
+        started = self._clock()
+        attempt: dict[str, Any] | None = None
+        reused = False
         try:
             # 0.1.5: with none in memory (a new epoch: Setup reopened the app after UAC 否, or any
             # restart), the durable receipt an earlier epoch verified for this release is reused on
@@ -486,6 +593,7 @@ class UpdateOwner:
                 receipt = self._revalidated_receipt(reuse, info) if reuse else self._adoptable_receipt(info)
             if receipt is not None:
                 receipt_ref = receipt["receipt_ref"]
+                reused = True
             else:
                 if handoff:
                     with self._lock:
@@ -501,21 +609,30 @@ class UpdateOwner:
             if handoff:
                 # Still _installing: no check/install can interleave here.
                 self._start_handoff(receipt)
+            attempt = self._attempt_entry("install", started, latest=app_updater.normalize_version(
+                info.latest_version), reused_installer=reused, handoff=handoff)
+            _LOG.info("update install ready: version=%s reused_installer=%s via=%s/%s elapsed_ms=%s",
+                      attempt.get("latest"), reused, attempt.get("source"), attempt.get("route"),
+                      attempt.get("elapsed_ms"))
             return {"verified": True, "handoff_pending": True, "receipt_ref": receipt_ref}
         except _HandoffUnpublished as exc:
             # The receipt stays valid; state is verified with the io error.
             _LOG.warning("update hand-off unpublished: %s", app_updater.failure_summary(exc))
+            attempt = self._attempt_entry("install", started, failure=("io", "handoff_unpublished", exc))
             raise JobFailure("io") from exc.__cause__
         except Exception as exc:
-            code = "io" if isinstance(exc, (app_updater.AppUpdateError, OSError, ValueError)) else "internal"
+            code, kind, message_key, params = self._failure(exc, "install")
             # Before 0.1.2 nothing recorded why an install failed (11-16 reports).
-            _LOG.warning("update install failed: code=%s %s", code, app_updater.failure_summary(exc))
+            _LOG.warning("update install failed: code=%s kind=%s %s", code, kind, app_updater.failure_summary(exc))
+            attempt = self._attempt_entry("install", started, failure=(code, kind, exc))
             with self._lock:
-                self._transition("failed", code)
+                self._transition("failed", code, message_key, params)
             raise JobFailure(code) from exc
         finally:
             with self._lock:
                 self._installing = False
+            if attempt is not None:
+                self._record_attempt(attempt)
 
     def _download_receipt(self, info: app_updater.AppUpdateInfo) -> str:
         # Re-download can overwrite/delete the previously verified bytes.
@@ -732,6 +849,8 @@ class UpdateOwner:
         else:
             _LOG.warning("update installer launch failed: receipt=%s reason=%s%s", receipt_ref, reason,
                          " (recorded once the check in flight lands)" if deferred else "")
+        self._record_attempt({"op": "launch", "result": "ok" if launched else "failed",
+                              "reason": reason, "deferred": bool(deferred)})
         return {"recorded": True}
 
     def last_install_result(self) -> dict[str, Any] | None:

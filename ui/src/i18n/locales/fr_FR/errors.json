@@ -272,6 +272,11 @@
   "errors.unknown": "Une erreur non reconnue s’est produite. Réessayez ; si le problème persiste, exportez un paquet de diagnostic et signalez-le.",
   "errors.update.launch_failed": "Le programme d’installation n’a pas pu démarrer. Recherchez les mises à jour pour réessayer, ou installez-la à la main depuis la page des versions.",
   "errors.update.operation_failed": "Échec de la mise à jour. Vérifiez le réseau, puis recherchez à nouveau des mises à jour.",
+  "errors.update.rate_limited": "GitHub refuse pour l’instant les requêtes de ce réseau (trop de requêtes). Recherchez à nouveau des mises à jour plus tard, ou démarrez le service et réessayez.",
+  "errors.update.storage_failed": "Impossible d’enregistrer les fichiers de mise à jour sur cet ordinateur (fichier utilisé, droits insuffisants ou disque plein) ; ce n’est pas un problème de réseau. Fermez tout programme d’installation en cours ou suspendez l’antivirus, puis réessayez.",
+  "errors.update.unreachable": "Impossible de joindre GitHub ou ses miroirs de téléchargement : aucune adresse n’a répondu, par aucune route. Vérifiez le réseau, puis recherchez à nouveau des mises à jour, ou installez-la à la main depuis la page des versions.",
+  "errors.update.unreachable_direct": "Le service n’est pas en marche : la mise à jour ne pouvait joindre GitHub qu’en direct, et cela a échoué. Démarrez le service et recherchez à nouveau des mises à jour ; elle passera alors par le proxy. Ou installez-la à la main depuis la page des versions.",
+  "errors.update.verify_failed": "Les fichiers de mise à jour téléchargés n’ont pas passé la vérification ; le réseau ou un miroir les a peut-être tronqués ou remplacés. Toutes les adresses de téléchargement ont été essayées. Réessayez plus tard, ou installez-la à la main depuis la page des versions.",
   "errors.validation": "Certaines informations saisies ne sont pas valides. Corrigez-les comme indiqué, puis réessayez.",
   "errors.validation.field": "Cette valeur n’est pas valide. Corrigez-la comme indiqué, puis enregistrez à nouveau.",
   "errors.settings.alerts_endpoint_changed": "L’adresse d’envoi a changé. Pour ne pas envoyer les identifiants enregistrés vers la nouvelle adresse, cette section n’a pas été enregistrée. Saisissez à nouveau ou effacez les clés, jetons et en-têtes d’identification de ce canal, puis enregistrez."
