@@ -847,6 +847,29 @@ def apply_dns_block_to_payload(payload: Mapping[str, Any], dns_block: Mapping[st
     return result
 
 
+def _order_free(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return tuple(sorted((str(key), _order_free(item)) for key, item in value.items()))
+    if isinstance(value, (list, tuple)):
+        return ("list", tuple(sorted((_order_free(item) for item in value), key=repr)))
+    return value
+
+
+def dns_blocks_equivalent(left: Mapping[str, Any] | None, right: Mapping[str, Any] | None) -> bool:
+    """Whether two rendered ``dns`` blocks configure Mihomo the same way.
+
+    Mihomo queries every list of the block concurrently (each nameserver
+    group, every ``nameserver-policy`` entry) and matches ``fake-ip-filter``
+    as a set, so list order means nothing to it.  The renderer orders
+    resolvers by measured latency: two qualifications of one link rarely
+    agree on that order, and must not reload the Core for it.
+    """
+
+    if not isinstance(left, Mapping) or not isinstance(right, Mapping):
+        return False
+    return _order_free(left) == _order_free(right)
+
+
 def display_summary(rung: str, qualification: ResolverQualification | None) -> str:
     """Short operator label such as ``encrypted (Cloudflare, Quad9)``."""
 
@@ -910,6 +933,7 @@ __all__ = [
     "bootstrap_ladder",
     "choose_rung",
     "display_summary",
+    "dns_blocks_equivalent",
     "dns_config_list",
     "dns_lists_are_legacy_defaults",
     "encrypted_candidates",

@@ -379,6 +379,39 @@ def test_apply_dns_block_to_payload_never_invents_a_dns_block():
     assert untouched["dns"] is not FORMAL_DNS
 
 
+def _hotspot_block(*, alidns_ms: int, dnspod_ms: int, v4_ms: int, v6_ms: int, extra_link: bool = True):
+    links = [link("192.168.43.1", LINK_ANSWERS_PUBLIC, v4_ms)]
+    if extra_link:
+        links.append(link("2001:db8:43::1", LINK_ANSWERS_PUBLIC, v6_ms))
+    result = qualification(
+        candidates=(
+            candidate("tls://223.5.5.5", CANDIDATE_QUALIFIED, alidns_ms),
+            candidate("tls://1.12.12.12", CANDIDATE_QUALIFIED, dnspod_ms),
+        ),
+        link_resolvers=tuple(links),
+    )
+    return render_dns_block(FORMAL_DNS, choose_rung(result, ladder=BOOTSTRAP_LADDER_AUTO), result)
+
+
+def test_a_latency_reorder_of_the_same_resolvers_is_an_equivalent_block():
+    """11-23 field report: re-qualifying one link flipped list order and reloaded the Core."""
+
+    first = _hotspot_block(alidns_ms=20, dnspod_ms=90, v4_ms=5, v6_ms=40)
+    second = _hotspot_block(alidns_ms=90, dnspod_ms=20, v4_ms=40, v6_ms=5)
+    assert first != second  # the renderer orders by latency
+    assert first["nameserver"] == list(reversed(second["nameserver"]))
+    assert policy.dns_blocks_equivalent(first, second) is True
+
+
+def test_a_changed_resolver_set_or_setting_is_not_equivalent():
+    base = _hotspot_block(alidns_ms=20, dnspod_ms=90, v4_ms=5, v6_ms=40)
+    assert policy.dns_blocks_equivalent(base, _hotspot_block(
+        alidns_ms=20, dnspod_ms=90, v4_ms=5, v6_ms=40, extra_link=False)) is False
+    assert policy.dns_blocks_equivalent(base, {**base, "ipv6": True}) is False
+    assert policy.dns_blocks_equivalent(base, {**base, "nameserver": base["nameserver"][:1]}) is False
+    assert policy.dns_blocks_equivalent(base, None) is False
+
+
 def test_every_rung_stays_free_of_hostnames_for_a_shipped_default_policy():
     result = qualification(
         candidates=(candidate("tls://9.9.9.9", CANDIDATE_QUALIFIED, 30),),

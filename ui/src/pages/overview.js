@@ -1460,7 +1460,7 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
       <div class="ch-y"></div><div class="ch-x"></div><div class="ch-tip"></div>`);
     const q = s => box.querySelector(s);
     box.querySelectorAll('#ch-gd stop').forEach((st, i) => { st.style.stopColor = 'var(--c-accent)'; st.style.stopOpacity = i ? '0' : '.16'; });
-    T.ti(box, 'overview.chart.aria', { range: 'h24' }, { attr: 'aria-label' });
+    T.ti(box, 'overview.chart.aria', { range: 'm5' }, { attr: 'aria-label' });
     const P = { svg: q('svg'), cr: q('.ch-cr'), slide: q('.ch-slide'), ld: q('.ch-ld'), lu: q('.ch-lu'), ad: q('.ch-ad'), au: q('.ch-au'), ed: q('.ch-ed'), eu: q('.ch-eu'),
       grid: Array.from(box.querySelectorAll('.ch-grid line')), yWrap: q('.ch-y'), xWrap: q('.ch-x'), tip: q('.ch-tip'),
       hl: q('.ch-hov line'), hd: q('.ch-hov .d'), hu: q('.ch-hov .u') };
@@ -1471,7 +1471,7 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
     // slots ending at the newest bucket, 5 min = 300 one-second slots ending at 现在 (fewer points
     // fill the right end only, never stretched across the plot); a hole longer than 1.5 slots
     // breaks the line (H4: no interpolation across a gap)
-    let W = 0, H = 0, mode = '24h', yMax = 0, yFrom = 0, yTo = 0, yT0 = 0, morph = null, reveal = null, hover = null, raf = 0, lastTick = performance.now(), paused = false, empty = false, active = false, slideAnims = [];
+    let W = 0, H = 0, mode = '5m', yMax = 0, yFrom = 0, yTo = 0, yT0 = 0, morph = null, reveal = null, hover = null, raf = 0, lastTick = performance.now(), paused = false, empty = false, active = false, slideAnims = [];
     const pw = () => W - pad.l - pad.r, ph = () => H - pad.t - pad.b;
     const yOf = v => pad.t + (1 - T.util.clamp(v / (yMax || 1), 0, 1.06)) * ph();
     const pts = md => ((md || mode) === '5m' ? HIST.live : HIST.h24);
@@ -1818,7 +1818,9 @@ import { modeSwitchOn, modeAfterSwitch } from '../data/static.js';
       if (runNow() === 'running') { openConfirm(v, k); return; }
       closeConfirm(true); paintToggles(v); setMode(v);
     });
-    rangeSeg = T.ui.seg(R.range, { value: '24h', onChange: v => { chart.setRange(v); } });
+    // the chart opens on 5 分钟: after 启动服务 it draws itself live from the first second, where a
+    // fresh 24 h history is empty and barely moves (keep makeChart's initial mode and aria in step)
+    rangeSeg = T.ui.seg(R.range, { value: '5m', onChange: v => { chart.setRange(v); } });
     R.ks.addEventListener('click', () => T.go('settings', { focus: 'killswitch' }));
     R.pool.addEventListener('click', () => T.go('profiles', {}));
     buildDeck(); buildProto();

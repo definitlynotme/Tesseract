@@ -20,6 +20,7 @@ from desktop_runtime import (
 )
 from runtime_egress_recovery import BoundRuntimeFailure, RuntimeEgressCoordinator
 from tests.test_runtime_ready_arm_regressions import _loaded_authority
+from tests.test_runtime_ready_carry import _gateway
 
 
 def _event(**changes):
@@ -219,6 +220,77 @@ def test_fixed_gateway_without_underlay_gets_own_authoritative_check():
         binding.node, reason="gateway_runtime_error", source="runtime_transport",
     )
     runtime._start_runtime_early_confirmation.assert_not_called()
+
+
+def _published_gateway_case(tmp_path):
+    """The real 1.19.27 Gateway publication under passive monitoring.
+
+    FINAL-EXIT -> EXIT-SELECT -> gw, and gw dials through PROXY-FALLBACK ->
+    TIER3-AUTO -> n1. Binding and underlay lookup are the production code;
+    only the controller refresh and the confirmation worker are stubbed.
+    """
+
+    runtime = _gateway(tmp_path).runtime
+    snapshot = runtime._runtime_route_snapshot
+    payload = runtime._runtime_route_snapshot_payload
+    token = runtime._runtime_worker_token()
+    runtime._runtime_monitoring_lease = _RuntimeMonitoringLease(
+        int(runtime._runtime_generation), int(runtime._core_generation),
+        int(token[3]), int(token[4]), int(runtime._lifecycle_revision),
+        time.monotonic() - 1,
+    )
+    runtime.manager.enqueue_node_health_check = Mock()
+    runtime._start_runtime_early_confirmation = Mock()
+
+    def refresh(**_kwargs):
+        runtime._runtime_egress_coordinator.set_current_snapshot(snapshot)
+        return snapshot, payload, None
+
+    runtime._refresh_loaded_runtime_authority = Mock(side_effect=refresh)
+    assert runtime._runtime_monitoring_is_active()
+    return runtime, snapshot, payload, token
+
+
+@pytest.mark.parametrize("route_changed", [False, True], ids=["same-route", "route-changed"])
+@pytest.mark.parametrize("outbound", ["GENERAL", "FINAL-EXIT"])
+def test_fixed_gateway_error_is_confirmed_on_its_underlay(tmp_path, outbound, route_changed):
+    """A 0.1.6 bundle (11-23): every Gateway error line raised AttributeError.
+
+    The line names the Gateway's chain (``MATCH,GENERAL`` or a FINAL-EXIT
+    rule) while the underlay binding names gw's dialer-proxy group, so
+    ``from_parsed`` returned None into ``observe`` and no Gateway route was
+    ever confirmed.
+    """
+
+    runtime, snapshot, payload, token = _published_gateway_case(tmp_path)
+    runtime._runtime_route_attribution_barrier_active = Mock(return_value=route_changed)
+    event = CoreOutputEvent(
+        raw_line=f'level=warning msg="[TCP] dial {outbound} (match Match/) '
+        '127.0.0.1:55001 --> example.invalid:443 error: context deadline exceeded"',
+        pid=int(token[3]), process_generation=int(token[4]),
+        received_at_monotonic=time.monotonic(),
+    )
+    runtime._handle_runtime_output_event(
+        event, snapshot, payload,
+        ingress_selector_intent_revision=runtime._runtime_selector_intent_revision,
+    )
+    runtime._start_runtime_early_confirmation.assert_called_once()
+    call = runtime._start_runtime_early_confirmation.call_args
+    failure, gateway_ref = call.args[0], call.kwargs["gateway_ref"]
+    assert (gateway_ref.proxy_name, gateway_ref.pool_kind) == ("gw", "gateway")
+    # Confirmation probes the dialer it is handed before it checks gw itself.
+    assert (failure.binding.node.proxy_name, failure.binding.node.pool_kind) == ("n1", "tier3b")
+    assert failure.binding.route_chain == ("PROXY-FALLBACK", "TIER3-AUTO", "n1")
+    assert failure.observed_outbound == failure.binding.observed_outbound == "PROXY-FALLBACK"
+    assert failure.error_type == (
+        "route_changed_after_transport_failure" if route_changed else "timeout"
+    )
+    # Its A/B pairs are the underlay's own fallback members; gw stays fixed.
+    plans = runtime._runtime_early_differential_plans(failure, snapshot, payload)
+    assert [(plan["ref"].proxy_name, plan["action"]["group"]) for plan in plans] == [
+        ("n2", "TIER3-AUTO"), ("n3", "TIER3-AUTO"),
+    ]
+    runtime.manager.enqueue_node_health_check.assert_not_called()
 
 
 def _idle_core_lines():

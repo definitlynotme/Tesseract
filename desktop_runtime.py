@@ -47,6 +47,7 @@ from dns_resolver_policy import (
     apply_dns_block_to_payload,
     bootstrap_ladder,
     choose_rung,
+    dns_blocks_equivalent,
     ladder_for_mode,
     next_rung,
     normalize_dns_mode,
@@ -57,6 +58,7 @@ from dns_resolver_qualification import (
     QUALIFICATION_BUDGET_SECONDS,
     QualificationHint,
     discover_link_resolvers,
+    link_matches_qualification,
     qualify_resolvers,
 )
 from manager_alert_policy import tier3_source_supply_no_egress_event
@@ -26723,7 +26725,16 @@ class DesktopRuntime:
                     gateway_ref, reason="gateway_runtime_error",
                 )
                 return
-            failure = BoundRuntimeFailure.from_parsed(parsed, underlay)
+            # The line names the Gateway's own chain (GENERAL, FINAL-EXIT),
+            # never its dialer-proxy group, so from_parsed() refuses this
+            # binding by design. Confirmation probes the underlay as the
+            # Gateway's dialer: hand it the same evidence under its own
+            # outbound, as the route_changed signal below also does.
+            failure = _dataclass_replace(
+                failure,
+                binding=underlay,
+                observed_outbound=underlay.observed_outbound,
+            )
         if route_changed:
             failure = BoundRuntimeFailure(
                 binding=failure.binding,
@@ -43608,6 +43619,14 @@ class DesktopRuntime:
         )
         return owner if min(owner) > 0 else None
 
+    def _core_reload_owner_or_none(self) -> tuple[int, int, int] | None:
+        """``_core_reload_owner`` for a reload step that must never raise."""
+
+        try:
+            return self._core_reload_owner()
+        except Exception:
+            return None
+
     def _core_reload_proof_stamp(self) -> tuple[Any, ...] | None:
         """Decision D option A: (route epoch, network epoch, Core owner, physical route) now.
 
@@ -44110,6 +44129,63 @@ class DesktopRuntime:
                     )
             return result
 
+    def _loaded_config_change_is_dns_only(
+        self,
+        previous_config_text: str | None,
+        runtime_config_path: Path,
+    ) -> bool:
+        """Whether the config just written moves nothing but the ``dns`` block.
+
+        A resolver plan for a new link, or a rung escalation, re-renders the
+        whole Core config, yet every proxy, group, rule and listener stays the
+        same: such a reload is no FINAL-EXIT route mutation.  The previous
+        text must be exactly the contract Core loaded (its digest) and the
+        provider the loaded one; anything unreadable or unproven counts as a
+        graph change.  Never raises.
+        """
+
+        def digest(text: str) -> str:
+            # The bytes Python's platform newline translation wrote (the
+            # export contract digests the payload the same way).
+            return hashlib.sha256(text.replace("\n", os.linesep).encode("utf-8")).hexdigest()
+
+        try:
+            if not previous_config_text:
+                return False
+            with self._runtime_route_snapshot_lock:
+                loaded = self._runtime_loaded_export_contract
+                pending = self._runtime_pending_export_contract
+                if not isinstance(loaded, dict) or not isinstance(pending, dict):
+                    return False
+                loaded_main = str(loaded.get("main_semantic_digest") or "")
+                loaded_provider = str(loaded.get("provider_semantic_digest") or "")
+                pending_main = str(pending.get("main_semantic_digest") or "")
+                pending_provider = str(pending.get("provider_semantic_digest") or "")
+            if (
+                not loaded_main
+                or not loaded_provider
+                or digest(previous_config_text) != loaded_main
+                or pending_provider != loaded_provider
+            ):
+                return False
+            current_text = Path(runtime_config_path).read_text(encoding="utf-8")
+            if not pending_main or digest(current_text) != pending_main:
+                return False
+            previous = yaml.safe_load(previous_config_text)
+            current = yaml.safe_load(current_text)
+            if (
+                not isinstance(previous, dict)
+                or not isinstance(current, dict)
+                or not isinstance(previous.get("dns"), dict)
+                or not isinstance(current.get("dns"), dict)
+            ):
+                return False
+            return {key: value for key, value in previous.items() if key != "dns"} == {
+                key: value for key, value in current.items() if key != "dns"
+            }
+        except Exception:
+            return False
+
     def _reload_core_config_serialized(
         self,
         *,
@@ -44157,9 +44233,21 @@ class DesktopRuntime:
                 and reload_mode == "incremental_export"
                 else None
             )
+            # A DNS-only change of a READY no-capture runtime keeps its route,
+            # exactly as in formal capture below.
+            dns_only_owner = (
+                self._core_reload_owner_or_none()
+                if runtime_phase == "formal_no_capture"
+                and reload_mode == "incremental_export"
+                and not capture_wanted
+                and selected_leaf_before is None
+                and self._runtime_initial_activation_was_completed()
+                else None
+            )
             if (
                 reload_mode == "incremental_export"
                 and (capture_wanted or selected_leaf_before is None)
+                and dns_only_owner is None
             ):
                 self._begin_core_route_mutation(
                     "Mihomo no-capture configuration mutation; "
@@ -44201,6 +44289,15 @@ class DesktopRuntime:
                 else:
                     runtime_config_path = self.write_mihomo_no_capture_runtime_config()
                     self._ensure_geodata_ready_for_core_start(runtime_config_path)
+                if dns_only_owner is not None and not self._loaded_config_change_is_dns_only(
+                    reload_context.previous_config_text,
+                    runtime_config_path,
+                ):
+                    dns_only_owner = None
+                    self._begin_core_route_mutation(
+                        "Mihomo no-capture configuration mutation; "
+                        "FINAL-EXIT 204 verification is pending"
+                    )
                 standby_reload = runner.hot_reload(
                     **hot_reload_kwargs_from_controller(controller)
                 )
@@ -44241,6 +44338,11 @@ class DesktopRuntime:
             preserve_final_exit = bool(
                 selected_leaf_before is not None
                 and selected_leaf_after == selected_leaf_before
+                and self._runtime_initial_activation_was_completed()
+            )
+            preserve_final_exit = preserve_final_exit or bool(
+                dns_only_owner is not None
+                and self._core_reload_owner_or_none() == dns_only_owner
                 and self._runtime_initial_activation_was_completed()
             )
             if (
@@ -44385,7 +44487,26 @@ class DesktopRuntime:
             if capture_was_active
             else None
         )
-        if reload_mode == "incremental_export" and selected_leaf_before is None:
+        # 11-23 field report: a DNS plan for a changed link reloads the whole
+        # config with only its ``dns`` block moved.  Read as a route mutation
+        # it rolled capture back (the Windows proxy went away) and the early
+        # profile parked readiness in CONTROLLER_HOLD for good, so the service
+        # read "starting" until a restart.  While READY stands on this Core,
+        # route invalidation waits for the render, as for a qualified leaf.
+        dns_only_owner = (
+            self._core_reload_owner_or_none()
+            if capture_was_active
+            and selected_leaf_before is None
+            and not unsafe_export_removal
+            and not empty_required_export
+            and self._runtime_initial_activation_was_completed()
+            else None
+        )
+        if (
+            reload_mode == "incremental_export"
+            and selected_leaf_before is None
+            and dns_only_owner is None
+        ):
             self._begin_core_route_mutation(
                 "Mihomo configuration mutation; FINAL-EXIT 204 verification is pending"
             )
@@ -44397,6 +44518,15 @@ class DesktopRuntime:
             if unsafe_export_removal:
                 return keep_existing(f"runtime config write failed: {exc}")
             raise
+        if dns_only_owner is not None and not self._loaded_config_change_is_dns_only(
+            reload_context.previous_config_text,
+            runtime_config_path,
+        ):
+            # The graph moved as well: the ordinary mutation, before ApplyConfig.
+            dns_only_owner = None
+            self._begin_core_route_mutation(
+                "Mihomo configuration mutation; FINAL-EXIT 204 verification is pending"
+            )
         if not mihomo_controller_enabled(controller):
             self.logger.info("Controller disabled; falling back to full restart for reload")
             return report_applied(self.restart_core())
@@ -44424,6 +44554,15 @@ class DesktopRuntime:
             and selected_leaf_after == selected_leaf_before
             and self._runtime_initial_activation_was_completed()
         )
+        # The same Core process loaded the same graph: READY and capture stand.
+        # A selection the reload moved is the route re-read's business, which
+        # carries READY over the same physical route or on Mihomo's verdict.
+        dns_only_preserved = bool(
+            dns_only_owner is not None
+            and self._core_reload_owner_or_none() == dns_only_owner
+            and self._runtime_initial_activation_was_completed()
+        )
+        preserve_final_exit = preserve_final_exit or dns_only_preserved
         if reload_mode == "incremental_export":
             self._advance_tier3_runtime_config_generation(
                 current_export_marker,
@@ -44479,7 +44618,12 @@ class DesktopRuntime:
                 )
             )
             self._mark_tier3_export_sync_complete()
-            if preserve_final_exit:
+            if dns_only_preserved:
+                self.logger.info(
+                    "Mihomo DNS-only reload kept the verified FINAL-EXIT "
+                    "route and traffic capture; revalidation skipped"
+                )
+            elif preserve_final_exit:
                 self.logger.info(
                     "Bastion Layer append-only runtime sync preserved the "
                     "qualified FINAL-EXIT leaf; revalidation skipped"
@@ -46855,10 +46999,15 @@ class DesktopRuntime:
             )
             return self._current_dns_resolver_plan()
         decision = choose_rung(qualification, ladder=ladder_for_mode(mode))
+        block = render_dns_block(formal_dns, decision, qualification)
+        if existing is not None and dns_blocks_equivalent(existing.block, block):
+            # The same resolvers in another latency order: keep the rendered
+            # block byte-stable, so the running Core is not reloaded for it.
+            block = existing.block
         plan = DnsResolverPlan(
             decision=decision,
             qualification=qualification,
-            block=render_dns_block(formal_dns, decision, qualification),
+            block=block,
             revision=previous_revision + 1,
             applied_at_monotonic=time.monotonic(),
             fault_count_at_apply=fault_count,
@@ -47599,6 +47748,10 @@ class DesktopRuntime:
             excluded_adapter_names=self._dns_resolver_excluded_adapter_names(),
         )
         if link.error or not link.fingerprint or link.fingerprint == plan.qualification.fingerprint:
+            return False
+        if link_matches_qualification(link, plan.qualification):
+            # Only addresses moved (an IPv6 temporary address rotated, a DHCP
+            # lease renewed): the plan still describes this link's resolvers.
             return False
         renewed = self._prepare_dns_resolver_plan(reason="network_changed", force=True)
         if renewed is None or renewed is plan:

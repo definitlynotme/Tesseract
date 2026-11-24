@@ -482,6 +482,35 @@ def discover_link_resolvers(
     )
 
 
+def link_matches_qualification(link: LinkDiscovery, qualification: ResolverQualification) -> bool:
+    """Whether ``link`` still has the resolvers ``qualification`` was run on.
+
+    The fingerprint also hashes every adapter's unicast addresses, and those
+    move while the resolvers stay put: IPv6 temporary addresses rotate and
+    DHCP renews leases (a 11-23 field report saw a new fingerprint every few
+    minutes on one campus link).  Qualification depends on the resolvers,
+    their adapters, the DNS suffixes and the address families, so only a
+    change of those is a new network for it.
+    """
+
+    if link.error:
+        return False
+    current = []
+    for address in link.resolvers:
+        adapter_index, has_gateway = link.resolver_adapters.get(address, (None, False))
+        current.append((address, adapter_index, bool(has_gateway)))
+    qualified = tuple(
+        (item.address, item.interface_index, bool(item.has_gateway))
+        for item in qualification.link_resolvers
+    )
+    return (
+        tuple(current) == qualified
+        and tuple(link.suffixes) == tuple(qualification.dns_suffixes)
+        and bool(link.ipv4_available) == bool(qualification.ipv4_available)
+        and bool(link.ipv6_available) == bool(qualification.ipv6_available)
+    )
+
+
 # ------------------------------------------------------------------ probes
 
 def _classify_link_result(result: PlainProbeResult) -> str:
@@ -801,6 +830,7 @@ __all__ = [
     "LinkDiscovery",
     "QualificationHint",
     "discover_link_resolvers",
+    "link_matches_qualification",
     "probe_encrypted_candidate",
     "qualify_resolvers",
 ]

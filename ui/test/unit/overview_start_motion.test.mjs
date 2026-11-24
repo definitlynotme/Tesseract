@@ -87,8 +87,10 @@ async function start(page) {
   return page.evaluate(() => {
     const name = document.getElementById('ov-name'), faces = [...name.children];
     return {
+      // (the 5 分钟 chart the page opens on slides its line and end dots once a second while shown: that
+      // slide is the chart being live, not a start animation left behind)
       seen: window.__f06,
-      running: document.getAnimations().filter(a => a.playState === 'running').map(a => String(a.effect && a.effect.target && (a.effect.target.id || a.effect.target.className))),
+      running: document.getAnimations().filter(a => a.playState === 'running' && !(a.effect && a.effect.target && a.effect.target.closest && a.effect.target.closest('#ov-chart svg'))).map(a => String(a.effect && a.effect.target && (a.effect.target.id || a.effect.target.className))),
       faces: faces.map(f => f.className), faceNodes: faces.map(f => [...f.childNodes].map(n => n.nodeType)),
       name: name.textContent, inner: name.querySelectorAll('.cr-c, .sr-only, .cr-v').length,
       pill: document.querySelector('#run .run-base .run-row:not(.is-out)').textContent.replace(/\d/g, '0'),

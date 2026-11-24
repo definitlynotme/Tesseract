@@ -114,6 +114,9 @@ export const SIM_STEPS = [
 /** Run SIM_STEPS in a page already loaded (#overview) and settled. */
 export async function walkSim(page, { steps = SIM_STEPS } = {}) {
   const out = {};
+  // the page opens the traffic chart on 5 分钟 (a fresh 24 h history is empty); the prototype
+  // trees were recorded on 24 小时, so the walk switches there first
+  await page.evaluate(() => document.querySelector('#ov-range [data-v="24h"]').click());
   for (const s of steps) {
     if (s.eval) await page.evaluate(s.eval);
     await page.evaluate(ms => window.__fixtureClock.advance(ms), s.ms || 0);

@@ -434,6 +434,48 @@ def test_excluded_adapter_names_drop_own_tunnel_even_with_public_looking_resolve
     assert discovery.resolvers == ("192.168.1.1",)
 
 
+def _campus_link(*, wlan_unicast=("172.21.6.66", "2001:db8:6::1111", "fe80::1"), wlan_dns=("222.198.178.68",),
+                 wlan_index=15, suffix="campus.example.edu"):
+    return discover_link_resolvers(adapter_source=lambda: (
+        DiscoveredAdapter(1, "{lo}", "Loopback Pseudo-Interface 1", True, False, ("fec0:0:0:ffff::1",), "",
+                          ("127.0.0.1",), 24),
+        DiscoveredAdapter(wlan_index, "{wlan}", "WLAN", True, True, tuple(wlan_dns), suffix, tuple(wlan_unicast), 71),
+    ))
+
+
+def _qualified_on(link):
+    return qualify_resolvers(
+        budget_seconds=1.0,
+        discovery=lambda **_: link,
+        plain_probe=fake_plain_probe(PUBLIC_ANSWERS),
+        encrypted_probe=lambda candidate, *, timeout_seconds: EncryptedCandidateResult(
+            candidate, CANDIDATE_QUALIFIED, 30),
+        outer_fake_ip_probe=lambda names: False,
+    )
+
+
+def test_address_churn_is_not_a_new_network_for_the_qualification():
+    """11-23 field report: one campus link showed a new fingerprint every few minutes."""
+
+    qualification = _qualified_on(_campus_link())
+    rotated = _campus_link(wlan_unicast=("172.21.6.67", "2001:db8:6::2222", "fe80::1"))
+    assert rotated.fingerprint != qualification.fingerprint
+    assert qual.link_matches_qualification(rotated, qualification) is True
+
+
+@pytest.mark.parametrize("change", ["resolver", "suffix", "adapter", "family", "error"])
+def test_a_resolver_change_is_a_new_network(change):
+    qualification = _qualified_on(_campus_link())
+    link = {
+        "resolver": lambda: _campus_link(wlan_dns=("222.198.178.68", "192.168.43.1")),
+        "suffix": lambda: _campus_link(suffix="dorm.example.edu"),
+        "adapter": lambda: _campus_link(wlan_index=16),
+        "family": lambda: _campus_link(wlan_unicast=("172.21.6.66", "fe80::1")),
+        "error": lambda: LinkDiscovery(error="OSError: boom", fingerprint="unknown"),
+    }[change]()
+    assert qual.link_matches_qualification(link, qualification) is False
+
+
 # ------------------------------------------------------------ orchestration
 
 def fake_discovery(resolvers=("222.198.178.68",), suffixes=("campus.example.edu",), **kwargs):

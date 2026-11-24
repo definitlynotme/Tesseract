@@ -11,18 +11,18 @@ from app_update_signing import decode_public_key, public_key_id
 
 class AppInfoTests(unittest.TestCase):
     def test_source_release_contract_is_stable(self) -> None:
-        self.assertEqual(app_info.APP_RELEASE_BASE_VERSION, "0.1.6")
+        self.assertEqual(app_info.APP_RELEASE_BASE_VERSION, "0.1.7")
         self.assertIsNone(app_info.APP_RELEASE_CANDIDATE_NUMBER)
-        self.assertEqual(app_info.DEFAULT_APP_VERSION, "0.1.6")
+        self.assertEqual(app_info.DEFAULT_APP_VERSION, "0.1.7")
         self.assertEqual(
             app_info.DEFAULT_RELEASE_VERSION_CONTRACT,
             {
-                "version": "0.1.6",
-                "base_version": "0.1.6",
+                "version": "0.1.7",
+                "base_version": "0.1.7",
                 "is_prerelease": False,
                 "rc_number": None,
-                "windows_version_numeric": "0.1.6.65535",
-                "windows_version_tuple": [0, 1, 6, 65535],
+                "windows_version_numeric": "0.1.7.65535",
+                "windows_version_tuple": [0, 1, 7, 65535],
             },
         )
 

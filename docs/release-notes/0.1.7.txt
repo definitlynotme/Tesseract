@@ -1,0 +1,39 @@
+[zh_CN]
+修复：网络变化后服务退回「启动中」
+
+- 连续使用几天后，服务明明已经「运行中」，一分钟内又退回「启动中」并一直停在那里，系统代理也随之关闭，只有重启服务才能恢复。原因是网络变化（换网、DHCP 续租、IPv6 临时地址更新）后，Tesseract 重新检测 DNS 服务器并重新载入配置；这次载入其实只改了 DNS 部分，却被当成出口线路变了，于是撤下系统代理并暂停服务，之后不会自动恢复。现在只改了 DNS 的载入不再影响出口：服务保持「运行中」，系统代理和出口线路照常工作。出口线路真的变了时，仍会先重新检测再应用。
+- 网络变化的判断不再看每块网卡的每个地址。只有 DNS 服务器、它们所在的网卡、DNS 后缀或可用的地址类型（IPv4 / IPv6）变了，才会重新检测 DNS。IPv6 临时地址更新、DHCP 续租不再被当成换了网络。
+- DNS 服务器按延迟排序，重新检测后顺序常会变。服务器还是那几个、只是顺序不同时，生成的配置保持不变，不再为此重新载入。
+
+修复：经回退层的 Gateway 出错时日志刷屏
+
+- Gateway 经回退层（PROXY-FALLBACK）转发时，代理核心每报一条错误，monitor.log 就多一段「Runtime egress event processing failed safely」的报错，一次能刷几十段，这条错误本身也没有被确认和处理。这个问题从 0.1.0 起一直存在。现在这类错误会归到 Gateway 所经过的回退层上确认：先检测回退层，回退层正常时再检测 Gateway 本身。
+
+改进：概览页流量图
+
+- 概览页的流量图默认显示最近 5 分钟。启动服务后它从第一秒起实时绘制；24 小时视图在刚启动时几乎是空的。仍可随时切换到 24 小时。
+
+关于更新
+
+- 已安装 0.1.4、0.1.5 或 0.1.6 的，可以直接在应用内更新到本版本。点「立即更新」后 Tesseract 会关闭，并显示「正在更新 Tesseract…」窗口；在「用户帐户控制」中选择「是」即可。如果没有看到授权提示，点任务栏上闪烁的按钮。
+- 0.1.0 到 0.1.3 仍需在浏览器中打开 github.com/definitlynotme/Tesseract/releases/latest，下载 Tesseract-Setup-0.1.7-win-x64.exe 手动安装一次。
+
+[en_US]
+Fixed: the service fell back to "Starting" after a network change
+
+- After a few days of normal use, a service that had reached "Running" could fall back to "Starting" within a minute and stay there, with the system proxy turned off, until the service was restarted. After a network change (another network, a DHCP renewal, a new IPv6 temporary address) Tesseract checks the DNS servers again and reloads the configuration. That reload changed only the DNS part, but it was read as a change of the exit route: the system proxy was taken down and the service put on hold, and nothing resumed it. A reload that changes only DNS now leaves the exit alone: the service stays "Running" and the system proxy and the exit route keep working. When the exit route really changes, it is still checked again before it is applied.
+- A network change is no longer judged by every address on every adapter. The DNS servers are checked again only when the servers, their adapters, the DNS suffixes or the address families (IPv4 / IPv6) change. A new IPv6 temporary address or a DHCP renewal no longer counts as a new network.
+- The DNS servers are ordered by latency, so checking them again often gave another order. The same servers in another order now keep the configuration as it was, with no reload for it.
+
+Fixed: a Gateway through the fallback layers filled the log on errors
+
+- With a Gateway reached through the fallback layers (PROXY-FALLBACK), every error the proxy core reported added a "Runtime egress event processing failed safely" traceback to monitor.log, dozens at a time, and the error itself was never confirmed or acted on. This was there in every release since 0.1.0. Such an error is now confirmed on the fallback layers the Gateway goes through: those are checked first, and the Gateway itself is checked when they pass.
+
+Improved: the overview traffic chart
+
+- The traffic chart on the overview opens on the last 5 minutes. After a start it draws itself live from the first second; the 24-hour view is nearly empty right after a start. You can still switch to 24 hours at any time.
+
+About updating
+
+- If you have 0.1.4, 0.1.5 or 0.1.6, you can update to this version from inside the app. After "Update now", Tesseract closes and an "Updating Tesseract…" window appears: choose Yes in User Account Control. If you see no prompt, click the flashing button on the taskbar.
+- 0.1.0 to 0.1.3 still need one install by hand: open github.com/definitlynotme/Tesseract/releases/latest in your browser and download Tesseract-Setup-0.1.7-win-x64.exe.

@@ -571,6 +571,73 @@ def test_network_change_requalifies_and_applies_to_the_running_core(tmp_path):
     assert runtime.reloads == [("incremental_export", RuntimeReloadReason.DNS_LIFECYCLE)]
 
 
+def _hotspot(*, alidns_ms, dnspod_ms, adapter=15, fingerprint="fp-hotspot"):
+    """The 11-23 hotspot link: one IPv4 and one IPv6 resolver, AliDNS and DNSPod qualified."""
+
+    return ResolverQualification(
+        fingerprint=fingerprint,
+        wall_time_ms=5,
+        link_resolvers=(
+            LinkResolverResult("192.168.43.1", LINK_ANSWERS_PUBLIC, 5, adapter, True),
+            LinkResolverResult("2001:db8:43::1", LINK_ANSWERS_PUBLIC, 9, adapter, True),
+        ),
+        candidates=(
+            EncryptedCandidateResult(CANDIDATES["tls://223.5.5.5"], CANDIDATE_QUALIFIED, alidns_ms),
+            EncryptedCandidateResult(CANDIDATES["tls://1.12.12.12"], CANDIDATE_QUALIFIED, dnspod_ms),
+        ),
+        ipv4_available=True,
+        ipv6_available=True,
+        inconclusive=False,
+    )
+
+
+def _hotspot_link(*, adapter=15, fingerprint):
+    resolvers = ("192.168.43.1", "2001:db8:43::1")
+    return LinkDiscovery(
+        resolvers=resolvers,
+        resolver_adapters={address: (adapter, True) for address in resolvers},
+        ipv4_available=True,
+        ipv6_available=True,
+        fingerprint=fingerprint,
+    )
+
+
+def test_address_churn_on_the_same_resolvers_neither_requalifies_nor_reloads():
+    """11-23 field report: a new fingerprint every few minutes, the same resolvers."""
+
+    runtime = make_runtime()
+    plan = prepared(runtime, _hotspot(alidns_ms=20, dnspod_ms=90))
+    with patch.object(runtime_module, "discover_link_resolvers",
+                      return_value=_hotspot_link(fingerprint="fp-rotated-ipv6-temporary")), \
+            patch.object(runtime_module, "qualify_resolvers") as probe:
+        assert runtime._dns_resolver_watch_once() is False
+    probe.assert_not_called()
+    assert runtime._current_dns_resolver_plan() is plan
+    assert runtime.reloads == []
+
+
+def test_a_requalification_that_only_reorders_keeps_the_block_and_the_core(tmp_path):
+    runtime = make_runtime()
+    plan = prepared(runtime, _hotspot(alidns_ms=20, dnspod_ms=90))
+    rendered = tmp_path / "mihomo-runtime.yaml"
+    import yaml as _yaml
+
+    rendered.write_text(_yaml.safe_dump({"dns": dict(plan.block)}), encoding="utf-8")
+    runtime._current_mihomo_runtime_config_path = lambda: rendered
+    # The resolvers moved to another adapter (a driver reset): a new network
+    # for the plan, re-qualified, and this time DNSPod answered first.
+    moved = _hotspot_link(adapter=16, fingerprint="fp-adapter-16")
+    with patch.object(runtime_module, "discover_link_resolvers", return_value=moved), \
+            patch.object(runtime_module, "qualify_resolvers",
+                         return_value=_hotspot(alidns_ms=90, dnspod_ms=20, adapter=16)) as probe:
+        assert runtime._dns_resolver_watch_once() is True
+    probe.assert_called_once()
+    renewed = runtime._current_dns_resolver_plan()
+    assert renewed is not plan and renewed.revision == plan.revision + 1
+    assert renewed.block == plan.block and list(renewed.block["nameserver"]) == list(plan.block["nameserver"])
+    assert runtime.reloads == []
+
+
 def test_network_change_during_no_egress_retries_immediately():
     runtime = make_runtime()
     prepared(runtime, qualification(

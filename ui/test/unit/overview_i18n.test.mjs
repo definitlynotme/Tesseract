@@ -295,6 +295,8 @@ function sameTree(want, got, what, extra = []) {
 test('regression: running, stopped and starting show the prototype text and tips (sim mode)', { skip, timeout: 120000 }, async () => {
   const { context, page, errors } = await open();
   try {
+    assert.deepEqual(await page.evaluate(() => [document.querySelector('#ov-range .seg-btn[aria-checked="true"]')?.dataset.v, document.querySelector('#ov-chart')?.getAttribute('aria-label')]),
+      ['5m', '最近 5 分钟的下载与上传速率曲线'], 'the traffic chart opens on 5 分钟');
     const states = await walkSim(page, { steps: SIM_STEPS });
     sameTree(withoutP1(withoutF04(withoutRoles(withoutF01(withoutGone(baselineSlice(readBaseline())), 'running')), 'running')), states.running.tree, 'running (T-P4-01 baseline)', [...DATA_05A, ...DATA_H2, ...DATA_F04, ...DATA_P1]);
     assert.deepEqual(states.running.tips, tipsNoRole(f01Tips(BEFORE.running.tips)), 'running: data-tips');
