@@ -80,7 +80,7 @@ def _credential_for(cipher: str) -> str:
 
 class ShadowsocksCipherContractTests(unittest.TestCase):
     def test_capability_is_the_exact_mihomo_1_19_24_set(self) -> None:
-        self.assertEqual(MIHOMO_SHADOWSOCKS_VERSION, "1.19.27")
+        self.assertEqual(MIHOMO_SHADOWSOCKS_VERSION, "1.19.34")
         self.assertEqual(SUPPORTED_SHADOWSOCKS_CIPHERS, frozenset(OFFICIAL_MIHOMO_1_19_24_CIPHERS))
         self.assertEqual(len(SHADOWSOCKS_CIPHER_CHOICES), 34)
         self.assertEqual(SHADOWSOCKS_CIPHER_CHOICES[0], DEFAULT_SHADOWSOCKS_CIPHER)

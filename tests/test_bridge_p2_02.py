@@ -647,7 +647,17 @@ def test_diagnostic_cleanup_completes_while_business_return_is_blocked(executor,
         before = drain(executor)
         release.set()
         assert executor.shutdown(time.monotonic() + 1)
-        assert ended.is_set() and executor.recorder.pending == 0
+        # shutdown() joins the control/change/cancel workers only. The business
+        # return runs on a normal worker, which shutdown asked to stop but never
+        # joins, so it can still be between release.wait() and ended.set() here
+        # (failed 1 of 12,250 in the 0.1.7 release run on the 4-vCPU runner).
+        # Join that worker: its late return has then been handled in full, so
+        # pending == 0 proves it recorded nothing.
+        assert ended.wait(1)
+        for worker in executor._normal_threads:
+            worker.join(1)
+            assert not worker.is_alive()
+        assert executor.recorder.pending == 0
         assert [event["data"]["state"] for event in before] == ["queued", "running", "cancelled"]
     finally:
         release.set()

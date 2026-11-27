@@ -4,16 +4,16 @@ This document identifies the source materials and corresponding binaries used
 in the Tesseract Windows package. The per-file software inventory is provided
 separately in `sbom.cdx.json`.
 
-## Mihomo 1.19.27
+## Mihomo 1.19.34
 
-- Source: upstream tag `v1.19.27`, included as
-  `sources/mihomo-1.19.27/mihomo-v1.19.27-source.zip`.
+- Source: upstream tag `v1.19.34`, included as
+  `sources/mihomo-1.19.34/mihomo-v1.19.34-source.zip`.
 - Source archive SHA-256:
-  `1ceb58df46e52900f9f4c9bcb4e6bad19a5fb138ed131b60dca793845893d709`.
+  `ecc4755c1fcb1826e883fe670d41dc5a214d734ffbe8b44b96fa84283c4a94d4`.
 - Upstream Windows amd64 v1 archive SHA-256:
-  `0f67ea6452545a5bbd192def9456ab970aedcbeea27161a04b764eb680927af2`.
+  `703e325bfeee582f874b06d054eaae55ab7c194645d1835411685aafa85da5ea`.
 - Distributed `mihomo.exe` SHA-256:
-  `842fa17493a82c97148e76e3c523f5058e3cf386fba611cab86b6681e75f2f77`.
+  `513ec525d782e29e00dd92b25f25623b3811a9b2fc5c51d95e1190bcc7fa0d3c`.
 - Package path: `_internal/bin/mihomo.exe`.
 - License: GPL-3.0-only; the GPL v3 text is included at
   `LICENSES/GPL-3.0-only.txt`.
@@ -25,9 +25,9 @@ identical to that upstream binary.
 
 Upstream references:
 
-- <https://github.com/MetaCubeX/mihomo/tree/v1.19.27>
-- <https://github.com/MetaCubeX/mihomo/blob/v1.19.27/README.md>
-- <https://github.com/MetaCubeX/mihomo/blob/v1.19.27/go.mod>
+- <https://github.com/MetaCubeX/mihomo/tree/v1.19.34>
+- <https://github.com/MetaCubeX/mihomo/blob/v1.19.34/README.md>
+- <https://github.com/MetaCubeX/mihomo/blob/v1.19.34/go.mod>
 
 ## WinTun 0.14.1
 

@@ -71,6 +71,19 @@ def _tick(runtime):
         runtime._retry_kicked_tier3_pick()
 
 
+# Mihomo's provider-wide check reuses a check that ended within the last second
+# (singledo), and a write's own post-update check may have just ended.  The
+# runtime tests members one by one, outside that window; a provider-wide check
+# made right after a write can test nothing.  On 1.19.34 the write and its
+# member tests end soon enough for that to happen most of the time.
+_PROVIDER_CHECK_SINGLEDO_SECONDS = 1.1
+
+
+def _health_check_provider_after_write(lab):
+    time.sleep(_PROVIDER_CHECK_SINGLEDO_SECONDS)
+    lab.client.health_check_provider(PROVIDER, timeout=8)
+
+
 def test_churn_inside_the_write_spacing_lands_writes_instead_of_superseding_them(tmp_path):
     """F3: the spacing wait comes before the pool marker is taken, and an
     attempt that wrote nothing does not space the next one."""
@@ -207,7 +220,7 @@ def test_a_kicked_pick_leaves_as_soon_as_traffic_moved_off_it(tmp_path):
             assert lab.members()[0] == 'n1' and 'n1' in runtime._tier3_kicked_pick_since
             assert runtime._retry_kicked_tier3_pick() is False  # inside the grace, still serving
             lab.nodes['n1'].refused.set()
-            lab.client.health_check_provider(PROVIDER, timeout=8)
+            _health_check_provider_after_write(lab)
             assert lab.group()['now'] == 'n2'
             assert runtime._refresh_runtime_route_snapshot(timeout_seconds=2.0) is not None
             started = time.monotonic()
@@ -550,7 +563,7 @@ def test_a_member_kicked_again_under_the_same_name_gets_its_own_timed_move(tmp_p
             assert _wait_worker_idle(runtime)
             lab.nodes['n2'].refused.set()
             lab.nodes['n3'].refused.set()
-            lab.client.health_check_provider(PROVIDER, timeout=8)
+            _health_check_provider_after_write(lab)
             assert lab.group()['now'] == 'n1' and not lab.group().get('fixed'), lab.group()
             assert runtime._refresh_runtime_route_snapshot(timeout_seconds=2.0) is not None
             follow.set(['n2', 'n3', 'n1', 'n4'])
@@ -560,7 +573,7 @@ def test_a_member_kicked_again_under_the_same_name_gets_its_own_timed_move(tmp_p
             assert lab.members()[0] == 'n1', lab.members()
             lab.nodes['n2'].refused.clear()
             lab.nodes['n3'].refused.clear()
-            lab.client.health_check_provider(PROVIDER, timeout=8)
+            _health_check_provider_after_write(lab)
             assert lab.group()['now'] == 'n1', lab.group()
             assert runtime._refresh_runtime_route_snapshot(timeout_seconds=2.0) is not None
 

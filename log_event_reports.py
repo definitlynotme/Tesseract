@@ -19,7 +19,7 @@ Translate = Callable[[str], str]
 # Keep upstream prose matching explicitly coupled to the core artifact shipped
 # by scripts/download_mihomo.ps1.  A version bump must update the fixed corpus
 # tests before these patterns can be treated as complete again.
-MIHOMO_PATTERN_CATALOG_VERSION = "1.19.27"
+MIHOMO_PATTERN_CATALOG_VERSION = "1.19.34"
 
 _COMMON_CONTEXT_PARAMS = (
     "title",

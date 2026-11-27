@@ -450,6 +450,202 @@ class MihomoAPIClientTests(unittest.TestCase):
         self.assertEqual(client.proxies(timeout=0.35), {"proxies": {}})
         self.assertEqual(opener.timeouts, [0.35])
 
+    # Mihomo 1.19.28+ lists provider members only in their groups' `all`; the
+    # client merges them back from the named provider, as 1.19.27 did itself.
+    _UNMERGED_LISTING = {
+        "proxies": {
+            "TIER3-AUTO": {"name": "TIER3-AUTO", "type": "Fallback", "all": ["n1", "n2", "REJECT"], "now": "n1"},
+            "REJECT": {"name": "REJECT", "type": "Reject", "provider-name": ""},
+            "inline": {"name": "inline", "type": "Socks5"},
+        }
+    }
+
+    def test_proxies_merges_unlisted_provider_members_from_the_named_provider(self) -> None:
+        opener = FakeOpener(
+            [
+                FakeResponse(body=json.dumps(self._UNMERGED_LISTING).encode()),
+                FakeResponse(body=json.dumps(CONF_C_PROVIDER_FIXTURE).encode()),
+            ]
+        )
+        client = self._client(opener)
+
+        entries = client.proxies(timeout=0.5)["proxies"]
+
+        self.assertEqual(
+            [call[1] for call in opener.calls],
+            [
+                "http://127.0.0.1:9090/proxies",
+                "http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME",
+            ],
+        )
+        self.assertEqual(sorted(entries), ["REJECT", "TIER3-AUTO", "inline", "n1", "n2", "n3"])
+        members = {member["name"]: member for member in CONF_C_PROVIDER_FIXTURE["proxies"]}  # type: ignore[index]
+        for name in ("n1", "n2", "n3"):
+            self.assertEqual(entries[name], members[name])
+        # 1.19.27's merge let a provider member win over a same-named entry.
+        self.assertEqual(entries["REJECT"], members["REJECT"])
+        self.assertEqual(entries["inline"], {"name": "inline", "type": "Socks5"})
+        # One deadline bounds both reads.
+        self.assertEqual(opener.timeouts[0], 0.5)
+        self.assertLessEqual(opener.timeouts[1], 0.5)
+
+    def test_proxies_reads_no_provider_when_every_member_is_listed(self) -> None:
+        merged = {
+            "proxies": {
+                "TIER3-AUTO": {"name": "TIER3-AUTO", "type": "Fallback", "all": ["n1"]},
+                "n1": {"name": "n1", "type": "Socks5"},
+            }
+        }
+        opener = FakeOpener([FakeResponse(body=json.dumps(merged).encode())])
+        client = self._client(opener)
+
+        self.assertEqual(client.proxies(), merged)
+        self.assertEqual(len(opener.calls), 1)
+
+    def test_proxies_skips_an_undeclared_provider_and_raises_on_other_failures(self) -> None:
+        missing = HTTPError(
+            "http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME",
+            404,
+            "Not Found",
+            {},  # type: ignore[arg-type]
+            io.BytesIO(b'{"message":"Resource not found"}'),
+        )
+        opener = FakeOpener(
+            [FakeResponse(body=json.dumps(self._UNMERGED_LISTING).encode()), missing]
+        )
+        self.assertEqual(self._client(opener).proxies(), self._UNMERGED_LISTING)
+
+        # A listing without the members would read as if none were loaded.
+        opener = FakeOpener(
+            [
+                FakeResponse(body=json.dumps(self._UNMERGED_LISTING).encode()),
+                ConnectionRefusedError("refused"),
+            ]
+        )
+        with self.assertRaises(MihomoAPIError):
+            self._client(opener).proxies()
+
+    def test_proxies_never_reads_the_all_provider_listing(self) -> None:
+        opener = FakeOpener(
+            [
+                FakeResponse(body=json.dumps(self._UNMERGED_LISTING).encode()),
+                FakeResponse(body=json.dumps(CONF_C_PROVIDER_FIXTURE).encode()),
+            ]
+        )
+        self._client(opener).proxies()
+        self.assertNotIn(
+            "http://127.0.0.1:9090/providers/proxies",
+            [call[1] for call in opener.calls],
+        )
+
+    def test_proxy_reads_a_provider_member_from_its_provider_after_404(self) -> None:
+        missing = HTTPError(
+            "http://127.0.0.1:9090/proxies/n1",
+            404,
+            "Not Found",
+            {},  # type: ignore[arg-type]
+            io.BytesIO(b'{"message":"Resource not found"}'),
+        )
+        member = {"name": "n1", "type": "Socks5", "provider-name": "TIER3B-RUNTIME"}
+        opener = FakeOpener([missing, FakeResponse(body=json.dumps(member).encode())])
+        client = self._client(opener)
+
+        self.assertEqual(client.proxy("n1", timeout=0.35), member)
+        self.assertEqual(
+            [call[1] for call in opener.calls],
+            [
+                "http://127.0.0.1:9090/proxies/n1",
+                "http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME/n1",
+            ],
+        )
+
+    def test_proxy_keeps_the_404_when_no_provider_holds_the_name(self) -> None:
+        def not_found(url: str) -> HTTPError:
+            return HTTPError(url, 404, "Not Found", {}, io.BytesIO(b"{}"))  # type: ignore[arg-type]
+
+        opener = FakeOpener(
+            [
+                not_found("http://127.0.0.1:9090/proxies/gone"),
+                not_found("http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME/gone"),
+            ]
+        )
+        with self.assertRaises(MihomoAPIError) as raised:
+            self._client(opener).proxy("gone")
+        self.assertIn("GET /proxies/gone failed: HTTP 404", str(raised.exception))
+        self.assertEqual(raised.exception.http_status, 404)  # type: ignore[attr-defined]
+
+    def test_proxy_delay_runs_a_provider_members_test_on_its_provider_route(self) -> None:
+        def not_found(url: str) -> HTTPError:
+            return HTTPError(url, 404, "Not Found", {}, io.BytesIO(b"{}"))  # type: ignore[arg-type]
+
+        state = {"extra": {CONTRACT_URL: {"alive": True}}}
+        opener = FakeOpener(
+            [
+                not_found("http://127.0.0.1:9090/proxies/n1/delay"),
+                FakeResponse(body=b'{"delay":8}'),
+                FakeResponse(body=json.dumps(state).encode()),
+            ]
+        )
+        result = self._client(opener).proxy_delay(
+            "n1",
+            url=CONTRACT_URL,
+            timeout_ms=5000,
+            expected_status="204",
+            verify_expected_status=True,
+            request_timeout=5.65,
+        )
+
+        self.assertEqual(result, {"delay": 8})
+        urls = [call[1] for call in opener.calls]
+        self.assertTrue(urls[0].startswith("http://127.0.0.1:9090/proxies/n1/delay?"))
+        self.assertTrue(
+            urls[1].startswith("http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME/n1/healthcheck?")
+        )
+        self.assertEqual(urls[0].split("?", 1)[1], urls[1].split("?", 1)[1])
+        # The expected-status readback reads the member where the test ran.
+        self.assertEqual(urls[2], "http://127.0.0.1:9090/providers/proxies/TIER3B-RUNTIME/n1")
+        # The 404 shares the request's deadline (monotonic ticks are coarse on
+        # Windows, so the remainder can equal the whole budget).
+        self.assertLessEqual(opener.timeouts[1], 5.65 + 1e-6)
+
+    def test_provider_member_delay_verdicts_keep_their_classes(self) -> None:
+        cases = (
+            (503, b'{"message":"An error occurred in the delay test"}', MihomoDelayTransportFailed),
+            (504, b'{"message":"Timeout"}', MihomoDelayTimeout),
+        )
+        for status, body, expected_type in cases:
+            with self.subTest(status=status):
+                opener = FakeOpener(
+                    [
+                        HTTPError("x", 404, "Not Found", {}, io.BytesIO(b"{}")),  # type: ignore[arg-type]
+                        _delay_http_error(status, body),
+                    ]
+                )
+                with self.assertRaises(MihomoAPIError) as raised:
+                    self._client(opener).proxy_delay("n1", url=CONTRACT_URL)
+                self.assertIs(type(raised.exception), expected_type)
+                self.assertIn(f"HTTP {status}", str(raised.exception))
+
+    def test_proxy_delay_of_an_unknown_name_stays_a_plain_404(self) -> None:
+        opener = FakeOpener(
+            [
+                HTTPError("x", 404, "Not Found", {}, io.BytesIO(b"{}")),  # type: ignore[arg-type]
+                HTTPError("y", 404, "Not Found", {}, io.BytesIO(b"{}")),  # type: ignore[arg-type]
+            ]
+        )
+        with self.assertRaises(MihomoAPIError) as raised:
+            self._client(opener).proxy_delay("gone", url=CONTRACT_URL)
+        self.assertIs(type(raised.exception), MihomoAPIError)
+        self.assertIn("GET /proxies/gone/delay failed: HTTP 404", str(raised.exception))
+
+    def test_merged_providers_can_be_turned_off(self) -> None:
+        opener = FakeOpener([FakeResponse(body=json.dumps(self._UNMERGED_LISTING).encode())])
+        client = MihomoAPIClient(
+            base_url="http://127.0.0.1:9090", timeout=1.0, opener=opener, merged_proxy_providers=()
+        )
+        self.assertEqual(client.proxies(), self._UNMERGED_LISTING)
+        self.assertEqual(len(opener.calls), 1)
+
     def test_select_proxy_uses_put_and_url_escapes_name(self) -> None:
         opener = FakeOpener([FakeResponse()])
         client = self._client(opener)

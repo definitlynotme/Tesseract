@@ -15,10 +15,10 @@
 #define MyAppPublisher "Tesseract contributors"
 #define MyAppURL "https://github.com/definitlynotme/Tesseract"
 #ifndef AppVersion
-#define AppVersion "0.1.7"
+#define AppVersion "0.1.8"
 #endif
 #ifndef AppVersionNumeric
-#define AppVersionNumeric "0.1.7.65535"
+#define AppVersionNumeric "0.1.8.65535"
 #endif
 #ifndef SourceDir
 #define SourceDir "..\..\dist-release\Tesseract"

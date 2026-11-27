@@ -6,11 +6,11 @@ from dataclasses import dataclass
 from typing import Any
 
 
-MIHOMO_SHADOWSOCKS_VERSION = "1.19.27"
+MIHOMO_SHADOWSOCKS_VERSION = "1.19.34"
 DEFAULT_SHADOWSOCKS_CIPHER = "aes-256-gcm"
 SHADOWSOCKS_NONE_NOTICE_CODE = "ss_none_unencrypted"
 
-# Mihomo v1.19.27 Shadowsocks methods. Keep the default first for the native
+# Mihomo v1.19.34 Shadowsocks methods. Keep the default first for the native
 # non-editable combo box and the deliberately unencrypted method last.
 SHADOWSOCKS_CIPHER_CHOICES = (
     DEFAULT_SHADOWSOCKS_CIPHER,

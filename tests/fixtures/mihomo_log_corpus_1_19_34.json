@@ -1,5 +1,5 @@
 {
-  "catalog_version": "1.19.27",
+  "catalog_version": "1.19.34",
   "cases": [
     {
       "case_id": "mihomo_dns_resolve_failed",

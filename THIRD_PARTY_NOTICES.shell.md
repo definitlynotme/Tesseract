@@ -68,9 +68,9 @@ declared license is included and the index marks it "canonical text".
   additional notices contained in the CPython license file.
   https://www.python.org/downloads/release/python-3127/
 - OpenSSL and libffi, as bundled by CPython: Apache-2.0 and MIT respectively.
-- Mihomo 1.19.27: GPL-3.0-only. The corresponding source tag and source
+- Mihomo 1.19.34: GPL-3.0-only. The corresponding source tag and source
   materials are included with the related Tesseract release.
-  https://github.com/MetaCubeX/mihomo/tree/v1.19.27
+  https://github.com/MetaCubeX/mihomo/tree/v1.19.34
 - WinTun 0.14.1: the unmodified official prebuilt `wintun.dll` is redistributed
   under WireGuard LLC's Prebuilt Binaries License. The full license is included
   in `third-party-licenses/wintun-0.14.1/`.

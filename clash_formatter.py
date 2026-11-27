@@ -962,6 +962,26 @@ def _clash_config_payload(value: str | dict[str, Any]) -> dict[str, Any]:
     return loaded
 
 
+def _start_select_on_empty_fallback(group: dict[str, Any]) -> None:
+    """Start a select group on its empty-fallback member, as up to Mihomo 1.19.27.
+
+    Until 1.19.27 a new select group's pick was its ``empty-fallback``; from
+    1.19.28 it is ``default-selected``, and the first member when that is
+    unset.  FINAL-EXIT lists REJECT as a member and must start there: ordinary
+    traffic stays rejected until the runtime selects the verified route
+    (gate-before-READY), in a bootstrap Core and in a formal one, TUN included.
+    A group whose members do not include its empty-fallback started on its
+    first member in both versions and is left as it is.
+    """
+
+    if str(group.get("type") or "").strip().lower() != "select" or "default-selected" in group:
+        return
+    fallback = group.get("empty-fallback")
+    members = group.get("proxies")
+    if isinstance(fallback, str) and fallback and isinstance(members, list) and fallback in members:
+        group["default-selected"] = fallback
+
+
 def build_capture_disabled_clash_config(
     config: str | dict[str, Any],
     *,
@@ -993,6 +1013,7 @@ def build_capture_disabled_clash_config(
             # every generated group explicitly fails closed during startup
             # and after hot reloads.
             group["empty-fallback"] = "REJECT"
+            _start_select_on_empty_fallback(group)
             group_type = str(group.get("type") or "").strip().lower()
             if group_type in {"fallback", "url-test", "url_test", "urltest"}:
                 # No-capture startup has no ordinary traffic to lazily trigger
@@ -1992,6 +2013,7 @@ def build_full_clash_config(
     for group in payload["proxy-groups"]:
         if group.get("type") == "fallback":
             group["max-failed-times"] = 2
+        _start_select_on_empty_fallback(group)
     if rule_providers:
         payload["rule-providers"] = rule_providers
     if secret:

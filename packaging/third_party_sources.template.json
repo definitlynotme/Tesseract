@@ -3,10 +3,10 @@
   "components": [
     {
       "name": "mihomo",
-      "version": "1.19.27",
-      "source_path": "mihomo-v1.19.27-source.zip",
-      "sha256": "1ceb58df46e52900f9f4c9bcb4e6bad19a5fb138ed131b60dca793845893d709",
-      "source_url": "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.27.zip",
+      "version": "1.19.34",
+      "source_path": "mihomo-v1.19.34-source.zip",
+      "sha256": "ecc4755c1fcb1826e883fe670d41dc5a214d734ffbe8b44b96fa84283c4a94d4",
+      "source_url": "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.34.zip",
       "license": "GPL-3.0-only"
     },
     {

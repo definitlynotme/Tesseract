@@ -1,11 +1,11 @@
 [CmdletBinding()]
 param(
-    [string] $Version = "1.19.27",
+    [string] $Version = "1.19.34",
     [ValidateSet("v1", "v2", "v3")]
     [string] $CpuLevel = "v1",
     [string] $DownloadUrl = "",
-    [string] $MihomoArchiveSha256 = "0f67ea6452545a5bbd192def9456ab970aedcbeea27161a04b764eb680927af2",
-    [string] $MihomoBinarySha256 = "842fa17493a82c97148e76e3c523f5058e3cf386fba611cab86b6681e75f2f77",
+    [string] $MihomoArchiveSha256 = "703e325bfeee582f874b06d054eaae55ab7c194645d1835411685aafa85da5ea",
+    [string] $MihomoBinarySha256 = "513ec525d782e29e00dd92b25f25623b3811a9b2fc5c51d95e1190bcc7fa0d3c",
     [string] $OutputPath = "bin\mihomo.exe",
     [string] $WintunOutputPath = "bin\wintun.dll",
     [string] $WintunVersion = "0.14.1",

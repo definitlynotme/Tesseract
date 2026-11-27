@@ -15,8 +15,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DOWNLOAD_SCRIPT = REPO_ROOT / "scripts" / "download_mihomo.ps1"
 EXPECTED_URI = (
-    "https://github.com/MetaCubeX/mihomo/releases/download/v1.19.27/"
-    "mihomo-windows-amd64-v1-v1.19.27.zip"
+    "https://github.com/MetaCubeX/mihomo/releases/download/v1.19.34/"
+    "mihomo-windows-amd64-v1-v1.19.34.zip"
 )
 
 
@@ -207,7 +207,7 @@ def test_mihomo_download_fails_closed_on_missing_direct_asset() -> None:
     assert "Simulated direct asset HTTP 404" in output
 
 
-@pytest.mark.parametrize("version", ("", "latest", "1.19", "1.19.27-rc.1"))
+@pytest.mark.parametrize("version", ("", "latest", "1.19", "1.19.34-rc.1"))
 def test_mihomo_download_rejects_unpinned_or_noncanonical_version(version: str) -> None:
     completed = _run_offline_download(version=version)
     output = completed.stdout + completed.stderr

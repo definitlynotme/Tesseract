@@ -701,6 +701,45 @@ class ClashFormatterTests(unittest.TestCase):
         self.assertEqual(groups_by_name["FINAL-EXIT"]["proxies"], ["PROXY-FALLBACK", "REJECT"])
         self.assertEqual(groups_by_name["PROXY-FALLBACK"]["proxies"], ["REJECT"])
 
+    def test_final_exit_starts_on_reject_in_every_rendered_config(self) -> None:
+        # Up to Mihomo 1.19.27 a select group started on its empty-fallback;
+        # 1.19.28+ starts on default-selected (the first member when unset).
+        # FINAL-EXIT must start on REJECT until the runtime selects the route.
+        tier3 = parse_node_uri(
+            "ss://YWVzLTI1Ni1nY206cGFzc0BiYXN0aW9uLmV4YW1wbGUuY29tOjgzODg#Bastion",
+            source="test",
+            tier="tier3",
+        )
+        exit_node = parse_node_uri(
+            "ss://YWVzLTI1Ni1nY206cGFzc0BleGl0LmV4YW1wbGUuY29tOjgzODg#Exit-SS",
+            source="test",
+            tier="exit",
+        )
+        assert tier3 is not None and exit_node is not None
+        for active_exit in (None, "Exit-SS"):
+            with self.subTest(active_exit=active_exit):
+                formal = build_full_clash_config(
+                    {"tier1": [], "tier2": [], "tier3": [tier3], "exit": [exit_node]},
+                    active_exit_proxy=active_exit,
+                )
+                for rendered in (
+                    formal,
+                    build_capture_disabled_clash_config(formal),
+                    build_bootstrap_clash_config(formal),
+                ):
+                    groups = {group["name"]: group for group in yaml.safe_load(rendered)["proxy-groups"]}
+                    self.assertEqual(groups["FINAL-EXIT"]["default-selected"], "REJECT")
+                    for name, group in groups.items():
+                        starts_on = group.get("default-selected")
+                        if group.get("type") != "select":
+                            self.assertIsNone(starts_on, name)
+                        elif "REJECT" in group.get("proxies", []):
+                            self.assertEqual(starts_on, "REJECT", name)
+                        else:
+                            # Without REJECT among its members a select group
+                            # started on its first member in both versions.
+                            self.assertIsNone(starts_on, name)
+
     def test_tls_options_do_not_fallback_to_ip_sni(self) -> None:
         node = parse_node_uri(
             "vless://11111111-1111-1111-1111-111111111111@203.0.113.10:443"

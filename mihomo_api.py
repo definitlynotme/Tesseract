@@ -61,6 +61,21 @@ DELAY_WINDOW_MAX_NAMES = 512
 _DELAY_WINDOW_LOCK = threading.Lock()
 _DELAY_WINDOWS: dict[tuple[str, str], deque[list[Any]]] = {}
 
+# Proxy providers whose members the client merges back into the /proxies view.
+# Mihomo 1.19.28 (upstream 85c1798f, "restore original Clash /proxies
+# behavior") stopped merging proxy-provider members into GET /proxies and into
+# every /proxies/{name} route: a member that only a provider holds is missing
+# from the listing, and its entry and its delay test answer 404.  Up to 1.19.27
+# the controller merged them in, and the runtime is built on that view: every
+# TIER3B-RUNTIME member is a TIER3-AUTO leaf whose entry, history and delay
+# test it reads like any other node's.  The client restores that view from the
+# provider's own routes, which run the same handlers (GET
+# /providers/proxies/{p}/{m} is getProxy, .../healthcheck is getProxyDelay).
+# Only the providers named here are read, each on its own: GET
+# /providers/proxies (all of them) marshals every group, which clears a dead
+# ``fixed`` pick (design v3 Conf-1).
+MERGED_PROXY_PROVIDERS: tuple[str, ...] = ("TIER3B-RUNTIME",)
+
 
 @contextmanager
 def _delay_window(base_url: str, name: str) -> Iterator[None]:
@@ -197,10 +212,33 @@ def _http_failure(method: str, path: str, status: int, reason: str, raw: bytes) 
             if _PROVIDER_PARSE_ERROR.match(message):
                 error_type = MihomoProviderUpdateRejected
     error = error_type(f"{method.upper()} {path} failed: HTTP {status} {reason}".rstrip())
+    error.http_status = int(status)
     if message is not None:
         # Kept off the text, which stays as it was for every lane.
         error.controller_message = message
     return error
+
+
+def _is_not_found(exc: BaseException) -> bool:
+    """True for the controller's HTTP 404 (an unknown proxy or provider name)."""
+
+    return getattr(exc, "http_status", None) == 404
+
+
+def _lists_unloaded_members(entries: dict[str, Any]) -> bool:
+    """True when a group lists a member that has no entry of its own.
+
+    That is the 1.19.28+ listing, where provider members appear only in their
+    groups' ``all``.  A merged listing (1.19.27, or a fake) never has one.
+    """
+
+    for entry in entries.values():
+        members = entry.get("all") if isinstance(entry, dict) else None
+        if isinstance(members, list) and any(
+            isinstance(member, str) and member not in entries for member in members
+        ):
+            return True
+    return False
 
 
 MihomoSelectionMode = Literal["selected", "fixed"]
@@ -244,11 +282,15 @@ class MihomoAPIClient:
         secret: str = "",
         timeout: float = 3.0,
         opener: UrlOpen = urlopen,
+        merged_proxy_providers: tuple[str, ...] | list[str] | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.secret = secret or ""
         self.timeout = float(timeout)
         self.opener = opener
+        self.merged_proxy_providers = tuple(
+            MERGED_PROXY_PROVIDERS if merged_proxy_providers is None else merged_proxy_providers
+        )
         self._lock = threading.RLock()
         self._active_streams: list[tuple[Any, object | None]] = []
 
@@ -405,7 +447,39 @@ class MihomoAPIClient:
         return self._request("PATCH", "/configs", payload=patch) or {"ok": True}
 
     def proxies(self, *, timeout: float | None = None) -> dict[str, Any]:
-        return self._request("GET", "/proxies", timeout=timeout)
+        """``GET /proxies`` with provider members merged in, as up to 1.19.27.
+
+        When a group lists members the listing has no entry for (1.19.28+),
+        each of ``merged_proxy_providers`` is read once and its members are
+        added; a member wins over a same-named entry, as in 1.19.27's merge.
+        ``timeout`` bounds the reads together.  A provider the config does not
+        declare (404) is skipped; any other failure raises, because a listing
+        without the provider members would read as if none were loaded.
+        """
+
+        deadline = None if timeout is None else time.monotonic() + float(timeout)
+        payload = self._request("GET", "/proxies", timeout=timeout)
+        entries = payload.get("proxies") if isinstance(payload, dict) else None
+        providers = self._merged_providers()
+        if not isinstance(entries, dict) or not providers or not _lists_unloaded_members(entries):
+            return payload
+        merged = dict(entries)
+        for provider in providers:
+            path = f"/providers/proxies/{quote(provider, safe='')}"
+            try:
+                body = self._request(
+                    "GET", path, timeout=self._remaining_timeout(deadline, "GET", path)
+                )
+            except MihomoAPIError as exc:
+                if _is_not_found(exc):
+                    continue
+                raise
+            members = body.get("proxies") if isinstance(body, dict) else None
+            for member in members if isinstance(members, list) else ():
+                name = member.get("name") if isinstance(member, dict) else None
+                if isinstance(name, str) and name:
+                    merged[name] = member
+        return {**payload, "proxies": merged}
 
     def proxy(
         self,
@@ -413,11 +487,45 @@ class MihomoAPIClient:
         *,
         timeout: float | None = None,
     ) -> dict[str, Any]:
-        return self._request(
-            "GET",
-            f"/proxies/{quote(name, safe='')}",
-            timeout=timeout,
-        )
+        """One entry; a provider member's comes from its provider (1.19.28+)."""
+
+        deadline = None if timeout is None else time.monotonic() + float(timeout)
+        try:
+            return self._request(
+                "GET",
+                f"/proxies/{quote(name, safe='')}",
+                timeout=timeout,
+            )
+        except MihomoAPIError as exc:
+            if not _is_not_found(exc):
+                raise
+            for provider in self._merged_providers():
+                path = self._provider_member_path(provider, name)
+                try:
+                    return self._request(
+                        "GET", path, timeout=self._remaining_timeout(deadline, "GET", path)
+                    )
+                except MihomoAPIError as member_exc:
+                    if not _is_not_found(member_exc):
+                        raise
+            raise
+
+    def _merged_providers(self) -> tuple[str, ...]:
+        # getattr: test doubles subclass the client without running __init__.
+        return tuple(getattr(self, "merged_proxy_providers", MERGED_PROXY_PROVIDERS))
+
+    @staticmethod
+    def _provider_member_path(provider: str, name: str) -> str:
+        return f"/providers/proxies/{quote(provider, safe='')}/{quote(name, safe='')}"
+
+    @staticmethod
+    def _remaining_timeout(deadline: float | None, method: str, path: str) -> float | None:
+        if deadline is None:
+            return None
+        remaining = deadline - time.monotonic()
+        if remaining <= 0.0:
+            raise MihomoAPIError(f"{method} {path} failed: request deadline expired")
+        return remaining
 
     def select_proxy(
         self,
@@ -612,19 +720,34 @@ class MihomoAPIClient:
             else max(0.1, float(request_timeout))
         )
         deadline = time.monotonic() + effective_timeout
-        result = self._request(
-            "GET",
-            f"/proxies/{quote(name, safe='')}/delay",
-            query={
-                "url": url,
-                "timeout": int(timeout_ms),
-                # Mihomo's controller calls this query parameter `expected`,
-                # while generated proxy-group YAML uses `expected-status`.
-                "expected": expected_status,
-            },
-            timeout=effective_timeout,
-            connection_abort_sink=connection_abort_sink,
-        )
+        query = {
+            "url": url,
+            "timeout": int(timeout_ms),
+            # Mihomo's controller calls this query parameter `expected`,
+            # while generated proxy-group YAML uses `expected-status`.
+            "expected": expected_status,
+        }
+        entry_path = f"/proxies/{quote(name, safe='')}"
+        try:
+            result = self._request(
+                "GET",
+                f"{entry_path}/delay",
+                query=query,
+                timeout=effective_timeout,
+                connection_abort_sink=connection_abort_sink,
+            )
+        except MihomoAPIError as exc:
+            if not _is_not_found(exc):
+                raise
+            # 1.19.28+: a provider member's test runs on its provider's route
+            # (the same handler, so 503/504 keep their verdict classes).  The
+            # 404 itself returns at once, before any URL test starts.
+            member_test = self._provider_member_delay(
+                name, query, deadline, connection_abort_sink
+            )
+            if member_test is None:
+                raise
+            entry_path, result = member_test
         if verify_expected_status and expected_status is not None:
             # URLTest can return a positive delay for an unexpected HTTP status.
             # Only its per-URL alive state contains the expected-status verdict.
@@ -632,7 +755,7 @@ class MihomoAPIClient:
             if remaining <= 0:
                 raise MihomoAPIError("proxy delay status readback deadline expired")
             state = self._request(
-                "GET", f"/proxies/{quote(name, safe='')}",
+                "GET", entry_path,
                 timeout=remaining, connection_abort_sink=connection_abort_sink,
             )
             extra = state.get("extra") if isinstance(state, dict) else None
@@ -643,6 +766,38 @@ class MihomoAPIClient:
             if alive is not True:
                 raise MihomoAPIError("proxy delay expected-status readback is unavailable")
         return result
+
+    def _provider_member_delay(
+        self,
+        name: str,
+        query: dict[str, Any],
+        deadline: float,
+        connection_abort_sink: ConnectionAbortSink | None,
+    ) -> tuple[str, Any] | None:
+        """``/delay`` for a provider member: (its entry path, the result).
+
+        ``None`` when no merged provider holds ``name``; a verdict (503/504)
+        or any other failure raises as it would on ``/proxies/{name}/delay``.
+        """
+
+        for provider in self._merged_providers():
+            entry_path = self._provider_member_path(provider, name)
+            path = f"{entry_path}/healthcheck"
+            remaining = deadline - time.monotonic()
+            if remaining <= 0.0:
+                raise MihomoAPIError(f"GET {path} failed: proxy delay deadline expired")
+            try:
+                return entry_path, self._request(
+                    "GET",
+                    path,
+                    query=query,
+                    timeout=remaining,
+                    connection_abort_sink=connection_abort_sink,
+                )
+            except MihomoAPIError as exc:
+                if not _is_not_found(exc):
+                    raise
+        return None
 
     def group_delay(
         self,

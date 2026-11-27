@@ -125,7 +125,7 @@ SOURCE_BUNDLE_NAME_RE = re.compile(
     r"third-party-sources\.zip$"
 )
 PINNED_UPSTREAM_BINARY_HASHES = {
-    "mihomo.exe": "842fa17493a82c97148e76e3c523f5058e3cf386fba611cab86b6681e75f2f77",
+    "mihomo.exe": "513ec525d782e29e00dd92b25f25623b3811a9b2fc5c51d95e1190bcc7fa0d3c",
     "wintun.dll": "e5da8447dc2c320edc0fc52fa01885c103de8c118481f683643cacc3220dafce",
 }
 

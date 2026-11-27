@@ -917,7 +917,7 @@ if (-not (Test-Path -LiteralPath $MihomoPath -PathType Leaf)) {
 if (-not (Test-Path -LiteralPath $WintunPath -PathType Leaf)) {
     throw "Pinned WinTun runtime is missing: $WintunPath"
 }
-$ExpectedMihomoSha256 = "842fa17493a82c97148e76e3c523f5058e3cf386fba611cab86b6681e75f2f77"
+$ExpectedMihomoSha256 = "513ec525d782e29e00dd92b25f25623b3811a9b2fc5c51d95e1190bcc7fa0d3c"
 $ExpectedWintunSha256 = "e5da8447dc2c320edc0fc52fa01885c103de8c118481f683643cacc3220dafce"
 if ((Get-Sha256 $MihomoPath) -ne $ExpectedMihomoSha256) {
     throw "Pinned Mihomo binary SHA-256 does not match the reviewed release input."
@@ -926,8 +926,8 @@ if ((Get-Sha256 $WintunPath) -ne $ExpectedWintunSha256) {
     throw "Pinned WinTun binary SHA-256 does not match the reviewed release input."
 }
 $MihomoVersionText = (& $MihomoPath -v | Out-String).Trim()
-if ($LASTEXITCODE -ne 0 -or $MihomoVersionText -notmatch "\bv?1\.19\.27\b") {
-    throw "Expected Mihomo 1.19.27, got: $MihomoVersionText"
+if ($LASTEXITCODE -ne 0 -or $MihomoVersionText -notmatch "\bv?1\.19\.34\b") {
+    throw "Expected Mihomo 1.19.34, got: $MihomoVersionText"
 }
 
 # GeoData ships in the package so a first start needs no download before Mihomo
@@ -1067,7 +1067,7 @@ $ShellLicenseArguments = @(
     "--build-requirements", "requirements-build.txt",
     "--license-dir", $ThirdPartyLicenseDir,
     "--sbom", $SbomFile,
-    "--mihomo-version", "1.19.27",
+    "--mihomo-version", "1.19.34",
     "--app-version", $Version,
     "--cargo-about-json", (Join-Path $ShellLegalInputsDir "cargo-about.json"),
     "--cargo-metadata-json", (Join-Path $ShellLegalInputsDir "cargo-metadata.json"),
@@ -1666,7 +1666,7 @@ $ReleaseMetadata = [ordered]@{
     build_time_utc = $BuildStartedUtc
     python = $ReleasePythonVersion
     flavor = "shell"
-    mihomo = "1.19.27"
+    mihomo = "1.19.34"
     wintun = "0.14.1"
     artifact_mode = $ReleaseMode
     authenticode = $SigningMode

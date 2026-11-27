@@ -56,12 +56,12 @@ class LogEventRegistryTests(unittest.TestCase):
     def test_mihomo_pattern_catalog_is_bound_to_packaged_core_version(self) -> None:
         download_script = Path("scripts/download_mihomo.ps1").read_text(encoding="utf-8")
 
-        self.assertEqual(MIHOMO_PATTERN_CATALOG_VERSION, "1.19.27")
+        self.assertEqual(MIHOMO_PATTERN_CATALOG_VERSION, "1.19.34")
         self.assertIn(f'$Version = "{MIHOMO_PATTERN_CATALOG_VERSION}"', download_script)
 
     def test_versioned_mihomo_corpus_covers_every_registered_pattern(self) -> None:
         fixture = json.loads(
-            Path("tests/fixtures/mihomo_log_corpus_1_19_27.json").read_text(encoding="utf-8")
+            Path("tests/fixtures/mihomo_log_corpus_1_19_34.json").read_text(encoding="utf-8")
         )
         self.assertEqual(fixture["catalog_version"], MIHOMO_PATTERN_CATALOG_VERSION)
         cases = fixture["cases"]

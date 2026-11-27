@@ -62,9 +62,9 @@ $destinationRoot = Assert-UnderRepo (Resolve-RepoPath $OutputDir)
 New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
 $downloads = @(
     @{
-        Name = "mihomo-v1.19.27-source.zip"
-        Uri = "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.27.zip"
-        Sha256 = "1ceb58df46e52900f9f4c9bcb4e6bad19a5fb138ed131b60dca793845893d709"
+        Name = "mihomo-v1.19.34-source.zip"
+        Uri = "https://github.com/MetaCubeX/mihomo/archive/refs/tags/v1.19.34.zip"
+        Sha256 = "ecc4755c1fcb1826e883fe670d41dc5a214d734ffbe8b44b96fa84283c4a94d4"
     },
     @{
         Name = "pyside-setup-6.11.0-source.tar.xz"

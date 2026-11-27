@@ -114,7 +114,7 @@ class MihomoProviderRuntimeTests(unittest.TestCase):
             **hidden_subprocess_kwargs(),
         )
         self.assertEqual(version.returncode, 0, version.stdout + version.stderr)
-        self.assertIn("v1.19.27", version.stdout + version.stderr)
+        self.assertIn("v1.19.34", version.stdout + version.stderr)
 
         used: set[int] = set()
         mixed_port = self._reserve_port(used)
@@ -608,7 +608,7 @@ class MihomoProviderRuntimeTests(unittest.TestCase):
             **hidden_subprocess_kwargs(),
         )
         self.assertEqual(version.returncode, 0, version.stdout + version.stderr)
-        self.assertIn("v1.19.27", version.stdout + version.stderr)
+        self.assertIn("v1.19.34", version.stdout + version.stderr)
 
         used: set[int] = set()
         origin_port = self._reserve_port(used)
