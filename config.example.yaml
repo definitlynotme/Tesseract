@@ -174,11 +174,15 @@ tiers:
 testing:
   tcp_timeout: 5
   concurrency: 50
-  # Tier1, Tier2, and Gateway become unavailable when a successful automatic
-  # or manual probe exceeds this latency. Tier3 keeps its fallback policy.
+  # Tier1, Tier2, and Gateway become unavailable when a successful direct
+  # automatic or manual probe exceeds this latency (100-5000). It also sets
+  # the fallback groups' timeout. Tier3 keeps its fallback policy.
   primary_gateway_max_latency_ms: 800
-  # Legacy Tier3 slow threshold; strict tiers derive SLOW at half of the
-  # primary/Gateway maximum above.
+  # Chain checks only (500-15000): a Gateway through the fallback layers, or a
+  # node through the selected Gateway. The extra hop counts, so it is looser.
+  gateway_max_latency_ms: 6000
+  # Legacy Tier3 slow threshold; strict tiers derive SLOW at half of their
+  # maximum above.
   slow_threshold_ms: 2000
   request_timeout: 15
   max_source_bytes: 8388608

@@ -5,7 +5,9 @@ proxy has ``dialer-proxy: PROXY-FALLBACK``.  Its scheduled check, however, is a
 direct TCP probe from this computer, and many residential/ISP gateways answer
 direct connections poorly or refuse some source networks.  A failed direct
 probe alone must not condemn such a node: a Gateway left out of the export is
-unselectable, and a selected one leaves EXIT-SELECT with only REJECT.
+unselectable, and a selected one the Core does not serve yet (a start) leaves
+EXIT-SELECT with only REJECT.  The one the Core serves stays in the export
+whatever its verdict (DesktopRuntime._served_gateway_identities).
 
 1. Direct first: a passed direct probe is a pass.
 2. Direct failed and the fallback layers have usable nodes: probe once more
@@ -58,6 +60,7 @@ _LATENCY_POLICY_EXTRA_KEYS = (
     "latency_policy_limit_ms",
     "latency_policy_observed_ms",
     "latency_policy_scope",
+    "latency_policy_path",
 )
 
 

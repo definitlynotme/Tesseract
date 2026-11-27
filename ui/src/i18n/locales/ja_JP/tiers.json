@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "無効なリクエスト",
   "tiers.reason.invalid_request.fix": "詳細を閉じて開き直してから、もう一度テストしてください。",
   "tiers.reason.latency_limit_exceeded": "遅延が上限超過",
-  "tiers.reason.latency_limit_exceeded.fix": "上限は {max_ms, number, integer} ms です。設定 › 接続品質 で変更できます。",
+  "tiers.reason.latency_limit_exceeded.fix": "上限は {max_ms, number, integer} ms です。設定 › 接続品質{limit, select, chain { › フォールバック層経由の出口チェーン遅延上限} other {}} で変更できます。",
   "tiers.reason.node_changed": "ノード変更済み",
   "tiers.reason.node_changed.fix": "テスト中にノードの設定が変わりました。もう一度テストしてください。",
   "tiers.reason.node_index_unavailable": "ノードリスト準備中",

@@ -851,6 +851,26 @@
     "m": "无响应",
     "_desc": "节点点阵提示：节点上次检测没有响应"
   },
+  "settings.quality.gateway.title": {
+    "m": "出口经回退层的链路延迟上限",
+    "_desc": "设置项标题，也是输入框的无障碍名称：只用于整条链路检测（出口经回退层，或节点经所选 Gateway）的延迟上限"
+  },
+  "settings.quality.gateway.hint": {
+    "m": "只用于整条链路的检测：Gateway 经回退层，或节点经所选 Gateway。多走的一跳也在延迟里，所以默认值更大；直接检测仍按上面的延迟上限。范围 {min}–{max} ms，默认 {def} ms。",
+    "_desc": "出口延迟上限输入框下的说明；min、max、def 为毫秒数（不分组）"
+  },
+  "settings.quality.gateway.err.range": {
+    "m": "请输入 {min}–{max} 之间的整数（毫秒）。",
+    "_desc": "出口延迟上限不是范围内整数时的错误；min、max 为毫秒数"
+  },
+  "settings.quality.gateway.err.range.short": {
+    "m": "应为 {min}–{max}",
+    "_desc": "同上的简短原因，嵌在保存提示里"
+  },
+  "settings.quality.gateway.problem": {
+    "m": "链路延迟上限有误：{reason}",
+    "_desc": "保存时出口延迟上限有误；reason 为简短原因"
+  },
   "settings.bastion.on.title": {
     "m": "启用 Bastion",
     "_desc": "设置项标题，也是开关的无障碍名称；Bastion 不译"

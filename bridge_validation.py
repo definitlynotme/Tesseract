@@ -26,7 +26,10 @@ from config_validation import (
 from dns_resolver_policy import DNS_MODES
 from dns_ui import validate_plain_dns_ips
 from killswitch_config_view import parse_whitelist_text
-from latency_policy_view import validate_latency_policy_max_latency_ms
+from latency_policy_view import (
+    validate_gateway_latency_policy_max_latency_ms,
+    validate_latency_policy_max_latency_ms,
+)
 from system_proxy_runtime import normalize_system_proxy_bypass_entry
 
 
@@ -41,7 +44,7 @@ FIELDS = {
     # rule_list / providers (配置整理 P2): the rules as one ordered list
     # (routing.rules.list) and the rule sets it may name (routing.rule_providers).
     "routing": {"rules", "rule_order", "rule_list", "providers"},
-    "latency": {"primary_gateway_max_latency_ms"},
+    "latency": {"primary_gateway_max_latency_ms", "gateway_max_latency_ms"},
     # 提醒 redesign 10-30: three switches under alerts.notify (alert_policy).
     "sources": {"items"}, "alerts": {"notify"},
     # D8 ``start_in_tray_on_autostart`` (T-P4-C1 #4): shell autostart preference.
@@ -192,7 +195,9 @@ def _normal(section: str, field: str, value: Any) -> Any:
         validate_dns_local({"mode": "custom", field: entries})
         return entries
     if section == "latency":
-        normalized = validate_latency_policy_max_latency_ms(value)
+        normalized = (validate_gateway_latency_policy_max_latency_ms(value)
+                      if field == "gateway_max_latency_ms"
+                      else validate_latency_policy_max_latency_ms(value))
         validate_testing_local({field: normalized})
         return normalized
     if section == "ui" and field == "language":

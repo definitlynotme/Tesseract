@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Solicitud no válida",
   "tiers.reason.invalid_request.fix": "Cierra los detalles, vuelve a abrirlos y prueba otra vez.",
   "tiers.reason.latency_limit_exceeded": "Latencia por encima del límite",
-  "tiers.reason.latency_limit_exceeded.fix": "El límite es de {max_ms, number, integer} ms. Puedes cambiarlo en Configuración › Calidad de la conexión.",
+  "tiers.reason.latency_limit_exceeded.fix": "El límite es de {max_ms, number, integer} ms. Puedes cambiarlo en Configuración › Calidad de la conexión{limit, select, chain { › Límite de latencia de la cadena Gateway (respaldo)} other {}}.",
   "tiers.reason.node_changed": "Nodo modificado",
   "tiers.reason.node_changed.fix": "La configuración del nodo cambió durante la prueba. Basta con volver a probar.",
   "tiers.reason.node_index_unavailable": "Lista de nodos no preparada",

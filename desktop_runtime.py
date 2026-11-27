@@ -203,6 +203,8 @@ from runtime_settings import (
     testing_block,
     slow_threshold_ms_from_testing,
     primary_gateway_max_latency_ms_from_testing,
+    gateway_chain_probe_timeout_ms,
+    strict_latency_limit_ms_for_path,
     verified_tier3_provider_writes,
 )
 from mihomo_api import (
@@ -1371,6 +1373,7 @@ class _Tier3CoreExportManagerView:
         excluded_leaf_keys: set[tuple[str, str, str]] | None = None,
         pool_kind_fn: Callable[[str, Any], str] | None = None,
         stable_tier3_names: bool = False,
+        served_gateway_identities: frozenset[str] | set[str] | None = None,
     ) -> None:
         self._manager = manager
         # Read by subscription._render_clash_config: only the runtime's own
@@ -1382,6 +1385,10 @@ class _Tier3CoreExportManagerView:
         self._identity_fn = identity_fn
         self._excluded_leaf_keys = set(excluded_leaf_keys or set())
         self._pool_kind_fn = pool_kind_fn
+        # Gateway identities of the loaded EXIT-SELECT member for the saved
+        # selection: exported whatever their latest verdict
+        # (DesktopRuntime._served_gateway_identities).
+        self._served_gateway_identities = frozenset(served_gateway_identities or ())
         self._frozen_nodes: dict[str, tuple[Any, ...]] | None = None
         self._frozen_exit_inventory: tuple[Any, ...] | None = None
 
@@ -1408,6 +1415,17 @@ class _Tier3CoreExportManagerView:
         if self._frozen_exit_inventory is not None:
             return list(self._frozen_exit_inventory)
         return self._live_exit_inventory()
+
+    def _serves_gateway(self, node: Any) -> bool:
+        """Whether ``node`` is the Gateway the loaded Core serves for the saved
+        selection: its verdict never takes it out of the export."""
+
+        if not self._served_gateway_identities:
+            return False
+        try:
+            return gateway_identity(node) in self._served_gateway_identities
+        except Exception:
+            return False
 
     @staticmethod
     def _clone_node(node: Any) -> Any:
@@ -1481,6 +1499,7 @@ class _Tier3CoreExportManagerView:
                 node
                 for node in nodes
                 if getattr(node, "status", None) in {NodeStatus.ALIVE, NodeStatus.SLOW}
+                or (tier_id == "exit" and self._serves_gateway(node))
             ]
         if (
             self._excluded_identities
@@ -1961,6 +1980,10 @@ class DesktopRuntime:
         self._runtime_lifecycle_lock = threading.RLock()
         self._runtime_intent_lock = threading.RLock()
         self._lifecycle_revision = 0
+        # The lifecycle revision whose READY first served user traffic through
+        # the Windows system proxy; a rollback in that run keeps the proxy on
+        # Tesseract (_system_proxy_capture_hold_applies).
+        self._system_proxy_capture_served_revision: int | None = None
         self._stop_intent_sequence = 0
         self._active_stop_intent: RuntimeStopIntent | None = None
         self._stop_request_pending = False
@@ -4026,6 +4049,73 @@ class DesktopRuntime:
             and bool(getattr(proxy_manager, "enabled", False))
         )
 
+    def _note_system_proxy_capture_served(self) -> None:
+        """Record that this run's READY serves user traffic via the Windows proxy."""
+
+        if self._system_proxy_capture_proof_required():
+            self._system_proxy_capture_served_revision = int(
+                getattr(self, "_lifecycle_revision", 0) or 0
+            )
+
+    def _system_proxy_capture_hold_applies(self) -> bool:
+        """Whether a rollback keeps the Windows proxy on this Core (fail-closed).
+
+        Field report 11-25 (0.1.7, Windows system proxy, no kill switch): a
+        reload while the Gateway was briefly judged dead rolled capture back,
+        and the rollback wrote back the proxy setting from before the start:
+        off.  For about seven minutes every browser request then went out
+        directly, with the link's own DNS: the "DNS leak" the user saw.  TUN
+        would not have helped, because the capture-disabled config drops TUN
+        as well.  Before this run's first READY the user's traffic was direct
+        anyway, so a failed start keeps restoring it; once READY has served
+        through the proxy, only an explicit stop or exit hands it back.
+        Meanwhile Windows keeps sending traffic to the same mixed port, whose
+        rules never fall back to DIRECT, and FINAL-EXIT is verified again
+        before READY.  TUN and mixed modes keep their existing rollback.
+        """
+
+        if not self._system_proxy_capture_proof_required():
+            return False
+        stop_event = getattr(self, "stop_event", None)
+        if (
+            (stop_event is not None and stop_event.is_set())
+            or bool(getattr(self, "_stop_request_pending", False))
+            or not bool(getattr(self, "_desired_running", True))
+        ):
+            return False
+        served = getattr(self, "_system_proxy_capture_served_revision", None)
+        if served is None or int(served) != int(
+            getattr(self, "_lifecycle_revision", 0) or 0
+        ):
+            return False
+        target_probe = getattr(
+            getattr(self, "system_proxy", None), "is_target_active", None,
+        )
+        try:
+            return bool(target_probe()) if callable(target_probe) else False
+        except Exception:
+            return False
+
+    def _release_system_proxy_capture_for_rollback(self, reason: str) -> bool:
+        """Withdraw host capture for a rollback; True when it was kept instead."""
+
+        if self._system_proxy_capture_hold_applies():
+            # The caller's lifecycle bookkeeping depends on this answer;
+            # a diagnostic that cannot be written must not change it.
+            try:
+                log_raw_diagnostic(
+                    self.logger,
+                    "warning",
+                    "Kept the Windows system proxy on Tesseract while FINAL-EXIT "
+                    "is verified again; traffic is not sent direct (reason=%s)",
+                    reason,
+                )
+            except Exception:
+                pass
+            return True
+        self.restore_system_proxy()
+        return False
+
     def _system_proxy_host_probe_uses_wininet_preconfig(self) -> bool:
         """Return whether the host proof can exercise the real Windows path.
 
@@ -5044,7 +5134,10 @@ class DesktopRuntime:
         if not rollback_owner_is_current():
             return
         try:
-            self.restore_system_proxy()
+            # Once this run has served through the Windows proxy, the
+            # rollback keeps it on Tesseract instead of handing traffic back
+            # to the direct connection (_system_proxy_capture_hold_applies).
+            self._release_system_proxy_capture_for_rollback(reason)
         except Exception:
             # Capture rollback must continue even when the Windows proxy
             # backend is temporarily unavailable. Leaving the Core in capture
@@ -6323,7 +6416,8 @@ class DesktopRuntime:
         return primary_runtime_healthy_count(runtime_nodes)
 
     def _selected_gateway_usable(self) -> bool:
-        """Whether the export would carry the selected Gateway now (ALIVE/SLOW).
+        """Whether the export would carry the selected Gateway now: ALIVE/SLOW,
+        or the one the loaded Core serves (_served_gateway_identities).
 
         A selection saved by identity needs that node; an older name-only one
         needs any usable Gateway (its member is resolved by the renderer).
@@ -6333,9 +6427,13 @@ class DesktopRuntime:
         selection = self._gateway_selection()
         if manager is None or selection is None or not selection.active:
             return True
+        exits = manager.runtime_effective_nodes("exit")
+        served = self._served_gateway_identities()
+        if served and any(gateway_identity(node) in served for node in exits):
+            return True
         usable = [
             node
-            for node in manager.runtime_effective_nodes("exit")
+            for node in exits
             if node.status in {NodeStatus.ALIVE, NodeStatus.SLOW}
         ]
         if selection.state == "bound":
@@ -8178,6 +8276,7 @@ class DesktopRuntime:
             excluded_leaf_keys=failback_holds,
             pool_kind_fn=self._runtime_pool_kind,
             stable_tier3_names=self._tier3_verified_provider_writes_enabled(),
+            served_gateway_identities=self._served_gateway_identities(),
         ).freeze_nodes()
 
     def _probe_tier3_proxy_delay_candidate(
@@ -12729,7 +12828,9 @@ class DesktopRuntime:
                             getattr(self.system_proxy, "active", False)
                         ):
                             try:
-                                self.restore_system_proxy()
+                                self._release_system_proxy_capture_for_rollback(
+                                    "native fallback host-path proof failed"
+                                )
                             except Exception:
                                 pass
                         raise
@@ -13040,6 +13141,8 @@ class DesktopRuntime:
                     "verified FINAL-EXIT could not arm bounded runtime recovery"
                 )
             self._commit_runtime_monitoring_lease()
+            if capture_wanted:
+                self._note_system_proxy_capture_served()
             self._reset_tier3_standby_activation_failure()
             self._record_tier3_initial_activation_stage(
                 "ready",
@@ -13056,6 +13159,7 @@ class DesktopRuntime:
             if traffic_monitor_started:
                 self.traffic_monitor.stop()
             self._runtime_initial_activation_generation = -1
+            capture_held = False
             if capture_wanted and runner.is_running():
                 stop_already_owns_proxy_restore = bool(
                     self.stop_event.is_set()
@@ -13069,7 +13173,11 @@ class DesktopRuntime:
                     and bool(getattr(self.system_proxy, "active", False))
                 ):
                     try:
-                        self.restore_system_proxy()
+                        capture_held = (
+                            self._release_system_proxy_capture_for_rollback(
+                                "initial data-plane admission did not commit"
+                            )
+                        )
                     except Exception:
                         pass
             if core_capture_reloaded and runner.is_running():
@@ -13086,7 +13194,12 @@ class DesktopRuntime:
                 system_proxy_capture_phase_published
                 and self.core_runner is runner
                 and runner.is_running()
-                and not bool(getattr(self.system_proxy, "active", False))
+                and (
+                    # A held proxy still leaves the lifecycle at no-capture:
+                    # the next admission owns capture again.
+                    capture_held
+                    or not bool(getattr(self.system_proxy, "active", False))
+                )
             ):
                 manager = self.manager
                 manager_lock = getattr(manager, "lock", None)
@@ -26818,7 +26931,9 @@ class DesktopRuntime:
         )
         if failure is None:
             return
+        gateway_ref = None
         if failure.binding.node.pool_kind == "gateway":
+            gateway_ref = failure.binding.node
             underlay = self._runtime_gateway_underlay_binding(
                 snapshot,
                 snapshot_payload,
@@ -26861,6 +26976,8 @@ class DesktopRuntime:
                 snapshot_payload,
                 probe_token=decision.probe_token,
                 incident_id=decision.incident_id,
+                # The Gateway stays fixed and its dialer is never swapped.
+                gateway_ref=gateway_ref,
             )
 
     def _handle_runtime_output_event(
@@ -35449,10 +35566,27 @@ class DesktopRuntime:
             # budget before later fallback members could be considered.
             current_evidence: dict[tuple[str, str], tuple[str, Any]] = {}
             try:
-                plans = self._runtime_early_differential_plans(
-                    failure,
-                    snapshot,
-                    snapshot_payload,
+                # A Gateway's line never swaps its dialer (field report
+                # 11-25..27, 0.1.7, a SOCKS5 ISP Gateway through
+                # PROXY-FALLBACK on a phone hotspot).  The A/B pairs probe the
+                # dialer's members directly while the evidence is a
+                # full-chain error (any site timing out through the
+                # Gateway), so one missed direct probe "proved" the current
+                # member failed; the swap's FINAL-EXIT 204 through the
+                # Gateway chain then had at most 1.5 s, failed, and parked
+                # readiness in DATA_PLANE_FAILED, which the early profile
+                # never reopens: the service sat in "starting" until a
+                # restart.  Mihomo's own fallback group already moves new
+                # dials off a dead dialer member and the dialer's layer
+                # checks its nodes on schedule: request the right check only.
+                plans = (
+                    []
+                    if gateway_ref is not None
+                    else self._runtime_early_differential_plans(
+                        failure,
+                        snapshot,
+                        snapshot_payload,
+                    )
                 )
                 if not plans:
                     if gateway_ref is None:
@@ -35495,7 +35629,11 @@ class DesktopRuntime:
                         failure,
                         ticket,
                         probe_token=probe_token,
-                        reason_code="alternative_unbound",
+                        reason_code=(
+                            "alternative_unbound"
+                            if gateway_ref is None
+                            else "gateway_dialer_checked"
+                        ),
                     )
                     return
                 for plan in plans:
@@ -42291,6 +42429,59 @@ class DesktopRuntime:
         except Exception:
             return None
 
+    def _served_gateway_identities(self) -> frozenset[str]:
+        """The Gateway the loaded Core serves for the saved selection.
+
+        Field report 11-25..27 (0.1.7, Windows system proxy, a SOCKS5 ISP
+        Gateway dialled through Sentinel on a phone hotspot): a DNS re-plan
+        reload landed while the Gateway was briefly judged DEAD (a chain pass
+        over the latency limit; a chain timeout does the same).  The export
+        carried only ALIVE/SLOW exits, so the reload loaded EXIT-SELECT
+        [REJECT]: the graph moved, capture rolled back, and the admission that
+        followed found no FINAL-EXIT branch.  Runtime health never reloads the
+        Core, so nothing loaded the Gateway again once it was ALIVE: the outage
+        lasted until the next unrelated reload or a restart.
+
+        A verdict is a selection concern, as every runtime health verdict is
+        (_hot_reload_runtime_audit_overlay): it never takes the Gateway the
+        Core serves out of the graph, whichever reload comes along.  So the
+        node the loaded EXIT-SELECT holds for the saved selection (the
+        renderer's ``selected_for`` decision in the loaded contract) stays in
+        the export whatever its latest verdict.  Fail-closed is unchanged:
+        EXIT-SELECT holds that node or REJECT, never the tier chain or DIRECT,
+        and READY still waits for its FINAL-EXIT 204.  A Gateway the loaded
+        Core does not serve (a first start, another pick, a node whose
+        identity changed) still needs a usable verdict.  The contract is
+        replaced on commit, never mutated: read without a lock.  Never raises.
+        """
+
+        try:
+            selection = self._gateway_selection()
+            if selection is None or not selection.active:
+                return frozenset()
+            contract = getattr(self, "_runtime_loaded_export_contract", None)
+            proxy_map = contract.get("proxy_map") if isinstance(contract, dict) else None
+            if not isinstance(proxy_map, dict):
+                return frozenset()
+            served: set[str] = set()
+            for info in list(proxy_map.values()):
+                if not isinstance(info, dict) or str(info.get("tier") or "") != "exit":
+                    continue
+                decided = str(info.get("selected_for") or "")
+                node = info.get("node")
+                if not decided or node is None:
+                    continue
+                identity = gateway_identity(node)
+                # The decision for this selection; or, for a selection bound
+                # since (an old name-only one), the same node under its key.
+                if decided == selection.key or (
+                    selection.state == "bound" and identity == selection.identity
+                ):
+                    served.add(identity)
+            return frozenset(served)
+        except Exception:
+            return frozenset()
+
     def _loaded_gateway_member(
         self,
         selection: GatewaySelection | None,
@@ -44630,6 +44821,18 @@ class DesktopRuntime:
                 )
             else:
                 self._queue_incremental_egress_recheck()
+                if (
+                    capture_was_active
+                    and self._runtime_uses_early_single_coordinator()
+                    and runner.is_running()
+                    and self._current_core_runtime_phase() == "formal_no_capture"
+                ):
+                    # The rollback above left a no-capture standby, and the
+                    # early profile's hold has no verifier of its own (11-25:
+                    # "starting" until a restart).  Admission is that
+                    # verifier, exactly as on a start: READY again once the
+                    # new graph's FINAL-EXIT passes, the hold if it fails.
+                    self._queue_tier3_egress_activation()
             return report_applied({
                 "reloaded": True,
                 "mode": reload_mode,
@@ -53947,8 +54150,8 @@ class DesktopRuntime:
                     result["status_applied"] = applied
                     result["last_checked_at"] = tested_node.last_checked_at
                     result["quality_reason"] = str(tested_node.suspicious_reason or "")
-                    strict_limit = primary_gateway_max_latency_ms_from_testing(
-                        self._testing_block()
+                    strict_limit = strict_latency_limit_ms_for_path(
+                        self._testing_block(), tested_node.extra.get("latency_policy_path")
                     )
                     result["latency_limit_ms"] = (
                         strict_limit
@@ -53977,7 +54180,7 @@ class DesktopRuntime:
             request_id=f"gateway-chain-check-{time.time_ns()}",
             mode="chain",
             upstream_nodes=list(upstream_nodes),
-            timeout_ms=self._default_probe_timeout_ms(),
+            timeout_ms=gateway_chain_probe_timeout_ms(self.config),
             ipv6=coerce_bool(self._client_config().get("ipv6", False), False),
             excluded_ports=self._node_diagnostic_excluded_ports(),
         )
@@ -55751,7 +55954,8 @@ class DesktopRuntime:
                         node.extra.get("tier3_origin") or node.extra.get("source_origin"),
                         (node.protocol, node.address, node.port, node.uuid, node.password, node.method,
                          node.security, node.network, node.host, node.path, node.sni, node.plugin),
-                        variants.get(id(node)), str(node.suspicious_reason or "")))
+                        variants.get(id(node)), str(node.suspicious_reason or ""),
+                        node.extra.get("latency_policy_path")))
                     secret_nodes.append({"uri": node.uri, "password": node.password,
                         "uuid": node.uuid, "extra": copy.deepcopy(node.extra),
                         "source": node.source, "sources": tuple(node.sources)})
@@ -55768,7 +55972,7 @@ class DesktopRuntime:
                                 "loaded": self.bridge_secret_facts()})
         rows = []
         for (tier, name, protocol, status, latency, checked, source, sources, origin, identity,
-                variant, failure) in sampled:
+                variant, failure, latency_path) in sampled:
             pool = "automatic" if tier == "tier3" and origin != "tier3a" else "user"
             # A failed node's reason crosses only as its display category (never the
             # raw check text); bridge_nodes maps it to Node.reason_code.
@@ -55779,7 +55983,9 @@ class DesktopRuntime:
                 "reason_code": reason,
                 "pool_kind": pool, "latency_ms": latency, "checked_at_ms": observation_ms(checked),
                 "source_id": opaque_id(tier, source) if source else None,
-                "source_ids": tuple(opaque_id(tier, value) for value in sources)}
+                "source_ids": tuple(opaque_id(tier, value) for value in sources),
+                # how the last latency was measured (tester latency_policy_path)
+                "latency_path": latency_path if latency_path in {"chain", "direct"} else None}
             if variant is not None and tier == "tier1":
                 row.update({"variant_group": opaque_id(owner[0], "tier1-physical", variant[0]),
                     "variant_name": clean(variant[0]), "variant_rank": variant[1],

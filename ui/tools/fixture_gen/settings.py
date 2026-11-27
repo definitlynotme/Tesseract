@@ -99,7 +99,7 @@ def snapshot_values(**over):
                     "rule_list": [{"kind": "suffix", "value": "example.cn", "to": "direct"}, {"kind": "geoip", "value": "CN", "to": "direct"},
                                   {"kind": "suffix", "value": "example.io", "to": "proxy"}, {"kind": "keyword", "value": "ads", "to": "reject"}],
                     "providers": []},
-        "latency": {"primary_gateway_max_latency_ms": 800},
+        "latency": {"primary_gateway_max_latency_ms": 800, "gateway_max_latency_ms": 6000},
         "sources": [{"id": "src-gh-1", "kind": "github_repos", "display": "GitHub", "enabled": True, "hint": "e\u2022\u2022\u2022/f\u2022\u2022\u2022"},
                     {"id": "src-sub-1", "kind": "subscription_urls", "display": "Subscription", "enabled": True}],
         # 10-30 alert redesign: the sidecar projects alerts.notify only (bridge_settings /
@@ -292,7 +292,7 @@ add("settings_save_hold_field", "S-05: settings.apply holds (validation, hold, f
         error=err("validation", "errors.bridge.runtime_listener_conflict", "runtime_listener_conflict", field="network.mihomo_mixed_port", hold=True, params={"port": 7891})))])
 # S-06 conflict
 add("settings_save_conflict", "S-06: base_rev is stale (conflict, base_rev_mismatch): the page re-reads config.snapshot; rows without a draft follow, the bar says 配置已在别处修改",
-    second_snapshot={"rev": 9, "values": snapshot_values(latency={"primary_gateway_max_latency_ms": 1200})},
+    second_snapshot={"rev": 9, "values": snapshot_values(latency={"primary_gateway_max_latency_ms": 1200, "gateway_max_latency_ms": 6000})},
     extra_steps=[on("settings.apply", reply=apply_job(
         result={"rev": 9, "sections": [section("network", False, False, "none")], "pending": None},
         error=err("conflict", "errors.settings.conflict", "base_rev_mismatch", hold=True)))])

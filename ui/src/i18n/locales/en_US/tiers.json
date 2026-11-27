@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Invalid request",
   "tiers.reason.invalid_request.fix": "Close the details, reopen them, and test again.",
   "tiers.reason.latency_limit_exceeded": "Latency over limit",
-  "tiers.reason.latency_limit_exceeded.fix": "The limit is {max_ms, number, integer} ms. You can change it in Settings › Connection quality.",
+  "tiers.reason.latency_limit_exceeded.fix": "The limit is {max_ms, number, integer} ms. You can change it in Settings › Connection quality{limit, select, chain { › Gateway chain latency limit} other {}}.",
   "tiers.reason.node_changed": "Node changed",
   "tiers.reason.node_changed.fix": "The node's configuration changed during the test. Just test again.",
   "tiers.reason.node_index_unavailable": "Node list not ready",

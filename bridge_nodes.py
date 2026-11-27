@@ -282,7 +282,12 @@ class NodeProjection:
                        # verdict (tester.py: NodeStatus.SLOW); healthy only.
                        "slow": state == "healthy" and raw.get("status") == "slow",
                        # T-P4-C2 #3 (K-2): the runtime's last check of this node.
-                       "last_checked_at_ms": _uint(raw.get("checked_at_ms"))}
+                       "last_checked_at_ms": _uint(raw.get("checked_at_ms")),
+                       # how the latency was measured: chain (through the fallback
+                       # layers or the selected Gateway) or direct; each has its limit.
+                       "latency_path": (raw.get("latency_path")
+                                        if state in {"healthy", "failed"}
+                                        and raw.get("latency_path") in {"chain", "direct"} else None)}
                 node_dtos.append(dto)
                 if kind == "subscription" and enabled:
                     total += 1

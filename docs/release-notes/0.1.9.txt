@@ -1,0 +1,55 @@
+[zh_CN]
+修复：系统代理模式下，Gateway 短暂不可用时流量改为直连
+
+- 使用系统代理时，如果配置恰好在 Gateway 被判为不可用的那一刻重新载入（例如网络变化后重新检测 DNS），新配置的出口只剩「拒绝」，Tesseract 随即撤下系统代理，把 Windows 代理设置恢复成启动前的样子（通常是关闭）。这段时间里浏览器的请求都直接发出，用的也是本地网络的 DNS，DNS 泄露测试因此显示本地的 DNS 服务器；Gateway 恢复可用后，也要等下一次重新载入或重启服务才会重新接管。
+- 现在重新载入时，代理核心正在使用的 Gateway 会保留在配置里，不再因为一次不可用的判定变成「拒绝」。只改了 DNS 的载入照常只改 DNS，服务保持「运行中」。
+- 本次运行已经通过系统代理提供过服务后，即使出口需要重新验证，Windows 代理也继续指向 Tesseract：请求仍交给代理核心，不会转为直连；出口验证会自动进行，通过后服务回到「运行中」，不再停在「启动中」直到重启。启动失败、手动停止和退出时，仍会恢复启动前的设置。
+- 经回退层转发的 Gateway 在运行中报错时，Tesseract 不再更换回退层里的节点，而是让回退层检测自己的节点。以前一次检测没通过就会换节点，换节点后的出口检测只有 1.5 秒，没通过时服务会停在「启动中」。
+
+修复：选用 Gateway 时，Vanguard 和 Sentinel 层反复离线
+
+- 选用 Gateway 后，Vanguard 和 Sentinel 层的节点都经 Gateway 整条链路检测，同一轮检测共用 Gateway 这一跳和本机的网络。以前一轮里的链路全部失败，所有节点就会立刻被判为不可用，该层离线并发出告警，几秒后的下一轮又恢复；在手机热点等网络上一天会出现好几次。现在一轮全部失败时先保留上一轮的结果，约 5 秒后再检测一轮，仍然失败才判定该层离线。
+- 链路检测用的辅助代理核心如果在 5 秒内没有启动，这个节点在这一轮不下结论，不再记为失败。这种情况通常是本机暂时卡顿（杀毒软件、CPU 繁忙或睡眠唤醒），与节点本身无关。
+
+改进：链路检测有单独的延迟上限
+
+- 以前同一个延迟上限既用于直接检测，也用于整条链路的检测。Gateway 经回退层、节点经所选 Gateway 检测时，多走的一跳也算在延迟里，正常的链路常常超过上限，被判为不可用。
+- 配置 › 连接质量 新增「出口经回退层的链路延迟上限」，只用于整条链路的检测，默认 6000 ms，可设为 500–15000 ms。直接检测仍按原来的延迟上限。层级页按判定这个节点的上限显示颜色和原因。
+
+改进：应用内更新窗口
+
+- 应用内更新改在 Tesseract 自己的安装窗口里进行，外观与应用一致，不再先后出现系统样式的「正在更新 Tesseract…」窗口和安装程序的进度窗口。窗口打开后直接开始更新，等待授权时提示在「用户帐户控制」中选择「是」，进度显示在按钮上；完成后显示已更新到的版本并打开 Tesseract，窗口随后自动关闭。
+- 没有完成时，窗口说明原因，可以「重试」，也可以点「稍后」关闭窗口，打开当前已安装的版本。
+
+关于更新
+
+- 已安装 0.1.4 到 0.1.8 的，可以直接在应用内更新到本版本。点「立即更新」后 Tesseract 会关闭，并打开更新窗口；在「用户帐户控制」中选择「是」即可。如果没有看到授权提示，点任务栏上闪烁的按钮。
+- 0.1.0 到 0.1.3 仍需在浏览器中打开 github.com/definitlynotme/Tesseract/releases/latest，下载 Tesseract-Setup-0.1.9-win-x64.exe 手动安装一次。
+
+[en_US]
+Fixed: in system-proxy mode, traffic went direct while the Gateway was briefly unusable
+
+- With the system proxy, a configuration reload that happened just while the Gateway was judged unusable (for example when the DNS servers were checked again after a network change) left the new configuration's exit with only "Reject". Tesseract then took the system proxy down and put the Windows proxy setting back as it was before the start, usually off. Meanwhile every browser request went out directly, with the local network's DNS, so a DNS leak test showed the local DNS servers; once the Gateway was usable again, it took over only at the next reload or service restart.
+- A reload now keeps the Gateway the proxy core is using in the configuration, so one unusable verdict no longer turns it into "Reject". A reload that changes only DNS changes only DNS again, and the service stays "Running".
+- Once this run has served through the system proxy, the Windows proxy stays on Tesseract even when the exit has to be verified again: requests still go to the proxy core and never directly. The exit is verified again on its own, and the service returns to "Running" when it passes instead of staying at "Starting" until a restart. A failed start, a stop and an exit still put back the setting from before the start.
+- When a Gateway reached through the fallback layers reports an error while running, Tesseract no longer swaps the fallback layer's node; it asks the fallback layer to check its own nodes. Before, one failed check swapped the node, the exit check after the swap had only 1.5 seconds, and when it did not pass the service stayed at "Starting".
+
+Fixed: with a Gateway selected, the Vanguard and Sentinel tiers went offline again and again
+
+- With a Gateway selected, Vanguard and Sentinel nodes are checked as whole chains through it, so every check in a round shares the Gateway hop and this computer's network. When every chain in a round failed, all nodes were judged unusable at once, the tier went offline with an alert, and the next round, seconds later, brought it back; on a phone hotspot this happened several times a day. A round in which every chain fails now keeps the previous round's results and checks again about 5 seconds later; only if that round fails too does the tier go offline.
+- When the helper proxy core used for a chain check has not started within 5 seconds, that node gets no verdict in this round instead of a failure. This usually means the computer stalled for a moment (antivirus, a busy CPU, waking from sleep), not that the node is bad.
+
+Improved: chain checks have their own latency limit
+
+- One latency limit used to judge both direct checks and checks of a whole chain. A Gateway checked through the fallback layers, or a node checked through the selected Gateway, counts the extra hop in its latency, so working chains often went over the limit and were judged unusable.
+- Settings › Connection quality has a new "Gateway chain latency limit". It applies only to checks of a whole chain, defaults to 6000 ms and can be set from 500 to 15000 ms. Direct checks keep the existing latency limit. The Tiers page colours each node, and explains its reason, by the limit that judged it.
+
+Improved: the in-app update window
+
+- An in-app update now runs in Tesseract's own setup window, in the app's look, instead of the system-style "Updating Tesseract…" window followed by the installer's progress window. The window starts the update as soon as it opens; while authorization is pending it says to choose Yes in User Account Control, and the progress fills the button. When done, it shows the version now installed and opens Tesseract, then closes itself.
+- When the update does not finish, the window says why: choose Retry, or Later to close the window and open the version installed now.
+
+About updating
+
+- If you have 0.1.4 to 0.1.8, you can update to this version from inside the app. After "Update now", Tesseract closes and the update window opens: choose Yes in User Account Control. If you see no prompt, click the flashing button on the taskbar.
+- 0.1.0 to 0.1.3 still need one install by hand: open github.com/definitlynotme/Tesseract/releases/latest in your browser and download Tesseract-Setup-0.1.9-win-x64.exe.

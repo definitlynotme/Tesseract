@@ -546,6 +546,104 @@
       "lang": "es_ES",
       "term_id": "log",
       "reason": "T-P5-15 es_ES: the sentence means individual records in the log list (new, held while paused, cleared from view, left after filtering, the latest one, undelivered in a gap); the catalog uses the entry word (entrada) for them, same rule as T-P5-14 class 2 (ru); \"log\" itself (the page, views, stream, history, files) keeps the glossary word"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "en_US",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "en_US",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "de_DE",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "de_DE",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "es_ES",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "es_ES",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "fr_FR",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "fr_FR",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "pt_BR",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "pt_BR",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "ru_RU",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "ru_RU",
+      "term_id": "exit",
+      "reason": "2026-11-27 Gateway chain latency limit: zh 写「出口经回退层的链路」以便中文读者认出这条链路；其他语言直接用层名 Gateway（glossary 的 dnt 层名）指同一个节点，再加 exit 一词会重复。"
+    },
+    {
+      "check": "glossary",
+      "id": "settings.quality.gateway.title",
+      "lang": "en_US",
+      "term_id": "fallback",
+      "reason": "2026-11-27 Gateway chain latency limit: the agreed en_US setting name is \"Gateway chain latency limit\"; the hint under the field names the fallback layers."
+    },
+    {
+      "check": "glossary",
+      "id": "tiers.reason.latency_limit_exceeded.fix",
+      "lang": "en_US",
+      "term_id": "fallback",
+      "reason": "2026-11-27 Gateway chain latency limit: the agreed en_US setting name is \"Gateway chain latency limit\"; the hint under the field names the fallback layers."
     }
   ]
 }

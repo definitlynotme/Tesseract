@@ -8,6 +8,10 @@
 //! (the app that started this process had it), owns the elevation so the prompt opens on the secure
 //! desktop, and says what to do if it still only flashes. It closes once the elevation is answered:
 //! Inno's own /SILENT progress window shows the install from there.
+//!
+//! From 0.1.9 the updater's `/SILENT` run opens the setup window itself (`UpdateRun` in main.rs),
+//! which owns the elevation the same way. This window remains for an unelevated `/VERYSILENT
+//! /RESTARTAPPLICATIONS` run, and for when the setup window cannot be made.
 use std::{sync::mpsc, thread::JoinHandle};
 use windows::{
     core::{w, PCWSTR},

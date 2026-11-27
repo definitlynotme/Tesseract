@@ -107,16 +107,19 @@ import * as P from '../rt/project_tiers.js';
   /* reason_code → tiers.reason.<code> (word) and tiers.reason.<code>.fix (advice); the code list is
      rt/project_tiers.js REASON_CODES (backend_keys.py reasons tiers.reason + configuration_invalid) */
   const wordOf = r => T.rt.reasonText('tiers.reason', P.reasonKey(r));
-  const fixOf = (r, n) => L(`tiers.reason.${P.reasonKey(r)}.fix`, { max_ms: ceil(), source: n && n.kind === 'subscription' ? 'subscription' : 'own' });
+  /* a Gateway over its limit is pointed at its own setting (latency.gateway_max_latency_ms) */
+  const fixOf = (r, n) => L(`tiers.reason.${P.reasonKey(r)}.fix`, { max_ms: ceil(n), limit: n && n.latency_path === 'chain' ? 'chain' : 'primary', source: n && n.kind === 'subscription' ? 'subscription' : 'own' });
 
   /* ================================================================ view state */
   const V = {
     tier: 'vanguard', drill: null, q: '', sort: 'lat', gen: 0, panel: null, pkey: null, edit: null, pr: null, mute: false, imp: null, mng: null,
     cfg: null, cfgBusy: false, rev: {}, results: new Map(), fresh: null, expect: null, lastFlush: 0, flushT: 0,
   };
-  /* the latency ceiling (config.snapshot.values.latency.primary_gateway_max_latency_ms): it only
-     colours latencies (T.ui.lat's bands), it never re-judges a node */
-  const ceil = () => (V.cfg && V.cfg.ceil) || 800;
+  /* the latency ceiling that judged a node, by how it was measured (Node.latency_path; config.snapshot
+     .values.latency): gateway_max_latency_ms for a chain measurement (through the fallback layers or
+     the selected Gateway), primary_gateway_max_latency_ms otherwise. It only colours latencies
+     (T.ui.lat's bands), it never re-judges a node */
+  const ceil = n => (n && n.latency_path === 'chain' ? (V.cfg && V.cfg.gwCeil) || 6000 : (V.cfg && V.cfg.ceil) || 800);
 
   /* ================================================================ runtime data (read on demand) */
   const topic = (name, key) => T.rt.topic(name, key).get();
@@ -179,9 +182,9 @@ import * as P from '../rt/project_tiers.js';
       V.cfgBusy = false;
       const values = (d && d.values) || {};
       const lat = values.latency || {};
-      const c = Number(lat.primary_gateway_max_latency_ms);
+      const c = Number(lat.primary_gateway_max_latency_ms), g = Number(lat.gateway_max_latency_ms);
       const b = values.bastion && typeof values.bastion === 'object' ? values.bastion : null;
-      V.cfg = { rev: d && Number.isInteger(d.rev) ? d.rev : 0, ceil: c > 0 ? c : null, bastion: b };
+      V.cfg = { rev: d && Number.isInteger(d.rev) ? d.rev : 0, ceil: c > 0 ? c : null, gwCeil: g > 0 ? g : null, bastion: b };
       changed('config');
     }, () => { V.cfgBusy = false; });
   }
@@ -803,7 +806,7 @@ import * as P from '../rt/project_tiers.js';
     const st = stateOf(n);
     if (n._testing) return T.html`<span class="spin tiers-spin" role="img" aria-label="${L('tiers.row.checking')}"></span>`;
     if (st === 'draft' || st === 'pending' || st === 'recheck' || st === 'down' || n.latency_ms == null) return T.html`<span class="tiers-dash">—</span>`;
-    return uiLat(n.latency_ms, { ceiling: ceil() });
+    return uiLat(n.latency_ms, { ceiling: ceil(n) });
   }
   /* the library's latency (band colour) with its value in the language's number-and-unit form
      (F.ms): the core writes a literal 「N ms」, which is replaced as text, never as markup */
@@ -1606,8 +1609,8 @@ import * as P from '../rt/project_tiers.js';
     if (!pr || !pr.q || pr.kind !== 'node' || (!force && (!V.panel || V.panel.closed || !pr.box.isConnected))) return;
     const n = panelNode(pr), q = pr.q, st = stateOf(n), live = st !== 'draft' && run() === 'running';
     setD(q.lat, latNode(n));
-    const note = st === 'draft' || st === 'down' || n.latency_ms == null ? '' : n.latency_ms > ceil() ? (live ? 'over' : 'last') : live ? 'live' : 'last';
-    setT(q.latnote, note ? L('tiers.panel.latnote', { kind: note, max_ms: ceil() }) : '');
+    const note = st === 'draft' || st === 'down' || n.latency_ms == null ? '' : n.latency_ms > ceil(n) ? (live ? 'over' : 'last') : live ? 'live' : 'last';
+    setT(q.latnote, note ? L('tiers.panel.latnote', { kind: note, max_ms: ceil(n) }) : '');
     /* K-2: the time of the last check when Node carries last_checked_at_ms (F-01: no longer followed
        by how often the core checks; a draft, which is not checked, shows —) */
     const at = Number.isInteger(n.last_checked_at_ms) ? n.last_checked_at_ms : null;

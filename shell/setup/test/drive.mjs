@@ -3,6 +3,9 @@
 // page shows, for the sandbox end-to-end check. Node's built-in WebSocket; no packages.
 //   node drive.mjs <port> <outdir> <plan>
 // plan: install | install-desktop | look (screenshot the first screen only) | fail
+//   | update (the in-app updater's run: nothing to click; it closes itself once done)
+//   | update-later (an update that stops: leave with 稍后, and the window opens Tesseract again)
+//   | update-retry (as update-later, after one 重试 that runs the package again)
 import {writeFile, mkdir} from 'node:fs/promises';
 const [port, outdir, plan = 'install'] = process.argv.slice(2);
 await mkdir(outdir, {recursive: true});
@@ -19,6 +22,8 @@ if (!target) { console.error('no setup page'); process.exit(2); }
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((ok, no) => { ws.onopen = ok; ws.onerror = no; });
 let next = 0; const pending = new Map(); const logs = [];
+let gone = 0;                                    // when the window closed (the socket went)
+ws.onclose = () => { gone = Date.now(); for (const {no} of pending.values()) no(new Error('closed')); pending.clear(); };
 ws.onmessage = e => {
   const m = JSON.parse(e.data);
   if (m.id && pending.has(m.id)) { const {ok, no} = pending.get(m.id); pending.delete(m.id); m.error ? no(new Error(JSON.stringify(m.error))) : ok(m.result); }
@@ -46,6 +51,32 @@ const record = async label => { const s = await snap(); s.t = Date.now(); s.labe
 await sleep(1600);                               // the opening draw
 await record('first'); await shot('1-ready');
 if (plan === 'look') { await writeFile(`${outdir}/timeline.json`, JSON.stringify({timeline, logs}, null, 1)); process.exit(0); }
+if (plan.startsWith('update')) {
+  // the in-app updater's run: the page opened on its progress and the host started it
+  let midShot = false, uacShot = false, retried = false;
+  for (const deadline = Date.now() + 120000; !gone && Date.now() < deadline; await sleep(80)) {
+    let s; try { s = await record(); } catch { break; }
+    const p = parseFloat(s.act.split(':')[2] || '0');
+    if (!uacShot && s.body.includes('|') && /UAC|帐户控制|User Account/.test(s.body)) { uacShot = true; await shot('2-elevate'); }
+    if (!midShot && s.act.startsWith('track') && p > .3 && p < 1) { midShot = true; await shot('2-working'); }
+    if (/^button:/.test(s.act) && plan === 'update-retry' && !retried) {
+      retried = true; await sleep(700); await record('stopped'); await shot('3-stopped');
+      await ev(`document.querySelector('.act').click(), 1`); await sleep(300); await record('retry');
+      continue;
+    }
+    if (s.dot.includes('is-lit') || /^button:/.test(s.act)) break;
+  }
+  await sleep(700);
+  if (!gone) { await record('end').catch(() => {}); await shot('3-end').catch(() => {}); }
+  const ended = Date.now();
+  if (plan !== 'update' && !gone) await ev(`[...document.querySelectorAll('#footR .btn')].find(b => !b.classList.contains('act'))?.click(), 1`).catch(() => {});
+  for (const deadline = Date.now() + 20000; !gone && Date.now() < deadline;) await sleep(100);
+  await writeFile(`${outdir}/timeline.json`, JSON.stringify({timeline, logs}, null, 1));
+  console.log(JSON.stringify(timeline.map(s => `${s.label || ''} ${s.body} || ${s.act} || ${s.foot} || ${s.dot} || close-hidden=${s.close}`), null, 1));
+  console.log('logs', logs);
+  console.log(gone ? `window closed ${gone - ended} ms after the end state` : 'window still open after 20 s');
+  process.exit(gone ? 0 : 3);
+}
 if (plan === 'install-desktop') await ev(`document.getElementById('desk')?.click(), 1`);
 await ev(`document.querySelector('.act').click(), 1`);
 let midShot = false, final;

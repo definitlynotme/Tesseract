@@ -240,6 +240,9 @@ pub fn keep_running(args: &[String]) -> bool { has(args, "/NOCLOSEAPPLICATIONS")
 /// `/RESTARTAPPLICATIONS`: the in-app updater's run (the .iss [Run] entry reopens the app on it).
 pub fn restarts_app(args: &[String]) -> bool { has(args, "/RESTARTAPPLICATIONS") }
 
+/// `/VERYSILENT`: no progress window at all.
+pub fn very_silent(args: &[String]) -> bool { has(args, "/VERYSILENT") }
+
 /// `/NORESTARTAPPLICATIONS`: what was closed for the install stays closed after a good one.
 pub fn no_restart(args: &[String]) -> bool { has(args, "/NORESTARTAPPLICATIONS") }
 

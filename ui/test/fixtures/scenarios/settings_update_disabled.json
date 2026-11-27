@@ -517,7 +517,8 @@
                 "providers": []
               },
               "latency": {
-                "primary_gateway_max_latency_ms": 800
+                "primary_gateway_max_latency_ms": 800,
+                "gateway_max_latency_ms": 6000
               },
               "sources": [
                 {

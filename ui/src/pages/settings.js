@@ -183,6 +183,8 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
   const LANGS = ['zh_CN', 'en_US', 'ja_JP', 'ko_KR', 'fr_FR', 'de_DE', 'es_ES', 'pt_BR', 'ru_RU'];
   /* the latency ceiling's default (latency_policy_view: the policy's default ceiling) */
   const LAT_DEF = 800;
+  /* the chain ceiling (latency.gateway_max_latency_ms: chain checks only; default 6000, 500–15000 ms) */
+  const GW_DEF = 6000, GW_MIN = 500, GW_MAX = 15000;
   /* the releases page (app_info.APP_RELEASES_URL; host.openUrl allows github.com only) */
   const RELEASES_URL = 'https://github.com/definitlynotme/Tesseract/releases';
   /* Geo data kinds, in the updater's order (Geo.items[].kind): settings.app.geo.kind.<kind> */
@@ -200,7 +202,7 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
   const DEFAULTS = {
     ks: false, ksLan: false, ksDns: false, ksDnsList: [], ksExtra: [], autoExit: false,
     rules: [], ruleSets: [], bypass: [], lan: false, ipv6: false, portMixed: '', portSub: '',
-    dnsMode: 'auto', dnsRules: false, dnsList: [], egress: false, egressRetry: false, latency: LAT_DEF,
+    dnsMode: 'auto', dnsRules: false, dnsList: [], egress: false, egressRetry: false, latency: LAT_DEF, gwLatency: GW_DEF,
     bastionOn: false, bastionMin: '', sources: [], lang: 'zh_CN', autostart: false, tray: false,
     nOn: true, nConn: true, nTier: true, nUpd: true, nSound: true,
   };
@@ -718,6 +720,7 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
           el('div', { class: 'set-lat-bar' }, el('i', { class: 'b-ok', id: 'set-lb-ok' }), el('i', { class: 'b-slow', id: 'set-lb-slow' }), el('i', { class: 'b-down', id: 'set-lb-down' }), el('span', { class: 'set-lat-cut', id: 'set-lc-half' }), el('span', { class: 'set-lat-cut', id: 'set-lc-ceil' })),
           el('div', { class: 'set-lat-axis' }, el('span', { class: 'set-lat-end l' }, msText(20)), mk('set-lm-half'), mk('set-lm-ceil'), el('span', { class: 'set-lat-end r', id: 'set-lat-endr' }, msText(5000)))),
         el('div', { class: 'set-lat-sum', id: 'set-lat-sum', 'aria-live': 'polite' })),
+      frow('set-gwLat-row', t('settings.quality.gateway.title'), '', numBox('set-gw-lat', 'w-min', t('settings.quality.gateway.title')), { cls: 'set-vrow' }),
       frow('set-egress-row', t('settings.net.egress.title'), t('settings.net.egress.desc'), swEl('egress', t('settings.net.egress.title')), { sub: el('div', { class: 'frow-sub', id: 'set-egress-sub' }, el('div', { class: 'set-sub' },
         el('div', { class: 'set-subrow', id: 'set-egressRetry-row' }, el('div', { class: 'frow-l' }, el('div', { class: 'frow-t' }, el('span', { class: 'set-t' }, t('settings.net.egress_retry.title', { bastion: tierLbl('bastion') })))),
           el('div', { class: 'frow-c' }, swEl('egressRetry', t('settings.net.egress_retry.title', { bastion: tierLbl('bastion') }), true))))) }),
@@ -945,7 +948,7 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
   const remoteSeq = {};
   const REMOTE = {
     portMixed: v => ['network', 'mihomo_mixed_port', v], portSub: v => ['network', 'subscription_port', v],
-    bastionMin: v => ['bastion', 'min_alive_nodes', v],
+    bastionMin: v => ['bastion', 'min_alive_nodes', v], gwLatency: v => ['latency', 'gateway_max_latency_ms', v],
     ksDnsList: v => ['killswitch', 'dns_whitelist', v], ksExtra: v => ['killswitch', 'additional_whitelist', v],
     bypass: v => ['network', 'system_proxy', { bypass: v }],
   };
@@ -956,7 +959,7 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     remoteT[k] = setTimeout(() => {
       const v = draft[k];
       if (same(v, base[k])) { setRemote(k, null); return; }
-      if ((k === 'portMixed' || k === 'portSub' || k === 'bastionMin') && !/^\d+$/.test(String(v).trim())) return;   // the local hint already says why
+      if ((k === 'portMixed' || k === 'portSub' || k === 'bastionMin' || k === 'gwLatency') && !/^\d+$/.test(String(v).trim())) return;   // the local hint already says why
       const n = remoteSeq[k] = (remoteSeq[k] || 0) + 1;
       const [section, field, value] = REMOTE[k](clone(v));
       T.rt.call('settings.validate', { section, field, value }).then(r => {
@@ -2448,8 +2451,24 @@ import { releaseNotesFor } from '../i18n/release_notes.js';
     K.latency = { sec: 'set-nodes', row: () => R.root.querySelector('#set-lat-row'), lock: () => R.root.querySelector('.set-lat-top'),
       paint: (v, a) => { latSlider.set(iOf(v), a); paintLat(v, a); } };
     paintLat(draft.latency);
+    wireGatewayLatency();
     if (window.ResizeObserver) new ResizeObserver(es => { latW = es[es.length - 1].contentRect.width; paintLatDots(draft.latency); }).observe(R.latDots);
     else latW = R.latDots.clientWidth;
+  }
+
+  /* the chain latency ceiling (latency.gateway_max_latency_ms): a number box */
+  function wireGatewayLatency() {
+    const row = R.root.querySelector('#set-gwLat-row'), input = R.root.querySelector('#set-gw-lat');
+    const p = { min: String(GW_MIN), max: String(GW_MAX), def: String(GW_DEF) };
+    const err = () => ({ msg: t('settings.quality.gateway.err.range', p), short: t('settings.quality.gateway.err.range.short', p) });
+    const gw = rowNumber(row, input, {
+      min: GW_MIN, max: GW_MAX, hint: () => t('settings.quality.gateway.hint', p),
+      validate: v => { const s = String(v).trim(); return !/^\d+$/.test(s) || +s < GW_MIN || +s > GW_MAX ? err() : null; },
+      onInput: v => setD('gwLatency', /^\d+$/.test(String(v).trim()) ? +v : String(v)),
+    });
+    K.gwLatency = { sec: 'set-nodes', row: () => row, lock: () => input.closest('.input'), paint: v => gw.set(v), remote: m => { if (m) gw.error(m); else gw.hint(); } };
+    CHECKS.push(() => (editable('gwLatency') && !same(draft.gwLatency, base.gwLatency) && gw.run() ? { row, focus: input, msg: t('settings.quality.gateway.problem', { reason: gw.err.short }) } : null));
+    gw.set(draft.gwLatency);
   }
 
   /* ================================================================ Bastion */

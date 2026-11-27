@@ -7,6 +7,9 @@
 //! Hand-over to the Inno package as it is, with no window of ours:
 //! - any command-line switch (`/VERYSILENT`, `/DIR=…`: deployments keep working unchanged);
 //! - no WebView2 runtime (older Windows 10): Inno's own wizard installs it first.
+//!
+//! Except the in-app updater's run (0.1.9, `UpdateRun`): it opens this window on its progress,
+//! runs the package very silently, and closes once the new version opens.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod assets;
@@ -18,6 +21,7 @@ mod sys;
 
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 use tao::{
     dpi::{LogicalSize, PhysicalPosition},
     event::{Event, WindowEvent},
@@ -41,6 +45,27 @@ enum Ev {
     Outcome(Value, Phase),
     /// 打开 on the done page: whether Tesseract was started (open_app)
     Opened(bool),
+    /// the in-app update's run is done and Tesseract is opening again: the window goes
+    Leave,
+}
+
+/// The in-app updater's run in this window (0.1.9): its command line, passed on as `hand_over`
+/// would, and what its attempts left behind.
+struct UpdateRun {
+    args: Vec<String>,
+    attempts: Mutex<Attempts>,
+}
+
+#[derive(Default)]
+struct Attempts {
+    /// the folder it installs into
+    target: Option<PathBuf>,
+    /// the copy an attempt closed, opened again as it ran (a retry keeps the first one's)
+    closed: Option<rm::Shell>,
+    /// the package's exit code of the last attempt: this process's own at the end
+    code: i32,
+    /// a good attempt already opened Tesseract again
+    reopened: bool,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -59,9 +84,12 @@ fn main() {
         std::process::exit(1);
     };
     if !rest.is_empty() || !sys::webview2_installed() {
+        if sys::webview2_installed() && shows_update_window(&rest, sys::elevated()) {
+            run(source, Some(rest));
+        }
         std::process::exit(hand_over(&source, &rest));
     }
-    run(source);
+    run(source, None);
 }
 
 /// Runs the Inno package with our command line and returns its exit code.
@@ -115,6 +143,25 @@ fn hand_over(source: &payload::Source, args: &[String]) -> i32 {
 /// Deployments (`/VERYSILENT` without it, or an elevated console) keep running with no window.
 fn shows_handover_window(args: &[String], elevated: bool) -> bool {
     !elevated && rm::restarts_app(args) && rm::silent_install(args)
+}
+
+/// Whether the in-app updater's run shows this window instead (0.1.9: `UpdateRun`). Before, it
+/// waited for the elevation in handover.rs's plain window and Inno's own /SILENT progress window,
+/// in the system's look, took over. The same runs, except `/VERYSILENT` (no progress at all),
+/// which keeps the hand-over. The updater passes `/SILENT`.
+fn shows_update_window(args: &[String], elevated: bool) -> bool {
+    shows_handover_window(args, elevated) && !rm::very_silent(args)
+}
+
+/// The switches the package gets in this window's run of the in-app update: `inno_switches`, with
+/// `/SILENT` made `/VERYSILENT` (this window shows the progress; Inno shows nothing) and the
+/// handle of this window's progress receiver (setup_progress.iss).
+fn update_switches(args: &[String], own_token: Option<bool>, progress_hwnd: isize) -> Vec<String> {
+    let mut switches: Vec<String> = inno_switches(args, own_token).into_iter()
+        .map(|a| if a.eq_ignore_ascii_case("/SILENT") { "/VERYSILENT".to_owned() } else { a })
+        .collect();
+    if progress_hwnd != 0 { switches.push(format!("/TSPROGRESS={progress_hwnd}")); }
+    switches
 }
 
 /// Whether the copy this window closed opens again with this window's own token: `routes` starts
@@ -231,8 +278,9 @@ fn temp_log(prefix: &str) -> Option<PathBuf> {
     (dir.is_dir() && sys::local_disk(&dir)).then(|| dir.join(format!("{prefix}-{stamp}.log")))
 }
 
-/// What the page needs to draw its first screen. Read again on 重试.
-fn facts() -> Value {
+/// What the page needs to draw its first screen. Read again on 重试. `run` is `update` for the
+/// in-app updater's run, which has no first screen: the page opens on the progress.
+fn facts(update: bool) -> Value {
     let existing = sys::existing_install();
     let scene = match &existing { None => "fresh", Some(e) if e.version == VERSION => "reinstall", Some(_) => "update" };
     json!({
@@ -244,7 +292,15 @@ fn facts() -> Value {
         "dir": existing.as_ref().map(|e| e.dir.clone()).unwrap_or_else(sys::default_dir),
         "desktopExists": sys::desktop_shortcut_exists(),
         "running": sys::app_running(),
+        "run": update.then_some("update"),
     })
+}
+
+/// The page for a run of the package that exited with `code`, not 0. Inno's exit codes: 1–3, 7, 8
+/// end before anything is changed; 4 and 5 roll back; 6 was killed mid-way (no rollback).
+fn failed_page(code: u32, log: Option<&str>) -> Value {
+    let kind = match code { 1 | 2 | 3 | 7 | 8 => "unchanged", 4 | 5 => "rolledback", 6 => "interrupted", _ => "unknown" };
+    json!({"ev": "failed", "kind": kind, "code": code, "log": log})
 }
 
 /// A picked folder becomes `<folder>\Tesseract`, unless it already is one.
@@ -319,20 +375,101 @@ fn install(proxy: EventLoopProxy<Ev>, source: &'static payload::Source, owner: i
             let dir = sys::existing_install().map(|e| e.dir);
             (json!({"ev": "done", "dir": dir, "desktop": sys::desktop_shortcut_exists()}), Phase::Done)
         }
-        // Inno's exit codes: 1–3, 7, 8 end before anything is changed; 4 and 5 roll back;
-        // 6 was killed mid-way (no rollback)
-        sys::Run::Exited(code) => {
-            let kind = match code { 1 | 2 | 3 | 7 | 8 => "unchanged", 4 | 5 => "rolledback", 6 => "interrupted", _ => "unknown" };
-            (json!({"ev": "failed", "kind": kind, "code": code, "log": log_shown}), Phase::Failed)
-        }
+        sys::Run::Exited(code) => (failed_page(code, log_shown.as_deref()), Phase::Failed),
         sys::Run::Declined => (json!({"ev": "declined"}), Phase::Ready),
         sys::Run::Failed(detail) => (json!({"ev": "failed", "kind": "launch", "detail": detail, "log": log_shown}), Phase::Failed),
     };
     let _ = proxy.send_event(Ev::Outcome(page, phase));
 }
 
-fn run(source: payload::Source) {
+/// One attempt of the in-app updater's run in this window (`UpdateRun`): what `hand_over` does for
+/// it, with the package very silent and its progress shown here. The shell quit before it started
+/// this window, so the close gets the full wait, as there. A good update opens Tesseract again at
+/// once (the package's [Run] entry starts the new version with this window's token, `reopen`
+/// covers the rest); one that did not finish only when the window goes (`leave`), so 重试 can run
+/// the package again meanwhile, with Tesseract still closed.
+fn update_attempt(proxy: EventLoopProxy<Ev>, source: &'static payload::Source, owner: isize, progress_hwnd: isize, run: Arc<UpdateRun>) {
+    sys::com_init();
+    let args = &run.args;
+    send(&proxy, json!({"ev": "step", "step": "prepare"}));
+    let existing = sys::existing_install().map(|e| e.dir);
+    let target = rm::target_dir(args, existing.as_deref());
+    if let Some(dir) = target.as_ref().filter(|_| !rm::keep_running(args)) {
+        if rm::in_use(dir) { send(&proxy, json!({"ev": "step", "step": "close"})); }
+        let quitting = sys::shell_quitting();
+        let before = if quitting { None } else { rm::shell_here(dir) };
+        let _ = rm::close_app(dir, rm::WAIT, rm::WAIT);
+        let mut attempts = run.attempts.lock().unwrap();
+        if attempts.closed.is_none() { attempts.closed = before; }
+    }
+    let closed = {
+        let mut attempts = run.attempts.lock().unwrap();
+        attempts.target = target.clone();
+        attempts.closed.clone()
+    };
+    let mut params = update_switches(args, closed.as_ref().map(reopens_with_own_token), progress_hwnd)
+        .iter().map(|a| sys::quote(a)).collect::<Vec<_>>();
+    // the in-app updater's run leaves a log behind, for when an update does not finish
+    let log = if rm::logs_itself(args) { None } else { temp_log("Tesseract-Update") };
+    if let Some(log) = &log { params.push(sys::quote(&format!("/LOG={}", log.display()))); }
+    let outcome = match payload::extract(source) {
+        Err(e) => Err(e.to_string()),
+        Ok(file) => {
+            send(&proxy, json!({"ev": "step", "step": "elevate"}));
+            let outcome = sys::run_and_wait(owner, file.path(), &params.join(" "), false);
+            drop(file);
+            Ok(outcome)
+        }
+    };
+    let log_shown = log.filter(|l| l.exists()).map(|l| l.display().to_string());
+    // The exit codes as `hand_over` returns them. The package elevates itself (the updater's token
+    // stays the one its [Run] entry starts Tesseract with), so a declined prompt is its exit code,
+    // not ours: Inno's 2 (cancelled before installing), which a very silent run with no wizard to
+    // cancel ends with only there. Nothing has changed either way.
+    let (code, page, phase) = match outcome {
+        Err(detail) => (1, json!({"ev": "failed", "kind": "extract", "detail": detail}), Phase::Failed),
+        Ok(sys::Run::Exited(0)) => (0, json!({"ev": "done"}), Phase::Done),
+        Ok(sys::Run::Exited(2) | sys::Run::Declined) => (2, json!({"ev": "declined"}), Phase::Failed),
+        Ok(sys::Run::Exited(code)) => (code as i32, failed_page(code, log_shown.as_deref()), Phase::Failed),
+        Ok(sys::Run::Failed(detail)) => (1, json!({"ev": "failed", "kind": "launch", "detail": detail, "log": log_shown}), Phase::Failed),
+    };
+    if code == 0 {
+        if let (Some(dir), Some(how)) = (target.as_ref(), after_hand_over(closed, args, 0)) { reopen(dir, how); }
+    }
+    {
+        let mut attempts = run.attempts.lock().unwrap();
+        attempts.code = code;
+        attempts.reopened = code == 0;
+    }
+    let _ = proxy.send_event(Ev::Outcome(page, phase));
+}
+
+/// The in-app updater's run ends: Tesseract opens again unless a good attempt already opened it
+/// (an update that did not finish, closed with 稍后 or ×), and the package's last exit code is
+/// this process's own, as `hand_over` returns it.
+fn leave(run: &UpdateRun) -> i32 {
+    let attempts = run.attempts.lock().unwrap();
+    if !attempts.reopened {
+        if let (Some(dir), Some(how)) = (attempts.target.as_ref(), after_hand_over(attempts.closed.clone(), &run.args, attempts.code)) {
+            reopen(dir, how);
+        }
+    }
+    attempts.code
+}
+
+/// The window could not be made. The in-app updater's run never fails for it: it goes on as the
+/// hand-over did before 0.1.9 (handover.rs, then Inno's own progress window).
+fn without_window(source: &payload::Source, update: Option<&UpdateRun>, what: &str) -> ! {
+    match update {
+        Some(run) => std::process::exit(hand_over(source, &run.args)),
+        None => panic!("{what}"),
+    }
+}
+
+/// The window: the setup window's own install, or the in-app updater's run (`update_args`).
+fn run(source: payload::Source, update_args: Option<Vec<String>>) -> ! {
     let source: &'static payload::Source = Box::leak(Box::new(source));
+    let update = update_args.map(|args| Arc::new(UpdateRun { args, attempts: Mutex::default() }));
     let event_loop = EventLoopBuilder::<Ev>::with_user_event().build();
     let proxy = event_loop.create_proxy();
 
@@ -346,7 +483,7 @@ fn run(source: payload::Source) {
         .with_visible(false)
         .with_window_icon(Icon::from_resource(1, None).ok())
         .build(&event_loop)
-        .expect("window");
+        .unwrap_or_else(|_| without_window(source, update.as_deref(), "window"));
     if let Some(m) = window.current_monitor().or_else(|| window.primary_monitor()) {
         let (mp, ms, ws) = (m.position(), m.size(), window.outer_size());
         window.set_outer_position(PhysicalPosition::new(
@@ -376,29 +513,52 @@ fn run(source: payload::Source) {
         .with_browser_accelerator_keys(false)
         .with_default_context_menus(false)
         .build(&window)
-        .expect("webview");
+        .unwrap_or_else(|_| without_window(source, update.as_deref(), "webview"));
 
     // the page shows the window once its fonts are in (no blank or re-flowing first frame);
     // a page that never says so still gets a window
     { let p = proxy.clone(); std::thread::spawn(move || { std::thread::sleep(std::time::Duration::from_millis(2500)); let _ = p.send_event(Ev::Show); }); }
 
     let needed: u64 = INSTALLED_BYTES.parse().unwrap_or(0);
-    let mut phase = Phase::Ready;
+    // the in-app updater's run is working from the start: it begins as soon as the window shows
+    let mut phase = if update.is_some() { Phase::Working } else { Phase::Ready };
     let mut shown = false;
     let mut app_dir: Option<String> = None;
     let mut log: Option<String> = None;
     // 打开 is being carried out (open_app, on a thread of its own): a second click waits for it
     let mut opening = false;
+    // the in-app updater's run: one attempt (`update_attempt`) at a time, on a thread of its own
+    let attempt = {
+        let (proxy, update) = (proxy.clone(), update.clone());
+        move || if let Some(run) = &update {
+            let (p, run) = (proxy.clone(), run.clone());
+            std::thread::spawn(move || update_attempt(p, source, hwnd, progress_hwnd, run));
+        }
+    };
 
     event_loop.run(move |event, _, flow| {
         *flow = ControlFlow::Wait;
         let to_page = |v: &Value| { let _ = webview.evaluate_script(&format!("window.__host&&window.__host({v})")); };
+        // The window goes: the in-app updater's run first opens Tesseract again where it has to
+        // (out of sight: Explorer may take a moment) and ends with the package's exit code.
+        let go = |flow: &mut ControlFlow| {
+            *flow = match &update {
+                Some(run) => { window.set_visible(false); ControlFlow::ExitWithCode(leave(run)) }
+                None => ControlFlow::Exit,
+            };
+        };
         match event {
             Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
-                if phase != Phase::Working { *flow = ControlFlow::Exit; }
+                if phase != Phase::Working { go(flow); }
             }
             Event::UserEvent(Ev::Show) => {
-                if !shown { shown = true; window.set_visible(true); window.set_focus(); }
+                if !shown {
+                    shown = true;
+                    window.set_visible(true);
+                    window.set_focus();
+                    // in front, so the elevation prompt it owns opens instead of flashing (handover.rs)
+                    attempt();
+                }
             }
             Event::UserEvent(Ev::ToPage(v)) => to_page(&v),
             Event::UserEvent(Ev::Outcome(v, next)) => {
@@ -406,7 +566,13 @@ fn run(source: payload::Source) {
                 if next == Phase::Done { app_dir = v.get("dir").and_then(Value::as_str).map(str::to_owned); }
                 log = v.get("log").and_then(Value::as_str).map(str::to_owned);
                 to_page(&v);
+                // the in-app updater's run: the new version is opening; the window lands and goes
+                if next == Phase::Done && update.is_some() {
+                    let p = proxy.clone();
+                    std::thread::spawn(move || { std::thread::sleep(std::time::Duration::from_millis(2400)); let _ = p.send_event(Ev::Leave); });
+                }
             }
+            Event::UserEvent(Ev::Leave) => go(flow),
             Event::UserEvent(Ev::Opened(started)) => {
                 opening = false;
                 if started { *flow = ControlFlow::Exit; } else { to_page(&json!({"ev": "openManual"})); }
@@ -414,11 +580,18 @@ fn run(source: payload::Source) {
             Event::UserEvent(Ev::Ipc(text)) => {
                 let Ok(msg) = serde_json::from_str::<Value>(&text) else { return };
                 match msg.get("cmd").and_then(Value::as_str).unwrap_or("") {
-                    "hello" | "refresh" => to_page(&facts()),
-                    "shown" => { if !shown { shown = true; window.set_visible(true); window.set_focus(); } }
+                    "hello" | "refresh" => to_page(&facts(update.is_some())),
+                    "shown" => { let _ = proxy.send_event(Ev::Show); }
                     "drag" => { let _ = window.drag_window(); }
                     "min" => window.set_minimized(true),
-                    "close" => { if phase != Phase::Working { *flow = ControlFlow::Exit; } }
+                    "close" => { if phase != Phase::Working { go(flow); } }
+                    // 重试 in the in-app updater's run
+                    "update" if update.is_some() && phase == Phase::Failed => {
+                        phase = Phase::Working;
+                        attempt();
+                    }
+                    "log" => { if let Some(l) = &log { sys::open(Path::new(l), None); } }
+                    _ if update.is_some() => {}
                     "pick" if phase != Phase::Working => {
                         let start = msg.get("dir").and_then(Value::as_str).unwrap_or("").to_owned();
                         let p = proxy.clone();
@@ -461,7 +634,6 @@ fn run(source: payload::Source) {
                             let _ = p.send_event(Ev::Opened(started));
                         });
                     }
-                    "log" => { if let Some(l) = &log { sys::open(Path::new(l), None); } }
                     _ => {}
                 }
             }
@@ -482,6 +654,27 @@ mod tests {
         assert!(!shows_handover_window(&args("/VERYSILENT /DIR=C:\\Apps\\Tesseract"), false), "a deployment");
         assert!(!shows_handover_window(&args("/RESTARTAPPLICATIONS"), false), "Inno's own wizard");
         assert!(!shows_handover_window(&args("/SILENT /RESTARTAPPLICATIONS /?"), false));
+    }
+
+    #[test]
+    fn the_in_app_update_runs_in_this_window_with_inno_very_silent() {
+        // 0.1.9: the updater's run shows this window on its progress instead of handover.rs's
+        // plain window followed by Inno's own /SILENT progress window.
+        let args = |line: &str| line.split(' ').map(str::to_owned).collect::<Vec<_>>();
+        let in_app = args("/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTART");
+        assert!(shows_update_window(&in_app, false));
+        assert!(!shows_update_window(&in_app, true), "an elevated console's deployment: no window");
+        assert!(!shows_update_window(&args("/VERYSILENT /RESTARTAPPLICATIONS"), false), "very silent keeps the hand-over");
+        assert!(!shows_update_window(&args("/VERYSILENT /DIR=C:\\Apps\\Tesseract"), false), "a deployment");
+        assert!(!shows_update_window(&args("/RESTARTAPPLICATIONS"), false), "Inno's own wizard");
+        assert!(!shows_update_window(&args("/SILENT /RESTARTAPPLICATIONS /HELP"), false));
+        // The package gets the updater's switches, very silent, with this window's progress handle.
+        assert_eq!(update_switches(&in_app, None, 0x1234),
+            args("/VERYSILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTART /TSPROGRESS=4660"));
+        assert_eq!(update_switches(&args("/silent /RestartApplications /LOG=C:\\t.log"), None, 0),
+            args("/VERYSILENT /RestartApplications /LOG=C:\\t.log"), "any case; no receiver, no handle");
+        // a copy this window closed whose token is not this window's: no [Run] relaunch (inno_switches)
+        assert_eq!(update_switches(&in_app, Some(false), 7), args("/VERYSILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART /TSPROGRESS=7"));
     }
     #[test]
     fn the_copy_this_window_closed_starts_with_its_own_kind_of_token() {

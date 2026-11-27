@@ -6,18 +6,27 @@ it embeds that package, runs it silently and elevated, and shows its progress. I
 (rollback, file replacement, shortcuts, AUMID, the uninstall entry, the WebView2 check) stays
 Inno's, unchanged.
 
-- **Hand-over**: any command-line switch (`/VERYSILENT`, `/DIR=…`, the in-app updater's
-  `/SILENT …`) or a machine without the WebView2 runtime runs the embedded Inno package as it is,
-  with its own wizard or silently, and returns its exit code.
-- **The in-app update's elevation** (`src/handover.rs`, 0.1.6): the updater's run
-  (`/RESTARTAPPLICATIONS`, silent, started unelevated) shows a small native window at once
-  (正在更新 Tesseract… and what to do in User Account Control), brings it to the foreground (the
-  app that started it had the foreground; from 0.1.6 the shell also calls
-  `AllowSetForegroundWindow` for it) and makes it the owner of the elevation. Before, the
-  hand-over elevated with no window at all, and Windows shows such a request only as a flashing
-  taskbar button: on 11-22 the app vanished, nothing seemed to happen, and the user opened the old
-  version again. The window closes as soon as the elevation is answered; Inno's own `/SILENT`
-  progress window takes over. Deployments (`/VERYSILENT`, an elevated console) show nothing.
+- **Hand-over**: any command-line switch (`/VERYSILENT`, `/DIR=…`) or a machine without the
+  WebView2 runtime runs the embedded Inno package as it is, with its own wizard or silently, and
+  returns its exit code. The in-app updater's run is the one exception (next item).
+- **The in-app update** (`UpdateRun` in `src/main.rs`, 0.1.9): the updater's run (`/SILENT …
+  /RESTARTAPPLICATIONS`, started unelevated) opens this window, in the app's look, on its
+  progress: no first screen and nothing to click (the user already chose 更新 in the app). The
+  window comes to the foreground and starts the update once it shows, so it owns the elevation
+  prompt (the app that started it had the foreground and calls `AllowSetForegroundWindow` for it);
+  while the prompt waits the page says what to do in User Account Control. Everything else is the
+  hand-over's, unchanged: the full wait for the quitting shell, the same switches (only `/SILENT`
+  becomes `/VERYSILENT`, plus `/TSPROGRESS`, so Inno shows no window of its own), the package
+  elevating itself (so its `[Run]` entry starts the new version with the updater's token), the
+  `Tesseract-Update-*.log`, the reopen rules, and the exit code. Done: 已更新到 x.y.z · 正在打开
+  Tesseract…, and the window closes itself 2.4 s later. Not done (declined, failed): the reason,
+  重试 (the package again; Tesseract stays closed meanwhile) and 稍后 / × (the window closes and
+  opens the version installed now). Before 0.1.9 this run showed `src/handover.rs`'s plain
+  window for the elevation (0.1.6; with no window at all Windows showed the request only as a
+  flashing taskbar button, field report 11-22) and then Inno's own `/SILENT` progress window, both
+  in the system's look. handover.rs stays for an unelevated `/VERYSILENT /RESTARTAPPLICATIONS` run
+  and for when this window cannot be made (the update then runs as before 0.1.9). Deployments
+  (`/VERYSILENT`, an elevated console) show nothing.
 - **The command line** (`sys::params`, 11-19) is split the way Inno splits it: a double quote
   toggles quoting and a backslash is literal. So `/DIR="C:\Program Files\Tesseract\"
   /VERYSILENT` means here what it means to Inno, where the C runtime's rules would read `\"` as a
@@ -94,7 +103,8 @@ Inno's, unchanged.
 - **Page**: `ui/` (index.html, setup.css, setup.js, strings.js in the app's nine languages),
   with `ui/css/tokens.css`, `ui/css/fonts.css` and the fonts served from the binary.
   Opened in a plain browser, `setup.js` plays a stand-in host
-  (`?scene=fresh|update|reinstall&running=1&fail=4|disk|decline&lang=en_US`).
+  (`?scene=fresh|update|reinstall&running=1&fail=4|disk|decline&lang=en_US`; the in-app update's
+  run: `?run=update&fail=4|decline`).
 
 ## Design
 
@@ -108,7 +118,8 @@ screen installs, with the location and a desktop-shortcut choice as the only opt
   the light is unlit before installing, only it breathes while installing, and it lands when
   done. 打开 hands over to the app, whose launch screen starts from the same mark.
 - **Scenes**: first install, update (`0.0.9 → 0.1.0`), reinstall, app running (said once, at the
-  action), failed (the problem, the fix, and whether anything changed), elevation declined.
+  action), failed (the problem, the fix, and whether anything changed), elevation declined, and
+  the in-app update's run (opens on the progress, lands, closes itself).
 - **Licence**: GPL-3.0 needs no acceptance to install or run, so there is no accept page; a
   link opens the text in a sheet inside the window.
 - Not here on purpose: welcome page, illustrations, tips while installing, a close button
@@ -141,6 +152,15 @@ ISCC /DPayload=<folder with Tesseract.exe> /DAppVersion=0.0.9 test\sandbox.iss
 set WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9333
 target\debug\tesseract-setup.exe --payload target\sandbox\sandbox-setup.exe
 node test\drive.mjs 9333 target\e2e\fresh install
+```
+
+The in-app update's run: install the sandbox at an older version first, then pass the updater's
+switches and drive it with `update` (nothing to click; it closes itself), `update-later` or
+`update-retry` (`TESSERACT_SANDBOX_FAIL=prepare` makes every attempt stop with exit code 7):
+
+```
+target\debug\tesseract-setup.exe --payload target\sandbox\sandbox-setup.exe /SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTART
+node test\drive.mjs 9333 target\e2e\update update
 ```
 
 Not covered by the sandbox: the elevation prompt and a post from an elevated process to this

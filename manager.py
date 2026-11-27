@@ -58,6 +58,7 @@ from clash_formatter import (
     selected_gateway_nodes,
 )
 from exit_nodes import exit_nodes_from_entry, mark_exit_node
+from gateway_chain_round import judge_chain_round
 from gateway_check import (
     CHAIN_PROBE_INTERVAL_SECONDS,
     CHAIN_UPSTREAM_LIMIT,
@@ -69,7 +70,7 @@ from gateway_check import (
 from gateway_selection import GatewaySelection, read_selection
 from killswitch import KillSwitchManager
 from log_event_reports import log_raw_diagnostic
-from tier_log_events import TierLogTracker, emit_tier_log_events
+from tier_log_events import TIER_PRODUCT_NAMES, TierLogTracker, emit_tier_log_events
 from manager_alert_policy import (
     kill_switch_activated_event,
     kill_switch_deactivated_event,
@@ -1974,6 +1975,10 @@ class ProxyTierManager:
         self.gateway_chain_prober: ChainProber | None = None
         self._gateway_chain_verdicts: dict[str, ChainVerdict] = {}
         self._gateway_waiting_for_upstream = False
+        # Layers whose last round through the Gateway failed for every node,
+        # held until the next round confirms it (gateway_chain_round.py):
+        # tier id -> the runtime generation that held it.
+        self._gateway_chain_held_rounds: dict[str, int] = {}
         self.last_tier2_remote_refresh_attempt_monotonic = 0.0
         self.last_tier3_user_subscription_collect_attempt_monotonic = 0.0
         self.tier2_full_outage_started_monotonic = 0.0
@@ -6412,15 +6417,23 @@ class ProxyTierManager:
         verdicts = getattr(self, "_gateway_chain_verdicts", None)
         if verdicts is None:
             verdicts = self._gateway_chain_verdicts = {}
+        interval_seconds = getattr(
+            self, "gateway_chain_probe_interval_seconds", CHAIN_PROBE_INTERVAL_SECONDS
+        )
+        if self._gateway_chain_round_held_tiers():
+            # A fallback layer's last round through the Gateway failed for
+            # every node and waits for its confirming round.  A chain probe
+            # now would test that same doubtful hop and remember a failure
+            # against the Gateway too, so remembered verdicts stand until the
+            # layer is confirmed (gateway_chain_round.py).
+            interval_seconds = float("inf")
         return resolve_gateway_check(
             tested,
             prober=getattr(self, "gateway_chain_prober", None),
             upstream=self._gateway_chain_upstream_nodes,
             verdicts=verdicts,
             testing_config=self._testing_config_for_node_checks(),
-            interval_seconds=getattr(
-                self, "gateway_chain_probe_interval_seconds", CHAIN_PROBE_INTERVAL_SECONDS
-            ),
+            interval_seconds=interval_seconds,
             cancelled=self._manager_stop_requested,
             logger=self.logger,
         )
@@ -6451,6 +6464,97 @@ class ProxyTierManager:
         if tier_id == "exit" or not self._exit_active():
             return []
         return self._selected_gateway_nodes()
+
+    def _gateway_chain_round_held_tiers(self) -> set[str]:
+        """Layers whose last round through the Gateway is held (this generation)."""
+
+        held = getattr(self, "_gateway_chain_held_rounds", None)
+        if not held:
+            return set()
+        generation = int(getattr(self, "runtime_generation", 0) or 0)
+        with self.lock:
+            return {tier for tier, held_generation in held.items() if held_generation == generation}
+
+    def _gateway_chain_round_results(
+        self,
+        tier_id: str,
+        previous_nodes: list[Node],
+        tested: list[Node],
+        gateway_nodes: list[Node],
+    ) -> list[Node]:
+        """The results of one layer round to commit now (gateway_chain_round.py).
+
+        The first round in which every chain check through the Gateway failed
+        is held: its usable nodes keep their last verdict and the layer is
+        checked again on the next urgent cycle.  That next round is committed
+        whatever it finds.  A node whose helper never listened was not tested
+        and is left out too; a round of nothing else keeps a hold as it was.
+        Rounds without a Gateway are committed as they are.
+        """
+
+        held_rounds = getattr(self, "_gateway_chain_held_rounds", None)
+        if held_rounds is None:
+            held_rounds = self._gateway_chain_held_rounds = {}
+        generation = int(getattr(self, "runtime_generation", 0) or 0)
+        if not gateway_nodes:
+            with self.lock:
+                held_rounds.pop(tier_id, None)
+            return tested
+        with self.lock:
+            held_before = held_rounds.get(tier_id) == generation
+        chain_round = judge_chain_round(
+            previous_nodes,
+            tested,
+            held_before=held_before,
+            key=lambda node: (self._node_identity(node), str(node.name or "")),
+        )
+        with self.lock:
+            if chain_round.held:
+                held_rounds[tier_id] = generation
+            elif chain_round.decided:
+                held_rounds.pop(tier_id, None)
+            if chain_round.held or chain_round.not_ready:
+                # What was left out is checked again by the next round, on the
+                # urgent cycle while held (_run_due_urgent_checks), never on
+                # the very next monitor tick of the regular schedule.
+                now = time.monotonic()
+                self.last_check_monotonic[tier_id] = now
+                self.last_urgent_check_monotonic[tier_id] = now
+        layer = TIER_PRODUCT_NAMES.get(tier_id, tier_id)
+        if chain_round.held:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "%s check through the Gateway failed for every node (%s); "
+                "their last verdict stands until the next round confirms it",
+                layer,
+                len(chain_round.held),
+            )
+        elif chain_round.every_chain_failed and held_before:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "%s check through the Gateway failed for every node again; "
+                "the round is committed",
+                layer,
+            )
+        if chain_round.not_ready:
+            log_raw_diagnostic(
+                self.logger,
+                "warning",
+                "%s check through the Gateway: the helper never listened for %s "
+                "node(s), so they keep their last verdict",
+                layer,
+                len(chain_round.not_ready),
+            )
+        return chain_round.commit
+
+    def _gateway_chain_round_confirmation_due(
+        self, tier_id: str, *, now: float, interval: int
+    ) -> bool:
+        return tier_id in self._gateway_chain_round_held_tiers() and self._is_urgent_due(
+            tier_id, now, interval
+        )
 
     def _selected_gateway_nodes(self) -> list[Node]:
         # The saved selection names a node (identity), never a same-named twin.
@@ -14411,15 +14515,17 @@ class ProxyTierManager:
     def check_tier1(self) -> list[Node]:
         with self.operation_lock:
             previous_nodes, check_contexts = self._capture_layer_health_checks("tier1")
+            gateway_nodes = self._gateway_nodes_for_testing("tier1")
             tested = self._run_async(
                 test_nodes(
                     previous_nodes,
                     testing_config=self._testing_config_for_node_checks(),
                     logger=self.logger,
                     full_validation_enabled=self._full_validation_enabled(),
-                    gateway_nodes=self._gateway_nodes_for_testing("tier1"),
+                    gateway_nodes=gateway_nodes,
                 )
             )
+            tested = self._gateway_chain_round_results("tier1", previous_nodes, tested, gateway_nodes)
             complete = self._commit_layer_health_checks("tier1", tested, check_contexts)
             with self.lock:
                 if complete:
@@ -14843,18 +14949,20 @@ class ProxyTierManager:
                     self._clear_subscription_source_check_evidence("tier2")
 
             previous_nodes, check_contexts = self._capture_layer_health_checks("tier2")
+            gateway_nodes = self._gateway_nodes_for_testing("tier2")
             tested = self._run_async(
                 test_nodes(
                     previous_nodes,
                     testing_config=self._testing_config_for_node_checks(),
                     logger=self.logger,
                     full_validation_enabled=self._full_validation_enabled(),
-                    gateway_nodes=self._gateway_nodes_for_testing("tier2"),
+                    gateway_nodes=gateway_nodes,
                 ),
                 cancel_event=self._tier3_cancel_event,
             )
             if self._manager_stop_requested():
                 return previous_nodes
+            tested = self._gateway_chain_round_results("tier2", previous_nodes, tested, gateway_nodes)
             complete = self._commit_layer_health_checks("tier2", tested, check_contexts)
             checked_subscription_urls = self._subscription_sources_in_nodes(
                 "tier2",
@@ -33562,7 +33670,9 @@ class ProxyTierManager:
         """Read scalar counts once under lock, without clones or ledger maintenance.
 
         ALIVE/SLOW is usable unless the runtime-health ledger overlays it.
-        Strict tiers additionally apply testing.primary_gateway_max_latency_ms
+        Strict tiers additionally apply their latency ceiling
+        (testing.primary_gateway_max_latency_ms; a chain measurement:
+        gateway_max_latency_ms, by extra["latency_policy_path"])
         to latency_ms and honor latency_policy_state=over_limit; Tier3 retains
         its ALIVE/SLOW policy (slow_threshold_ms classifies, not excludes).
         Display eligibility and origin predicates are the existing pool rules.
@@ -33570,7 +33680,7 @@ class ProxyTierManager:
         otherwise counts individual user nodes.
         O(nodes + ledger entries), scalar indexes only, fixed-size return value.
         """
-        from runtime_settings import primary_gateway_max_latency_ms_from_testing
+        from runtime_settings import strict_latency_limit_ms_for_path
         from tier1_protocols import physical_node_name
         from tier3_origin import is_tier3_user_pool_node
         from tier3_pool_retention import node_has_tier3_cache_revalidation_pending
@@ -33578,7 +33688,9 @@ class ProxyTierManager:
 
         with self.lock:
             config = self.config
-            limit = primary_gateway_max_latency_ms_from_testing(config.get("testing", {}))
+            testing = config.get("testing", {})
+            limits = {path: strict_latency_limit_ms_for_path(testing, path)
+                      for path in ("direct", "chain")}
             counts = {tier: {"total": 0, "usable": 0}
                       for tier in ("tier1", "tier2", "tier3", "exit")}
             pool = {"total": 0, "usable": 0}
@@ -33606,7 +33718,7 @@ class ProxyTierManager:
                     if tier != "tier3":
                         usable = usable and node.extra.get("latency_policy_state") != "over_limit"
                         if node.latency_ms is not None:
-                            usable = usable and math.isfinite(node.latency_ms) and node.latency_ms <= limit
+                            usable = usable and math.isfinite(node.latency_ms) and node.latency_ms <= limits.get(node.extra.get("latency_policy_path"), limits["direct"])
                     if tier == "tier1":
                         group = physical_node_name(node)
                         groups[group] = groups.get(group, False) or usable
@@ -34835,8 +34947,16 @@ class ProxyTierManager:
             self.check_tier3(force_collect=False)
 
     def _run_due_urgent_checks(self, *, now: float, interval: int = 5) -> None:
+        # A held round through the Gateway (gateway_chain_round.py) is
+        # confirmed by the layer's next round, one urgent interval later.
+        if self._gateway_chain_round_confirmation_due("tier1", now=now, interval=interval):
+            self._run_urgent_check("tier1", self.check_tier1)
         force_remote_refresh = self._tier2_degraded_remote_refresh_due(now=now)
-        if force_remote_refresh or self._tier2_urgent_recheck_due(now=now, interval=interval):
+        if (
+            force_remote_refresh
+            or self._tier2_urgent_recheck_due(now=now, interval=interval)
+            or self._gateway_chain_round_confirmation_due("tier2", now=now, interval=interval)
+        ):
             self._run_urgent_check(
                 "tier2",
                 lambda: self.check_tier2(force_remote_refresh=force_remote_refresh),

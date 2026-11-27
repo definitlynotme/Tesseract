@@ -18,7 +18,11 @@ from desktop_runtime import (
     _RuntimeRecoveryArm,
     _RuntimeRecoveryTicket,
 )
-from runtime_egress_recovery import BoundRuntimeFailure, RuntimeEgressCoordinator
+from runtime_egress_recovery import (
+    BoundRuntimeFailure,
+    RuntimeEgressCoordinator,
+    RuntimeEgressReadinessState,
+)
 from tests.test_runtime_ready_arm_regressions import _loaded_authority
 from tests.test_runtime_ready_carry import _gateway
 
@@ -285,12 +289,75 @@ def test_fixed_gateway_error_is_confirmed_on_its_underlay(tmp_path, outbound, ro
     assert failure.error_type == (
         "route_changed_after_transport_failure" if route_changed else "timeout"
     )
-    # Its A/B pairs are the underlay's own fallback members; gw stays fixed.
+    # The dialer group has backups (n2, n3), yet a Gateway line never swaps
+    # to them: see test_a_gateway_error_never_swaps_its_dialer.
     plans = runtime._runtime_early_differential_plans(failure, snapshot, payload)
     assert [(plan["ref"].proxy_name, plan["action"]["group"]) for plan in plans] == [
         ("n2", "TIER3-AUTO"), ("n3", "TIER3-AUTO"),
     ]
     runtime.manager.enqueue_node_health_check.assert_not_called()
+
+
+@pytest.mark.parametrize("dialer_passes", [False, True], ids=["dialer-missed", "dialer-passed"])
+def test_a_gateway_error_never_swaps_its_dialer(tmp_path, dialer_passes):
+    """Field report 11-25..27 (0.1.7, a SOCKS5 ISP Gateway through PROXY-FALLBACK).
+
+    A site timing out through the Gateway (``GENERAL[Decodo-ISP]``) started
+    an A/B pair on the dialer's fallback members.  On the user's phone
+    hotspot the current member missed its direct probe while a backup
+    passed, so the dialer group was fixed to the backup and the Gateway
+    chain got at most 1.5 s for the FINAL-EXIT 204 it needs 2-5 s for.  The
+    204 failed, readiness was parked in DATA_PLANE_FAILED, and the service
+    read "starting" (4 and 29 minutes) until restarts.  Driven through the
+    shipped dispatch and confirmation worker on the real Gateway
+    publication: only the dialer is probed, the matching node check is
+    requested, and neither the route nor READY moves.
+    """
+
+    runtime, snapshot, payload, token = _published_gateway_case(tmp_path)
+    ready = runtime._publish_runtime_egress_readiness(
+        RuntimeEgressReadinessState.READY, validation_active=False, reason="verified",
+    )
+    event = CoreOutputEvent(
+        raw_line='level=warning msg="[TCP] dial GENERAL (match Match/) '
+        '127.0.0.1:49622 --> mc.yandex.com:443 error: context deadline exceeded"',
+        pid=int(token[3]), process_generation=int(token[4]),
+        received_at_monotonic=time.monotonic(),
+    )
+    runtime._handle_runtime_output_event(
+        event, snapshot, payload,
+        ingress_selector_intent_revision=runtime._runtime_selector_intent_revision,
+    )
+    call = runtime._start_runtime_early_confirmation.call_args
+    failure = call.args[0]
+    assert [plan["ref"].proxy_name for plan in runtime._runtime_early_differential_plans(
+        failure, snapshot, payload,
+    )] == ["n2", "n3"]
+    probed = []
+
+    def probe(ref, _payload, **_kwargs):
+        probed.append(ref.proxy_name)
+        return {"delay": 120} if dialer_passes or ref.proxy_name != "n1" else None
+
+    runtime._probe_runtime_leaf = probe
+    runtime._proxy_delay_failure_is_transient = lambda _exc: False
+    runtime._run_runtime_early_confirmed_recovery = Mock()
+    runtime._apply_runtime_automatic_selection = Mock()
+    ticket = DesktopRuntime._start_runtime_early_confirmation(runtime, *call.args, **call.kwargs)
+    assert ticket is not None
+    for worker in tuple(runtime._runtime_failure_recovery_threads):
+        worker.join(5)
+        assert not worker.is_alive()
+
+    assert probed == ["n1"]  # the dialer only, never a backup
+    runtime._run_runtime_early_confirmed_recovery.assert_not_called()
+    runtime._apply_runtime_automatic_selection.assert_not_called()
+    assert runtime._runtime_egress_readiness is ready
+    checked = runtime.manager.enqueue_node_health_check.call_args
+    assert (checked.args[0].proxy_name, checked.kwargs["reason"]) == (
+        ("gw", "gateway_runtime_error") if dialer_passes else ("n1", "runtime_no_alternative")
+    )
+    assert runtime._runtime_incident_recovery_state[ticket.incident_id] == "indeterminate"
 
 
 def _idle_core_lines():
@@ -421,4 +488,9 @@ def test_gateway_failed_chain_with_healthy_underlay_checks_gateway_only():
         gateway.node, reason="gateway_runtime_error", source="runtime_transport",
     )
     runtime._run_runtime_early_confirmed_recovery.assert_not_called()
-    assert runtime._complete_runtime_early_indeterminate.call_args.kwargs["reason_code"] == "current_leaf_healthy"
+    # A Gateway line never consults the dialer's backups at all.
+    runtime._runtime_early_differential_plans.assert_not_called()
+    assert runtime._probe_runtime_leaf.call_count == 1
+    assert runtime._complete_runtime_early_indeterminate.call_args.kwargs["reason_code"] == (
+        "gateway_dialer_checked"
+    )

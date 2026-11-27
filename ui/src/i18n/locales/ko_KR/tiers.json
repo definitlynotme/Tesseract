@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "잘못된 요청",
   "tiers.reason.invalid_request.fix": "세부 정보를 닫았다가 다시 연 후 다시 검사하세요.",
   "tiers.reason.latency_limit_exceeded": "지연 시간 상한 초과",
-  "tiers.reason.latency_limit_exceeded.fix": "상한은 {max_ms, number, integer} ms입니다. 설정 › 연결 품질에서 조정할 수 있습니다.",
+  "tiers.reason.latency_limit_exceeded.fix": "상한은 {max_ms, number, integer} ms입니다. 설정 › 연결 품질{limit, select, chain { › 폴백 계층을 거친 출구 체인 지연 시간 상한} other {}}에서 조정할 수 있습니다.",
   "tiers.reason.node_changed": "노드 변경됨",
   "tiers.reason.node_changed.fix": "검사 중에 노드 구성이 변경되었습니다. 다시 검사하면 됩니다.",
   "tiers.reason.node_index_unavailable": "노드 목록 준비 안 됨",

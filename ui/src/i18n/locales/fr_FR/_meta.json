@@ -5973,6 +5973,21 @@
   "settings.quality.no_response": {
     "src_hash": "8fec97c850430eaa"
   },
+  "settings.quality.gateway.title": {
+    "src_hash": "7c676caeced8ef3b"
+  },
+  "settings.quality.gateway.hint": {
+    "src_hash": "8913f61bd839e8a8"
+  },
+  "settings.quality.gateway.err.range": {
+    "src_hash": "37b30fcfbe5ab75a"
+  },
+  "settings.quality.gateway.err.range.short": {
+    "src_hash": "d96423bce5b7b6bd"
+  },
+  "settings.quality.gateway.problem": {
+    "src_hash": "06308ceb461f99e3"
+  },
   "settings.bastion.on.title": {
     "src_hash": "ccc80151ec964889"
   },
@@ -7899,7 +7914,7 @@
     "src_hash": "5b17effafc5e806a"
   },
   "tiers.reason.latency_limit_exceeded.fix": {
-    "src_hash": "e9eb2ac2aaca0732"
+    "src_hash": "b287d6ec772ee86d"
   },
   "tiers.reason.node_changed": {
     "src_hash": "91548de07410aeea"

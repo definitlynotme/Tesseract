@@ -33,8 +33,9 @@ from runtime_settings import (
     helper_block_from_testing,
     node_test_concurrency_from_testing,
     node_test_tcp_timeout_seconds,
-    primary_gateway_max_latency_ms_from_testing,
     slow_threshold_ms_from_testing,
+    latency_path_for_scope,
+    strict_latency_limit_ms_for_path,
 )
 from tier3_validation_config import build_single_proxy_validation_config
 from tier3_tcp_dns import Tier3TcpDnsBusy
@@ -73,6 +74,7 @@ _LATENCY_POLICY_EXTRA_KEYS = (
     "latency_policy_limit_ms",
     "latency_policy_observed_ms",
     "latency_policy_scope",
+    "latency_policy_path",
 )
 
 
@@ -91,7 +93,12 @@ def apply_success_latency_policy(
 ) -> Node:
     """Classify one successful formal latency measurement.
 
-    Tier1, Tier2, and Gateway (``exit``) use the primary/Gateway hard limit.
+    Tier1, Tier2, and Gateway (``exit``) use a hard limit chosen by how the
+    latency was measured: a chain scope (``gateway_chain``: a Gateway through
+    the fallback layers, or a node through the selected Gateway) uses
+    ``gateway_max_latency_ms``; a direct one uses ``primary_gateway_max_latency_ms``.
+    A chain result is marked ``extra["latency_policy_path"] = "chain"`` for
+    later readers; absent means direct.
     Tier3 and unknown tiers intentionally retain the legacy slow threshold.
     The returned node is a clone so callers can safely reuse this contract for
     both scheduled checks and user-triggered checks.
@@ -116,7 +123,10 @@ def apply_success_latency_policy(
         updated.status = _healthy_status(measured_ms, legacy_slow_threshold_ms)
         return updated
 
-    limit_ms = primary_gateway_max_latency_ms_from_testing(testing)
+    path = latency_path_for_scope(scope)
+    if path == "chain":  # absent = direct, so a direct result keeps its extra unchanged
+        updated.extra["latency_policy_path"] = path
+    limit_ms = strict_latency_limit_ms_for_path(testing, path)
     if measured_ms > limit_ms:
         updated.status = NodeStatus.DEAD
         updated.suspicious_reason = "latency_limit_exceeded"
@@ -3337,6 +3347,37 @@ def _mihomo_direct_validate(
     return updated
 
 
+# A chain helper that is still running but never listened tested nothing: the
+# result is no verdict on the node (a pending one, see gateway_chain_round.py),
+# as gateway_check.py treats a chain probe that could not run.  A helper that
+# exited before listening rejected the chain and stays a failure.
+GATEWAY_CHAIN_HELPER_NOT_READY_REASON = "validation_deferred: gateway_chain_helper_not_ready"
+
+
+class _ChainHelperNotReady(Exception):
+    """The chain helper Mihomo is running but did not listen in time."""
+
+
+def _wait_for_chain_helper(process: subprocess.Popen[str], port: int, timeout: float) -> None:
+    try:
+        _wait_for_tcp_port("127.0.0.1", port, timeout)
+        return
+    except TimeoutError as exc:
+        timed_out = exc
+    exit_code = process.poll()
+    if exit_code is not None:
+        raise RuntimeError(f"chain helper exited before listening (exit code {exit_code})") from timed_out
+    # The deadline also passes while this process or the whole computer
+    # stalls (on Windows time.monotonic counts a sleep), so a helper that is
+    # up by now is looked for once more before it counts as not ready.
+    try:
+        with socket.create_connection(("127.0.0.1", int(port)), timeout=0.2):
+            return
+    except OSError:
+        pass
+    raise _ChainHelperNotReady(f"did not listen within {timeout:g}s") from timed_out
+
+
 def _gateway_chain_validate(
     node: Node,
     gateway_nodes: list[Node],
@@ -3383,6 +3424,10 @@ def _gateway_chain_validate(
         return updated
 
     failures: list[str] = []
+    # Whether any attempt got as far as a verdict on the chain, and how many
+    # ended with a helper that never listened.
+    chain_decided = False
+    helpers_not_ready = 0
     port_attempts = max(1, int(helper_config.get("port_attempts", 3)))
     for gateway in gateways:
         gateway_failures: list[str] = []
@@ -3399,6 +3444,7 @@ def _gateway_chain_validate(
             if not mihomo_config:
                 reserved_port.close()
                 gateway_failures.append("unsupported chain proxy")
+                chain_decided = True
                 break
             process: subprocess.Popen[str] | None = None
             temp_dir_handle: tempfile.TemporaryDirectory[str] | None = None
@@ -3418,7 +3464,8 @@ def _gateway_chain_validate(
                     errors="replace",
                     **hidden_subprocess_kwargs(),
                 )
-                _wait_for_tcp_port("127.0.0.1", inbound_port, startup_timeout)
+                _wait_for_chain_helper(process, inbound_port, startup_timeout)
+                chain_decided = True
                 helper_ready_at = time.perf_counter()
                 proxy_url = f"http://127.0.0.1:{inbound_port}"
                 opener = urllib.request.build_opener(
@@ -3458,7 +3505,19 @@ def _gateway_chain_validate(
                     except Exception as exc:
                         probe_failures.append(f"{probe_url}: {exc}")
                 gateway_failures.append("; ".join(probe_failures[:3]) or "all probe urls failed")
+            except _ChainHelperNotReady as exc:
+                helpers_not_ready += 1
+                log_raw_diagnostic(
+                    logger,
+                    "warning",
+                    "Gateway chain helper for %s via %s %s; no verdict on the node",
+                    node.name or node.address,
+                    gateway.name or gateway.address,
+                    exc,
+                )
+                gateway_failures.append(f"helper {exc}")
             except Exception as exc:
+                chain_decided = True
                 log_raw_diagnostic(
                     logger,
                     "warning",
@@ -3480,7 +3539,10 @@ def _gateway_chain_validate(
 
     updated.status = NodeStatus.SUSPICIOUS
     updated.latency_ms = None
-    updated.suspicious_reason = "all_gateways_unavailable: " + ("; ".join(failures[:3]) or "Gateway chain validation failed")
+    if helpers_not_ready and not chain_decided:
+        updated.suspicious_reason = f"{GATEWAY_CHAIN_HELPER_NOT_READY_REASON}: " + "; ".join(failures[:3])
+    else:
+        updated.suspicious_reason = "all_gateways_unavailable: " + ("; ".join(failures[:3]) or "Gateway chain validation failed")
     updated.last_checked_at = utc_now_iso()
     return updated
 

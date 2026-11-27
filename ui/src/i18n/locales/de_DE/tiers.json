@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Ungültige Anfrage",
   "tiers.reason.invalid_request.fix": "Schließen Sie die Details, öffnen Sie sie erneut und testen Sie noch einmal.",
   "tiers.reason.latency_limit_exceeded": "Latenz überschreitet den Grenzwert",
-  "tiers.reason.latency_limit_exceeded.fix": "Der Grenzwert liegt bei {max_ms, number, integer} ms. Sie können ihn unter Einstellungen › Verbindungsqualität ändern.",
+  "tiers.reason.latency_limit_exceeded.fix": "Der Grenzwert liegt bei {max_ms, number, integer} ms. Sie können ihn unter Einstellungen › Verbindungsqualität{limit, select, chain { › Latenzgrenze der Gateway-Kette (Fallback)} other {}} ändern.",
   "tiers.reason.node_changed": "Knoten geändert",
   "tiers.reason.node_changed.fix": "Die Konfiguration des Knotens hat sich während des Tests geändert. Testen Sie einfach erneut.",
   "tiers.reason.node_index_unavailable": "Knotenliste nicht bereit",

@@ -47,6 +47,8 @@ class TesterTests(unittest.TestCase):
     def test_primary_gateway_latency_policy_boundaries_and_recovery(self) -> None:
         testing_config = {
             "primary_gateway_max_latency_ms": 800,
+            # a direct ("tcp") check of every strict tier, exit included, uses this one
+            "gateway_max_latency_ms": 6000,
             "slow_threshold_ms": 2000,
         }
 
@@ -363,6 +365,8 @@ class TesterTests(unittest.TestCase):
                 {
                     "mihomo_binary_path": "fake-mihomo.exe",
                     "primary_gateway_max_latency_ms": 800,
+                    # a chain measurement is judged by the chain limit
+                    "gateway_max_latency_ms": 800,
                     "mihomo_helper": {
                         "port_attempts": 1,
                         "probe_urls": ["https://ok.example"],

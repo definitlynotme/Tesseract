@@ -3,8 +3,12 @@
 // next action; the body cross-fades in place; the brand light lands when the work is done.
 //
 // Host contract (src/main.rs): the page posts {cmd} with window.ipc.postMessage — hello, shown,
-// drag, min, close, pick {dir}, install {dir, desktop}, open, log, refresh — and the host calls
-// window.__host(event) with {ev: init | dir | step | progress | done | failed | declined | openManual}.
+// drag, min, close, pick {dir}, install {dir, desktop}, update, open, log, refresh — and the host
+// calls window.__host(event) with {ev: init | dir | step | progress | done | failed | declined | openManual}.
+// The in-app update's run (init.run === 'update') has no first screen: the host starts the update
+// as soon as the window shows, the page opens on the progress, and the window closes itself once
+// the update is done and Tesseract opens again. Its 重试 posts update; 稍后 and × close it, and
+// the host then opens the version installed now.
 // Opened in a plain browser (no window.ipc), a small simulator plays the host (end of file).
 'use strict';
 
@@ -18,12 +22,13 @@ let S = STRINGS.en_US;
 let facts = null;           // the host's init event
 let phase = 'ready';        // ready | working | done | failed
 let dir = '', desktop = false, act = null, shown = 0, stage = -1, closedFirst = false;
+let auto = false;           // the in-app update's run: no first screen, no choices
 
 const post = m => { if (window.ipc) window.ipc.postMessage(JSON.stringify(m)); else Sim.post(m); };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const t = (k, vars = {}) => (S[k] || STRINGS.en_US[k] || k).replace(/\{(\w+)\}/g, (_, n) => n in vars ? vars[n] : (n === 'v' ? facts.version : ''));
-const isUp = () => facts.scene === 'update';
-const isRe = () => facts.scene === 'reinstall';
+const isUp = () => facts.scene === 'update' || auto;     // the in-app update's run says update throughout
+const isRe = () => facts.scene === 'reinstall' && !auto;
 const size = b => b >= 1e9 ? (b / 1e9).toFixed(1) + ' GB' : Math.max(1, Math.round(b / 1e6)) + ' MB';
 
 // ---- motion helpers ------------------------------------------------------------------------
@@ -123,13 +128,17 @@ function licenseLink() {
 }
 function setClose(visible) { $('wcClose').hidden = !visible; }
 
+function showVersion() {
+  ver.innerHTML = isUp() && facts.old && facts.old !== facts.version
+    ? `<span>${esc(facts.old)}</span><span class="arr">→</span><span>${esc(facts.version)}</span>`
+    : esc(facts.version);
+}
+
 function renderReady(note) {
   phase = 'ready';
   setClose(true);
   dot.classList.remove('is-pending', 'is-landing', 'is-lit');
-  ver.innerHTML = isUp() && facts.old
-    ? `<span>${esc(facts.old)}</span><span class="arr">→</span><span>${esc(facts.version)}</span>`
-    : esc(facts.version);
+  showVersion();
   const parts = [];
   if (facts.scene === 'fresh') {
     parts.push(`<div><div class="lab">${esc(t('loc'))}</div>
@@ -152,10 +161,13 @@ function renderReady(note) {
   actButton(isUp() ? t('update') : isRe() ? t('reinstall') : t('install'), start);
 }
 
-function start() {
+// the working view: the title, the step under it, the action as its own track
+function renderWorking() {
   phase = 'working';
   setClose(false);                                       // nothing to close into while files move
+  dot.classList.remove('is-landing', 'is-lit');
   dot.classList.add('is-pending');
+  showVersion();
   const head = isUp() ? t('w_update') : isRe() ? t('w_reinstall') : t('w_install');
   setBody(`<div class="title">${esc(head)}</div><div class="sub"><span class="step" id="step"></span></div>`);
   footer([], []);
@@ -163,7 +175,28 @@ function start() {
   closedFirst = false;
   actProgress(0);
   swapText($('step'), esc(t('s_prepare')));
+}
+
+function start() {
+  renderWorking();
   post({ cmd: 'install', dir, desktop: facts.scene !== 'fresh' && facts.desktopExists ? true : desktop });
+}
+
+// The in-app update's run: the window came up on its own (the app quit for it), so the elevation
+// prompt may only flash on the taskbar; the page says what to do while it waits (0.1.6's
+// handover.rs said it in a plain window of its own). It goes once the installer reports.
+function showUacHint(on) {
+  const cur = $('hint');
+  if (on && !cur) {
+    const n = document.createElement('div');
+    n.className = 'sub hint'; n.id = 'hint'; n.textContent = t('u_uac');
+    body.insertBefore(n, body.querySelector('.ghost'));
+    if (!reduced()) n.animate([{ opacity: 0, translate: '0 4px' }, { opacity: 1, translate: '0 0' }], { duration: 220, easing: EASE_OUT, fill: 'backwards' });
+  } else if (!on && cur) {
+    cur.id = '';
+    if (reduced()) { cur.remove(); return; }
+    cur.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: EASE_IN, fill: 'forwards' }).finished.then(() => cur.remove(), () => cur.remove());
+  }
 }
 
 function onStep(step) {
@@ -171,7 +204,7 @@ function onStep(step) {
   if (step === 'prepare') actProgress(.01);
   // a running Tesseract is closed (politely) before the elevation prompt (rm.rs, 11-19)
   if (step === 'close') { closedFirst = true; swapText($('step'), esc(t('s_close'))); }
-  if (step === 'elevate') { actProgress(.02); swapText($('step'), esc(t('s_elevate'))); }
+  if (step === 'elevate') { actProgress(.02); swapText($('step'), esc(t('s_elevate'))); if (auto) showUacHint(true); }
 }
 
 // stages from the .iss: 1 prepare (Inno closes a running app here, unless the window already
@@ -180,7 +213,9 @@ function onProgress(st, permille) {
   if (phase !== 'working') return;
   if (st !== stage) {
     stage = st;
-    const key = st === 1 ? (facts.running && !closedFirst ? 's_close' : 's_prepare') : st === 2 ? 's_copy' : 's_links';
+    showUacHint(false);                                  // the installer runs: permission was given
+    // the in-app update's run closed (or waited for) Tesseract before the installer started
+    const key = st === 1 ? (facts.running && !closedFirst && !auto ? 's_close' : 's_prepare') : st === 2 ? 's_copy' : 's_links';
     swapText($('step'), esc(t(key)));
   }
   const p = st === 1 ? .03 : st === 2 ? .04 + .9 * (permille / 1000) : .96;
@@ -198,8 +233,10 @@ function onDone(ev) {
   dot.classList.add('is-lit');                           // the light lands
   if (!reduced()) { dot.classList.remove('is-landing'); void dot.getBBox(); dot.classList.add('is-landing'); }
   ver.textContent = facts.version;
-  const sub = facts.scene === 'fresh' ? t(ev.desktop ? 'd_sub_desk' : 'd_sub') : t('d_sub_kept');
+  // the in-app update's run: Tesseract is opening again and the host closes this window
+  const sub = auto ? t('u_opening') : facts.scene === 'fresh' ? t(ev.desktop ? 'd_sub_desk' : 'd_sub') : t('d_sub_kept');
   setBody(`<div class="title">${esc(doneTitle())}</div><div class="sub">${esc(sub)}</div>`);
+  if (auto) return;
   setTimeout(() => {
     footer([], [ghostBtn(t('finish'), () => post({ cmd: 'close' }))]);
     actButton(t('open'), () => post({ cmd: 'open' }));
@@ -224,7 +261,8 @@ function onFailed(ev) {
     extract: () => t('e_extract', { detail: ev.detail }),
     launch: () => t('e_launch', { detail: ev.detail }),
     unchanged: () => t('e_unchanged'),
-    rolledback: () => t('e_rolledback'),
+    // the in-app update's run already closed Tesseract: whatever held a file was something else
+    rolledback: () => t(auto ? 'u_rolledback' : 'e_rolledback'),
     interrupted: () => t('e_interrupted'),
     running: () => t('e_running'),
     // Tesseract went, but another program keeps one of its files loaded (it has been reopened)
@@ -232,10 +270,26 @@ function onFailed(ev) {
   }[ev.kind] || (() => t('e_unknown', { code: ev.code }));
   // what the machine is left with, said only where it is known
   const sub = ['disk', 'dir', 'extract', 'unchanged', 'running', 'busy'].includes(ev.kind) ? t('sub_unchanged') : ev.kind === 'rolledback' ? t('sub_rolledback') : '';
+  if (auto) return updateStopped(reason(), sub, ev.log);
   setBody(`<div class="title is-err">${esc(t('e_title'))}</div>
     <div class="sub reason">${esc(reason())}</div>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}`);
   footer([], ev.log ? [ghostBtn(t('log'), () => post({ cmd: 'log' }))] : []);
   actButton(t('retry'), () => post({ cmd: 'refresh' }));
+}
+
+// The in-app update's run stopped (failed, or the elevation was declined). Tesseract stays closed
+// while this window is up, so 重试 can run the installer again; 稍后 or × close the window and the
+// host opens the version installed now.
+function updateStopped(reason, sub, log) {
+  phase = 'failed';
+  setClose(true);
+  dot.classList.remove('is-pending');
+  showUacHint(false);
+  setBody(`<div class="title is-err">${esc(t('u_title'))}</div>
+    <div class="sub reason">${esc(reason)}</div>${sub ? `<div class="sub">${esc(sub)}</div>` : ''}<div class="sub">${esc(t('u_back'))}</div>`);
+  footer(log ? [ghostBtn(t('log'), () => post({ cmd: 'log' }))] : [], [ghostBtn(t('u_later'), () => post({ cmd: 'close' }))]);
+  actButton(t('retry'), () => { renderWorking(); post({ cmd: 'update' }); });
+  act.focus({ preventScroll: true });
 }
 
 // ---- the licence sheet -----------------------------------------------------------------------
@@ -287,10 +341,12 @@ window.__host = ev => {
         $('wcMin').setAttribute('aria-label', t('min'));
         $('wcClose').setAttribute('aria-label', t('close'));
         dir = ev.dir;
+        auto = ev.run === 'update';
         footR.replaceChildren(makeAct());
       }
       if (first && !reduced()) win.classList.add('is-opening');
-      renderReady();
+      // the in-app update's run opens on its progress: the host starts it once the window shows
+      if (auto) { if (first) renderWorking(); } else renderReady();
       if (first) {
         // show the window once the faces are in, so the first frame is the drawn one
         const show = () => { if (opened) return; opened = true; post({ cmd: 'shown' }); setTimeout(() => win.classList.remove('is-opening'), 1300); };
@@ -304,47 +360,53 @@ window.__host = ev => {
     case 'progress': onProgress(ev.stage, ev.permille); break;
     case 'done': onDone(ev); break;
     case 'failed': onFailed(ev); break;
-    case 'declined': renderReady(t('declined')); break;
+    case 'declined': if (auto) updateStopped(t('declined'), '', null); else renderReady(t('declined')); break;
     case 'openManual': onOpenManual(); break;
   }
 };
 
 // ---- a stand-in host for a plain browser (design review only; never runs in the product) ----
 // ?lang=zh_CN&scene=fresh|update|reinstall&running=1&fail=4|disk|decline|running|busy|open
+// ?run=update (the in-app update's run: starts once shown; a retry then succeeds)&fail=4|decline
 const Sim = (() => {
   const q = new URLSearchParams(location.search);
-  const scene = q.get('scene') || 'fresh';
+  const run = q.get('run');
+  const scene = run === 'update' ? 'update' : q.get('scene') || 'fresh';
   const say = ev => setTimeout(() => window.__host(ev), 0);
   const init = () => ({ ev: 'init', lang: q.get('lang') || 'zh_CN', version: '0.1.0', scene, old: scene === 'update' ? '0.0.9' : scene === 'reinstall' ? '0.1.0' : null,
-    dir: 'C:\\Program Files\\Tesseract', desktopExists: false, running: q.get('running') === '1' });
+    dir: 'C:\\Program Files\\Tesseract', desktopExists: false, running: q.get('running') === '1', run });
+  const play = (fail, closing) => {
+    if (fail === 'disk') return say({ ev: 'failed', kind: 'disk', need: 312e6, free: 118e6, drive: 'C:' });
+    say({ ev: 'step', step: 'prepare' });
+    // a running Tesseract is closed first (rm.rs); fail=running: it would not quit;
+    // fail=busy: it quit, another program still has one of its files loaded
+    if (closing || fail === 'running' || fail === 'busy') setTimeout(() => say({ ev: 'step', step: 'close' }), 150);
+    if (fail === 'running') return setTimeout(() => say({ ev: 'failed', kind: 'running' }), 1400);
+    if (fail === 'busy') return setTimeout(() => say({ ev: 'failed', kind: 'busy', apps: ['Backup Agent'] }), 1400);
+    const elevate = closing ? 1500 : 300;
+    setTimeout(() => say({ ev: 'step', step: 'elevate' }), elevate);
+    if (fail === 'decline') return setTimeout(() => say({ ev: 'declined' }), elevate + 2400);
+    let pm = 0;
+    setTimeout(() => say({ ev: 'progress', stage: 1, permille: 0 }), elevate + 900);
+    const tick = () => {
+      pm = Math.min(1000, pm + 40 + Math.random() * 90);
+      if (fail === '4' && pm > 420) return say({ ev: 'failed', kind: 'rolledback', code: 4, log: 'x.log' });
+      say({ ev: 'progress', stage: 2, permille: Math.round(pm) });
+      if (pm < 1000) setTimeout(tick, 180 + Math.random() * 200);
+      else { say({ ev: 'progress', stage: 3, permille: 1000 }); setTimeout(() => say({ ev: 'done', dir: 'C:\\Program Files\\Tesseract', desktop: true }), 500); }
+    };
+    setTimeout(tick, elevate + 1400);
+  };
   return {
     post(m) {
       if (m.cmd === 'hello' || m.cmd === 'refresh') say(init());
       if (m.cmd === 'pick') say({ ev: 'dir', dir: m.dir.startsWith('C:') ? 'D:\\Apps\\Tesseract' : 'C:\\Program Files\\Tesseract' });
       // fail=open: an elevated window whose Explorer did not start the app (the page says how)
       if (m.cmd === 'open' && q.get('fail') === 'open') say({ ev: 'openManual' });
-      if (m.cmd === 'install') {
-        const fail = q.get('fail');
-        if (fail === 'disk') return say({ ev: 'failed', kind: 'disk', need: 312e6, free: 118e6, drive: 'C:' });
-        say({ ev: 'step', step: 'prepare' });
-        // a running Tesseract is closed first (rm.rs); fail=running: it would not quit;
-        // fail=busy: it quit, another program still has one of its files loaded
-        if (q.get('running') === '1' || fail === 'running' || fail === 'busy') setTimeout(() => say({ ev: 'step', step: 'close' }), 150);
-        if (fail === 'running') return setTimeout(() => say({ ev: 'failed', kind: 'running' }), 1400);
-        if (fail === 'busy') return setTimeout(() => say({ ev: 'failed', kind: 'busy', apps: ['Backup Agent'] }), 1400);
-        setTimeout(() => say({ ev: 'step', step: 'elevate' }), 300);
-        if (fail === 'decline') return setTimeout(() => say({ ev: 'declined' }), 1400);
-        let pm = 0;
-        setTimeout(() => say({ ev: 'progress', stage: 1, permille: 0 }), 1200);
-        const tick = () => {
-          pm = Math.min(1000, pm + 40 + Math.random() * 90);
-          if (fail === '4' && pm > 420) return say({ ev: 'failed', kind: 'rolledback', code: 4, log: 'x.log' });
-          say({ ev: 'progress', stage: 2, permille: Math.round(pm) });
-          if (pm < 1000) setTimeout(tick, 180 + Math.random() * 200);
-          else { say({ ev: 'progress', stage: 3, permille: 1000 }); setTimeout(() => say({ ev: 'done', dir: 'C:\\Program Files\\Tesseract', desktop: true }), 500); }
-        };
-        setTimeout(tick, 1700);
-      }
+      if (m.cmd === 'install') play(q.get('fail'), q.get('running') === '1');
+      // the in-app update's run: the host starts it once the window shows; the app is still quitting
+      if (run === 'update' && m.cmd === 'shown') play(q.get('fail'), true);
+      if (run === 'update' && m.cmd === 'update') play(null, false);
     },
   };
 })();

@@ -123,7 +123,8 @@ test('diagnosis reasons: tiers.reason.<code> and .fix for the backend reason_cod
   const fix = cat['tiers.reason.latency_limit_exceeded.fix'].m;
   assert.match(fix, /\{max_ms, number, integer\}/);
   assert.doesNotMatch(fix, /800/);
-  assert.match(SRC, /max_ms: ceil\(\)/);
+  assert.match(SRC, /max_ms: ceil\(n\), limit: n && n\.latency_path === 'chain' \? 'chain' : 'primary'/);
+  assert.match(fix, /\{limit, select, chain \{/);
 });
 
 /* --------------------------------------------------------------- browser */

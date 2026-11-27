@@ -384,7 +384,8 @@ def test_running_manager_chain_is_deep_copied_and_commits_only_target_health(
     assert _manager_state(manager)["runtime_nodes"]["tier3"] == manager_before["runtime_nodes"]["tier3"]
     committed_gateway = manager.runtime_nodes["exit"][0]
     assert committed_gateway.address == "gateway.example"
-    assert committed_gateway.extra == {}
+    # a manual chain check is judged by the chain limit and says so
+    assert committed_gateway.extra == {"latency_policy_path": "chain"}
     assert committed_gateway.status == NodeStatus.ALIVE
     assert committed_gateway.latency_ms == 86.0
     assert committed_gateway.last_checked_at == "2026-08-02T00:00:02+00:00"

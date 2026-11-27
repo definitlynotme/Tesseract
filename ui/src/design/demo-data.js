@@ -138,7 +138,7 @@ export function configValues(F, lang) {
     routing: { rules: { direct: ['suffix:example.cn'], proxy: [], reject: [], raw: [], rule_sets: [], compatibility_defaults: [] }, rule_order: ['direct', 'proxy', 'reject'], rule_providers: {},
       // 配置整理 P2: the one list and the rule sets the sidecar projects of the lists above
       rule_list: [{ kind: 'suffix', value: 'example.cn', to: 'direct' }], providers: [] },
-    latency: { primary_gateway_max_latency_ms: F.latCeiling },
+    latency: { primary_gateway_max_latency_ms: F.latCeiling, gateway_max_latency_ms: 6000 },
     sources: BASTION_SOURCES.map(s => ({ ...s })),
     alerts: { notify: { ...NOTIFY_DEFAULTS, events: NOTIFY_DEFAULTS.events.slice() } },
     ui: { language: lang, theme: 'light', overview_auto_exit_lookup: true },

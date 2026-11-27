@@ -28,6 +28,11 @@ window.STRINGS = {
     sub_unchanged: '没有做任何改动。', sub_rolledback: '已还原到安装前。',
     declined: '没有获得管理员授权，没有做任何改动。',
     o_manual: '没能从这里打开 Tesseract。从开始菜单打开它。',
+    // the in-app update's run (src/main.rs Mode::Update): starts at once, closes itself when done
+    u_title: '没有完成更新', u_later: '稍后',
+    u_uac: '在「用户帐户控制」中选择「是」。没有看到它时，点任务栏上闪烁的按钮。',
+    u_opening: '正在打开 Tesseract…', u_back: '关闭此窗口后，Tesseract 会重新打开。',
+    u_rolledback: '复制文件时出错，可能有文件正被使用。稍等片刻后重试。',
   },
   en_US: {
     min: 'Minimize', close: 'Close',
@@ -53,6 +58,10 @@ window.STRINGS = {
     sub_unchanged: 'Nothing was changed.', sub_rolledback: 'Everything was rolled back.',
     declined: 'Administrator permission was not given. Nothing was changed.',
     o_manual: 'Tesseract could not be opened from here. Open it from the Start menu.',
+    u_title: 'The update did not finish', u_later: 'Later',
+    u_uac: 'Choose Yes in User Account Control. If you don’t see it, click the flashing button on the taskbar.',
+    u_opening: 'Opening Tesseract…', u_back: 'Tesseract opens again when this window closes.',
+    u_rolledback: 'Copying files failed; a file may be in use. Wait a moment, then retry.',
   },
   de_DE: {
     min: 'Minimieren', close: 'Schließen',
@@ -78,6 +87,10 @@ window.STRINGS = {
     sub_unchanged: 'Es wurde nichts geändert.', sub_rolledback: 'Alle Änderungen wurden zurückgenommen.',
     declined: 'Keine Administratorberechtigung erteilt. Es wurde nichts geändert.',
     o_manual: 'Tesseract konnte von hier aus nicht geöffnet werden. Über das Startmenü öffnen.',
+    u_title: 'Das Update wurde nicht abgeschlossen', u_later: 'Später',
+    u_uac: 'Wählen Sie in der Benutzerkontensteuerung „Ja“. Wenn sie nicht zu sehen ist, klicken Sie auf die blinkende Schaltfläche in der Taskleiste.',
+    u_opening: 'Tesseract wird geöffnet…', u_back: 'Tesseract wird wieder geöffnet, wenn dieses Fenster geschlossen wird.',
+    u_rolledback: 'Kopieren fehlgeschlagen; eine Datei ist eventuell in Gebrauch. Einen Moment warten und wiederholen.',
   },
   es_ES: {
     min: 'Minimizar', close: 'Cerrar',
@@ -103,6 +116,10 @@ window.STRINGS = {
     sub_unchanged: 'No se cambió nada.', sub_rolledback: 'Se deshicieron todos los cambios.',
     declined: 'No se concedió permiso de administrador. No se cambió nada.',
     o_manual: 'No se pudo abrir Tesseract desde aquí. Ábrelo desde el menú Inicio.',
+    u_title: 'La actualización no terminó', u_later: 'Más tarde',
+    u_uac: 'Elige Sí en Control de cuentas de usuario. Si no lo ves, haz clic en el botón que parpadea en la barra de tareas.',
+    u_opening: 'Abriendo Tesseract…', u_back: 'Tesseract se vuelve a abrir al cerrar esta ventana.',
+    u_rolledback: 'Error al copiar archivos; puede que uno esté en uso. Espera un momento y reintenta.',
   },
   fr_FR: {
     min: 'Réduire', close: 'Fermer',
@@ -128,6 +145,10 @@ window.STRINGS = {
     sub_unchanged: 'Rien n’a été modifié.', sub_rolledback: 'Toutes les modifications ont été annulées.',
     declined: 'L’autorisation administrateur n’a pas été accordée. Rien n’a été modifié.',
     o_manual: 'Impossible d’ouvrir Tesseract d’ici. Ouvrez-le depuis le menu Démarrer.',
+    u_title: 'La mise à jour n’a pas abouti', u_later: 'Plus tard',
+    u_uac: 'Choisissez Oui dans le Contrôle de compte d’utilisateur. S’il n’apparaît pas, cliquez sur le bouton qui clignote dans la barre des tâches.',
+    u_opening: 'Ouverture de Tesseract…', u_back: 'Tesseract se rouvre à la fermeture de cette fenêtre.',
+    u_rolledback: 'La copie des fichiers a échoué ; un fichier est peut-être utilisé. Patientez un instant, puis réessayez.',
   },
   pt_BR: {
     min: 'Minimizar', close: 'Fechar',
@@ -153,6 +174,10 @@ window.STRINGS = {
     sub_unchanged: 'Nada foi alterado.', sub_rolledback: 'Todas as alterações foram desfeitas.',
     declined: 'A permissão de administrador não foi concedida. Nada foi alterado.',
     o_manual: 'Não foi possível abrir o Tesseract daqui. Abra-o pelo menu Iniciar.',
+    u_title: 'A atualização não foi concluída', u_later: 'Mais tarde',
+    u_uac: 'Escolha Sim no Controle de Conta de Usuário. Se ele não aparecer, clique no botão que pisca na barra de tarefas.',
+    u_opening: 'Abrindo o Tesseract…', u_back: 'O Tesseract abre de novo quando esta janela fechar.',
+    u_rolledback: 'Falha ao copiar arquivos; algum pode estar em uso. Aguarde um momento e tente de novo.',
   },
   ja_JP: {
     min: '最小化', close: '閉じる',
@@ -178,6 +203,10 @@ window.STRINGS = {
     sub_unchanged: '何も変更されていません。', sub_rolledback: 'すべての変更を元に戻しました。',
     declined: '管理者の許可が得られませんでした。何も変更されていません。',
     o_manual: 'ここから Tesseract を開けませんでした。スタート メニューから開いてください。',
+    u_title: '更新を完了できませんでした', u_later: '後で',
+    u_uac: 'ユーザー アカウント制御で［はい］を選んでください。表示されない場合は、タスク バーで点滅しているボタンをクリックしてください。',
+    u_opening: 'Tesseract を開いています…', u_back: 'このウィンドウを閉じると Tesseract がもう一度開きます。',
+    u_rolledback: 'ファイルのコピーに失敗しました。使用中のファイルがある可能性があります。少し待ってから再試行してください。',
   },
   ko_KR: {
     min: '최소화', close: '닫기',
@@ -203,6 +232,10 @@ window.STRINGS = {
     sub_unchanged: '아무것도 변경되지 않았습니다.', sub_rolledback: '모든 변경을 되돌렸습니다.',
     declined: '관리자 권한을 받지 못했습니다. 아무것도 변경되지 않았습니다.',
     o_manual: '여기에서 Tesseract를 열지 못했습니다. 시작 메뉴에서 여세요.',
+    u_title: '업데이트를 완료하지 못했습니다', u_later: '나중에',
+    u_uac: '사용자 계정 컨트롤에서 [예]를 선택하세요. 보이지 않으면 작업 표시줄에서 깜박이는 단추를 클릭하세요.',
+    u_opening: 'Tesseract를 여는 중…', u_back: '이 창을 닫으면 Tesseract가 다시 열립니다.',
+    u_rolledback: '파일 복사에 실패했습니다. 사용 중인 파일이 있을 수 있습니다. 잠시 기다린 뒤 다시 시도하세요.',
   },
   ru_RU: {
     min: 'Свернуть', close: 'Закрыть',
@@ -228,5 +261,9 @@ window.STRINGS = {
     sub_unchanged: 'Ничего не изменено.', sub_rolledback: 'Все изменения отменены.',
     declined: 'Права администратора не предоставлены. Ничего не изменено.',
     o_manual: 'Не удалось открыть Tesseract отсюда. Откройте его из меню «Пуск».',
+    u_title: 'Обновление не завершено', u_later: 'Позже',
+    u_uac: 'Выберите «Да» в окне контроля учётных записей. Если его не видно, нажмите мигающую кнопку на панели задач.',
+    u_opening: 'Открытие Tesseract…', u_back: 'Tesseract откроется снова, когда это окно закроется.',
+    u_rolledback: 'Не удалось скопировать файлы; возможно, файл занят. Подождите немного и повторите.',
   },
 };

@@ -358,7 +358,9 @@ V1_DTOS = {
              "reason_code": "str?", "protocol": "str", "latency_ms": "uint?",
              "subscription_id?": "str?",
              # T-P4-C2 #4 (K-5) / #3 (K-2).
-             "slow?": "bool", "last_checked_at_ms?": "uint?"},
+             "slow?": "bool", "last_checked_at_ms?": "uint?",
+             # 2026-11-27: which latency limit judged the node (chain / direct).
+             "latency_path?": "chain|direct?"},
     "Subscription": {"id": "str", "name": "str", "tier": "tier", "enabled": "bool",
                      "display": "str", "total": "uint", "healthy": "uint",
                      "visibility": "unknown|pending|current|previous", "refreshing": "bool",

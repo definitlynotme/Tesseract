@@ -187,7 +187,8 @@ def test_whitelist_and_secrets_in_names_and_other_fields():
     dto = first(result)[0]
     # T-P4-C1 #3 / T-P4-C2 #3-#4: optional v1 additions (PROTOCOL §17).
     assert set(dto) == {"id", "name", "tier", "kind", "enabled", "status", "reason_code", "protocol", "latency_ms",
-                        "subscription_id", "slow", "last_checked_at_ms"}
+                        "subscription_id", "slow", "last_checked_at_ms",
+                        "latency_path"}
     assert dto["reason_code"] == "tls_failed"
     wire = json.dumps(result, ensure_ascii=False)
     assert all(secret not in wire for secret in (password, uuid, uri, "https://example.invalid/private-sub", "secret junk"))

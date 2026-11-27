@@ -25,6 +25,15 @@ DEFAULT_MIHOMO_WORK_DIR = "data/mihomo"
 DEFAULT_PRIMARY_GATEWAY_MAX_LATENCY_MS = 800
 MIN_PRIMARY_GATEWAY_MAX_LATENCY_MS = 100
 MAX_PRIMARY_GATEWAY_MAX_LATENCY_MS = 5000
+# Chain measurements (a Gateway through the fallback layers, or a node through
+# the selected Gateway) have their own, looser ceiling: they measure the extra
+# hop. Direct measurements of every strict tier keep the primary ceiling.
+DEFAULT_GATEWAY_MAX_LATENCY_MS = 6000
+MIN_GATEWAY_MAX_LATENCY_MS = 500
+MAX_GATEWAY_MAX_LATENCY_MS = 15000
+# Headroom the Gateway chain probe gets above the Gateway ceiling, so a
+# measurement just over the limit is still observed (and judged over-limit).
+GATEWAY_CHAIN_PROBE_HEADROOM_MS = 1000
 
 
 @dataclass(frozen=True)
@@ -337,7 +346,7 @@ def slow_threshold_ms_from_testing(testing_config: Any, default_ms: int = 2000) 
 
 
 def validate_primary_gateway_max_latency_ms(value: Any) -> int:
-    """Validate the persisted Tier1/Tier2/Gateway latency ceiling."""
+    """Validate the persisted Tier1/Tier2 (primary) latency ceiling."""
 
     if (
         isinstance(value, bool)
@@ -355,7 +364,7 @@ def validate_primary_gateway_max_latency_ms(value: Any) -> int:
 
 
 def primary_gateway_max_latency_ms_from_testing(testing_config: Any) -> int:
-    """Return a safe latency ceiling for Tier1, Tier2, and Gateway checks."""
+    """Return a safe latency ceiling for Tier1 and Tier2 checks."""
 
     testing = testing_config if isinstance(testing_config, dict) else {}
     try:
@@ -380,6 +389,68 @@ def primary_gateway_slow_threshold_ms_from_testing(testing_config: Any) -> float
     """Return the exact ``max_latency_ms / 2`` strict-tier boundary."""
 
     return primary_gateway_max_latency_ms_from_testing(testing_config) / 2.0
+
+
+def validate_gateway_max_latency_ms(value: Any) -> int:
+    """Validate the persisted chain latency ceiling (``gateway_max_latency_ms``)."""
+
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, int)
+        or not MIN_GATEWAY_MAX_LATENCY_MS <= value <= MAX_GATEWAY_MAX_LATENCY_MS
+    ):
+        raise ValueError(
+            "testing.gateway_max_latency_ms must be an integer "
+            f"between {MIN_GATEWAY_MAX_LATENCY_MS} and "
+            f"{MAX_GATEWAY_MAX_LATENCY_MS}"
+        )
+    return value
+
+
+def gateway_max_latency_ms_from_testing(testing_config: Any) -> int:
+    """Return a safe chain ceiling; a missing key (older installs) is the default.
+
+    It never falls back to ``primary_gateway_max_latency_ms``: a customized
+    primary ceiling stays with the main layer only.
+    """
+
+    testing = testing_config if isinstance(testing_config, dict) else {}
+    try:
+        return validate_gateway_max_latency_ms(testing.get("gateway_max_latency_ms"))
+    except ValueError:
+        return DEFAULT_GATEWAY_MAX_LATENCY_MS
+
+
+# Latency-policy scopes whose measurement ran through a chain.
+CHAIN_LATENCY_SCOPES = frozenset({"gateway_chain", "manual_chain"})
+LATENCY_PATH_CHAIN = "chain"
+LATENCY_PATH_DIRECT = "direct"
+
+
+def latency_path_for_scope(scope: Any) -> str:
+    """``chain`` for a measurement through a chain, ``direct`` otherwise."""
+
+    return LATENCY_PATH_CHAIN if str(scope or "").strip().lower() in CHAIN_LATENCY_SCOPES else LATENCY_PATH_DIRECT
+
+
+def strict_latency_limit_ms_for_path(testing_config: Any, path: Any) -> int:
+    """The hard ceiling of a strict-tier measurement, chosen by how it was measured:
+    the chain ceiling for ``chain``, the primary ceiling otherwise (any tier)."""
+
+    if str(path or "").strip().lower() == LATENCY_PATH_CHAIN:
+        return gateway_max_latency_ms_from_testing(testing_config)
+    return primary_gateway_max_latency_ms_from_testing(testing_config)
+
+
+def strict_latency_limit_ms_for_scope(testing_config: Any, scope: Any) -> int:
+    return strict_latency_limit_ms_for_path(testing_config, latency_path_for_scope(scope))
+
+
+def gateway_chain_probe_timeout_ms(config: dict[str, Any]) -> int:
+    """Chain-probe timeout: the probe default, raised to cover the Gateway ceiling."""
+
+    limit = gateway_max_latency_ms_from_testing(testing_block(config))
+    return max(default_probe_timeout_ms(config), limit + GATEWAY_CHAIN_PROBE_HEADROOM_MS)
 
 
 def helper_block_from_testing(testing_config: Any, key: str) -> dict[str, Any]:

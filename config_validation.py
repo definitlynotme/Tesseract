@@ -14,7 +14,10 @@ from alert_config import (
 from config_item_identity import source_entry_value
 from config_utils import subscription_entry_url
 from dns_resolver_policy import DNS_MODES, DNS_MODE_CUSTOM, dns_config_list, normalize_dns_mode
-from runtime_settings import validate_primary_gateway_max_latency_ms
+from runtime_settings import (
+    validate_gateway_max_latency_ms,
+    validate_primary_gateway_max_latency_ms,
+)
 
 
 def validate_local_config(payload: dict[str, Any]) -> None:
@@ -113,6 +116,8 @@ def validate_testing_local(testing: Any) -> None:
         validate_primary_gateway_max_latency_ms(
             testing["primary_gateway_max_latency_ms"]
         )
+    if "gateway_max_latency_ms" in testing:
+        validate_gateway_max_latency_ms(testing["gateway_max_latency_ms"])
 
 
 def validate_tier1_local(nodes: Any) -> None:

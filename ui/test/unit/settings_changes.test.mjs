@@ -47,7 +47,7 @@ const VALUES = () => ({
     ],
     providers: [{ name: 'cn-sites', type: 'http', behavior: 'domain', format: 'yaml', url: 'https://rules.example.net/cn.yaml' },
       { name: 'private', type: 'http', behavior: 'classical', url_hidden: true }, { name: 'local', type: 'file', behavior: 'ipcidr' }] },
-  latency: { primary_gateway_max_latency_ms: 800 },
+  latency: { primary_gateway_max_latency_ms: 800, gateway_max_latency_ms: 6000 },
   sources: [{ id: 'src-1', kind: 'github_repos', display: 'GitHub', enabled: true, hint: 'e•••/f•••' }, { id: 'src-2', kind: 'subscription_urls', display: 'Sub', enabled: false }],
   alerts: { notify: { enabled: true, events: ['connection', 'tier_fallback', 'update'], sound: true } },
   ui: { language: 'zh_CN', overview_auto_exit_lookup: true, start_in_tray_on_autostart: true },
@@ -138,6 +138,7 @@ const ONE = [
   ['dnsMode', d => { d.dnsMode = 'custom'; }, 'dns', { mode: 'custom' }],
   ['dnsRules', d => { d.dnsRules = false; }, 'dns', { respect_rules: false }],
   ['latency', d => { d.latency = 1200; }, 'latency', { primary_gateway_max_latency_ms: 1200 }],
+  ['gwLatency', d => { d.gwLatency = 9000; }, 'latency', { gateway_max_latency_ms: 9000 }],
   ['bastionOn', d => { d.bastionOn = false; }, 'bastion', { enabled: false }],
   ['bastionMin', d => { d.bastionMin = 7; }, 'bastion', { min_alive_nodes: 7 }],
 ];
@@ -400,7 +401,7 @@ test('fieldKey: an Error.field lands on its row (holds, port conflicts after B-2
     'killswitch.additional_whitelist[0]': 'ksExtra', 'killswitch.dns_whitelist': 'ksDnsList', 'dns.mode': 'dnsMode', 'dns.nameserver[1]': 'dnsList',
     'routing.rules.proxy[3]': 'rules', 'routing.rule_order': 'rules', 'routing.rule_list': 'rules', 'routing.rule_list[3].of[1].value': 'rules',
     'routing.providers': 'ruleSets', 'routing.providers[1].url': 'ruleSets', 'sources.items[1].value': 'sources',
-    'bastion.min_alive_nodes': 'bastionMin', 'ui.language': 'lang', 'ui.start_in_tray_on_autostart': 'tray', 'latency.primary_gateway_max_latency_ms': 'latency',
+    'bastion.min_alive_nodes': 'bastionMin', 'ui.language': 'lang', 'ui.start_in_tray_on_autostart': 'tray', 'latency.primary_gateway_max_latency_ms': 'latency', 'latency.gateway_max_latency_ms': 'gwLatency',
     'alerts.notify.sound': 'nSound', 'alerts.notify.events': 'nConn', 'alerts.notify.enabled': 'nOn', '': null };
   for (const [f, k] of Object.entries(table)) assert.equal(C.fieldKey(f), k, f);
 });

@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Solicitação inválida",
   "tiers.reason.invalid_request.fix": "Feche os detalhes, abra-os de novo e teste novamente.",
   "tiers.reason.latency_limit_exceeded": "Latência acima do limite",
-  "tiers.reason.latency_limit_exceeded.fix": "O limite é de {max_ms, number, integer} ms. Você pode ajustá-lo em Configurações › Qualidade da conexão.",
+  "tiers.reason.latency_limit_exceeded.fix": "O limite é de {max_ms, number, integer} ms. Você pode ajustá-lo em Configurações › Qualidade da conexão{limit, select, chain { › Limite de latência da cadeia Gateway (contingência)} other {}}.",
   "tiers.reason.node_changed": "Nó alterado",
   "tiers.reason.node_changed.fix": "A configuração do nó mudou durante o teste. Basta testar novamente.",
   "tiers.reason.node_index_unavailable": "Lista de nós não está pronta",

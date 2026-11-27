@@ -31,7 +31,7 @@ export const SECTION = Object.freeze({
   rules: 'routing', ruleSets: 'routing',
   bypass: 'network', lan: 'network', ipv6: 'network', portMixed: 'network', portSub: 'network', egress: 'network', egressRetry: 'network',
   dnsMode: 'dns', dnsRules: 'dns', dnsList: 'dns',
-  latency: 'latency', bastionOn: 'bastion', bastionMin: 'bastion', sources: 'sources',
+  latency: 'latency', gwLatency: 'latency', bastionOn: 'bastion', bastionMin: 'bastion', sources: 'sources',
   // 提醒 (10-30 redesign): alerts.notify {enabled, events, sound}
   nOn: 'alerts', nConn: 'alerts', nTier: 'alerts', nUpd: 'alerts', nSound: 'alerts',
 });
@@ -48,7 +48,7 @@ const EFFECT = {
   lang: 'instant', tray: 'instant', autostart: 'instant',
   rules: 'reload', ruleSets: 'reload', bypass: 'instant',
   lan: 'restart', ipv6: 'restart', portMixed: 'restart', portSub: 'restart', egress: 'instant', egressRetry: 'instant',
-  dnsMode: 'reload', dnsRules: 'reload', latency: 'recheck', bastionOn: 'instant', bastionMin: 'instant', sources: 'instant',
+  dnsMode: 'reload', dnsRules: 'reload', latency: 'recheck', gwLatency: 'recheck', bastionOn: 'instant', bastionMin: 'instant', sources: 'instant',
   nOn: 'instant', nConn: 'instant', nTier: 'instant', nUpd: 'instant', nSound: 'instant',
 };
 export const RANK = Object.freeze({ instant: 0, recheck: 1, reload: 2, restart: 3 });
@@ -407,6 +407,8 @@ export function fromSnapshot(values, secretFields) {
     put('dnsList', rows, ok && !!obj(v.dns));
   }
   put('latency', lat.primary_gateway_max_latency_ms, isInt(lat.primary_gateway_max_latency_ms));
+  // the chain ceiling (the sidecar projects its effective value; an older one leaves the row read-only)
+  put('gwLatency', lat.gateway_max_latency_ms, isInt(lat.gateway_max_latency_ms));
   put('bastionOn', bas.enabled, isBool(bas.enabled));
   put('bastionMin', bas.min_alive_nodes, isInt(bas.min_alive_nodes));
   // 配置整理 P2: the one list (routing.rule_list); an older projection gives the three lists
@@ -476,6 +478,7 @@ export function toChanges({ draft, base, keys, adapt = null }) {
         }
         break;
       case 'latency': s.primary_gateway_max_latency_ms = +d; break;
+      case 'gwLatency': s.gateway_max_latency_ms = +d; break;
       case 'bastionOn': s.enabled = !!d; break;
       case 'bastionMin': s.min_alive_nodes = +d; break;
       // 配置整理 P2: the whole list and the whole set of rule sets (each replaces the stored one)
@@ -516,7 +519,7 @@ const FIELD_KEY = [
   [/^network\.mihomo_mixed_port\b/, 'portMixed'], [/^network\.subscription(_port|\.port)\b/, 'portSub'],
   [/^network\.egress_recovery\.retry_source_refresh\b/, 'egressRetry'], [/^network\.egress_recovery\b/, 'egress'],
   [/^dns\.mode\b/, 'dnsMode'], [/^dns\.respect_rules\b/, 'dnsRules'], [/^dns\b/, 'dnsList'],
-  [/^latency\b/, 'latency'], [/^bastion\.enabled\b/, 'bastionOn'], [/^bastion\.min_alive_nodes\b/, 'bastionMin'],
+  [/^latency\.gateway_max_latency_ms\b/, 'gwLatency'], [/^latency\b/, 'latency'], [/^bastion\.enabled\b/, 'bastionOn'], [/^bastion\.min_alive_nodes\b/, 'bastionMin'],
   [/^sources\b/, 'sources'],
   [/^alerts\.notify\.sound\b/, 'nSound'], [/^alerts\.notify\.events\b/, 'nConn'], [/^alerts\b/, 'nOn'],
 ];

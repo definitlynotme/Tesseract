@@ -16,7 +16,7 @@ from gateway_selection import gateway_identity
 from models import Node, NodeStatus
 from node_status_view import _runtime_failure_display_category
 
-TESTING = {"primary_gateway_max_latency_ms": 1900}
+TESTING = {"primary_gateway_max_latency_ms": 1900, "gateway_max_latency_ms": 3000}
 
 
 def _gateway(name: str = "isp", *, status: NodeStatus = NodeStatus.DEAD, reason: str | None = "timed out") -> Node:
@@ -118,7 +118,8 @@ def test_direct_failure_with_usable_upstream_passes_through_the_chain() -> None:
 
 
 def test_chain_latency_still_follows_the_gateway_latency_limit() -> None:
-    prober = _Prober({"state": "success", "latency_ms": 2400.0, "reason": "ok"})
+    # A chain check is held to the chain limit (3000), not the primary one (1900).
+    prober = _Prober({"state": "success", "latency_ms": 3400.0, "reason": "ok"})
 
     outcome, _reads = _resolve([_gateway()], prober=prober, upstream=[_sentinel()])
 
@@ -126,6 +127,18 @@ def test_chain_latency_still_follows_the_gateway_latency_limit() -> None:
     assert node.status == NodeStatus.DEAD
     assert node.suspicious_reason == "latency_limit_exceeded"
     assert node.extra["latency_policy_scope"] == "gateway_chain"
+    assert node.extra["latency_policy_limit_ms"] == 3000
+
+
+def test_chain_latency_over_the_primary_limit_passes_under_the_gateway_limit() -> None:
+    # The field case: a chain pass of 2400 ms, over the primary 1900, under the chain limit 3000.
+    prober = _Prober({"state": "success", "latency_ms": 2400.0, "reason": "ok"})
+
+    outcome, _reads = _resolve([_gateway()], prober=prober, upstream=[_sentinel()])
+
+    (node,) = outcome.nodes
+    assert node.status == NodeStatus.SLOW  # over half of 3000
+    assert node.suspicious_reason is None
 
 
 def test_direct_and_chain_failure_is_gateway_unreachable() -> None:

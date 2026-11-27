@@ -1144,8 +1144,8 @@
     "_desc": "原因词：节点能连通，但延迟超过上限"
   },
   "tiers.reason.latency_limit_exceeded.fix": {
-    "m": "上限为 {max_ms, number, integer} ms，可在 配置 › 连接质量 调整。",
-    "_desc": "原因 latency_limit_exceeded 的说明：max_ms 为当前的延迟上限（毫秒）；「配置 › 连接质量」是配置页的位置"
+    "m": "上限为 {max_ms, number, integer} ms，可在 配置 › 连接质量{limit, select, chain { › 出口经回退层的链路延迟上限} other {}} 调整。",
+    "_desc": "原因 latency_limit_exceeded 的说明：max_ms 为判定该节点的延迟上限（毫秒）；limit 为 chain（经链路测得，指向「出口经回退层的链路延迟上限」）或 primary（直接测得）；「配置 › 连接质量」是配置页的位置"
   },
   "tiers.reason.node_changed": {
     "m": "节点已变更",

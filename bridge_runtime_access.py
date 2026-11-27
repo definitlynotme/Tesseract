@@ -684,7 +684,7 @@ def config_projection(config: Mapping[str, Any], sources: Mapping[str, Any], *, 
     # holds the defaults); the retired channel blocks are never projected.
     from alert_policy import notify_settings
     values = {"network": network, "dns": dns, "routing": routing,
-              "latency": fields(config.get("testing"), {"primary_gateway_max_latency_ms": True}, "latency"),
+              "latency": latency_values(config.get("testing"), fields),
               "sources": source_rows, "alerts": {"notify": notify_settings(config.get("alerts"))},
               "ui": fields(config.get("ui"), _UI_FIELDS, "ui"),
               "autostart": {},  # RuntimeReadAccess adds the authoritative registry fact.
@@ -692,6 +692,17 @@ def config_projection(config: Mapping[str, Any], sources: Mapping[str, Any], *, 
               "killswitch": fields(config.get("killswitch"), _KILLSWITCH_FIELDS, "killswitch"),
               "bastion": bastion_values(config)}
     return values, tuple(sorted(secret_fields))
+
+
+def latency_values(testing: Any, fields: Any) -> dict[str, Any]:
+    """The latency section: both ceilings. ``gateway_max_latency_ms`` is
+    projected with its effective value, so an install that predates the key
+    (default 6000) shows a writable row instead of an unknown one."""
+
+    from runtime_settings import gateway_max_latency_ms_from_testing
+    values = fields(testing, {"primary_gateway_max_latency_ms": True, "gateway_max_latency_ms": True}, "latency")
+    values["gateway_max_latency_ms"] = gateway_max_latency_ms_from_testing(testing)
+    return values
 
 
 def bastion_values(config: Mapping[str, Any]) -> dict[str, Any]:

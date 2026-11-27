@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Requête invalide",
   "tiers.reason.invalid_request.fix": "Fermez les détails, rouvrez-les, puis relancez le test.",
   "tiers.reason.latency_limit_exceeded": "Latence trop élevée",
-  "tiers.reason.latency_limit_exceeded.fix": "La limite est de {max_ms, number, integer} ms. Vous pouvez la modifier dans Paramètres › Qualité de la connexion.",
+  "tiers.reason.latency_limit_exceeded.fix": "La limite est de {max_ms, number, integer} ms. Vous pouvez la modifier dans Paramètres › Qualité de la connexion{limit, select, chain { › Limite de latence de la chaîne Gateway (repli)} other {}}.",
   "tiers.reason.node_changed": "Nœud modifié",
   "tiers.reason.node_changed.fix": "La configuration du nœud a changé pendant le test. Relancez simplement le test.",
   "tiers.reason.node_index_unavailable": "Liste des nœuds non prête",

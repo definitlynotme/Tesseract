@@ -274,3 +274,78 @@ def test_real_capture_state_mismatch_remains_an_invariant_failure(phase, active)
 
     assert len(diagnostics) == 2
     assert all(item[1]["fail_closed"] is True for item in diagnostics)
+
+
+def _re_admission_with_held_proxy():
+    """Admission after a rollback that kept Windows on Tesseract (11-25).
+
+    This run's READY already served through the Windows proxy, so the
+    rollback left the proxy on the mixed port while the lifecycle went back
+    to no-capture (tests/test_runtime_rollback_keeps_system_proxy.py).
+    """
+
+    runtime, runner, events, diagnostics = _system_proxy_admission()
+    runtime.system_proxy.enabled = True
+    runtime.system_proxy.active = True
+    runtime.system_proxy.is_target_active = lambda: runtime.system_proxy.active
+    runtime._desired_running = True
+    runtime._stop_request_pending = False
+    runtime._system_proxy_capture_served_revision = runtime._lifecycle_revision
+    return runtime, runner, events, diagnostics
+
+
+def test_the_first_ready_records_that_this_run_serves_through_the_proxy():
+    runtime, runner, _events, _diagnostics = _system_proxy_admission()
+    runtime.system_proxy.enabled = True
+
+    assert _admit(runtime, runner)["status"] == 204
+
+    assert runtime._system_proxy_capture_served_revision == runtime._lifecycle_revision
+
+
+def test_a_failed_re_admission_keeps_the_held_proxy_instead_of_going_direct():
+    runtime, runner, events, _diagnostics = _re_admission_with_held_proxy()
+
+    def fail_host(**_kwargs):
+        raise TimeoutError("host path did not pass")
+
+    runtime._verify_system_proxy_host_capture = fail_host
+    with pytest.raises(TimeoutError, match="host path did not pass"):
+        _admit(runtime, runner)
+
+    assert ("capture-restored",) not in events
+    assert runtime.system_proxy.active is True
+    assert runtime._current_core_runtime_phase() == "formal_no_capture"
+    assert runtime.manager.tier3_traffic_capture_active is False
+    assert ("readiness", RuntimeEgressReadinessState.READY) not in events
+
+
+def test_a_held_proxy_still_returns_a_failed_ready_preparation_to_no_capture():
+    runtime, runner, events, _diagnostics = _re_admission_with_held_proxy()
+    runtime._try_arm_runtime_recovery = lambda **_kwargs: False
+
+    with pytest.raises(RuntimeControllerReadbackError, match="could not prepare"):
+        _admit(runtime, runner)
+
+    assert ("capture-restored",) not in events
+    assert runtime.system_proxy.active is True
+    # The next admission owns capture again: the lifecycle is no-capture.
+    assert runtime._current_core_runtime_phase() == "formal_no_capture"
+    assert runtime.manager.tier3_traffic_capture_active is False
+    assert ("capture-marker", True) in events
+    assert ("capture-marker", False) in events
+
+
+def test_a_stop_during_re_admission_still_restores_the_pre_start_proxy():
+    runtime, runner, events, _diagnostics = _re_admission_with_held_proxy()
+
+    def stop_during_arm(**_kwargs):
+        runtime.stop_event.set()
+        return True
+
+    runtime._try_arm_runtime_recovery = stop_during_arm
+    with pytest.raises(RuntimeStartCancelled):
+        _admit(runtime, runner)
+
+    assert ("capture-restored",) in events
+    assert runtime.system_proxy.active is False

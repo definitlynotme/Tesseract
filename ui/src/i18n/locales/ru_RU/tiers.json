@@ -285,7 +285,7 @@
   "tiers.reason.invalid_request": "Неверный запрос",
   "tiers.reason.invalid_request.fix": "Закройте сведения, откройте их снова и проверьте ещё раз.",
   "tiers.reason.latency_limit_exceeded": "Задержка превышает предел",
-  "tiers.reason.latency_limit_exceeded.fix": "Предел — {max_ms, number, integer} мс. Его можно изменить в разделе Настройки › Качество соединения.",
+  "tiers.reason.latency_limit_exceeded.fix": "Предел — {max_ms, number, integer} мс. Его можно изменить в разделе Настройки › Качество соединения{limit, select, chain { › Предел задержки цепочки Gateway (переключение)} other {}}.",
   "tiers.reason.node_changed": "Сервер изменён",
   "tiers.reason.node_changed.fix": "Конфигурация сервера изменилась во время проверки. Просто проверьте ещё раз.",
   "tiers.reason.node_index_unavailable": "Список серверов не готов",
